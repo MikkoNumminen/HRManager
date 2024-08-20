@@ -24,7 +24,7 @@ npm run dev
 
 ### Run tests
 
-npx test
+npm test
 
 ## Data model
 
