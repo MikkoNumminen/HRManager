@@ -10,8 +10,9 @@ import {
   header,
   inputField,
 } from "@/tailwindStyles";
-import { PersonSchema, TeamSchema } from "@/zodStyles";
+import { TeamSchema } from "@/zodStyles";
 import { getPersons } from "@/utilities";
+import { addManager, addMember } from "@/serverActions";
 
 // Server action, experimental
 async function createTeam(data: FormData) {
@@ -44,72 +45,6 @@ async function removeTeam(data: FormData) {
     },
   });
   redirect("/");
-}
-
-async function addManager(data: FormData) {
-  "use server";
-
-  const teamID = data.getAll("teamID") as string[];
-
-  if (!Array.isArray(teamID) || teamID.length === 0) {
-    throw new Error("No teamID selected");
-  }
-  const persons = await getPersons();
-  const selectedPerson = persons.find(
-    (person) => person.id === (data.get("personID") as string)
-  );
-  const personName = selectedPerson?.name;
-
-  console.log("data", data);
-
-  await prisma.team.update({
-    where: {
-      teamId: data.get("teamID") as string,
-    },
-    data: {
-      teamManagerId: personName,
-    },
-  });
-
-  redirect("..");
-}
-
-async function addMember(data: FormData) {
-  "use server";
-
-  const teamID = data.get("teamID") as string;
-  const personID = data.get("personID") as string;
-
-  if (!teamID) {
-    throw new Error("No teamID selected");
-  }
-  if (!personID) {
-    throw new Error("No personID selected");
-  }
-
-  const existingMember = await prisma.teamMember.findUnique({
-    where: {
-      personId_teamId: {
-        personId: personID,
-        teamId: teamID,
-      },
-    },
-  });
-
-  if (existingMember) {
-    throw new Error("Person is already a member of the team");
-  }
-
-  const newMember = await prisma.teamMember.create({
-    data: {
-      personId: personID,
-      teamId: teamID,
-    },
-  });
-
-  console.log("New Team Member created:", newMember);
-
-  redirect("..");
 }
 
 async function removeMember(data: FormData) {
@@ -151,7 +86,6 @@ async function removeMember(data: FormData) {
 
   redirect("..");
 }
-
 
 async function getTeams() {
   try {

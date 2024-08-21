@@ -1,5 +1,6 @@
 /*
- TODO: Create a public repo from: https://github.com/MikkoNumminen/HRM
+ TODO: Make sure all database entries are transactions! 
+       Move stuff from manageTeams to sercerActions 
  TODO: Refactor manage[personId]: Too many accept/cancel
  TODO: Refactor manageTeams page: Make similar to managePersons 
  TODO: Use Zod: Data integrity and type safety. KEEP UPDATE!
@@ -18,8 +19,6 @@
  TODO: Remove the rest of the Tailwind from the codebase?
  TODO: Make Persons to People
  TODO: aria-labels?
- TODO: Prisma: "Is this a transaction?" https://www.prisma.io/docs/orm/prisma-client/queries/transactions
-       Make sure that all database calls are transactions.
  TODO: Check if this is what is wanted: ON DELETE RESTRICT ON UPDATE CASCADE
 */
 

@@ -1,5 +1,7 @@
+// Using Prisma transaction to ensure atomicity
 "use server";
 import { prisma } from "@/db";
+import { redirect } from "next/navigation";
 
 // TODO: Function to get persons with validation: ZOD
 // TODO: getPerson(personId)
@@ -29,24 +31,41 @@ export async function createPerson(data: FormData) {
   if (typeof name !== "string" || name.length === 0) {
     throw new Error("Invalid Name");
   }
-  await prisma.person.create({ data: { name, position: "-", email: "-" } });
+
+  await prisma.$transaction(async (prisma) => {
+    await prisma.person.create({
+      data: {
+        name,
+        position: "-",
+        email: "-",
+      },
+    });
+  });
 }
 
 export async function removePerson(data: FormData) {
-  const personID = data.getAll("personID") as string[];
-  if (!Array.isArray(personID) || personID.length === 0) {
+  const personIDs = data.getAll("personID") as string[];
+  if (!Array.isArray(personIDs) || personIDs.length === 0) {
     throw new Error("No personID selected");
   }
-  await prisma.person.deleteMany({
-    where: {
-      id: { in: personID },
-    },
-  });
 
-  // TODO: When person is removed check if person is a team manager
+  await prisma.$transaction(async (prisma) => {
+    // Remove person from TeamMember records
+    await prisma.teamMember.deleteMany({
+      where: {
+        personId: { in: personIDs },
+      },
+    });
+
+    // Delete the person(s)
+    await prisma.person.deleteMany({
+      where: {
+        id: { in: personIDs },
+      },
+    });
+  });
 }
 
-// Update one personID for a new position
 export async function updatePosition(data: FormData) {
   const personID = data.get("personID")?.toString();
   if (!personID) {
@@ -58,17 +77,18 @@ export async function updatePosition(data: FormData) {
     throw new Error("New position is missing");
   }
 
-  await prisma.person.update({
-    where: {
-      id: personID,
-    },
-    data: {
-      position: newPosition,
-    },
+  await prisma.$transaction(async (prisma) => {
+    await prisma.person.update({
+      where: {
+        id: personID,
+      },
+      data: {
+        position: newPosition,
+      },
+    });
   });
 }
 
-// Update one personID for a new Email
 export async function updateEmail(data: FormData) {
   const personIDs = data.getAll("personID") as string[];
   if (!Array.isArray(personIDs) || personIDs.length === 0) {
@@ -76,19 +96,115 @@ export async function updateEmail(data: FormData) {
   }
 
   const newEmail = data.get("name")?.toString();
-
   if (!newEmail) {
     throw new Error("New Email is missing");
   }
 
-  for (const id of personIDs) {
-    await prisma.person.update({
+  await prisma.$transaction(async (prisma) => {
+    for (const id of personIDs) {
+      await prisma.person.update({
+        where: {
+          id: id,
+        },
+        data: {
+          email: newEmail,
+        },
+      });
+    }
+  });
+}
+
+export async function addManager(data: FormData) {
+  const teamID = data.getAll("teamID") as string[];
+  const personID = data.get("personID") as string;
+
+  if (!Array.isArray(teamID) || teamID.length === 0) {
+    throw new Error("No teamID selected");
+  }
+  if (!personID) {
+    throw new Error("No personID provided");
+  }
+
+  await prisma.$transaction(async (prisma) => {
+    const persons = await prisma.person.findMany();
+    const selectedPerson = persons.find((person) => person.id === personID);
+
+    if (!selectedPerson) {
+      throw new Error("Selected person not found");
+    }
+
+    // Update the team manager
+    await prisma.team.update({
       where: {
-        id: id,
+        teamId: teamID[0],
       },
       data: {
-        email: newEmail,
+        teamManagerId: selectedPerson.name,
       },
     });
+
+    // Check if the person is already a member of the team
+    const existingMember = await prisma.teamMember.findUnique({
+      where: {
+        personId_teamId: {
+          personId: personID,
+          teamId: teamID[0],
+        },
+      },
+    });
+
+    if (existingMember) {
+      throw new Error("Person is already a member of the team");
+    }
+
+    // Add the person as a team member
+    await prisma.teamMember.create({
+      data: {
+        personId: personID,
+        teamId: teamID[0],
+      },
+    });
+  });
+
+  redirect("/");
+}
+
+export async function addMember(data: FormData) {
+  const teamID = data.get("teamID")?.toString();
+  const personID = data.get("personID")?.toString();
+
+  if (!teamID) {
+    throw new Error("No teamID selected");
   }
+  if (!personID) {
+    throw new Error("No personID selected");
+  }
+
+  await prisma.$transaction(async (prisma) => {
+    const existingMember = await prisma.teamMember.findUnique({
+      where: {
+        personId_teamId: {
+          personId: personID,
+          teamId: teamID,
+        },
+      },
+    });
+
+    if (existingMember) {
+      throw new Error("Person is already a member of the team");
+    }
+
+    // Create a new team member record
+    const newMember = await prisma.teamMember.create({
+      data: {
+        personId: personID,
+        teamId: teamID,
+      },
+    });
+
+    console.log("New Team Member created:", newMember);
+  });
+
+  // Redirect to the previous page or a different location after successful creation
+  redirect("..");
 }

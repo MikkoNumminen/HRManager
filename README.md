@@ -1,4 +1,4 @@
-# Company HR management system
+# Company HR management system (v0.92)
 
 A system for managing employees, teams and departments in a company.
 
@@ -91,3 +91,11 @@ npm test
 - Deploy using Terraform **(IaaC)**
 
 ## Uses [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) for git commits
+
+# Current Patch Notes (0.92)
+
+### Features and Enhancements
+
+- **Fix:** Removing people now also removes them from every team and manager position.
+- **Fix:** Adding a manager to a team also adds as a member of the team.
+- **TODO:** Implement transactions for all database modifications (Completed: `serverActions.ts`).
