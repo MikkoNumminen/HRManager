@@ -12,80 +12,13 @@ import {
 } from "@/tailwindStyles";
 import { TeamSchema } from "@/zodStyles";
 import { getPersons } from "@/utilities";
-import { addManager, addMember } from "@/serverActions";
-
-// Server action, experimental
-async function createTeam(data: FormData) {
-  "use server";
-
-  const name = data.get("name")?.valueOf();
-  if (typeof name !== "string" || name.length === 0) {
-    throw new Error("Invalid Name");
-  }
-
-  await prisma.team.create({
-    data: {
-      teamName: name,
-      teamManagerId: "-",
-    },
-  });
-  redirect("/");
-}
-
-async function removeTeam(data: FormData) {
-  "use server";
-
-  const teamID = data.getAll("teamID") as string[];
-  if (!Array.isArray(teamID) || teamID.length === 0) {
-    throw new Error("No teamID selected");
-  }
-  await prisma.team.deleteMany({
-    where: {
-      teamId: { in: teamID },
-    },
-  });
-  redirect("/");
-}
-
-async function removeMember(data: FormData) {
-  "use server";
-
-  const teamID = data.get("teamID") as string;
-  const personID = data.get("personID") as string;
-
-  if (!teamID) {
-    throw new Error("No teamID selected");
-  }
-  if (!personID) {
-    throw new Error("No personID selected");
-  }
-
-  const existingMember = await prisma.teamMember.findUnique({
-    where: {
-      personId_teamId: {
-        personId: personID,
-        teamId: teamID,
-      },
-    },
-  });
-
-  if (!existingMember) {
-    throw new Error("Person is not a member of the team");
-  }
-
-  const deletedMember = await prisma.teamMember.delete({
-    where: {
-      personId_teamId: {
-        personId: personID,
-        teamId: teamID,
-      },
-    },
-  });
-
-  console.log("Team Member removed:", deletedMember);
-
-  redirect("..");
-}
+import {
+  addManager,
+  addMember,
+  createTeam,
+  removeMember,
+  removeTeam,
+} from "@/serverActions";
 
 async function getTeams() {
   try {
@@ -240,7 +173,7 @@ export default async function Page() {
 
       <form action={removeMember} className={collectedPageForm}>
         <header className={header}>
-          <h1 className="text-2xl">Remove Member to Team</h1>
+          <h1 className="text-2xl">Remove Member from Team</h1>
         </header>
         <ul className="pl-2 mb-2">
           <p>Select Team</p>

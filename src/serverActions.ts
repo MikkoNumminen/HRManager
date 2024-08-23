@@ -5,22 +5,23 @@ import { redirect } from "next/navigation";
 
 // TODO: Function to get persons with validation: ZOD
 // TODO: getPerson(personId)
+
 export async function getPersons() {
-  const persons = await prisma.person.findMany();
+  const validatedPersons = await prisma.$transaction(async (prisma) => {
+    const persons = await prisma.person.findMany();
 
-  const validatedPersons = persons.map((person) => {
-    const transformedPerson = {
-      id: person.id,
-      name: person.name,
-      email: person.email,
-      position: person.position,
-      createdAt: person.createdAt,
-      updatedAt: person.updatedAt,
-    };
+    return persons.map((person) => {
+      const transformedPerson = {
+        id: person.id,
+        name: person.name,
+        email: person.email,
+        position: person.position,
+        createdAt: person.createdAt,
+        updatedAt: person.updatedAt,
+      };
 
-    // Perform additional validation if needed
-
-    return transformedPerson;
+      return transformedPerson;
+    });
   });
 
   return validatedPersons;
@@ -57,7 +58,6 @@ export async function removePerson(data: FormData) {
       },
     });
 
-    // Delete the person(s)
     await prisma.person.deleteMany({
       where: {
         id: { in: personIDs },
@@ -143,7 +143,6 @@ export async function addManager(data: FormData) {
       },
     });
 
-    // Check if the person is already a member of the team
     const existingMember = await prisma.teamMember.findUnique({
       where: {
         personId_teamId: {
@@ -157,7 +156,6 @@ export async function addManager(data: FormData) {
       throw new Error("Person is already a member of the team");
     }
 
-    // Add the person as a team member
     await prisma.teamMember.create({
       data: {
         personId: personID,
@@ -205,6 +203,78 @@ export async function addMember(data: FormData) {
     console.log("New Team Member created:", newMember);
   });
 
-  // Redirect to the previous page or a different location after successful creation
+  redirect("..");
+}
+
+export async function createTeam(data: FormData) {
+  const name = data.get("name")?.valueOf();
+  if (typeof name !== "string" || name.length === 0) {
+    throw new Error("Invalid Name");
+  }
+
+  await prisma.$transaction(async (prisma) => {
+    await prisma.team.create({
+      data: {
+        teamName: name,
+        teamManagerId: "-",
+      },
+    });
+  });
+
+  redirect("/");
+}
+
+export async function removeTeam(data: FormData) {
+  const teamID = data.getAll("teamID") as string[];
+  if (!Array.isArray(teamID) || teamID.length === 0) {
+    throw new Error("No teamID selected");
+  }
+
+  await prisma.$transaction(async (prisma) => {
+    await prisma.team.deleteMany({
+      where: {
+        teamId: { in: teamID },
+      },
+    });
+  });
+
+  redirect("/");
+}
+
+export async function removeMember(data: FormData) {
+  const teamID = data.get("teamID") as string;
+  const personID = data.get("personID") as string;
+
+  if (!teamID) {
+    throw new Error("No teamID selected");
+  }
+  if (!personID) {
+    throw new Error("No personID selected");
+  }
+
+  await prisma.$transaction(async (prisma) => {
+    const existingMember = await prisma.teamMember.findUnique({
+      where: {
+        personId_teamId: {
+          personId: personID,
+          teamId: teamID,
+        },
+      },
+    });
+
+    if (!existingMember) {
+      throw new Error("Person is not a member of the team");
+    }
+
+    await prisma.teamMember.delete({
+      where: {
+        personId_teamId: {
+          personId: personID,
+          teamId: teamID,
+        },
+      },
+    });
+  });
+
   redirect("..");
 }

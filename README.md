@@ -98,4 +98,4 @@ npm test
 
 - **Fix:** Removing people now also removes them from every team and manager position.
 - **Fix:** Adding a manager to a team also adds as a member of the team.
-- **TODO:** Implement transactions for all database modifications (Completed: `serverActions.ts`).
+- **Feat** Implement transactions for all database modifications.

@@ -1,6 +1,4 @@
 /*
- TODO: Make sure all database entries are transactions! 
-       Move stuff from manageTeams to sercerActions 
  TODO: Refactor manage[personId]: Too many accept/cancel
  TODO: Refactor manageTeams page: Make similar to managePersons 
  TODO: Use Zod: Data integrity and type safety. KEEP UPDATE!
