@@ -99,3 +99,7 @@ npm test
 - **Fix:** Removing people now also removes them from every team and manager position.
 - **Fix:** Adding a manager to a team also adds as a member of the team.
 - **Feat** Implement transactions for all database modifications.
+
+# Under Development
+  - **Pending**: Refactor Teams Management to use a similar design to Persons Management.
+  - **Pending**: Add top bar with user authentication.
