@@ -1,5 +1,5 @@
-import { z } from 'zod';
-import { PersonSchema } from '@/zodStyles';
+import { PersonSchema } from "@/schemas";
+import { z } from "zod";
 
 type PersonListProps = z.infer<typeof PersonSchema>;
 

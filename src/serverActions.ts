@@ -2,26 +2,28 @@
 "use server";
 import { prisma } from "@/db";
 import { redirect } from "next/navigation";
+import { PersonSchema, TeamSchema } from "./schemas";
 
-// TODO: Function to get persons with validation: ZOD
 // TODO: getPerson(personId)
 
+// Function to get persons with validation
 export async function getPersons() {
-  const validatedPersons = await prisma.$transaction(async (prisma) => {
-    const persons = await prisma.person.findMany();
+  const persons = await prisma.person.findMany();
 
-    return persons.map((person) => {
-      const transformedPerson = {
-        id: person.id,
-        name: person.name,
-        email: person.email,
-        position: person.position,
-        createdAt: person.createdAt,
-        updatedAt: person.updatedAt,
-      };
+  const validatedPersons = persons.map((person) => {
+    const transformedPerson = {
+      ...person,
+      position: person.position ?? "",
+      email: person.email ?? "",
+    };
 
-      return transformedPerson;
-    });
+    try {
+      PersonSchema.parse(transformedPerson);
+    } catch (error) {
+      console.error(`Person validation failed: ${error}`);
+    }
+
+    return transformedPerson;
   });
 
   return validatedPersons;
@@ -277,4 +279,48 @@ export async function removeMember(data: FormData) {
   });
 
   redirect("..");
+}
+
+// Function to get teams with ZOD validation
+export async function getTeams() {
+  try {
+    const teams = await prisma.team.findMany({
+      include: {
+        members: {
+          include: {
+            person: true,
+          },
+        },
+      },
+    });
+
+    const validatedTeams = teams.map((team) => {
+      const transformedTeam = {
+        teamId: team.teamId,
+        teamName: team.teamName,
+        teamManagerId: team.teamManagerId ?? "",
+        createdAt: team.createdAt,
+        updatedAt: team.updatedAt,
+        members: team.members.map((member) => ({
+          name: member.person.name ?? "",
+          email: member.person.email ?? "",
+        })),
+      };
+
+      try {
+        TeamSchema.parse(transformedTeam);
+      } catch (error) {
+        console.error(`Team validation failed: ${error}`);
+      }
+
+      return transformedTeam;
+    });
+
+    return validatedTeams;
+  } catch (error) {
+    console.error(error);
+    return [];
+  } finally {
+    await prisma.$disconnect();
+  }
 }

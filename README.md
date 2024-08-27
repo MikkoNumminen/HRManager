@@ -92,14 +92,21 @@ npm test
 
 ## Uses [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) for git commits
 
-# Current Patch Notes (0.92)
+# Current Patch Notes (0.93)
+
+### Features and Enhancements
+
+- **Refactor:** Improved code organization and maintainability.
+
+# Patch Notes (0.92)
 
 ### Features and Enhancements
 
 - **Fix:** Removing people now also removes them from every team and manager position.
-- **Fix:** Adding a manager to a team also adds as a member of the team.
-- **Feat** Implement transactions for all database modifications.
+- **Fix:** Adding a manager to a team also adds them as a member of the team.
+- **Feat:** Implement transactions for all database modifications.
 
 # Under Development
-  - **Pending**: Refactor Teams Management to use a similar design to Persons Management.
-  - **Pending**: Add top bar with user authentication.
+
+- **Pending**: Refactor Teams Management to use a similar design to Persons Management.
+- **Pending**: Add top bar with user authentication.

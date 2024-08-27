@@ -1,30 +1,35 @@
 /*
- TODO: Refactor manage[personId]: Too many accept/cancel
- TODO: Refactor manageTeams page: Make similar to managePersons 
- TODO: Use Zod: Data integrity and type safety. KEEP UPDATE!
- TODO: Tests (Jest), KEEP UPDATE!
-       E2E Testing Example with Cypress?
-       Accessibility Testing Example with Axe? 
- TODO: Feature: Adding a team manager automaticly adds the new manager 
+  TODO: Removed people are not removed from team manager positions
+  TODO: Create upper panel to handle navigation and user account handling
+  TODO: Refactor manage[personId]: Too many accept/cancel
+  TODO: Refactor manageTeams page: Make similar to managePersons
+  TODO: Feature: Adding a team manager automaticly adds the new manager 
        as a memeber of the team?
- TODO: - Confirm the success of the event of removing a person:
-       - Ensure that the person is no longer listed as a member of any teams.
-       - Ensure that the person is no longer listed as a manager of any teams. 
-       - Pupup/View for exceptions?
-       - Removal will work in any case
- TODO: Create a list of people that are not in any team. View?
- TODO: Create upper panel to handle navigation and user account handling
- TODO: Remove the rest of the Tailwind from the codebase?
- TODO: Make Persons to People
- TODO: aria-labels?
- TODO: Check if this is what is wanted: ON DELETE RESTRICT ON UPDATE CASCADE
+  TODO: Tooltips/Popups UI development
+  TODO: Create a list of people that are not in any team. View?
+  TODO: TESTS:
+        - Confirm the success of the event of removing a person:
+          - Confirm that the person is no longer listed as a member of any teams after removal.
+          - Confirm that the person is no longer listed as a manager of any teams after removal. 
+          - Removal will work in any case
+        -Tests (Jest), KEEP UPDATE!
+        -E2E Testing with Playwright or Cypress?
+        -Testing: https://vitest.dev/ ?
+        -Accessibility Testing Example with Axe?
+  TODO: Refactor: getPerson(personId)
+  TODO: Validate/check: FormData ?
+  TODO: Remove the rest of the Tailwind from the codebase?
+  TODO: Make Persons to People
+  TODO: Use Zod: Data integrity and type safety. KEEP UPDATE!
+  TODO: aria-labels?
+  TODO: Check if this is what is wanted: ON DELETE RESTRICT ON UPDATE CASCADE
 */
 
 import { Box, Typography, Link, Tooltip } from "@mui/material";
 import PersonTable from "@/components/PersonsTable";
 import TeamsTable from "@/components/TeamsTable";
 import { boxStyles } from "@/muiStyles";
-import { getPersons, getTeams } from "@/utilities";
+import { getPersons, getTeams } from "@/serverActions";
 
 export default async function Home() {
   const persons = await getPersons();

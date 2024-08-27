@@ -1,5 +1,3 @@
-import { prisma } from "@/db";
-import { redirect } from "next/navigation";
 import Link from "next/link";
 import { TeamsCheckBoxList } from "@/components/TeamsCheckboxList";
 import { PersonCheckBoxList } from "@/components/PersonCheckboxList";
@@ -10,64 +8,15 @@ import {
   header,
   inputField,
 } from "@/tailwindStyles";
-import { TeamSchema } from "@/zodStyles";
-import { getPersons } from "@/utilities";
 import {
   addManager,
   addMember,
   createTeam,
+  getPersons,
+  getTeams,
   removeMember,
   removeTeam,
 } from "@/serverActions";
-
-async function getTeams() {
-  try {
-    const teams = await prisma.team.findMany({
-      include: {
-        members: {
-          include: {
-            person: true,
-          },
-        },
-      },
-    });
-
-    teams.forEach((team) => {
-      try {
-        TeamSchema.parse({
-          teamId: team.teamId,
-          teamName: team.teamName,
-          teamManagerId: team.teamManagerId,
-          createdAt: team.createdAt,
-          updatedAt: team.updatedAt,
-          members: team.members.map((member) => ({
-            name: member.person.name,
-            email: member.person.email,
-          })),
-        });
-      } catch (error) {
-        console.error(`Team validation failed: ${error}`);
-      }
-    });
-
-    return teams.map((team) => ({
-      teamName: team.teamName,
-      teamId: team.teamId,
-      teamManagerId: team.teamManagerId,
-      createdAt: team.createdAt,
-      updatedAt: team.updatedAt,
-      members: team.members.map((member) => ({
-        name: member.person.name,
-        email: member.person.email,
-      })),
-    }));
-  } catch (error) {
-    console.error(error);
-    return [];
-  } finally {
-    await prisma.$disconnect();
-  }
-}
 
 export default async function Page() {
   const teams = await getTeams();
