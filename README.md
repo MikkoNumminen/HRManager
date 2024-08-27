@@ -70,26 +70,6 @@ npm test
 - **Type Safety**:
   - **_TypeScript_** is used throughout the front-end and back-end, ensuring a consistent type system and reducing runtime errors.
 
-# Further development
-
-- Develop UI
-- Add authentication and authorization
-- Remove ORM
-- Deploy using CI/CD (Github Actions)
-
-## Infrastructure
-
-1: Deploy to Firebase
-
-- Firebase for hosting or additional services.
-
-2: Deploy to AWS
-
-- Uses **RDS** for the database
-- Uses **Fargate** for the back-end
-- Uses **S3** for storing static files
-- Deploy using Terraform **(IaaC)**
-
 ## Uses [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) for git commits
 
 # Current Patch Notes (0.93)
@@ -110,3 +90,23 @@ npm test
 
 - **Pending**: Refactor Teams Management to use a similar design to Persons Management.
 - **Pending**: Add top bar with user authentication.
+
+# Further development
+
+- Develop UI
+- Add authentication and authorization
+- Remove ORM
+- Deploy using CI/CD (Github Actions)
+
+## Infrastructure
+
+1: Deploy to Firebase
+
+- Firebase for hosting or additional services.
+
+2: Deploy to AWS
+
+- Uses **RDS** for the database
+- Uses **Fargate** for the back-end
+- Uses **S3** for storing static files
+- Deploy using Terraform **(IaaC)**
