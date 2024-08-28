@@ -77,18 +77,18 @@ npm test
 ### Features and Enhancements
 
 - **Refactor:** Improved code organization and maintainability.
+- **Pending**: Refactor Teams Management to use a similar design to Persons Management.
+- **Pending**: Fix: Removing people now also removes them from every manager positions.
 
 # Patch Notes (0.92)
 
 ### Features and Enhancements
 
-- **Fix:** Removing people now also removes them from every team and manager position.
+- **Fix:** Removing people now also removes them from every team member positons.
 - **Fix:** Adding a manager to a team also adds them as a member of the team.
 - **Feat:** Implement transactions for all database modifications.
 
 # Under Development
-
-- **Pending**: Refactor Teams Management to use a similar design to Persons Management.
 - **Pending**: Add top bar with user authentication.
 
 # Further development

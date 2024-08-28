@@ -4,8 +4,6 @@ import { prisma } from "@/db";
 import { redirect } from "next/navigation";
 import { PersonSchema, TeamSchema } from "./schemas";
 
-// TODO: getPerson(personId)
-
 // Function to get persons with validation
 export async function getPersons() {
   const persons = await prisma.person.findMany();

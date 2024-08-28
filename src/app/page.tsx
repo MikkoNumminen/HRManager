@@ -1,4 +1,5 @@
 /*
+  TODO: Add exception when creating teams or persons: Name already in use
   TODO: Removed people are not removed from team manager positions
   TODO: Create upper panel to handle navigation and user account handling
   TODO: Refactor manage[personId]: Too many accept/cancel
@@ -16,6 +17,8 @@
         -E2E Testing with Playwright or Cypress?
         -Testing: https://vitest.dev/ ?
         -Accessibility Testing Example with Axe?
+  TODO: Give return value with zod schema?: type Team = z.infer<typeof TeamSchema> 
+        Parse array for return value?: PersonSchema.array().parse
   TODO: Refactor: getPerson(personId)
   TODO: Validate/check: FormData ?
   TODO: Remove the rest of the Tailwind from the codebase?

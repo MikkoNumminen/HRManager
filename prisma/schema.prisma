@@ -20,7 +20,7 @@ model Person {
 model Team {
   teamId String @id @default(uuid())
   teamName String @unique
-  teamManagerId String
+  teamManagerId String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   members TeamMember[]
