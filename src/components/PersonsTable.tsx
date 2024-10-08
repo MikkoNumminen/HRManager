@@ -11,8 +11,8 @@ import {
 interface Person {
   id: string;
   name: string;
-  position: string;
-  email: string;
+  position: string | null;
+  email: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -23,7 +23,7 @@ interface PersonTableProps {
 
 const PersonTable: React.FC<PersonTableProps> = ({ persons }) => {
   return (
-    <TableContainer component={Paper} sx={{ marginBottom: '20px' }}>
+    <TableContainer component={Paper} sx={{ marginBottom: "20px" }}>
       <Table sx={{ minWidth: 650, maxWidth: 1020 }} aria-label="person table">
         <TableHead>
           <TableRow>

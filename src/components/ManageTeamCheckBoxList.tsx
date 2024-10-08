@@ -3,7 +3,7 @@ import React from "react";
 type TeamsCheckBoxListProps = {
   teamId: string;
   teamName: string;
-  teamManagerId: string;
+  teamManagerId: string | null;
 };
 
 export function ManageTeamsCheckBoxList({

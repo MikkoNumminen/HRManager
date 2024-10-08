@@ -1,152 +1,78 @@
-import Link from "next/link";
-import { TeamsCheckBoxList } from "@/components/TeamsCheckboxList";
-import { PersonCheckBoxList } from "@/components/PersonCheckboxList";
-import { ManageTeamsCheckBoxList } from "@/components/ManageTeamCheckBoxList";
-import {
-  collectedPageForm,
-  generalButton,
-  header,
-  inputField,
-} from "@/tailwindStyles";
-import {
-  addManager,
-  addMember,
-  createTeam,
-  getPersons,
-  getTeams,
-  removeMember,
-  removeTeam,
-} from "@/serverActions";
+"use client";
 
-export default async function Page() {
-  const teams = await getTeams();
-  const persons = await getPersons();
+import { header } from "@/tailwindStyles";
+import { getPersons, getTeams } from "@/serverActions";
+import { useEffect, useState } from "react";
+import { Person, Team } from "@prisma/client"; // Oletan että Team-mallisi on Prisma Clientissä
+import { Box, Typography } from "@mui/material";
+
+import AddTeamForm from "@/components/AddTeam";
+import EditableTeamsTable from "@/components/EditableTeamsTable";
+
+const ManageTeamsPage: React.FC = () => {
+  // State for persons
+  const [persons, setPersons] = useState<Person[]>([]);
+  const [loadingPersons, setLoadingPersons] = useState(true);
+  const [errorPersons, setErrorPersons] = useState<string | null>(null);
+
+  // State for teams
+  const [teams, setTeams] = useState<Team[]>([]);
+  const [loadingTeams, setLoadingTeams] = useState(true);
+  const [errorTeams, setErrorTeams] = useState<string | null>(null);
+
+  // Fetch persons on component mount
+  useEffect(() => {
+    const fetchPersons = async () => {
+      try {
+        setLoadingPersons(true);
+        const data = await getPersons();
+        setPersons(data);
+      } catch (err) {
+        console.error("Failed to fetch persons:", err);
+        setErrorPersons("Failed to fetch data");
+      } finally {
+        setLoadingPersons(false);
+      }
+    };
+
+    fetchPersons();
+  }, []); // Empty dependency array means this will run once when the component mounts
+
+  // Fetch teams on component mount
+  useEffect(() => {
+    const fetchTeams = async () => {
+      try {
+        setLoadingTeams(true);
+        const data = await getTeams();
+        setTeams(data);
+      } catch (err) {
+        console.error("Failed to fetch teams:", err);
+        setErrorTeams("Failed to fetch data");
+      } finally {
+        setLoadingTeams(false);
+      }
+    };
+
+    fetchTeams();
+  }, []); // Empty dependency array means this will run once when the component mounts
+
+  if (loadingPersons || loadingTeams)
+    return <Typography>Loading...</Typography>;
+  if (errorPersons)
+    return <Typography color="error">{errorPersons}</Typography>;
+  if (errorTeams) return <Typography color="error">{errorTeams}</Typography>;
+
   return (
     <>
-      <header className={header}>
-        <h1 className="text-2xl"> Manage Teams </h1>
-      </header>
-
-      <form action={createTeam} className={collectedPageForm}>
-        <header className={header}>
-          <h1 className="text-2xl"> Add Team </h1>
-        </header>
-        <input
-          type="text"
-          name="name"
-          placeholder="Enter Team Name"
-          className={inputField}
-        ></input>
-        <div className="flex gap-1 justify-end">
-          <Link href=".." className={generalButton}>
-            Cancel
-          </Link>
-          <button className={generalButton}>Create</button>
-        </div>
-      </form>
-
-      <form action={removeTeam} className={collectedPageForm}>
-        <header className={header}>
-          <h1 className="text-2xl">Remove Team</h1>
-        </header>
-        <ul className="pl-2 mb-2">
-          {teams.map((p) => (
-            <TeamsCheckBoxList key={p.teamId} {...p} />
-          ))}
-        </ul>
-        <div className="flex gap-1 justify-end">
-          <Link href=".." className={generalButton}>
-            Cancel
-          </Link>
-          <button type="submit" className={generalButton}>
-            Remove
-          </button>
-        </div>
-      </form>
-
-      <form action={addManager} className={collectedPageForm}>
-        <header className={header}>
-          <h1 className="text-2xl">Add Manager to Team</h1>
-        </header>
-        <ul className="pl-2 mb-2">
-          <p>Select Team</p>
-          {teams.map((p) => (
-            <ManageTeamsCheckBoxList key={p.teamId} {...p} />
-          ))}
-        </ul>
-
-        <ul className="pl-2 mb-2">
-          <p>Select Manager</p>
-          {persons.map((p) => (
-            <PersonCheckBoxList key={p.id} {...p} />
-          ))}
-        </ul>
-
-        <div className="flex gap-1 justify-end">
-          <Link href=".." className={generalButton}>
-            Cancel
-          </Link>
-          <button type="submit" className={generalButton}>
-            Add Manager
-          </button>
-        </div>
-      </form>
-
-      <form action={addMember} className={collectedPageForm}>
-        <header className={header}>
-          <h1 className="text-2xl">Add Member to Team</h1>
-        </header>
-        <ul className="pl-2 mb-2">
-          <p>Select Team</p>
-          {teams.map((p) => (
-            <ManageTeamsCheckBoxList key={p.teamId} {...p} />
-          ))}
-        </ul>
-
-        <ul className="pl-2 mb-2">
-          <p>Select Member</p>
-          {persons.map((p) => (
-            <PersonCheckBoxList key={p.id} {...p} />
-          ))}
-        </ul>
-
-        <div className="flex gap-1 justify-end">
-          <Link href=".." className={generalButton}>
-            Cancel
-          </Link>
-          <button type="submit" className={generalButton}>
-            Add Member
-          </button>
-        </div>
-      </form>
-
-      <form action={removeMember} className={collectedPageForm}>
-        <header className={header}>
-          <h1 className="text-2xl">Remove Member from Team</h1>
-        </header>
-        <ul className="pl-2 mb-2">
-          <p>Select Team</p>
-          {teams.map((p) => (
-            <ManageTeamsCheckBoxList key={p.teamId} {...p} />
-          ))}
-        </ul>
-
-        <ul className="pl-2 mb-2">
-          <p>Select Member</p>
-          {persons.map((p) => (
-            <PersonCheckBoxList key={p.id} {...p} />
-          ))}
-        </ul>
-
-        <div className="flex gap-1 justify-end">
-          <Link href=".." className={generalButton}>
-            Cancel
-          </Link>
-          <button type="submit" className={generalButton}>
-            Remove Member
-          </button>
-        </div>
-      </form>
+      <Typography variant="h4" mb={2}>
+        Manage Teams
+      </Typography>
+      <Box mb={4}>
+        <AddTeamForm />
+      </Box>
+      <EditableTeamsTable combinedTeams={teams} />
     </>
   );
-}
+};
+
+export default ManageTeamsPage;

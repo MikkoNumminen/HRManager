@@ -70,39 +70,31 @@ npm test
 - **Type Safety**:
   - **_TypeScript_** is used throughout the front-end and back-end, ensuring a consistent type system and reducing runtime errors.
 
-## Uses [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) for git commits
+### Uses [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) for git commits
 
-# Current Patch Notes (0.93)
+# Current Patch Notes (0.99)
 
 ### Features and Enhancements
 
 - **Refactor:** Improved code organization and maintainability.
-- **Pending**: Refactor Teams Management to use a similar design to Persons Management.
-- **Pending**: Fix: Removing people now also removes them from every manager positions.
-
-# Patch Notes (0.92)
-
-### Features and Enhancements
-
-- **Fix:** Removing people now also removes them from every team member positons.
-- **Fix:** Adding a manager to a team also adds them as a member of the team.
+- **Refactor**: Teams Management use the similar design to Persons Management.
 - **Feat:** Implement transactions for all database modifications.
 
-# Under Development
-- **Pending**: Add top bar with user authentication.
+- **Pending**: Fix: Removing people now also removes them from every manager and positions.
+- **Pending**: Fix: Removing a team works when team has a manager and members.
+- **Pending**: Fix: Exceptions when trying to create something that already exists.
+- **Pending**: Fix: Better team page member selections.
+- **Pending**: Feat: Team page tests
+- **Pending**: Add top bar with user authentication (NextAuth)
 
-# Further development
-
+# Further development plans
 - Develop UI
-- Add authentication and authorization
 - Remove ORM
 - Deploy using CI/CD (Github Actions)
 
 ## Infrastructure
 
 1: Deploy to Firebase
-
-- Firebase for hosting or additional services.
 
 2: Deploy to AWS
 

@@ -46,11 +46,21 @@ export async function createPerson(data: FormData) {
 
 export async function removePerson(data: FormData) {
   const personIDs = data.getAll("personID") as string[];
+  const teamID = data.getAll("teamID") as string[];
   if (!Array.isArray(personIDs) || personIDs.length === 0) {
     throw new Error("No personID selected");
   }
 
+  if (!Array.isArray(teamID) || teamID.length === 0) {
+    console.log("No teamID selected");
+  }
+  if (!teamID) {
+    console.log("No personID provided");
+  }
+
   await prisma.$transaction(async (prisma) => {
+    // TODO: Remove person from Manager records
+
     // Remove person from TeamMember records
     await prisma.teamMember.deleteMany({
       where: {
@@ -292,23 +302,25 @@ export async function getTeams() {
       },
     });
 
+    // Validate team data
     const validatedTeams = teams.map((team) => {
       const transformedTeam = {
         teamId: team.teamId,
         teamName: team.teamName,
-        teamManagerId: team.teamManagerId ?? "",
+        teamManagerId: team.teamManagerId ?? "Undefined",
         createdAt: team.createdAt,
         updatedAt: team.updatedAt,
-        members: team.members.map((member) => ({
+        members: team.members?.map((member) => ({
           name: member.person.name ?? "",
           email: member.person.email ?? "",
-        })),
+        })) ?? [{ name: "none", email: "none" }], // TODO: Default to an empty array if members is undefined. Add the rest. Refactor codebase.
       };
 
       try {
+        // Validate data for every team
         TeamSchema.parse(transformedTeam);
       } catch (error) {
-        console.error(`Team validation failed: ${error}`);
+        console.error(`Team validation failed for ${team.teamName}:`, error);
       }
 
       return transformedTeam;
@@ -316,7 +328,7 @@ export async function getTeams() {
 
     return validatedTeams;
   } catch (error) {
-    console.error(error);
+    console.error("Error fetching teams:", error);
     return [];
   } finally {
     await prisma.$disconnect();
