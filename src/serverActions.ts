@@ -59,16 +59,8 @@ export async function createPerson(data: FormData) {
 
 export async function removePerson(data: FormData) {
   const personIDs = data.getAll("personID") as string[];
-  const teamID = data.getAll("teamID") as string[];
   if (!Array.isArray(personIDs) || personIDs.length === 0) {
     throw new Error("No personID selected");
-  }
-
-  if (!Array.isArray(teamID) || teamID.length === 0) {
-    console.log("No teamID selected");
-  }
-  if (!teamID) {
-    console.log("No personID provided");
   }
 
   await prisma.$transaction(async (prisma) => {
