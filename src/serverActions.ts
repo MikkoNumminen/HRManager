@@ -16,12 +16,11 @@ export async function getPersons() {
     };
 
     try {
-      PersonSchema.parse(transformedPerson);
+      return PersonSchema.parse(transformedPerson);
     } catch (error) {
       console.error(`Person validation failed: ${error}`);
+      return transformedPerson;
     }
-
-    return transformedPerson;
   });
 
   return validatedPersons;
@@ -319,13 +318,11 @@ export async function getTeams() {
       };
 
       try {
-        // Validate data for every team
-        TeamSchema.parse(transformedTeam);
+        return TeamSchema.parse(transformedTeam);
       } catch (error) {
         console.error(`Team validation failed for ${team.teamName}:`, error);
+        return transformedTeam;
       }
-
-      return transformedTeam;
     });
 
     return validatedTeams;
