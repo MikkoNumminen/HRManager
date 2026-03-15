@@ -55,18 +55,9 @@ describe("PersonTable Component", () => {
     });
   });
 
-  test("should display no data rows when no persons are provided", () => {
+  test('should render "No Persons Available" when there are no persons', () => {
     render(<PersonTable persons={[]} />);
 
-    // Check if headers are present
-    expect(screen.getByText(/Name/i)).toBeInTheDocument(); // Headers should be present
-    expect(screen.getByText(/Position/i)).toBeInTheDocument(); // Headers should be present
-    expect(screen.getByText(/Email/i)).toBeInTheDocument(); // Headers should be present
-    expect(screen.getByText(/Created At/i)).toBeInTheDocument(); // Headers should be present
-    expect(screen.getByText(/Updated At/i)).toBeInTheDocument(); // Headers should be present
-
-    // Check if there are no data rows
-    const rows = screen.queryAllByRole("row");
-    expect(rows).toHaveLength(1); // Only the header row should be present
+    expect(screen.getByText(/No Persons Available/)).toBeInTheDocument();
   });
 });

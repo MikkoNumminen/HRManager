@@ -1,4 +1,5 @@
 import {
+  Box,
   Paper,
   Table,
   TableBody,
@@ -6,6 +7,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Typography,
 } from "@mui/material";
 
 interface Person {
@@ -35,19 +37,34 @@ const PersonTable: React.FC<PersonTableProps> = ({ persons }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {persons.map((person) => (
-            <TableRow key={person.id}>
-              <TableCell>{person.name}</TableCell>
-              <TableCell>{person.position}</TableCell>
-              <TableCell>{person.email}</TableCell>
-              <TableCell>
-                {new Date(person.createdAt).toLocaleString()}
-              </TableCell>
-              <TableCell>
-                {new Date(person.updatedAt).toLocaleString()}
+          {persons.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={5}>
+                <Box
+                  display="flex"
+                  justifyContent="center"
+                  alignItems="center"
+                  height="100px"
+                >
+                  <Typography align="center">No Persons Available</Typography>
+                </Box>
               </TableCell>
             </TableRow>
-          ))}
+          ) : (
+            persons.map((person) => (
+              <TableRow key={person.id}>
+                <TableCell>{person.name}</TableCell>
+                <TableCell>{person.position}</TableCell>
+                <TableCell>{person.email}</TableCell>
+                <TableCell>
+                  {new Date(person.createdAt).toLocaleString()}
+                </TableCell>
+                <TableCell>
+                  {new Date(person.updatedAt).toLocaleString()}
+                </TableCell>
+              </TableRow>
+            ))
+          )}
         </TableBody>
       </Table>
     </TableContainer>
