@@ -36,7 +36,7 @@ model TeamMember {
   updatedAt DateTime @updatedAt
 
   person Person @relation(fields: [personId], references: [id])
-  team Team @relation(fields: [teamId], references: [teamId])
+  team Team @relation(fields: [teamId], references: [teamId], onDelete: Cascade)
 
   @@unique([personId, teamId])
 }
