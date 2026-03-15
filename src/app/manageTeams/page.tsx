@@ -3,7 +3,7 @@
 import { header } from "@/tailwindStyles";
 import { getPersons, getTeams } from "@/serverActions";
 import { useEffect, useState } from "react";
-import { Person, Team } from "@prisma/client"; // Oletan että Team-mallisi on Prisma Clientissä
+import { Person } from "@prisma/client";
 import { Box, Typography } from "@mui/material";
 
 import AddTeamForm from "@/components/AddTeam";
@@ -16,7 +16,7 @@ const ManageTeamsPage: React.FC = () => {
   const [errorPersons, setErrorPersons] = useState<string | null>(null);
 
   // State for teams
-  const [teams, setTeams] = useState<Team[]>([]);
+  const [teams, setTeams] = useState<Awaited<ReturnType<typeof getTeams>>>([]);
   const [loadingTeams, setLoadingTeams] = useState(true);
   const [errorTeams, setErrorTeams] = useState<string | null>(null);
 
