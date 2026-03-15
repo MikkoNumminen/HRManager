@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { PersonCheckBoxList } from "./PersonCheckboxList";
 import { Person } from "@prisma/client";
-import { smallButtonStyles } from "@/muiStyles";
+import { activeButtonStyles, smallButtonStyles } from "@/muiStyles";
 
 const RemoveMemberForm: React.FC<{ teamID: string }> = ({ teamID }) => {
   const [selectedMember, setSelectedMember] = useState<string>(""); // State for selected member ID
@@ -38,11 +38,6 @@ const RemoveMemberForm: React.FC<{ teamID: string }> = ({ teamID }) => {
     event.preventDefault();
 
     try {
-      if (!selectedMember) {
-        alert("Please select a member.");
-        return;
-      }
-
       const formData = new FormData();
       formData.set("teamID", teamID);
       formData.set("personID", selectedMember);
@@ -85,7 +80,7 @@ const RemoveMemberForm: React.FC<{ teamID: string }> = ({ teamID }) => {
         <Link href={`/manageTeams`} sx={smallButtonStyles}>
           Cancel
         </Link>
-        <Button type="submit" sx={smallButtonStyles}>
+        <Button type="submit" disabled={!selectedMember} sx={{ ...smallButtonStyles, ...(selectedMember && activeButtonStyles) }}>
           Remove Member
         </Button>
       </Box>

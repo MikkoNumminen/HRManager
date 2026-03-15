@@ -38,11 +38,6 @@ const UpdateManagerForm: React.FC<{ teamID: string }> = ({ teamID }) => {
     event.preventDefault();
 
     try {
-      if (!newManager) {
-        alert("Please select a manager.");
-        return;
-      }
-
       const formData = new FormData();
       formData.set("teamID", teamID);
       formData.set("personID", newManager);
@@ -85,7 +80,7 @@ const UpdateManagerForm: React.FC<{ teamID: string }> = ({ teamID }) => {
         <Link href={`/manageTeams`} sx={smallButtonStyles}>
           Cancel
         </Link>
-        <Button type="submit" sx={{ ...smallButtonStyles, ...(newManager && activeButtonStyles) }}>
+        <Button type="submit" disabled={!newManager} sx={{ ...smallButtonStyles, ...(newManager && activeButtonStyles) }}>
           Add Manager
         </Button>
       </Box>

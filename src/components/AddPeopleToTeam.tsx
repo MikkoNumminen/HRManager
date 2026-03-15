@@ -37,11 +37,6 @@ const AddMemberForm: React.FC<{ teamID: string }> = ({ teamID }) => {
     event.preventDefault();
 
     try {
-      if (!selectedMember) {
-        alert("Please select a member.");
-        return;
-      }
-
       const formData = new FormData();
       formData.set("teamID", teamID);
       formData.set("personID", selectedMember);
@@ -83,7 +78,7 @@ const AddMemberForm: React.FC<{ teamID: string }> = ({ teamID }) => {
         <Link href={`/manageTeams`} sx={smallButtonStyles}>
           Cancel
         </Link>
-        <Button type="submit" sx={{ ...smallButtonStyles, ...(selectedMember && activeButtonStyles) }}>
+        <Button type="submit" disabled={!selectedMember} sx={{ ...smallButtonStyles, ...(selectedMember && activeButtonStyles) }}>
           Add Member
         </Button>
       </Box>
