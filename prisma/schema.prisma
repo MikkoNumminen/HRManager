@@ -11,7 +11,7 @@ model Person {
   id String @id @default(uuid())
   name String
   position String?
-  email String?
+  email String? @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   teams TeamMember[]

@@ -59,20 +59,19 @@ describe("AddPerson Component", () => {
 
     render(<AddPersonForm />);
 
-    // Find the input field and type a name
     const nameInput = screen.getByPlaceholderText("Enter Name");
     userEvent.type(nameInput, "John Doe");
 
-    // Find and click the submit button
+    const emailInput = screen.getByPlaceholderText("Enter Email");
+    userEvent.type(emailInput, "john.doe@example.com");
+
     const submitButton = screen.getByRole("button", { name: /Create/i });
     fireEvent.click(submitButton);
 
-    // Wait for createPerson to be called
     await waitFor(() => {
       expect(mockedCreatePerson).toHaveBeenCalledWith(expect.any(FormData));
     });
 
-    // Verify that the form submission triggers reload (mocked)
     expect(mockReload).toHaveBeenCalled();
   });
 });

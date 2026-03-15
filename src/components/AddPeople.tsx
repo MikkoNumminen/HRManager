@@ -26,6 +26,12 @@ const AddPersonForm: React.FC = () => {
         placeholder="Enter Name"
         className={inputField}
       />
+      <input
+        type="text"
+        name="email"
+        placeholder="Enter Email"
+        className={inputField}
+      />
       <Box display="flex" gap={1} justifyContent="flex-end">
         <Link href=".." sx={smallButtonStyles}>
           Cancel

@@ -33,12 +33,22 @@ export async function createPerson(data: FormData) {
     throw new Error("Invalid Name");
   }
 
+  const email = data.get("email")?.valueOf();
+  if (typeof email !== "string" || email.length === 0) {
+    throw new Error("Email is required");
+  }
+
+  const existingPerson = await prisma.person.findUnique({ where: { email } });
+  if (existingPerson) {
+    throw new Error("A person with this email already exists");
+  }
+
   await prisma.$transaction(async (prisma) => {
     await prisma.person.create({
       data: {
         name,
         position: "-",
-        email: "-",
+        email,
       },
     });
   });
@@ -106,6 +116,11 @@ export async function updateEmail(data: FormData) {
   const newEmail = data.get("name")?.toString();
   if (!newEmail) {
     throw new Error("New Email is missing");
+  }
+
+  const existingPerson = await prisma.person.findUnique({ where: { email: newEmail } });
+  if (existingPerson) {
+    throw new Error("A person with this email already exists");
   }
 
   await prisma.$transaction(async (prisma) => {
