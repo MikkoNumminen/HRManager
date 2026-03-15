@@ -9,6 +9,16 @@ import { PersonCheckBoxList } from "./PersonCheckboxList";
 import { Person } from "@prisma/client";
 import { smallButtonStyles } from "@/muiStyles";
 
+const activeButtonStyles = {
+  borderColor: "rgb(74 222 128)",
+  color: "rgb(74 222 128)",
+  "&:hover": {
+    backgroundColor: "rgb(20 83 45)",
+    borderColor: "rgb(74 222 128)",
+    textDecoration: "none",
+  },
+};
+
 const UpdateManagerForm: React.FC<{ teamID: string }> = ({ teamID }) => {
   const [newManager, setNewManager] = useState<string>(""); // State for selected manager ID
   const [persons, setPersons] = useState<Person[]>([]);
@@ -85,7 +95,7 @@ const UpdateManagerForm: React.FC<{ teamID: string }> = ({ teamID }) => {
         <Link href={`/manageTeams`} sx={smallButtonStyles}>
           Cancel
         </Link>
-        <Button type="submit" sx={smallButtonStyles}>
+        <Button type="submit" sx={{ ...smallButtonStyles, ...(newManager && activeButtonStyles) }}>
           Add Manager
         </Button>
       </Box>
