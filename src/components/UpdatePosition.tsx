@@ -36,6 +36,7 @@ const UpdatePositionForm: React.FC<{ personID: string }> = ({ personID }) => {
         type="text"
         name="name"
         placeholder="Enter New Position"
+        required
         className={inputField}
         value={newPosition}
         onChange={(e) => setNewPosition(e.target.value)}

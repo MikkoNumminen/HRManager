@@ -33,6 +33,7 @@ const AddTeamForm: React.FC = () => {
         type="text"
         name="name"
         placeholder="Enter Team Name"
+        required
         className={inputField}
         value={name}
         onChange={(e) => setName(e.target.value)}

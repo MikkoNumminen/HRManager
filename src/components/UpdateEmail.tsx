@@ -36,6 +36,7 @@ const UpdateEmailForm: React.FC<{ personID: string }> = ({ personID }) => {
         type="email"
         name="name"
         placeholder="Enter New Email"
+        required
         className={inputField}
         value={newEmail}
         onChange={(e) => setNewEmail(e.target.value)}

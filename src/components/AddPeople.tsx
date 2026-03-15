@@ -34,6 +34,7 @@ const AddPersonForm: React.FC = () => {
         type="text"
         name="name"
         placeholder="Enter Name"
+        required
         className={inputField}
         value={name}
         onChange={(e) => setName(e.target.value)}
@@ -42,6 +43,7 @@ const AddPersonForm: React.FC = () => {
         type="email"
         name="email"
         placeholder="Enter Email"
+        required
         className={inputField}
         value={email}
         onChange={(e) => setEmail(e.target.value)}
