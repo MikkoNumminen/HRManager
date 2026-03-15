@@ -84,8 +84,8 @@ const EditableTeamsTable: React.FC<CombinedTeamProps> = ({ combinedTeams }) => {
                 <TableCell>
                   <ul>
                     {team.members && team.members.length > 0 ? (
-                      team.members.map((member, index) => (
-                        <li key={`${team.teamId}-${index}`}>
+                      team.members.map((member) => (
+                        <li key={member.email}>
                           {member?.name || "Unknown Name"}
                         </li>
                       ))
