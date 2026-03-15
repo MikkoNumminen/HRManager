@@ -29,12 +29,12 @@ export async function getPersons() {
 
 export async function createPerson(data: FormData) {
   const name = data.get("name")?.valueOf();
-  if (typeof name !== "string" || name.length === 0) {
+  if (typeof name !== "string" || name.trim().length === 0) {
     throw new Error("Invalid Name");
   }
 
   const email = data.get("email")?.valueOf();
-  if (typeof email !== "string" || email.length === 0) {
+  if (typeof email !== "string" || email.trim().length === 0) {
     throw new Error("Email is required");
   }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -49,9 +49,9 @@ export async function createPerson(data: FormData) {
   await prisma.$transaction(async (prisma) => {
     await prisma.person.create({
       data: {
-        name,
+        name: name.trim(),
         position: "-",
-        email,
+        email: email.trim(),
       },
     });
   });
@@ -93,7 +93,7 @@ export async function updatePosition(data: FormData) {
     throw new Error("No personID provided");
   }
 
-  const newPosition = data.get("name")?.toString();
+  const newPosition = data.get("name")?.toString().trim();
   if (!newPosition) {
     throw new Error("New position is missing");
   }
@@ -116,7 +116,7 @@ export async function updateEmail(data: FormData) {
     throw new Error("No personID selected");
   }
 
-  const newEmail = data.get("name")?.toString();
+  const newEmail = data.get("name")?.toString().trim();
   if (!newEmail) {
     throw new Error("New Email is missing");
   }
@@ -226,14 +226,14 @@ export async function addMember(data: FormData) {
 
 export async function createTeam(data: FormData) {
   const name = data.get("name")?.valueOf();
-  if (typeof name !== "string" || name.length === 0) {
+  if (typeof name !== "string" || name.trim().length === 0) {
     throw new Error("Invalid Name");
   }
 
   await prisma.$transaction(async (prisma) => {
     await prisma.team.create({
       data: {
-        teamName: name,
+        teamName: name.trim(),
         teamManagerId: null,
       },
     });
