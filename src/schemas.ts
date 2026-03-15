@@ -13,6 +13,7 @@ export const TeamSchema = z.object({
   teamId: z.string(),
   teamName: z.string(),
   teamManagerId: z.string().nullable(),
+  managerName: z.string().nullable(),
   createdAt: z.date(),
   updatedAt: z.date(),
   members: z.array(

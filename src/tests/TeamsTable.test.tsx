@@ -8,7 +8,7 @@ describe("TeamsTable Component", () => {
     {
       teamName: "Development",
       teamId: "1",
-      teamManagerId: "Manager1",
+      managerName: "Manager1",
       createdAt: new Date("2023-01-01T10:00:00Z"),
       updatedAt: new Date("2023-01-10T10:00:00Z"),
       members: [
@@ -19,7 +19,7 @@ describe("TeamsTable Component", () => {
     {
       teamName: "Design",
       teamId: "2",
-      teamManagerId: "Manager2",
+      managerName: "Manager2",
       createdAt: new Date("2023-02-01T11:00:00Z"),
       updatedAt: new Date("2023-02-10T11:00:00Z"),
       members: [
@@ -44,7 +44,7 @@ describe("TeamsTable Component", () => {
 
     mockCombinedTeams.forEach((team) => {
       expect(screen.getByText(team.teamName)).toBeInTheDocument();
-      expect(screen.getByText(team.teamManagerId)).toBeInTheDocument();
+      expect(screen.getByText(team.managerName)).toBeInTheDocument();
       team.members.forEach((member) => {
         expect(screen.getByText(member.name)).toBeInTheDocument();
       });

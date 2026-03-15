@@ -1,13 +1,13 @@
 type TeamsCheckBoxListProps = {
   teamId: string;
   teamName: string;
-  teamManagerId: string | null;
+  managerName: string | null;
 };
 
 export function TeamsCheckBoxList({
   teamId,
   teamName,
-  teamManagerId,
+  managerName,
 }: TeamsCheckBoxListProps) {
   return (
     <li className="flex gap-1 items-center">
@@ -22,9 +22,8 @@ export function TeamsCheckBoxList({
         htmlFor={teamId}
         className="cursor-pointer peer-checked:line-through peer-checked:text-slate-400"
       >
-        <strong>Team Name:</strong> {teamName} <strong>Team Manager:</strong>
-        {teamManagerId}
-        {teamManagerId}
+        <strong>Team Name:</strong> {teamName} <strong>Team Manager:</strong>{" "}
+        {managerName || "No Manager Assigned"}
       </label>
     </li>
   );

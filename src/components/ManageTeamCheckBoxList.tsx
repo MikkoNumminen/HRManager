@@ -3,13 +3,13 @@ import React from "react";
 type TeamsCheckBoxListProps = {
   teamId: string;
   teamName: string;
-  teamManagerId: string | null;
+  managerName: string | null;
 };
 
 export function ManageTeamsCheckBoxList({
   teamId,
   teamName,
-  teamManagerId,
+  managerName,
 }: TeamsCheckBoxListProps) {
   return (
     <li className="flex gap-1 items-center">
@@ -22,7 +22,8 @@ export function ManageTeamsCheckBoxList({
       />
       <div>
         <label className="font-bold">Team Name:</label> {teamName}{" "}
-        <label className="font-bold">Team Manager:</label> {teamManagerId}
+        <label className="font-bold">Team Manager:</label>{" "}
+        {managerName || "No Manager Assigned"}
       </div>
     </li>
   );

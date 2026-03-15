@@ -14,7 +14,7 @@ import {
 interface CombinedTeam {
   teamName: string;
   teamId: string;
-  teamManagerId: string;
+  managerName: string | null;
   createdAt: Date;
   updatedAt: Date;
   members: {
@@ -58,7 +58,7 @@ const TeamsTable: React.FC<CombinedTeamProps> = ({ combinedTeams }) => {
             combinedTeams.map((team) => (
               <TableRow key={team.teamId}>
                 <TableCell>{team.teamName}</TableCell>
-                <TableCell>{team.teamManagerId}</TableCell>
+                <TableCell>{team.managerName || "No Manager Assigned"}</TableCell>
                 <TableCell>
                   <ul>
                     {team.members.map((member) => (

@@ -59,8 +59,6 @@ export async function removePerson(data: FormData) {
   }
 
   await prisma.$transaction(async (prisma) => {
-    // TODO: Remove person from Manager records
-
     // Remove person from TeamMember records
     await prisma.teamMember.deleteMany({
       where: {
@@ -136,20 +134,13 @@ export async function addManager(data: FormData) {
   }
 
   await prisma.$transaction(async (prisma) => {
-    const persons = await prisma.person.findMany();
-    const selectedPerson = persons.find((person) => person.id === personID);
-
-    if (!selectedPerson) {
-      throw new Error("Selected person not found");
-    }
-
     // Update the team manager
     await prisma.team.update({
       where: {
         teamId: teamID[0],
       },
       data: {
-        teamManagerId: selectedPerson.name,
+        teamManagerId: personID,
       },
     });
 
@@ -226,7 +217,7 @@ export async function createTeam(data: FormData) {
     await prisma.team.create({
       data: {
         teamName: name,
-        teamManagerId: "-",
+        teamManagerId: null,
       },
     });
   });
@@ -294,6 +285,7 @@ export async function getTeams() {
   try {
     const teams = await prisma.team.findMany({
       include: {
+        manager: true,
         members: {
           include: {
             person: true,
@@ -307,7 +299,8 @@ export async function getTeams() {
       const transformedTeam = {
         teamId: team.teamId,
         teamName: team.teamName,
-        teamManagerId: team.teamManagerId ?? "Undefined",
+        teamManagerId: team.teamManagerId ?? null,
+        managerName: team.manager?.name ?? null,
         createdAt: team.createdAt,
         updatedAt: team.updatedAt,
         members: team.members?.map((member) => ({

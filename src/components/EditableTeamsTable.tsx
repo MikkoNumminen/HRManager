@@ -18,6 +18,7 @@ interface CombinedTeam {
   teamName: string;
   teamId: string;
   teamManagerId: string | null;
+  managerName: string | null;
   createdAt: Date;
   updatedAt: Date;
   members?: {
@@ -78,7 +79,7 @@ const EditableTeamsTable: React.FC<CombinedTeamProps> = ({ combinedTeams }) => {
               >
                 <TableCell>{team.teamName}</TableCell>
                 <TableCell>
-                  {team.teamManagerId || "No Manager Assigned"}
+                  {team.managerName || "No Manager Assigned"}
                 </TableCell>
                 <TableCell>
                   <ul>
