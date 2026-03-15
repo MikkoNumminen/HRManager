@@ -25,7 +25,7 @@ export function RemovePersonCheckBoxList({
         className="cursor-pointer peer-checked:line-through peer-checked:text-slate-400"
       >
         <strong>Name:</strong> {name} <strong>Position:</strong> {position}{" "}
-        <strong>Email:</strong> {(email = "")}
+        <strong>Email:</strong> {email}
       </label>
     </li>
   );
