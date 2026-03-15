@@ -4,6 +4,7 @@ import { activeButtonStyles, smallButtonStyles } from "@/muiStyles";
 import { createPerson } from "@/serverActions";
 import { collectedPageForm, inputField } from "@/tailwindStyles";
 import { Box, Button, Link, Typography } from "@mui/material";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 const AddPersonForm: React.FC = () => {
@@ -11,6 +12,7 @@ const AddPersonForm: React.FC = () => {
   const [email, setEmail] = useState("");
   const [submitError, setSubmitError] = useState<string | null>(null);
   const isValid = name.trim().length > 0 && email.trim().length > 0;
+  const router = useRouter();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -18,7 +20,7 @@ const AddPersonForm: React.FC = () => {
 
     try {
       await createPerson(new FormData(event.currentTarget));
-      window.location.reload();
+      router.push("/managePersons");
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : "An error occurred");
     }

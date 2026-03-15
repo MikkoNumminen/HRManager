@@ -4,12 +4,14 @@ import { activeButtonStyles, smallButtonStyles } from "@/muiStyles";
 import { createTeam } from "@/serverActions";
 import { collectedPageForm, inputField } from "@/tailwindStyles";
 import { Box, Button, Link, Typography } from "@mui/material";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 const AddTeamForm: React.FC = () => {
   const [name, setName] = useState("");
   const [submitError, setSubmitError] = useState<string | null>(null);
   const isValid = name.trim().length > 0;
+  const router = useRouter();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -17,7 +19,7 @@ const AddTeamForm: React.FC = () => {
 
     try {
       await createTeam(new FormData(event.currentTarget));
-      window.location.reload();
+      router.push("/manageTeams");
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : "An error occurred");
     }
