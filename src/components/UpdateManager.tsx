@@ -7,17 +7,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { PersonCheckBoxList } from "./PersonCheckboxList";
 import { Person } from "@prisma/client";
-import { smallButtonStyles } from "@/muiStyles";
-
-const activeButtonStyles = {
-  borderColor: "rgb(74 222 128)",
-  color: "rgb(74 222 128)",
-  "&:hover": {
-    backgroundColor: "rgb(20 83 45)",
-    borderColor: "rgb(74 222 128)",
-    textDecoration: "none",
-  },
-};
+import { activeButtonStyles, smallButtonStyles } from "@/muiStyles";
 
 const UpdateManagerForm: React.FC<{ teamID: string }> = ({ teamID }) => {
   const [newManager, setNewManager] = useState<string>(""); // State for selected manager ID

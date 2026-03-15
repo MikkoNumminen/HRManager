@@ -1,21 +1,11 @@
 "use client";
 
-import { smallButtonStyles } from "@/muiStyles";
+import { activeButtonStyles, smallButtonStyles } from "@/muiStyles";
 import { updatePosition } from "@/serverActions";
 import { collectedPageForm, inputField } from "@/tailwindStyles";
 import { Box, Button, Link, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-
-const activeButtonStyles = {
-  borderColor: "rgb(74 222 128)",
-  color: "rgb(74 222 128)",
-  "&:hover": {
-    backgroundColor: "rgb(20 83 45)",
-    borderColor: "rgb(74 222 128)",
-    textDecoration: "none",
-  },
-};
 
 const UpdatePositionForm: React.FC<{ personID: string }> = ({ personID }) => {
   const [newPosition, setNewPosition] = useState("");
