@@ -13,11 +13,11 @@ beforeEach(() => {
 });
 
 describe("AddPerson Component", () => {
-  test("should have an enabled submit button", () => {
+  test("should have a disabled submit button when fields are empty", () => {
     render(<AddPersonForm />);
 
     const submitButton = screen.getByRole("button", { name: /Create/i });
-    expect(submitButton).not.toBeDisabled();
+    expect(submitButton).toBeDisabled();
   });
 
   test("submits the form and calls createPerson", async () => {

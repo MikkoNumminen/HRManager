@@ -48,7 +48,7 @@ const UpdateEmailForm: React.FC<{ personID: string }> = ({ personID }) => {
         <Link href={`/managePersons`} sx={smallButtonStyles}>
           Cancel
         </Link>
-        <Button type="submit" sx={{ ...smallButtonStyles, ...(isValid && activeButtonStyles) }}>
+        <Button type="submit" disabled={!isValid} sx={{ ...smallButtonStyles, ...(isValid && activeButtonStyles) }}>
           Change
         </Button>
       </Box>

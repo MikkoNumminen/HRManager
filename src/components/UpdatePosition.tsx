@@ -45,7 +45,7 @@ const UpdatePositionForm: React.FC<{ personID: string }> = ({ personID }) => {
         <Link href={`/managePersons`} sx={smallButtonStyles}>
           Cancel
         </Link>
-        <Button type="submit" sx={{ ...smallButtonStyles, ...(newPosition.trim().length > 0 && activeButtonStyles) }}>
+        <Button type="submit" disabled={newPosition.trim().length === 0} sx={{ ...smallButtonStyles, ...(newPosition.trim().length > 0 && activeButtonStyles) }}>
           Change
         </Button>
       </Box>

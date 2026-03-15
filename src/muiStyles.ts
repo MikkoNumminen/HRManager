@@ -21,6 +21,13 @@ export const smallButtonStyles = {
     backgroundColor: colors.slate600,
     borderColor: colors.slate300,
   },
+  "&.Mui-disabled": {
+    opacity: 0.25,
+    borderColor: colors.slate300,
+    color: colors.slate300,
+    cursor: "not-allowed",
+    pointerEvents: "auto",
+  },
   outline: "none",
 };
 

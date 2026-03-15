@@ -41,7 +41,7 @@ const AddTeamForm: React.FC<{ onSuccess?: () => void }> = ({ onSuccess }) => {
         <Link href=".." sx={smallButtonStyles}>
           Cancel
         </Link>
-        <Button type="submit" sx={{ ...smallButtonStyles, ...(isValid && activeButtonStyles) }}>
+        <Button type="submit" disabled={!isValid} sx={{ ...smallButtonStyles, ...(isValid && activeButtonStyles) }}>
           Create
         </Button>
       </Box>
