@@ -44,7 +44,7 @@ describe("Update Email", () => {
     const emailInput = screen.getByPlaceholderText(
       "Enter New Email"
     ) as HTMLInputElement;
-    userEvent.type(emailInput, "new.email@example.com");
+    fireEvent.change(emailInput, { target: { value: "new.email@example.com" } });
 
     // Find and click the submit button
     const submitButton = screen.getByRole("button", { name: /Change/i });

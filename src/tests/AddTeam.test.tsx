@@ -7,30 +7,13 @@ jest.mock("../serverActions", () => ({
   createTeam: jest.fn(),
 }));
 
-let originalLocation: Location;
-const mockReload = jest.fn();
-
-beforeAll(() => {
-  originalLocation = globalThis.location;
-
-  Object.defineProperty(globalThis, "location", {
-    value: {
-      ...originalLocation,
-      reload: mockReload,
-    },
-    writable: true,
-  });
-});
+const mockPush = jest.fn();
+jest.mock("next/navigation", () => ({
+  useRouter: () => ({ push: mockPush }),
+}));
 
 beforeEach(() => {
   jest.clearAllMocks();
-});
-
-afterAll(() => {
-  Object.defineProperty(globalThis, "location", {
-    value: originalLocation,
-    writable: true,
-  });
 });
 
 describe("AddTeam Component", () => {
@@ -40,7 +23,7 @@ describe("AddTeam Component", () => {
     render(<AddTeamForm />);
 
     const nameInput = screen.getByPlaceholderText("Enter Team Name");
-    userEvent.type(nameInput, "Engineering");
+    fireEvent.change(nameInput, { target: { value: "Engineering" } });
 
     const submitButton = screen.getByRole("button", { name: /Create/i });
     fireEvent.click(submitButton);
@@ -49,6 +32,6 @@ describe("AddTeam Component", () => {
       expect(mockedCreateTeam).toHaveBeenCalledWith(expect.any(FormData));
     });
 
-    expect(mockReload).toHaveBeenCalled();
+    expect(mockPush).toHaveBeenCalledWith("/manageTeams");
   });
 });

@@ -44,7 +44,7 @@ describe("UpdatePosition Component", () => {
     const positionInput = screen.getByPlaceholderText(
       "Enter New Position"
     ) as HTMLInputElement;
-    userEvent.type(positionInput, "Senior Developer");
+    fireEvent.change(positionInput, { target: { value: "Senior Developer" } });
 
     // Find and click the submit button
     const submitButton = screen.getByRole("button", { name: /Change/i });
