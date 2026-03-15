@@ -34,7 +34,7 @@ const AddPersonForm: React.FC = () => {
         onChange={(e) => setName(e.target.value)}
       />
       <input
-        type="text"
+        type="email"
         name="email"
         placeholder="Enter Email"
         className={inputField}

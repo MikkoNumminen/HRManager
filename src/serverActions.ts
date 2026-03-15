@@ -37,6 +37,9 @@ export async function createPerson(data: FormData) {
   if (typeof email !== "string" || email.length === 0) {
     throw new Error("Email is required");
   }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    throw new Error("Invalid email format");
+  }
 
   const existingPerson = await prisma.person.findUnique({ where: { email } });
   if (existingPerson) {
@@ -116,6 +119,9 @@ export async function updateEmail(data: FormData) {
   const newEmail = data.get("name")?.toString();
   if (!newEmail) {
     throw new Error("New Email is missing");
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) {
+    throw new Error("Invalid email format");
   }
 
   const existingPerson = await prisma.person.findUnique({ where: { email: newEmail } });

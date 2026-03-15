@@ -30,7 +30,7 @@ const UpdateEmailForm: React.FC<{ personID: string }> = ({ personID }) => {
     <form onSubmit={handleSubmit} className={collectedPageForm}>
       <Typography variant="h5">Change Email</Typography>
       <input
-        type="text"
+        type="email"
         name="name"
         placeholder="Enter New Email"
         className={inputField}
