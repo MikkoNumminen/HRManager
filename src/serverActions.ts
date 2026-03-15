@@ -317,7 +317,7 @@ export async function getTeams() {
         members: team.members?.map((member) => ({
           name: member.person.name ?? "",
           email: member.person.email ?? "",
-        })) ?? [{ name: "none", email: "none" }], // TODO: Default to an empty array if members is undefined. Add the rest. Refactor codebase.
+        })) ?? [],
       };
 
       try {
