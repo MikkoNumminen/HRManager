@@ -70,6 +70,8 @@ const AddMemberForm: React.FC<{ teamID: string }> = ({ teamID }) => {
               <PersonCheckBoxList
                 key={p.id}
                 {...p}
+                groupName="addMember-personID"
+                selectedId={selectedMember}
                 onSelect={(personID: string) => setSelectedMember(personID)}
               />
             ))}

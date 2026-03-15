@@ -71,7 +71,9 @@ const UpdateManagerForm: React.FC<{ teamID: string }> = ({ teamID }) => {
               <PersonCheckBoxList
                 key={p.id}
                 {...p}
-                onSelect={(personID: string) => setNewManager(personID)} // Set new manager ID
+                groupName="addManager-personID"
+                selectedId={newManager}
+                onSelect={(personID: string) => setNewManager(personID)}
               />
             ))}
           </ul>

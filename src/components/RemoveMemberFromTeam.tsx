@@ -71,7 +71,9 @@ const RemoveMemberForm: React.FC<{ teamID: string }> = ({ teamID }) => {
               <PersonCheckBoxList
                 key={p.id}
                 {...p}
-                onSelect={(personID: string) => setSelectedMember(personID)} // Set selected member ID
+                groupName="removeMember-personID"
+                selectedId={selectedMember}
+                onSelect={(personID: string) => setSelectedMember(personID)}
               />
             ))}
           </ul>
