@@ -62,17 +62,11 @@ describe("Update Email", () => {
   test("should handle form input change", () => {
     render(<UpdateEmailForm personID={personID} />);
 
-    // Find the input field and change its value
     const emailInput = screen.getByPlaceholderText(
       "Enter New Email"
     ) as HTMLInputElement;
-    userEvent.clear(emailInput);
-    userEvent.type(emailInput, "updated.email@example.com");
+    fireEvent.change(emailInput, { target: { value: "updated.email@example.com" } });
 
-    // Adding a delay to make sure that state update is applied
-    setTimeout(() => {
-      // Verify that the input field's value is updated
-      expect(emailInput.value).toBe("updated.email@example.com");
-    }, 500); // Adjust time as needed
+    expect(emailInput.value).toBe("updated.email@example.com");
   });
 });

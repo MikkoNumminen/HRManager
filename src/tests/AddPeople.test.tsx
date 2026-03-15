@@ -9,6 +9,7 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import AddPersonForm from "../components/AddPeople";
 import { createPerson } from "../serverActions";
+import "@testing-library/jest-dom";
 
 // Mock the createPerson function
 jest.mock("../serverActions", () => ({
@@ -44,6 +45,13 @@ afterAll(() => {
 });
 
 describe("AddPerson Component", () => {
+  test("should have an enabled submit button", () => {
+    render(<AddPersonForm />);
+
+    const submitButton = screen.getByRole("button", { name: /Create/i });
+    expect(submitButton).not.toBeDisabled();
+  });
+
   test("submits the form and calls createPerson", async () => {
     const mockedCreatePerson = createPerson as jest.MockedFunction<
       typeof createPerson

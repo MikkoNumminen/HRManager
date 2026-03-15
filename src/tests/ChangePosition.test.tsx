@@ -62,17 +62,11 @@ describe("UpdatePosition Component", () => {
   test("should handle form input change", () => {
     render(<UpdatePositionForm personID={personID} />);
 
-    // Find the input field and change its value
     const positionInput = screen.getByPlaceholderText(
       "Enter New Position"
     ) as HTMLInputElement;
-    userEvent.clear(positionInput);
-    userEvent.type(positionInput, "Lead Developer");
+    fireEvent.change(positionInput, { target: { value: "Lead Developer" } });
 
-    // Adding a delay to make sure that state update is applied
-    setTimeout(() => {
-      // Verify that the input field's value is updated
-      expect(positionInput.value).toBe("Lead Developer");
-    }, 500); // Adjust time as needed
+    expect(positionInput.value).toBe("Lead Developer");
   });
 });
