@@ -153,16 +153,14 @@ export async function addManager(data: FormData) {
       },
     });
 
-    if (existingMember) {
-      throw new Error("Person is already a member of the team");
+    if (!existingMember) {
+      await prisma.teamMember.create({
+        data: {
+          personId: personID,
+          teamId: teamID[0],
+        },
+      });
     }
-
-    await prisma.teamMember.create({
-      data: {
-        personId: personID,
-        teamId: teamID[0],
-      },
-    });
   });
 
   redirect("/");
