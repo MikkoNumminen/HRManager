@@ -1,4 +1,5 @@
 // TODO: Maby serverside? Fix tests?
+// TODO: In manage persons, change color of the buttons if all of the data is not filled in
 "use client";
 
 import { useEffect, useState } from "react";

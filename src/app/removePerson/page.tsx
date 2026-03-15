@@ -1,31 +1,17 @@
-import { prisma } from "@/db";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { RemovePersonCheckBoxList } from "@/components/RemovePersonCheckBoxList";
 import { generalButton, header } from "@/tailwindStyles";
-import { getPersons } from "@/utilities";
+import { getPersons, removePerson } from "@/serverActions";
 
-// Server action, experimental
-async function removePerson(data: FormData) {
+async function handleSubmit(data: FormData) {
   "use server";
-
-  const personID = data.getAll("personID") as string[];
-  if (!Array.isArray(personID) || personID.length === 0) {
-    throw new Error("No personID selected");
-  }
-  await prisma.person.deleteMany({
-    where: {
-      id: { in: personID },
-    },
-  });
-
-  // TODO: When person is removed check if person is a team manager
-
+  await removePerson(data);
   redirect("/");
 }
 
 export default async function Page() {
-  const persons = await getPersons(); // TODO: cache
+  const persons = await getPersons();
   return (
     <>
       <header className={header}>
@@ -33,7 +19,7 @@ export default async function Page() {
       </header>
 
       <form
-        action={removePerson}
+        action={handleSubmit}
         method="POST"
         className="flex gap-2 flex-col border border-slate-300 rounded p-4"
       >
