@@ -38,21 +38,21 @@ const ManageTeamsPage: React.FC = () => {
     fetchPersons();
   }, []); // Empty dependency array means this will run once when the component mounts
 
+  const fetchTeams = async () => {
+    try {
+      setLoadingTeams(true);
+      const data = await getTeams();
+      setTeams(data);
+    } catch (err) {
+      console.error("Failed to fetch teams:", err);
+      setErrorTeams("Failed to fetch data");
+    } finally {
+      setLoadingTeams(false);
+    }
+  };
+
   // Fetch teams on component mount
   useEffect(() => {
-    const fetchTeams = async () => {
-      try {
-        setLoadingTeams(true);
-        const data = await getTeams();
-        setTeams(data);
-      } catch (err) {
-        console.error("Failed to fetch teams:", err);
-        setErrorTeams("Failed to fetch data");
-      } finally {
-        setLoadingTeams(false);
-      }
-    };
-
     fetchTeams();
   }, []); // Empty dependency array means this will run once when the component mounts
 
@@ -68,7 +68,7 @@ const ManageTeamsPage: React.FC = () => {
         Manage Teams
       </Typography>
       <Box mb={4}>
-        <AddTeamForm />
+        <AddTeamForm onSuccess={fetchTeams} />
       </Box>
       <EditableTeamsTable combinedTeams={teams} />
     </>

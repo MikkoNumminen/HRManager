@@ -14,20 +14,20 @@ const ManagePersonsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchPersons = async () => {
-      try {
-        setLoading(true);
-        const data = await getPersons();
-        setPersons(data);
-      } catch (err) {
-        console.error("Failed to fetch persons:", err);
-        setError("Failed to fetch data");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchPersons = async () => {
+    try {
+      setLoading(true);
+      const data = await getPersons();
+      setPersons(data);
+    } catch (err) {
+      console.error("Failed to fetch persons:", err);
+      setError("Failed to fetch data");
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchPersons();
   }, []); // Empty dependency array means this will run once when the component mounts
 
@@ -40,7 +40,7 @@ const ManagePersonsPage: React.FC = () => {
         Manage Persons
       </Typography>
       <Box mb={4}>
-        <AddPersonForm />
+        <AddPersonForm onSuccess={fetchPersons} />
       </Box>
       <PersonTable persons={persons} />
     </>

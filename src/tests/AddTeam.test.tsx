@@ -7,11 +7,6 @@ jest.mock("../serverActions", () => ({
   createTeam: jest.fn(),
 }));
 
-const mockPush = jest.fn();
-jest.mock("next/navigation", () => ({
-  useRouter: () => ({ push: mockPush }),
-}));
-
 beforeEach(() => {
   jest.clearAllMocks();
 });
@@ -31,7 +26,5 @@ describe("AddTeam Component", () => {
     await waitFor(() => {
       expect(mockedCreateTeam).toHaveBeenCalledWith(expect.any(FormData));
     });
-
-    expect(mockPush).toHaveBeenCalledWith("/manageTeams");
   });
 });

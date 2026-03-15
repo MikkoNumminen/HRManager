@@ -8,11 +8,6 @@ jest.mock("../serverActions", () => ({
   createPerson: jest.fn(),
 }));
 
-const mockPush = jest.fn();
-jest.mock("next/navigation", () => ({
-  useRouter: () => ({ push: mockPush }),
-}));
-
 beforeEach(() => {
   jest.clearAllMocks();
 });
@@ -44,7 +39,5 @@ describe("AddPerson Component", () => {
     await waitFor(() => {
       expect(mockedCreatePerson).toHaveBeenCalledWith(expect.any(FormData));
     });
-
-    expect(mockPush).toHaveBeenCalledWith("/managePersons");
   });
 });
