@@ -9,10 +9,12 @@ import { useState } from "react";
 
 const UpdatePositionForm: React.FC<{ personID: string }> = ({ personID }) => {
   const [newPosition, setNewPosition] = useState("");
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const router = useRouter();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setSubmitError(null);
 
     try {
       const formData = new FormData(event.currentTarget);
@@ -20,16 +22,16 @@ const UpdatePositionForm: React.FC<{ personID: string }> = ({ personID }) => {
       formData.set("name", newPosition);
       await updatePosition(formData);
 
-      // After successful update, navigate to the desired route
       router.push(`/managePersons`);
     } catch (error) {
-      console.error("Error updating position:", error);
+      setSubmitError(error instanceof Error ? error.message : "An error occurred");
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className={collectedPageForm}>
       <Typography variant="h5">Change Position</Typography>
+      {submitError && <Typography color="error">{submitError}</Typography>}
       <input
         type="text"
         name="name"

@@ -9,22 +9,25 @@ import { useState } from "react";
 const AddPersonForm: React.FC = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const isValid = name.trim().length > 0 && email.trim().length > 0;
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setSubmitError(null);
 
     try {
       await createPerson(new FormData(event.currentTarget));
       window.location.reload();
     } catch (error) {
-      console.error("Error creating person:", error);
+      setSubmitError(error instanceof Error ? error.message : "An error occurred");
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className={collectedPageForm}>
       <Typography variant="h5">Add Person</Typography>
+      {submitError && <Typography color="error">{submitError}</Typography>}
       <input
         type="text"
         name="name"

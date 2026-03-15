@@ -8,22 +8,25 @@ import { useState } from "react";
 
 const AddTeamForm: React.FC = () => {
   const [name, setName] = useState("");
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const isValid = name.trim().length > 0;
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setSubmitError(null);
 
     try {
       await createTeam(new FormData(event.currentTarget));
       window.location.reload();
     } catch (error) {
-      console.error("Error creating team:", error);
+      setSubmitError(error instanceof Error ? error.message : "An error occurred");
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className={collectedPageForm}>
       <Typography variant="h5">Add Team</Typography>
+      {submitError && <Typography color="error">{submitError}</Typography>}
       <input
         type="text"
         name="name"

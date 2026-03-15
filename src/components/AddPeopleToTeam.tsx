@@ -14,6 +14,7 @@ const AddMemberForm: React.FC<{ teamID: string }> = ({ teamID }) => {
   const [persons, setPersons] = useState<Person[]>([]);
   const [loadingPersons, setLoadingPersons] = useState(true);
   const [errorPersons, setErrorPersons] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -35,6 +36,7 @@ const AddMemberForm: React.FC<{ teamID: string }> = ({ teamID }) => {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setSubmitError(null);
 
     try {
       const formData = new FormData();
@@ -45,7 +47,7 @@ const AddMemberForm: React.FC<{ teamID: string }> = ({ teamID }) => {
 
       router.push(`/manageTeams`);
     } catch (error) {
-      console.error("Error adding member:", error);
+      setSubmitError(error instanceof Error ? error.message : "An error occurred");
     }
   };
 
@@ -54,6 +56,7 @@ const AddMemberForm: React.FC<{ teamID: string }> = ({ teamID }) => {
       <header className={header}>
         <Typography variant="h4">Add Member to Team</Typography>
       </header>
+      {submitError && <Typography color="error">{submitError}</Typography>}
 
       <Box className="pl-2 mb-2">
         <Typography>Select Member</Typography>

@@ -10,10 +10,11 @@ import { Person } from "@prisma/client";
 import { activeButtonStyles, smallButtonStyles } from "@/muiStyles";
 
 const UpdateManagerForm: React.FC<{ teamID: string }> = ({ teamID }) => {
-  const [newManager, setNewManager] = useState<string>(""); // State for selected manager ID
+  const [newManager, setNewManager] = useState<string>("");
   const [persons, setPersons] = useState<Person[]>([]);
   const [loadingPersons, setLoadingPersons] = useState(true);
   const [errorPersons, setErrorPersons] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const router = useRouter();
 
   // Fetch persons on component mount
@@ -36,6 +37,7 @@ const UpdateManagerForm: React.FC<{ teamID: string }> = ({ teamID }) => {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setSubmitError(null);
 
     try {
       const formData = new FormData();
@@ -44,10 +46,9 @@ const UpdateManagerForm: React.FC<{ teamID: string }> = ({ teamID }) => {
 
       await addManager(formData);
 
-      // After successful update, navigate to the desired route
       router.push(`/manageTeams`);
     } catch (error) {
-      console.error("Error updating manager:", error);
+      setSubmitError(error instanceof Error ? error.message : "An error occurred");
     }
   };
 
@@ -56,6 +57,7 @@ const UpdateManagerForm: React.FC<{ teamID: string }> = ({ teamID }) => {
       <header className={header}>
         <Typography variant="h4">Add Manager to Team</Typography>
       </header>
+      {submitError && <Typography color="error">{submitError}</Typography>}
 
       <Box className="pl-2 mb-2">
         <Typography>Select Manager</Typography>
