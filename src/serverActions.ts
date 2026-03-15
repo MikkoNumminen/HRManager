@@ -108,8 +108,8 @@ export async function updatePosition(data: FormData) {
 }
 
 export async function updateEmail(data: FormData) {
-  const personIDs = data.getAll("personID") as string[];
-  if (!Array.isArray(personIDs) || personIDs.length === 0) {
+  const personID = data.get("personID")?.toString();
+  if (!personID) {
     throw new Error("No personID selected");
   }
 
@@ -124,16 +124,14 @@ export async function updateEmail(data: FormData) {
   }
 
   await prisma.$transaction(async (prisma) => {
-    for (const id of personIDs) {
-      await prisma.person.update({
-        where: {
-          id: id,
-        },
-        data: {
-          email: newEmail,
-        },
-      });
-    }
+    await prisma.person.update({
+      where: {
+        id: personID,
+      },
+      data: {
+        email: newEmail,
+      },
+    });
   });
 }
 
