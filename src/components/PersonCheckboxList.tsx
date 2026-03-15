@@ -17,11 +17,12 @@ export function PersonCheckBoxList({
   selectedId,
 }: PersonListProps) {
   const isSelected = selectedId === id;
+  const inputId = `${groupName}-${id}`;
 
   return (
     <li className="flex gap-1 items-center">
       <input
-        id={id}
+        id={inputId}
         type="radio"
         name={groupName}
         value={id}
@@ -31,7 +32,7 @@ export function PersonCheckBoxList({
         onClick={() => { if (isSelected) onSelect(""); }}
       />
       <label
-        htmlFor={id}
+        htmlFor={inputId}
         className="cursor-pointer peer-checked:line-through peer-checked:text-slate-400"
       >
         <strong>Name:</strong> {name} <strong>Position:</strong>{" "}
