@@ -10,7 +10,8 @@ const AddPersonForm: React.FC<{ onSuccess?: () => void }> = ({ onSuccess }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const isValid = name.trim().length > 0 && email.trim().length > 0;
+  const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const isValid = name.trim().length > 0 && EMAIL_REGEX.test(email.trim());
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();

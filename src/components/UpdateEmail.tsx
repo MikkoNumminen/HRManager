@@ -7,9 +7,12 @@ import { Box, Button, Link, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 const UpdateEmailForm: React.FC<{ personID: string }> = ({ personID }) => {
   const [newEmail, setNewEmail] = useState("");
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const isValid = EMAIL_REGEX.test(newEmail.trim());
   const router = useRouter();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -45,7 +48,7 @@ const UpdateEmailForm: React.FC<{ personID: string }> = ({ personID }) => {
         <Link href={`/managePersons`} sx={smallButtonStyles}>
           Cancel
         </Link>
-        <Button type="submit" sx={{ ...smallButtonStyles, ...(newEmail.trim().length > 0 && activeButtonStyles) }}>
+        <Button type="submit" sx={{ ...smallButtonStyles, ...(isValid && activeButtonStyles) }}>
           Change
         </Button>
       </Box>
