@@ -334,7 +334,5 @@ export async function getTeams() {
   } catch (error) {
     console.error("Error fetching teams:", error);
     return [];
-  } finally {
-    await prisma.$disconnect();
   }
 }
