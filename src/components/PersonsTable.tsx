@@ -54,7 +54,7 @@ const PersonTable: React.FC<PersonTableProps> = ({ persons }) => {
             persons.map((person) => (
               <TableRow key={person.id}>
                 <TableCell>{person.name}</TableCell>
-                <TableCell>{person.position}</TableCell>
+                <TableCell>{person.position === "-" ? "" : person.position}</TableCell>
                 <TableCell>{person.email}</TableCell>
                 <TableCell>
                   {new Date(person.createdAt).toLocaleString()}

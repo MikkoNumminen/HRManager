@@ -60,13 +60,13 @@ const TeamsTable: React.FC<CombinedTeamProps> = ({ combinedTeams }) => {
                 <TableCell>{team.teamName}</TableCell>
                 <TableCell>{team.managerName || "No Manager Assigned"}</TableCell>
                 <TableCell>
-                  <ul>
+                  <Box>
                     {team.members.map((member) => (
-                      <li key={`${team.teamId}-${member.name}`}>
+                      <Typography key={`${team.teamId}-${member.name}`} variant="body2">
                         {member.name}
-                      </li>
+                      </Typography>
                     ))}
-                  </ul>
+                  </Box>
                 </TableCell>
                 <TableCell>
                   {new Date(team.createdAt).toLocaleString()}

@@ -46,7 +46,7 @@ export function PersonCheckBoxList({
           }}
         >
           <strong>Name:</strong> {name} <strong>Position:</strong>{" "}
-          {position ?? "N/A"} <strong>Email:</strong>{" "}
+          {position || ""} <strong>Email:</strong>{" "}
           {email || "No email provided"}
         </Typography>
       }

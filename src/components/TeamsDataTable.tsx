@@ -1,5 +1,5 @@
 import React from 'react';
-import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import { Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 
 interface TeamData {
   teamName: string;
@@ -28,13 +28,13 @@ const TeamsDataTable: React.FC<TeamsDataTableProps> = ({ teamsData }) => {
             <TableRow key={index}>
               <TableCell>{team.teamName}</TableCell>
               <TableCell>
-                <ul>
+                <Box>
                   {team.members.map((member, idx) => (
-                    <li key={idx}>
+                    <Typography key={idx} variant="body2">
                       {member.name} - {member.email}
-                    </li>
+                    </Typography>
                   ))}
-                </ul>
+                </Box>
               </TableCell>
             </TableRow>
           ))}

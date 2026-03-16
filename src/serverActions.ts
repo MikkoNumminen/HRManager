@@ -49,7 +49,7 @@ export async function createPerson(data: FormData) {
     await prisma.person.create({
       data: {
         name: name.trim(),
-        position: "-",
+        position: null,
         email: email.trim(),
       },
     });

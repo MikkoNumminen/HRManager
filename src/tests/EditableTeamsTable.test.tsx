@@ -68,10 +68,12 @@ describe("EditableTeamsTable Component", () => {
     expect(screen.getByText("No Manager Assigned")).toBeInTheDocument();
   });
 
-  test("should show fallback when team has no members", () => {
+  test("should show empty cell when team has no members", () => {
     render(<EditableTeamsTable combinedTeams={mockCombinedTeams} />);
 
-    expect(screen.getByText("-")).toBeInTheDocument();
+    const designRow = screen.getByText("Design").closest("tr")!;
+    const cells = designRow.querySelectorAll("td");
+    expect(cells[2].textContent).toBe("");
   });
 
   test("should navigate to team page on row click", () => {

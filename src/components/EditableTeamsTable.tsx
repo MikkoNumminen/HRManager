@@ -83,17 +83,15 @@ const EditableTeamsTable: React.FC<CombinedTeamProps> = ({ combinedTeams }) => {
                   {team.managerName || "No Manager Assigned"}
                 </TableCell>
                 <TableCell>
-                  <ul>
+                  <Box>
                     {team.members && team.members.length > 0 ? (
                       team.members.map((member) => (
-                        <li key={member.email}>
+                        <Typography key={member.email} variant="body2">
                           {member?.name || "Unknown Name"}
-                        </li>
+                        </Typography>
                       ))
-                    ) : (
-                      <li>-</li>
-                    )}
-                  </ul>
+                    ) : null}
+                  </Box>
                 </TableCell>
                 <TableCell>
                   {new Date(team.createdAt).toLocaleString()}
