@@ -39,7 +39,6 @@ export async function removePerson(data: FormData) {
   }
 
   await prisma.$transaction(async (prisma) => {
-    // Remove person from TeamMember records
     await prisma.teamMember.deleteMany({
       where: {
         personId: { in: personIDs },
@@ -67,12 +66,8 @@ export async function updatePosition(data: FormData) {
 
   await prisma.$transaction(async (prisma) => {
     await prisma.person.update({
-      where: {
-        id: personID,
-      },
-      data: {
-        position: newPosition,
-      },
+      where: { id: personID },
+      data: { position: newPosition },
     });
   });
 }
@@ -98,12 +93,8 @@ export async function updateEmail(data: FormData) {
 
   await prisma.$transaction(async (prisma) => {
     await prisma.person.update({
-      where: {
-        id: personID,
-      },
-      data: {
-        email: newEmail,
-      },
+      where: { id: personID },
+      data: { email: newEmail },
     });
   });
 }
@@ -120,14 +111,9 @@ export async function addManager(data: FormData) {
   }
 
   await prisma.$transaction(async (prisma) => {
-    // Update the team manager
     await prisma.team.update({
-      where: {
-        teamId: teamID[0],
-      },
-      data: {
-        teamManagerId: personID,
-      },
+      where: { teamId: teamID[0] },
+      data: { teamManagerId: personID },
     });
 
     const existingMember = await prisma.teamMember.findUnique({
@@ -177,15 +163,12 @@ export async function addMember(data: FormData) {
       throw new Error("Person is already a member of the team");
     }
 
-    // Create a new team member record
-    const newMember = await prisma.teamMember.create({
+    await prisma.teamMember.create({
       data: {
         personId: personID,
         teamId: teamID,
       },
     });
-
-    console.log("New Team Member created:", newMember);
   });
 
   redirect("..");
