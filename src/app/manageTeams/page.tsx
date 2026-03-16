@@ -1,65 +1,10 @@
-"use client";
-
-import { getPersons, getTeams } from "@/serverActions";
-import { useEffect, useState } from "react";
-import { Person } from "@prisma/client";
 import { Box, Typography } from "@mui/material";
-
 import AddTeamForm from "@/components/AddTeam";
 import EditableTeamsTable from "@/components/EditableTeamsTable";
+import { getTeams } from "@/queries";
 
-const ManageTeamsPage: React.FC = () => {
-  // State for persons
-  const [persons, setPersons] = useState<Person[]>([]);
-  const [loadingPersons, setLoadingPersons] = useState(true);
-  const [errorPersons, setErrorPersons] = useState<string | null>(null);
-
-  // State for teams
-  const [teams, setTeams] = useState<Awaited<ReturnType<typeof getTeams>>>([]);
-  const [loadingTeams, setLoadingTeams] = useState(true);
-  const [errorTeams, setErrorTeams] = useState<string | null>(null);
-
-  // Fetch persons on component mount
-  useEffect(() => {
-    const fetchPersons = async () => {
-      try {
-        setLoadingPersons(true);
-        const data = await getPersons();
-        setPersons(data);
-      } catch (err) {
-        console.error("Failed to fetch persons:", err);
-        setErrorPersons("Failed to fetch data");
-      } finally {
-        setLoadingPersons(false);
-      }
-    };
-
-    fetchPersons();
-  }, []); // Empty dependency array means this will run once when the component mounts
-
-  const fetchTeams = async () => {
-    try {
-      setLoadingTeams(true);
-      const data = await getTeams();
-      setTeams(data);
-    } catch (err) {
-      console.error("Failed to fetch teams:", err);
-      setErrorTeams("Failed to fetch data");
-    } finally {
-      setLoadingTeams(false);
-    }
-  };
-
-  // Fetch teams on component mount
-  useEffect(() => {
-    fetchTeams();
-  }, []); // Empty dependency array means this will run once when the component mounts
-
-  if (loadingPersons || loadingTeams)
-    return <Typography>Loading...</Typography>;
-  if (errorPersons)
-    return <Typography color="error">{errorPersons}</Typography>;
-  if (errorTeams) return <Typography color="error">{errorTeams}</Typography>;
+export default async function ManageTeamsPage() {
+  const teams = await getTeams();
 
   return (
     <>
@@ -67,11 +12,9 @@ const ManageTeamsPage: React.FC = () => {
         Manage Teams
       </Typography>
       <Box mb={4}>
-        <AddTeamForm onSuccess={fetchTeams} />
+        <AddTeamForm />
       </Box>
       <EditableTeamsTable combinedTeams={teams} />
     </>
   );
-};
-
-export default ManageTeamsPage;
+}

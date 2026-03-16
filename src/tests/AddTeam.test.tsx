@@ -38,19 +38,17 @@ describe("AddTeam Component", () => {
     });
   });
 
-  test("clears the form and calls onSuccess after successful submit", async () => {
+  test("clears the form after successful submit", async () => {
     (createTeam as jest.MockedFunction<typeof createTeam>).mockResolvedValue(undefined);
-    const onSuccess = jest.fn();
-    render(<AddTeamForm onSuccess={onSuccess} />);
+    render(<AddTeamForm />);
 
     const input = screen.getByLabelText(/Enter Team Name/i);
     fireEvent.change(input, { target: { value: "Engineering" } });
     fireEvent.click(screen.getByRole("button", { name: /Create/i }));
 
     await waitFor(() => {
-      expect(onSuccess).toHaveBeenCalled();
+      expect((input as HTMLInputElement).value).toBe("");
     });
-    expect((input as HTMLInputElement).value).toBe("");
   });
 
   test("shows error message when createTeam fails", async () => {

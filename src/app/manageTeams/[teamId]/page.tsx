@@ -1,6 +1,6 @@
 import UpdateManagerForm from "@/components/UpdateManager";
 import RemoveTeamForm from "@/components/RemoveTeam";
-import { getTeams } from "@/serverActions";
+import { getPersons, getTeams } from "@/queries";
 import { Box, Typography } from "@mui/material";
 import AddPeopleToTeam from "@/components/AddPeopleToTeam";
 import RemoveMemberFromTeam from "@/components/RemoveMemberFromTeam";
@@ -18,7 +18,7 @@ export default async function TeamPage({
     return <Typography variant="h4">Team not found</Typography>;
   }
 
-  const teams = await getTeams();
+  const [teams, persons] = await Promise.all([getTeams(), getPersons()]);
   const team = teams.find((t) => t.teamId === teamId);
 
   if (!team) {
@@ -39,6 +39,7 @@ export default async function TeamPage({
       <Box mb={2}>
         <UpdateManagerForm
           teamID={teamId}
+          persons={persons}
           showCancel={false}
           excludeIds={team.teamManagerId ? [team.teamManagerId] : []}
         />
@@ -46,6 +47,7 @@ export default async function TeamPage({
       <Box mb={2}>
         <AddPeopleToTeam
           teamID={teamId}
+          persons={persons}
           showCancel={false}
           excludeIds={managerAndMemberIds}
         />
@@ -53,6 +55,7 @@ export default async function TeamPage({
       <Box mb={2}>
         <RemoveMemberFromTeam
           teamID={teamId}
+          persons={persons}
           showCancel={false}
           includeOnlyIds={memberIds}
         />

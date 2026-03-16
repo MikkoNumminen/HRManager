@@ -5,7 +5,7 @@ import { createPerson } from "@/serverActions";
 import { Box, Button, Link, TextField, Tooltip, Typography } from "@mui/material";
 import { useState } from "react";
 
-const AddPersonForm: React.FC<{ onSuccess?: () => void }> = ({ onSuccess }) => {
+const AddPersonForm: React.FC = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -20,7 +20,6 @@ const AddPersonForm: React.FC<{ onSuccess?: () => void }> = ({ onSuccess }) => {
       await createPerson(new FormData(event.currentTarget));
       setName("");
       setEmail("");
-      onSuccess?.();
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : "An error occurred");
     }

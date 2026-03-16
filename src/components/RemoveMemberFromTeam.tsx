@@ -1,37 +1,17 @@
 "use client";
 
-import { removeMember, getPersons } from "@/serverActions";
+import { removeMember } from "@/serverActions";
 import { activeButtonStyles, formStyles, headerStyles, smallButtonStyles } from "@/muiStyles";
 import { Box, Button, Link, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { PersonCheckBoxList } from "./PersonCheckboxList";
 import { Person } from "@prisma/client";
 
-const RemoveMemberForm: React.FC<{ teamID: string; showCancel?: boolean; includeOnlyIds?: string[] }> = ({ teamID, showCancel = true, includeOnlyIds }) => {
+const RemoveMemberForm: React.FC<{ teamID: string; persons: Person[]; showCancel?: boolean; includeOnlyIds?: string[] }> = ({ teamID, persons, showCancel = true, includeOnlyIds }) => {
   const [selectedMember, setSelectedMember] = useState<string>("");
-  const [persons, setPersons] = useState<Person[]>([]);
-  const [loadingPersons, setLoadingPersons] = useState(true);
-  const [errorPersons, setErrorPersons] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const router = useRouter();
-
-  useEffect(() => {
-    const fetchPersons = async () => {
-      try {
-        setLoadingPersons(true);
-        const data = await getPersons();
-        setPersons(data);
-      } catch (err) {
-        console.error("Failed to fetch persons:", err);
-        setErrorPersons("Failed to fetch data");
-      } finally {
-        setLoadingPersons(false);
-      }
-    };
-
-    fetchPersons();
-  }, []);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -59,23 +39,17 @@ const RemoveMemberForm: React.FC<{ teamID: string; showCancel?: boolean; include
 
       <Box sx={{ pl: 1, mb: 1 }}>
         <Typography variant="body2">Select Member</Typography>
-        {loadingPersons ? (
-          <Typography>Loading...</Typography>
-        ) : errorPersons ? (
-          <Typography>{errorPersons}</Typography>
-        ) : (
-          <Box>
-            {persons.filter((p) => !includeOnlyIds || includeOnlyIds.includes(p.id)).map((p) => (
-              <PersonCheckBoxList
-                key={p.id}
-                {...p}
-                groupName="removeMember-personID"
-                selectedId={selectedMember}
-                onSelect={(personID: string) => setSelectedMember(personID)}
-              />
-            ))}
-          </Box>
-        )}
+        <Box>
+          {persons.filter((p) => !includeOnlyIds || includeOnlyIds.includes(p.id)).map((p) => (
+            <PersonCheckBoxList
+              key={p.id}
+              {...p}
+              groupName="removeMember-personID"
+              selectedId={selectedMember}
+              onSelect={(personID: string) => setSelectedMember(personID)}
+            />
+          ))}
+        </Box>
       </Box>
 
       <Box display="flex" gap={1} justifyContent="flex-end">

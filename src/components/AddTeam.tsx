@@ -5,7 +5,7 @@ import { createTeam } from "@/serverActions";
 import { Box, Button, Link, TextField, Tooltip, Typography } from "@mui/material";
 import { useState } from "react";
 
-const AddTeamForm: React.FC<{ onSuccess?: () => void }> = ({ onSuccess }) => {
+const AddTeamForm: React.FC = () => {
   const [name, setName] = useState("");
   const [submitError, setSubmitError] = useState<string | null>(null);
   const isValid = name.trim().length > 0;
@@ -17,7 +17,6 @@ const AddTeamForm: React.FC<{ onSuccess?: () => void }> = ({ onSuccess }) => {
     try {
       await createTeam(new FormData(event.currentTarget));
       setName("");
-      onSuccess?.();
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : "An error occurred");
     }

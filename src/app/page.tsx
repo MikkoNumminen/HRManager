@@ -38,7 +38,7 @@ import { Box, Typography, Link, Tooltip } from "@mui/material";
 import PersonTable from "@/components/PersonsTable";
 import TeamsTable from "@/components/TeamsTable";
 import { boxStyles } from "@/muiStyles";
-import { getPersons, getTeams } from "@/serverActions";
+import { getPersons, getTeams } from "@/queries";
 
 export default async function Home() {
   const persons = await getPersons();

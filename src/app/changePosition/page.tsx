@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { formStyles, headerStyles, smallButtonStyles, textFieldStyles } from "@/muiStyles";
-import { getPersons, updatePosition } from "@/serverActions";
+import { updatePosition } from "@/serverActions";
+import { getPersons } from "@/queries";
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { RemovePersonCheckBoxList } from "@/components/RemovePersonCheckBoxList";
 

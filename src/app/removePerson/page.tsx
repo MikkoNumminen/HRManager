@@ -2,7 +2,8 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { RemovePersonCheckBoxList } from "@/components/RemovePersonCheckBoxList";
 import { formStyles, headerStyles, smallButtonStyles } from "@/muiStyles";
-import { getPersons, removePerson } from "@/serverActions";
+import { removePerson } from "@/serverActions";
+import { getPersons } from "@/queries";
 import { Box, Button, Typography } from "@mui/material";
 
 async function handleSubmit(data: FormData) {

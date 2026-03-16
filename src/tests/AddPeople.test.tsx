@@ -63,10 +63,9 @@ describe("AddPerson Component", () => {
     });
   });
 
-  test("clears the form and calls onSuccess after successful submit", async () => {
+  test("clears the form after successful submit", async () => {
     (createPerson as jest.MockedFunction<typeof createPerson>).mockResolvedValue(undefined);
-    const onSuccess = jest.fn();
-    render(<AddPersonForm onSuccess={onSuccess} />);
+    render(<AddPersonForm />);
 
     const nameInput = screen.getByLabelText(/Enter Name/i);
     const emailInput = screen.getByLabelText(/Enter Email/i);
@@ -75,9 +74,8 @@ describe("AddPerson Component", () => {
     fireEvent.click(screen.getByRole("button", { name: /Create/i }));
 
     await waitFor(() => {
-      expect(onSuccess).toHaveBeenCalled();
+      expect((nameInput as HTMLInputElement).value).toBe("");
     });
-    expect((nameInput as HTMLInputElement).value).toBe("");
     expect((emailInput as HTMLInputElement).value).toBe("");
   });
 

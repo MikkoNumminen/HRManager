@@ -1,7 +1,7 @@
 import RemovePersonForm from "@/components/RemovePerson";
 import UpdateEmailForm from "@/components/UpdateEmail";
 import UpdatePositionForm from "@/components/UpdatePosition";
-import { getPersons } from "@/serverActions";
+import { getPersons } from "@/queries";
 import { Box, Typography } from "@mui/material";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

@@ -1,11 +1,10 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import RemoveMemberFromTeam from "../components/RemoveMemberFromTeam";
-import { removeMember, getPersons } from "../serverActions";
+import { removeMember } from "../serverActions";
 import { useRouter } from "next/navigation";
 
 jest.mock("../serverActions", () => ({
   removeMember: jest.fn(),
-  getPersons: jest.fn(),
 }));
 
 jest.mock("next/navigation", () => ({
@@ -41,34 +40,28 @@ describe("RemoveMemberFromTeam Component", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (getPersons as jest.Mock).mockResolvedValue(mockPersons);
   });
 
-  test("renders the full person list when no includeOnlyIds given", async () => {
-    render(<RemoveMemberFromTeam teamID={teamID} />);
-    await waitFor(() => {
-      expect(screen.getByText(/Alice/)).toBeInTheDocument();
-      expect(screen.getByText(/Bob/)).toBeInTheDocument();
-    });
+  test("renders the full person list when no includeOnlyIds given", () => {
+    render(<RemoveMemberFromTeam teamID={teamID} persons={mockPersons} />);
+    expect(screen.getByText(/Alice/)).toBeInTheDocument();
+    expect(screen.getByText(/Bob/)).toBeInTheDocument();
   });
 
-  test("shows only members in includeOnlyIds", async () => {
-    render(<RemoveMemberFromTeam teamID={teamID} includeOnlyIds={["person-1"]} />);
-    await waitFor(() => screen.getByText(/Alice/));
+  test("shows only members in includeOnlyIds", () => {
+    render(<RemoveMemberFromTeam teamID={teamID} persons={mockPersons} includeOnlyIds={["person-1"]} />);
 
     expect(screen.getByText(/Alice/)).toBeInTheDocument();
     expect(screen.queryByText(/Bob/)).not.toBeInTheDocument();
   });
 
-  test("submit button is disabled when no person is selected", async () => {
-    render(<RemoveMemberFromTeam teamID={teamID} />);
-    await waitFor(() => screen.getByText(/Alice/));
+  test("submit button is disabled when no person is selected", () => {
+    render(<RemoveMemberFromTeam teamID={teamID} persons={mockPersons} />);
     expect(screen.getByRole("button", { name: /Remove Member/i })).toBeDisabled();
   });
 
-  test("submit button is enabled after selecting a person", async () => {
-    render(<RemoveMemberFromTeam teamID={teamID} />);
-    await waitFor(() => screen.getByText(/Alice/));
+  test("submit button is enabled after selecting a person", () => {
+    render(<RemoveMemberFromTeam teamID={teamID} persons={mockPersons} />);
 
     fireEvent.click(screen.getAllByRole("radio")[0]);
     expect(screen.getByRole("button", { name: /Remove Member/i })).not.toBeDisabled();
@@ -76,8 +69,7 @@ describe("RemoveMemberFromTeam Component", () => {
 
   test("submits the form and calls removeMember", async () => {
     (removeMember as jest.Mock).mockResolvedValue(undefined);
-    render(<RemoveMemberFromTeam teamID={teamID} />);
-    await waitFor(() => screen.getByText(/Alice/));
+    render(<RemoveMemberFromTeam teamID={teamID} persons={mockPersons} />);
 
     fireEvent.click(screen.getAllByRole("radio")[0]);
     fireEvent.click(screen.getByRole("button", { name: /Remove Member/i }));
@@ -89,8 +81,7 @@ describe("RemoveMemberFromTeam Component", () => {
 
   test("shows error message when removeMember fails", async () => {
     (removeMember as jest.Mock).mockRejectedValue(new Error("Person is not a member"));
-    render(<RemoveMemberFromTeam teamID={teamID} />);
-    await waitFor(() => screen.getByText(/Alice/));
+    render(<RemoveMemberFromTeam teamID={teamID} persons={mockPersons} />);
 
     fireEvent.click(screen.getAllByRole("radio")[0]);
     fireEvent.click(screen.getByRole("button", { name: /Remove Member/i }));
