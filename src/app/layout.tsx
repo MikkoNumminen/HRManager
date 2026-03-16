@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Box } from "@mui/material";
+import { AppRouterCacheProvider } from "@mui/material-nextjs/v16-appRouter";
 import ThemeRegistry from "@/components/ThemeRegistry";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -17,11 +18,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body style={{ fontFamily: inter.style.fontFamily }}>
-        <ThemeRegistry>
-          <Box sx={{ maxWidth: "1280px", mx: "auto", pl: 2, pt: 2, pb: 2, pr: 18 }}>
-            {children}
-          </Box>
-        </ThemeRegistry>
+        <AppRouterCacheProvider>
+          <ThemeRegistry>
+            <Box sx={{ maxWidth: "1280px", mx: "auto", pl: 2, pt: 2, pb: 2, pr: 18 }}>
+              {children}
+            </Box>
+          </ThemeRegistry>
+        </AppRouterCacheProvider>
       </body>
     </html>
   );

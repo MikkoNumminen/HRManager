@@ -10,14 +10,16 @@ const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12
 export default async function TeamPage({
   params,
 }: {
-  params: { teamId: string };
+  params: Promise<{ teamId: string }>;
 }) {
-  if (!UUID_REGEX.test(params.teamId)) {
+  const { teamId } = await params;
+
+  if (!UUID_REGEX.test(teamId)) {
     return <Typography variant="h4">Team not found</Typography>;
   }
 
   const teams = await getTeams();
-  const team = teams.find((t) => t.teamId === params.teamId);
+  const team = teams.find((t) => t.teamId === teamId);
 
   if (!team) {
     return <Typography variant="h4">Team not found</Typography>;
@@ -32,25 +34,25 @@ export default async function TeamPage({
     <>
       <Typography variant="h4" mb={2}>Manage {team.teamName}</Typography>
       <Box mb={2}>
-        <RemoveTeamForm teamID={params.teamId} />
+        <RemoveTeamForm teamID={teamId} />
       </Box>
       <Box mb={2}>
         <UpdateManagerForm
-          teamID={params.teamId}
+          teamID={teamId}
           showCancel={false}
           excludeIds={team.teamManagerId ? [team.teamManagerId] : []}
         />
       </Box>
       <Box mb={2}>
         <AddPeopleToTeam
-          teamID={params.teamId}
+          teamID={teamId}
           showCancel={false}
           excludeIds={managerAndMemberIds}
         />
       </Box>
       <Box mb={2}>
         <RemoveMemberFromTeam
-          teamID={params.teamId}
+          teamID={teamId}
           showCancel={false}
           includeOnlyIds={memberIds}
         />

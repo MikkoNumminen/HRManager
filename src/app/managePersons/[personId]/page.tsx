@@ -9,14 +9,16 @@ const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12
 export default async function PersonPage({
   params,
 }: {
-  params: { personId: string };
+  params: Promise<{ personId: string }>;
 }) {
-  if (!UUID_REGEX.test(params.personId)) {
+  const { personId } = await params;
+
+  if (!UUID_REGEX.test(personId)) {
     return <Typography variant="h4">Person not found</Typography>;
   }
 
   const persons = await getPersons();
-  const person = persons.find((p) => p.id === params.personId);
+  const person = persons.find((p) => p.id === personId);
 
   if (!person) {
     return <Typography variant="h4">Person not found</Typography>;
@@ -26,13 +28,13 @@ export default async function PersonPage({
     <>
       <Typography variant="h4" mb={2}>Manage {person.name}</Typography>
       <Box mb={2}>
-        <RemovePersonForm personID={params.personId} />
+        <RemovePersonForm personID={personId} />
       </Box>
       <Box mb={2}>
-        <UpdatePositionForm personID={params.personId} showCancel={false} />
+        <UpdatePositionForm personID={personId} showCancel={false} />
       </Box>
       <Box mb={2}>
-        <UpdateEmailForm personID={params.personId} showCancel={false} />
+        <UpdateEmailForm personID={personId} showCancel={false} />
       </Box>
     </>
   );
