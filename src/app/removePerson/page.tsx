@@ -20,18 +20,20 @@ export default async function Page() {
         <Typography variant="h4">Remove Person</Typography>
       </Box>
 
-      <Box sx={formStyles} component="form" action={handleSubmit as never} method="POST">
-        <Box sx={{ pl: 1, mb: 1 }}>
-          {persons.map((p) => (
-            <RemovePersonCheckBoxList key={p.id} {...p} />
-          ))}
-        </Box>
+      <form action={handleSubmit} style={{ display: "contents" }}>
+        <Box sx={formStyles}>
+          <Box sx={{ pl: 1, mb: 1 }}>
+            {persons.map((p) => (
+              <RemovePersonCheckBoxList key={p.id} {...p} />
+            ))}
+          </Box>
 
-        <Box display="flex" gap={1} justifyContent="flex-end">
-          <Button component={Link} href=".." sx={smallButtonStyles}>Cancel</Button>
-          <Button type="submit" sx={smallButtonStyles}>Remove</Button>
+          <Box display="flex" gap={1} justifyContent="flex-end">
+            <Button component={Link} href=".." sx={smallButtonStyles}>Cancel</Button>
+            <Button type="submit" sx={smallButtonStyles}>Remove</Button>
+          </Box>
         </Box>
-      </Box>
+      </form>
     </>
   );
 }

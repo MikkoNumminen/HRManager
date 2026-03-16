@@ -3,32 +3,39 @@
 import { activeButtonStyles, formStyles, smallButtonStyles, textFieldStyles } from "@/muiStyles";
 import { createPerson } from "@/serverActions";
 import { Box, Button, Link, TextField, Tooltip, Typography } from "@mui/material";
-import { useState } from "react";
+import { useActionState, useEffect, useState } from "react";
+
+type FormState = { error: string | null; success: boolean };
 
 const AddPersonForm: React.FC = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [submitError, setSubmitError] = useState<string | null>(null);
   const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const isValid = name.trim().length > 0 && EMAIL_REGEX.test(email.trim());
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setSubmitError(null);
+  const [state, formAction, isPending] = useActionState(
+    async (_prev: FormState, formData: FormData): Promise<FormState> => {
+      try {
+        await createPerson(formData);
+        return { error: null, success: true };
+      } catch (error) {
+        return { error: error instanceof Error ? error.message : "An error occurred", success: false };
+      }
+    },
+    { error: null, success: false },
+  );
 
-    try {
-      await createPerson(new FormData(event.currentTarget));
+  useEffect(() => {
+    if (state.success) {
       setName("");
       setEmail("");
-    } catch (error) {
-      setSubmitError(error instanceof Error ? error.message : "An error occurred");
     }
-  };
+  }, [state]);
 
   return (
-    <Box component="form" onSubmit={handleSubmit} sx={formStyles}>
+    <Box component="form" action={formAction} sx={formStyles}>
       <Typography variant="h5">Add Person</Typography>
-      {submitError && <Typography color="error">{submitError}</Typography>}
+      {state.error && <Typography color="error">{state.error}</Typography>}
       <Tooltip title="Required" placement="right" arrow>
         <TextField
           label="Enter Name"
@@ -52,7 +59,7 @@ const AddPersonForm: React.FC = () => {
       </Tooltip>
       <Box display="flex" gap={1} justifyContent="flex-end">
         <Link href=".." sx={smallButtonStyles}>Cancel</Link>
-        <Button type="submit" disabled={!isValid} sx={{ ...smallButtonStyles, ...(isValid && activeButtonStyles) }}>
+        <Button type="submit" disabled={!isValid || isPending} sx={{ ...smallButtonStyles, ...(isValid && activeButtonStyles) }}>
           Create
         </Button>
       </Box>

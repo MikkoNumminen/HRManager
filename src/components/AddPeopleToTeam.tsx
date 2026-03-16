@@ -3,39 +3,36 @@
 import { addMember } from "@/serverActions";
 import { activeButtonStyles, formStyles, headerStyles, smallButtonStyles } from "@/muiStyles";
 import { Box, Button, Link, Typography } from "@mui/material";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useActionState, useState } from "react";
 import { PersonCheckBoxList } from "./PersonCheckboxList";
 import { Person } from "@prisma/client";
 
+type FormState = { error: string | null };
+
 const AddMemberForm: React.FC<{ teamID: string; persons: Person[]; showCancel?: boolean; excludeIds?: string[] }> = ({ teamID, persons, showCancel = true, excludeIds = [] }) => {
   const [selectedMember, setSelectedMember] = useState<string>("");
-  const [submitError, setSubmitError] = useState<string | null>(null);
-  const router = useRouter();
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setSubmitError(null);
-
-    try {
-      const formData = new FormData();
-      formData.set("teamID", teamID);
-      formData.set("personID", selectedMember);
-
-      await addMember(formData);
-
-      router.push(`/manageTeams`);
-    } catch (error) {
-      setSubmitError(error instanceof Error ? error.message : "An error occurred");
-    }
-  };
+  const [state, formAction, isPending] = useActionState(
+    async (_prev: FormState, formData: FormData): Promise<FormState> => {
+      try {
+        await addMember(formData);
+        return { error: null };
+      } catch (error) {
+        return { error: error instanceof Error ? error.message : "An error occurred" };
+      }
+    },
+    { error: null },
+  );
 
   return (
-    <Box component="form" onSubmit={handleSubmit} sx={formStyles}>
+    <Box component="form" action={formAction} sx={formStyles}>
       <Box sx={headerStyles}>
         <Typography variant="h5">Add Member to Team</Typography>
       </Box>
-      {submitError && <Typography color="error">{submitError}</Typography>}
+      {state.error && <Typography color="error">{state.error}</Typography>}
+
+      <input type="hidden" name="teamID" value={teamID} />
+      <input type="hidden" name="personID" value={selectedMember} />
 
       <Box sx={{ pl: 1, mb: 1 }}>
         <Typography variant="body2">Select Member</Typography>
@@ -54,7 +51,7 @@ const AddMemberForm: React.FC<{ teamID: string; persons: Person[]; showCancel?: 
 
       <Box display="flex" gap={1} justifyContent="flex-end">
         {showCancel && <Link href={`/manageTeams`} sx={smallButtonStyles}>Cancel</Link>}
-        <Button type="submit" disabled={!selectedMember} sx={{ ...smallButtonStyles, ...(selectedMember && activeButtonStyles) }}>
+        <Button type="submit" disabled={!selectedMember || isPending} sx={{ ...smallButtonStyles, ...(selectedMember && activeButtonStyles) }}>
           Add Member
         </Button>
       </Box>

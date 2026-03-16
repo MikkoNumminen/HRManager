@@ -3,39 +3,36 @@
 import { addManager } from "@/serverActions";
 import { activeButtonStyles, formStyles, headerStyles, smallButtonStyles } from "@/muiStyles";
 import { Box, Button, Link, Typography } from "@mui/material";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useActionState, useState } from "react";
 import { PersonCheckBoxList } from "./PersonCheckboxList";
 import { Person } from "@prisma/client";
 
+type FormState = { error: string | null };
+
 const UpdateManagerForm: React.FC<{ teamID: string; persons: Person[]; showCancel?: boolean; excludeIds?: string[] }> = ({ teamID, persons, showCancel = true, excludeIds = [] }) => {
   const [newManager, setNewManager] = useState<string>("");
-  const [submitError, setSubmitError] = useState<string | null>(null);
-  const router = useRouter();
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setSubmitError(null);
-
-    try {
-      const formData = new FormData();
-      formData.set("teamID", teamID);
-      formData.set("personID", newManager);
-
-      await addManager(formData);
-
-      router.push(`/manageTeams`);
-    } catch (error) {
-      setSubmitError(error instanceof Error ? error.message : "An error occurred");
-    }
-  };
+  const [state, formAction, isPending] = useActionState(
+    async (_prev: FormState, formData: FormData): Promise<FormState> => {
+      try {
+        await addManager(formData);
+        return { error: null };
+      } catch (error) {
+        return { error: error instanceof Error ? error.message : "An error occurred" };
+      }
+    },
+    { error: null },
+  );
 
   return (
-    <Box component="form" onSubmit={handleSubmit} sx={formStyles}>
+    <Box component="form" action={formAction} sx={formStyles}>
       <Box sx={headerStyles}>
         <Typography variant="h5">Add Manager to Team</Typography>
       </Box>
-      {submitError && <Typography color="error">{submitError}</Typography>}
+      {state.error && <Typography color="error">{state.error}</Typography>}
+
+      <input type="hidden" name="teamID" value={teamID} />
+      <input type="hidden" name="personID" value={newManager} />
 
       <Box sx={{ pl: 1, mb: 1 }}>
         <Typography variant="body2">Select Manager</Typography>
@@ -54,7 +51,7 @@ const UpdateManagerForm: React.FC<{ teamID: string; persons: Person[]; showCance
 
       <Box display="flex" gap={1} justifyContent="flex-end">
         {showCancel && <Link href={`/manageTeams`} sx={smallButtonStyles}>Cancel</Link>}
-        <Button type="submit" disabled={!newManager} sx={{ ...smallButtonStyles, ...(newManager && activeButtonStyles) }}>
+        <Button type="submit" disabled={!newManager || isPending} sx={{ ...smallButtonStyles, ...(newManager && activeButtonStyles) }}>
           Add Manager
         </Button>
       </Box>

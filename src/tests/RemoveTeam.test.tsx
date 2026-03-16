@@ -1,23 +1,13 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import RemoveTeamForm from "../components/RemoveTeam";
 import { removeTeam } from "../serverActions";
-import { useRouter } from "next/navigation";
 
 jest.mock("../serverActions", () => ({
   removeTeam: jest.fn(),
 }));
 
-jest.mock("next/navigation", () => ({
-  useRouter: jest.fn(),
-}));
-
 describe("RemoveTeam Component", () => {
-  const mockPush = jest.fn();
   const teamID = "team-123";
-
-  beforeAll(() => {
-    (useRouter as jest.Mock).mockReturnValue({ push: mockPush });
-  });
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -37,7 +27,6 @@ describe("RemoveTeam Component", () => {
     await waitFor(() => {
       expect(mockedRemoveTeam).toHaveBeenCalledWith(expect.any(FormData));
     });
-    expect(mockPush).toHaveBeenCalledWith("/manageTeams");
   });
 
   test("shows error message when removeTeam fails", async () => {
