@@ -1,21 +1,13 @@
-/*
-- Added test to verify handling of input field value changes in UpdateEmailForm
-- Added test to ensure form submission triggers `updateEmail` and navigates to the correct route
-- Mocked `useRouter` and `updateEmail` to validate routing and API calls
-*/
-
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import UpdateEmailForm from "../components/UpdateEmail";
 import { updateEmail } from "../serverActions";
 import { useRouter } from "next/navigation";
+import "@testing-library/jest-dom";
 
-// Mock the updateEmail function
 jest.mock("../serverActions", () => ({
   updateEmail: jest.fn(),
 }));
 
-// Mock useRouter hook from next/navigation
 jest.mock("next/navigation", () => ({
   useRouter: jest.fn(),
 }));
@@ -25,7 +17,6 @@ describe("Update Email", () => {
   const personID = "123";
 
   beforeAll(() => {
-    // Mock useRouter to provide the mockPush function
     (useRouter as jest.Mock).mockReturnValue({ push: mockPush });
   });
 
@@ -33,40 +24,64 @@ describe("Update Email", () => {
     jest.clearAllMocks();
   });
 
-  test("should submit the form and call updateEmail", async () => {
-    const mockedUpdateEmail = updateEmail as jest.MockedFunction<
-      typeof updateEmail
-    >;
+  test("submit button is disabled when email is empty", () => {
+    render(<UpdateEmailForm personID={personID} />);
+    expect(screen.getByRole("button", { name: /Change/i })).toBeDisabled();
+  });
 
+  test("submit button is disabled when email format is invalid", () => {
+    render(<UpdateEmailForm personID={personID} />);
+    fireEvent.change(screen.getByPlaceholderText("Enter New Email"), {
+      target: { value: "notanemail" },
+    });
+    expect(screen.getByRole("button", { name: /Change/i })).toBeDisabled();
+  });
+
+  test("submit button is enabled when email format is valid", () => {
+    render(<UpdateEmailForm personID={personID} />);
+    fireEvent.change(screen.getByPlaceholderText("Enter New Email"), {
+      target: { value: "valid@example.com" },
+    });
+    expect(screen.getByRole("button", { name: /Change/i })).not.toBeDisabled();
+  });
+
+  test("should submit the form and call updateEmail", async () => {
+    const mockedUpdateEmail = updateEmail as jest.MockedFunction<typeof updateEmail>;
     render(<UpdateEmailForm personID={personID} />);
 
-    // Find the input field and type a new email
-    const emailInput = screen.getByPlaceholderText(
-      "Enter New Email"
-    ) as HTMLInputElement;
-    fireEvent.change(emailInput, { target: { value: "new.email@example.com" } });
+    fireEvent.change(screen.getByPlaceholderText("Enter New Email"), {
+      target: { value: "new.email@example.com" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /Change/i }));
 
-    // Find and click the submit button
-    const submitButton = screen.getByRole("button", { name: /Change/i });
-    fireEvent.click(submitButton);
-
-    // Wait for updateEmail to be called
     await waitFor(() => {
       expect(mockedUpdateEmail).toHaveBeenCalledWith(expect.any(FormData));
     });
-
-    // Verify that router.push was called to navigate to the new route
     expect(mockPush).toHaveBeenCalledWith("/managePersons");
+  });
+
+  test("shows error message when updateEmail fails", async () => {
+    (updateEmail as jest.MockedFunction<typeof updateEmail>).mockRejectedValue(
+      new Error("A person with this email already exists")
+    );
+    render(<UpdateEmailForm personID={personID} />);
+
+    fireEvent.change(screen.getByPlaceholderText("Enter New Email"), {
+      target: { value: "taken@example.com" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /Change/i }));
+
+    await waitFor(() => {
+      expect(
+        screen.getByText("A person with this email already exists")
+      ).toBeInTheDocument();
+    });
   });
 
   test("should handle form input change", () => {
     render(<UpdateEmailForm personID={personID} />);
-
-    const emailInput = screen.getByPlaceholderText(
-      "Enter New Email"
-    ) as HTMLInputElement;
+    const emailInput = screen.getByPlaceholderText("Enter New Email") as HTMLInputElement;
     fireEvent.change(emailInput, { target: { value: "updated.email@example.com" } });
-
     expect(emailInput.value).toBe("updated.email@example.com");
   });
 });

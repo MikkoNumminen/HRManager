@@ -1,5 +1,4 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import RemoveTeamForm from "../components/RemoveTeam";
 import { removeTeam } from "../serverActions";
 import { useRouter } from "next/navigation";
@@ -25,27 +24,43 @@ describe("RemoveTeam Component", () => {
     jest.clearAllMocks();
   });
 
+  test("submit button is enabled", () => {
+    render(<RemoveTeamForm teamID={teamID} />);
+    expect(screen.getByRole("button", { name: /Remove/i })).not.toBeDisabled();
+  });
+
   test("submits the form and calls removeTeam", async () => {
     const mockedRemoveTeam = removeTeam as jest.MockedFunction<typeof removeTeam>;
-
     render(<RemoveTeamForm teamID={teamID} />);
 
-    const submitButton = screen.getByRole("button", { name: /Remove/i });
-    fireEvent.click(submitButton);
+    fireEvent.click(screen.getByRole("button", { name: /Remove/i }));
 
     await waitFor(() => {
       expect(mockedRemoveTeam).toHaveBeenCalledWith(expect.any(FormData));
     });
-
     expect(mockPush).toHaveBeenCalledWith("/manageTeams");
   });
 
-  test("should handle button click", () => {
+  test("shows error message when removeTeam fails", async () => {
+    (removeTeam as jest.MockedFunction<typeof removeTeam>).mockRejectedValue(
+      new Error("Removal failed")
+    );
     render(<RemoveTeamForm teamID={teamID} />);
 
-    const submitButton = screen.getByRole("button", { name: /Remove/i });
-    userEvent.click(submitButton);
+    fireEvent.click(screen.getByRole("button", { name: /Remove/i }));
 
-    expect(submitButton).not.toBeDisabled();
+    await waitFor(() => {
+      expect(screen.getByText("Removal failed")).toBeInTheDocument();
+    });
+  });
+
+  test("shows Cancel button by default", () => {
+    render(<RemoveTeamForm teamID={teamID} />);
+    expect(screen.getByText("Cancel")).toBeInTheDocument();
+  });
+
+  test("hides Cancel button when showCancel is false", () => {
+    render(<RemoveTeamForm teamID={teamID} showCancel={false} />);
+    expect(screen.queryByText("Cancel")).not.toBeInTheDocument();
   });
 });

@@ -1,21 +1,13 @@
-/*
-- Added test to verify handling of input field value changes in UpdatePositionForm
-- Added test to ensure form submission triggers `updatePosition` and navigates to the correct route
-- Mocked `useRouter` and `updatePosition` to validate routing and API calls
-*/
-
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import UpdatePositionForm from "../components/UpdatePosition";
 import { updatePosition } from "../serverActions";
 import { useRouter } from "next/navigation";
+import "@testing-library/jest-dom";
 
-// Mock the updatePosition function
 jest.mock("../serverActions", () => ({
   updatePosition: jest.fn(),
 }));
 
-// Mock useRouter hook from next/navigation
 jest.mock("next/navigation", () => ({
   useRouter: jest.fn(),
 }));
@@ -25,7 +17,6 @@ describe("UpdatePosition Component", () => {
   const personID = "123";
 
   beforeAll(() => {
-    // Mock useRouter to provide the mockPush function
     (useRouter as jest.Mock).mockReturnValue({ push: mockPush });
   });
 
@@ -33,40 +24,62 @@ describe("UpdatePosition Component", () => {
     jest.clearAllMocks();
   });
 
-  test("should submit the form and call updatePosition", async () => {
-    const mockedUpdatePosition = updatePosition as jest.MockedFunction<
-      typeof updatePosition
-    >;
+  test("submit button is disabled when position is empty", () => {
+    render(<UpdatePositionForm personID={personID} />);
+    expect(screen.getByRole("button", { name: /Change/i })).toBeDisabled();
+  });
 
+  test("submit button is disabled when position is only whitespace", () => {
+    render(<UpdatePositionForm personID={personID} />);
+    fireEvent.change(screen.getByPlaceholderText("Enter New Position"), {
+      target: { value: "   " },
+    });
+    expect(screen.getByRole("button", { name: /Change/i })).toBeDisabled();
+  });
+
+  test("submit button is enabled when position has content", () => {
+    render(<UpdatePositionForm personID={personID} />);
+    fireEvent.change(screen.getByPlaceholderText("Enter New Position"), {
+      target: { value: "Senior Developer" },
+    });
+    expect(screen.getByRole("button", { name: /Change/i })).not.toBeDisabled();
+  });
+
+  test("should submit the form and call updatePosition", async () => {
+    const mockedUpdatePosition = updatePosition as jest.MockedFunction<typeof updatePosition>;
     render(<UpdatePositionForm personID={personID} />);
 
-    // Find the input field and type a new position
-    const positionInput = screen.getByPlaceholderText(
-      "Enter New Position"
-    ) as HTMLInputElement;
-    fireEvent.change(positionInput, { target: { value: "Senior Developer" } });
+    fireEvent.change(screen.getByPlaceholderText("Enter New Position"), {
+      target: { value: "Senior Developer" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /Change/i }));
 
-    // Find and click the submit button
-    const submitButton = screen.getByRole("button", { name: /Change/i });
-    fireEvent.click(submitButton);
-
-    // Wait for updatePosition to be called
     await waitFor(() => {
       expect(mockedUpdatePosition).toHaveBeenCalledWith(expect.any(FormData));
     });
-
-    // Verify that router.push was called to navigate to the new route
     expect(mockPush).toHaveBeenCalledWith("/managePersons");
+  });
+
+  test("shows error message when updatePosition fails", async () => {
+    (updatePosition as jest.MockedFunction<typeof updatePosition>).mockRejectedValue(
+      new Error("Update failed")
+    );
+    render(<UpdatePositionForm personID={personID} />);
+
+    fireEvent.change(screen.getByPlaceholderText("Enter New Position"), {
+      target: { value: "Senior Developer" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /Change/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText("Update failed")).toBeInTheDocument();
+    });
   });
 
   test("should handle form input change", () => {
     render(<UpdatePositionForm personID={personID} />);
-
-    const positionInput = screen.getByPlaceholderText(
-      "Enter New Position"
-    ) as HTMLInputElement;
+    const positionInput = screen.getByPlaceholderText("Enter New Position") as HTMLInputElement;
     fireEvent.change(positionInput, { target: { value: "Lead Developer" } });
-
     expect(positionInput.value).toBe("Lead Developer");
   });
 });

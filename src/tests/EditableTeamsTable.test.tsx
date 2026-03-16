@@ -28,8 +28,8 @@ describe("EditableTeamsTable Component", () => {
       createdAt: new Date("2023-01-01T10:00:00Z"),
       updatedAt: new Date("2023-01-10T10:00:00Z"),
       members: [
-        { name: "John Doe", email: "john.doe@example.com" },
-        { name: "Jane Smith", email: "jane.smith@example.com" },
+        { personId: "person-1", name: "John Doe", email: "john.doe@example.com" },
+        { personId: "person-2", name: "Jane Smith", email: "jane.smith@example.com" },
       ],
     },
     {
