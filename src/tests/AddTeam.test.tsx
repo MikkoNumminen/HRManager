@@ -6,11 +6,11 @@ jest.mock("../serverActions", () => ({
   createTeam: jest.fn(),
 }));
 
-beforeEach(() => {
-  jest.clearAllMocks();
-});
-
 describe("AddTeam Component", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   test("submit button is disabled when name is empty", () => {
     render(<AddTeamForm />);
     expect(screen.getByRole("button", { name: /Create/i })).toBeDisabled();

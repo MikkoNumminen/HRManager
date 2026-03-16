@@ -6,11 +6,11 @@ jest.mock("../serverActions", () => ({
   createPerson: jest.fn(),
 }));
 
-beforeEach(() => {
-  jest.clearAllMocks();
-});
-
 describe("AddPerson Component", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   test("submit button is disabled when fields are empty", () => {
     render(<AddPersonForm />);
     expect(screen.getByRole("button", { name: /Create/i })).toBeDisabled();
