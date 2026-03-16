@@ -283,6 +283,14 @@ export async function removeMember(data: FormData) {
         },
       },
     });
+
+    const team = await prisma.team.findUnique({ where: { teamId: teamID } });
+    if (team?.teamManagerId === personID) {
+      await prisma.team.update({
+        where: { teamId: teamID },
+        data: { teamManagerId: null },
+      });
+    }
   });
 
   redirect("..");
