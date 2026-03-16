@@ -312,6 +312,7 @@ export async function getTeams() {
         createdAt: team.createdAt,
         updatedAt: team.updatedAt,
         members: team.members?.map((member) => ({
+          personId: member.personId,
           name: member.person.name ?? "",
           email: member.person.email ?? "",
         })) ?? [],

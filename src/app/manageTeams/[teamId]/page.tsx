@@ -23,6 +23,11 @@ export default async function TeamPage({
     return <Typography variant="h4">Team not found</Typography>;
   }
 
+  const memberIds = team.members.map((m) => m.personId);
+  const managerAndMemberIds = team.teamManagerId
+    ? [team.teamManagerId, ...memberIds]
+    : memberIds;
+
   return (
     <>
       <Typography variant="h4" mb={2}>Manage {team.teamName}</Typography>
@@ -30,13 +35,25 @@ export default async function TeamPage({
         <RemoveTeamForm teamID={params.teamId} />
       </Box>
       <Box mb={2}>
-        <UpdateManagerForm teamID={params.teamId} showCancel={false} />
+        <UpdateManagerForm
+          teamID={params.teamId}
+          showCancel={false}
+          excludeIds={team.teamManagerId ? [team.teamManagerId] : []}
+        />
       </Box>
       <Box mb={2}>
-        <AddPeopleToTeam teamID={params.teamId} showCancel={false} />
+        <AddPeopleToTeam
+          teamID={params.teamId}
+          showCancel={false}
+          excludeIds={managerAndMemberIds}
+        />
       </Box>
       <Box mb={2}>
-        <RemoveMemberFromTeam teamID={params.teamId} showCancel={false} />
+        <RemoveMemberFromTeam
+          teamID={params.teamId}
+          showCancel={false}
+          includeOnlyIds={memberIds}
+        />
       </Box>
     </>
   );

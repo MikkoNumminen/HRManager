@@ -9,7 +9,7 @@ import { PersonCheckBoxList } from "./PersonCheckboxList";
 import { Person } from "@prisma/client";
 import { activeButtonStyles, smallButtonStyles } from "@/muiStyles";
 
-const UpdateManagerForm: React.FC<{ teamID: string; showCancel?: boolean }> = ({ teamID, showCancel = true }) => {
+const UpdateManagerForm: React.FC<{ teamID: string; showCancel?: boolean; excludeIds?: string[] }> = ({ teamID, showCancel = true, excludeIds = [] }) => {
   const [newManager, setNewManager] = useState<string>("");
   const [persons, setPersons] = useState<Person[]>([]);
   const [loadingPersons, setLoadingPersons] = useState(true);
@@ -67,7 +67,7 @@ const UpdateManagerForm: React.FC<{ teamID: string; showCancel?: boolean }> = ({
           <Typography>{errorPersons}</Typography>
         ) : (
           <ul>
-            {persons.map((p) => (
+            {persons.filter((p) => !excludeIds.includes(p.id)).map((p) => (
               <PersonCheckBoxList
                 key={p.id}
                 {...p}

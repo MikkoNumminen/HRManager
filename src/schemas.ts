@@ -18,6 +18,7 @@ export const TeamSchema = z.object({
   updatedAt: z.date(),
   members: z.array(
     z.object({
+      personId: z.string(),
       name: z.string(),
       email: z.string(),
     })
