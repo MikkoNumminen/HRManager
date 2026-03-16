@@ -11,6 +11,11 @@ const compat = new FlatCompat({
 
 const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
+  ...compat.extends("plugin:jest-dom/recommended"),
+  ...compat.extends("plugin:testing-library/react"),
+  {
+    ignores: ["node_modules/", ".next/", "__mocks__/"],
+  },
 ];
 
 export default eslintConfig;

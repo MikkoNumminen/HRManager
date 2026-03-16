@@ -1,6 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { PersonCheckBoxList } from "../components/PersonCheckboxList";
-import "@testing-library/jest-dom";
 
 const defaultProps = {
   id: "person-1",

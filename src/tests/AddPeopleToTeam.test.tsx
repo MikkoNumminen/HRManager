@@ -2,7 +2,6 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import AddPeopleToTeam from "../components/AddPeopleToTeam";
 import { addMember, getPersons } from "../serverActions";
 import { useRouter } from "next/navigation";
-import "@testing-library/jest-dom";
 
 jest.mock("../serverActions", () => ({
   addMember: jest.fn(),

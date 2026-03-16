@@ -2,7 +2,6 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import RemoveTeamForm from "../components/RemoveTeam";
 import { removeTeam } from "../serverActions";
 import { useRouter } from "next/navigation";
-import "@testing-library/jest-dom";
 
 jest.mock("../serverActions", () => ({
   removeTeam: jest.fn(),
