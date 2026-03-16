@@ -7,7 +7,7 @@ import { Box, Button, Link, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-const UpdatePositionForm: React.FC<{ personID: string }> = ({ personID }) => {
+const UpdatePositionForm: React.FC<{ personID: string; showCancel?: boolean }> = ({ personID, showCancel = true }) => {
   const [newPosition, setNewPosition] = useState("");
   const [submitError, setSubmitError] = useState<string | null>(null);
   const router = useRouter();
@@ -42,9 +42,7 @@ const UpdatePositionForm: React.FC<{ personID: string }> = ({ personID }) => {
         onChange={(e) => setNewPosition(e.target.value)}
       />
       <Box display="flex" gap={1} justifyContent="flex-end">
-        <Link href={`/managePersons`} sx={smallButtonStyles}>
-          Cancel
-        </Link>
+        {showCancel && <Link href={`/managePersons`} sx={smallButtonStyles}>Cancel</Link>}
         <Button type="submit" disabled={newPosition.trim().length === 0} sx={{ ...smallButtonStyles, ...(newPosition.trim().length > 0 && activeButtonStyles) }}>
           Change
         </Button>

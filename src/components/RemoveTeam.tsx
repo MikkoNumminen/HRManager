@@ -7,7 +7,7 @@ import { Box, Button, Link, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-const RemoveTeamForm: React.FC<{ teamID: string }> = ({ teamID }) => {
+const RemoveTeamForm: React.FC<{ teamID: string; showCancel?: boolean }> = ({ teamID, showCancel = true }) => {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const router = useRouter();
 
@@ -31,9 +31,7 @@ const RemoveTeamForm: React.FC<{ teamID: string }> = ({ teamID }) => {
       <Typography variant="h5">Remove Team</Typography>
       {submitError && <Typography color="error">{submitError}</Typography>}
       <Box display="flex" gap={1} justifyContent="flex-end">
-        <Link href={`/manageTeams`} sx={smallButtonStyles}>
-          Cancel
-        </Link>
+        {showCancel && <Link href={`/manageTeams`} sx={smallButtonStyles}>Cancel</Link>}
         <Button type="submit" sx={smallButtonStyles}>
           Remove
         </Button>

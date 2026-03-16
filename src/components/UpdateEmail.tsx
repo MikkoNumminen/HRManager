@@ -9,7 +9,7 @@ import { useState } from "react";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-const UpdateEmailForm: React.FC<{ personID: string }> = ({ personID }) => {
+const UpdateEmailForm: React.FC<{ personID: string; showCancel?: boolean }> = ({ personID, showCancel = true }) => {
   const [newEmail, setNewEmail] = useState("");
   const [submitError, setSubmitError] = useState<string | null>(null);
   const isValid = EMAIL_REGEX.test(newEmail.trim());
@@ -45,9 +45,7 @@ const UpdateEmailForm: React.FC<{ personID: string }> = ({ personID }) => {
         onChange={(e) => setNewEmail(e.target.value)}
       />
       <Box display="flex" gap={1} justifyContent="flex-end">
-        <Link href={`/managePersons`} sx={smallButtonStyles}>
-          Cancel
-        </Link>
+        {showCancel && <Link href={`/managePersons`} sx={smallButtonStyles}>Cancel</Link>}
         <Button type="submit" disabled={!isValid} sx={{ ...smallButtonStyles, ...(isValid && activeButtonStyles) }}>
           Change
         </Button>

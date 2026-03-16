@@ -25,20 +25,18 @@ export default async function TeamPage({
 
   return (
     <>
-      <Typography variant="h4" mb={2}>
-        Manage {team.teamName}
-      </Typography>
+      <Typography variant="h4" mb={2}>Manage {team.teamName}</Typography>
       <Box mb={2}>
         <RemoveTeamForm teamID={params.teamId} />
       </Box>
       <Box mb={2}>
-        <UpdateManagerForm teamID={params.teamId} />
+        <UpdateManagerForm teamID={params.teamId} showCancel={false} />
       </Box>
       <Box mb={2}>
-        <AddPeopleToTeam teamID={params.teamId} />
+        <AddPeopleToTeam teamID={params.teamId} showCancel={false} />
       </Box>
       <Box mb={2}>
-        <RemoveMemberFromTeam teamID={params.teamId} />
+        <RemoveMemberFromTeam teamID={params.teamId} showCancel={false} />
       </Box>
     </>
   );

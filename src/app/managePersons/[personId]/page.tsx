@@ -24,17 +24,15 @@ export default async function PersonPage({
 
   return (
     <>
-      <Typography variant="h4" mb={2}>
-        Manage {person.name}
-      </Typography>
-      <Box mb={2}>
-        <UpdatePositionForm personID={params.personId} />
-      </Box>
-      <Box mb={2}>
-        <UpdateEmailForm personID={params.personId} />
-      </Box>
+      <Typography variant="h4" mb={2}>Manage {person.name}</Typography>
       <Box mb={2}>
         <RemovePersonForm personID={params.personId} />
+      </Box>
+      <Box mb={2}>
+        <UpdatePositionForm personID={params.personId} showCancel={false} />
+      </Box>
+      <Box mb={2}>
+        <UpdateEmailForm personID={params.personId} showCancel={false} />
       </Box>
     </>
   );

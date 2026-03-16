@@ -9,7 +9,7 @@ import { PersonCheckBoxList } from "./PersonCheckboxList";
 import { Person } from "@prisma/client";
 import { activeButtonStyles, smallButtonStyles } from "@/muiStyles";
 
-const RemoveMemberForm: React.FC<{ teamID: string }> = ({ teamID }) => {
+const RemoveMemberForm: React.FC<{ teamID: string; showCancel?: boolean }> = ({ teamID, showCancel = true }) => {
   const [selectedMember, setSelectedMember] = useState<string>("");
   const [persons, setPersons] = useState<Person[]>([]);
   const [loadingPersons, setLoadingPersons] = useState(true);
@@ -81,9 +81,7 @@ const RemoveMemberForm: React.FC<{ teamID: string }> = ({ teamID }) => {
       </Box>
 
       <Box display="flex" gap={1} justifyContent="flex-end">
-        <Link href={`/manageTeams`} sx={smallButtonStyles}>
-          Cancel
-        </Link>
+        {showCancel && <Link href={`/manageTeams`} sx={smallButtonStyles}>Cancel</Link>}
         <Button type="submit" disabled={!selectedMember} sx={{ ...smallButtonStyles, ...(selectedMember && activeButtonStyles) }}>
           Remove Member
         </Button>
