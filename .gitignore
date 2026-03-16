@@ -128,3 +128,10 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Local database
+prisma/dev.db
+prisma/dev.db-journal.claude/
+
+# Claude cache
+.claude/
