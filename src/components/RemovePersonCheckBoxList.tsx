@@ -1,3 +1,5 @@
+import { checkboxLabel } from "@/tailwindStyles";
+
 type PersonListProps = {
   id: string;
   name: string;
@@ -22,7 +24,7 @@ export function RemovePersonCheckBoxList({
       />
       <label
         htmlFor={id}
-        className="cursor-pointer peer-checked:line-through peer-checked:text-slate-400"
+        className={checkboxLabel}
       >
         <strong>Name:</strong> {name} <strong>Position:</strong> {position}{" "}
         <strong>Email:</strong> {email}

@@ -1,4 +1,5 @@
 import { PersonSchema } from "@/schemas";
+import { checkboxLabel } from "@/tailwindStyles";
 import { z } from "zod";
 
 type PersonListProps = z.infer<typeof PersonSchema> & {
@@ -33,7 +34,7 @@ export function PersonCheckBoxList({
       />
       <label
         htmlFor={inputId}
-        className="cursor-pointer peer-checked:line-through peer-checked:text-slate-400"
+        className={checkboxLabel}
       >
         <strong>Name:</strong> {name} <strong>Position:</strong>{" "}
         {position ?? "N/A"} <strong>Email:</strong>{" "}

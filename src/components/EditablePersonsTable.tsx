@@ -12,6 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
+import { colors } from "@/muiStyles";
 
 interface Person {
   id: string;
@@ -68,7 +69,7 @@ const PersonTable: React.FC<PersonTableProps> = ({ persons }) => {
                 sx={{
                   "&:hover": {
                     cursor: "pointer",
-                    backgroundColor: "#f0f0f0",
+                    backgroundColor: colors.rowHover,
                   },
                 }}
               >

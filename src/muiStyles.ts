@@ -1,12 +1,17 @@
-const colors = {
+export const colors = {
+  slate100: "rgb(241 245 249)",
   slate300: "rgb(203 213 225)",
+  slate400: "rgb(148 163 184)",
   slate600: "rgb(71 85 105)",
+  slate700: "rgb(51 65 85)",
   green400: "rgb(74 222 128)",
   green900: "rgb(20 83 45)",
+  rowHover: "#f0f0f0",
+  hoverOverlay: "rgba(255, 255, 255, 0.1)",
 };
 
 export const smallButtonStyles = {
-  border: "1px solid #CBD5E0",
+  border: `1px solid ${colors.slate300}`,
   borderColor: colors.slate300,
   color: colors.slate300,
   px: 2,
@@ -64,6 +69,6 @@ export const boxStyles = {
   padding: "20px",
   transition: "background-color 0.3s ease",
   "&:hover": {
-    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    backgroundColor: colors.hoverOverlay,
   },
 };

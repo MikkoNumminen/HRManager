@@ -1,3 +1,5 @@
+import { checkboxLabel } from "@/tailwindStyles";
+
 type TeamsCheckBoxListProps = {
   teamId: string;
   teamName: string;
@@ -20,7 +22,7 @@ export function TeamsCheckBoxList({
       />
       <label
         htmlFor={teamId}
-        className="cursor-pointer peer-checked:line-through peer-checked:text-slate-400"
+        className={checkboxLabel}
       >
         <strong>Team Name:</strong> {teamName} <strong>Team Manager:</strong>{" "}
         {managerName || "No Manager Assigned"}

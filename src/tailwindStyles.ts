@@ -19,3 +19,6 @@ export const changeFormStyle =
 
 export const collectedPageForm =
   "flex gap-2 flex-col border border-slate-300 rounded p-4 mb-4";
+
+export const checkboxLabel =
+  "cursor-pointer peer-checked:line-through peer-checked:text-slate-400";

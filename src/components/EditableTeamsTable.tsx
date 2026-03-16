@@ -13,6 +13,7 @@ import {
   Box,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
+import { colors } from "@/muiStyles";
 
 interface CombinedTeam {
   teamName: string;
@@ -73,7 +74,7 @@ const EditableTeamsTable: React.FC<CombinedTeamProps> = ({ combinedTeams }) => {
                 sx={{
                   "&:hover": {
                     cursor: "pointer",
-                    backgroundColor: "#f0f0f0", // Change background color on hover
+                    backgroundColor: colors.rowHover,
                   },
                 }}
               >
