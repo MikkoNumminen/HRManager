@@ -1,8 +1,7 @@
 "use client";
 
-import { smallButtonStyles } from "@/muiStyles";
+import { formStyles, smallButtonStyles } from "@/muiStyles";
 import { removeTeam } from "@/serverActions";
-import { collectedPageForm } from "@/tailwindStyles";
 import { Box, Button, Link, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -27,7 +26,7 @@ const RemoveTeamForm: React.FC<{ teamID: string; showCancel?: boolean }> = ({ te
   };
 
   return (
-    <form onSubmit={handleSubmit} className={collectedPageForm}>
+    <Box component="form" onSubmit={handleSubmit} sx={formStyles}>
       <Typography variant="h5">Remove Team</Typography>
       {submitError && <Typography color="error">{submitError}</Typography>}
       <Box display="flex" gap={1} justifyContent="flex-end">
@@ -36,7 +35,7 @@ const RemoveTeamForm: React.FC<{ teamID: string; showCancel?: boolean }> = ({ te
           Remove
         </Button>
       </Box>
-    </form>
+    </Box>
   );
 };
 

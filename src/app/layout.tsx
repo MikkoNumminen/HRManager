@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "./globals.css";
+import { Box } from "@mui/material";
+import ThemeRegistry from "@/components/ThemeRegistry";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -15,10 +16,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${inter.className} bg-slate-700 text-slate-100 container mx-auto p-4`}
-      >
-        {children}
+      <body style={{ fontFamily: inter.style.fontFamily }}>
+        <ThemeRegistry>
+          <Box sx={{ maxWidth: "1280px", mx: "auto", p: 2 }}>
+            {children}
+          </Box>
+        </ThemeRegistry>
       </body>
     </html>
   );

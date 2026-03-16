@@ -1,8 +1,7 @@
 "use client";
 
-import { smallButtonStyles } from "@/muiStyles";
-import { removePerson } from "@/serverActions"; // Import the function correctly
-import { collectedPageForm } from "@/tailwindStyles";
+import { formStyles, smallButtonStyles } from "@/muiStyles";
+import { removePerson } from "@/serverActions";
 import { Box, Button, Link, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -27,7 +26,7 @@ const RemovePersonForm: React.FC<{ personID: string; showCancel?: boolean }> = (
   };
 
   return (
-    <form onSubmit={handleSubmit} className={collectedPageForm}>
+    <Box component="form" onSubmit={handleSubmit} sx={formStyles}>
       <Typography variant="h5">Remove Person</Typography>
       {submitError && <Typography color="error">{submitError}</Typography>}
       <Box display="flex" gap={1} justifyContent="flex-end">
@@ -36,7 +35,7 @@ const RemovePersonForm: React.FC<{ personID: string; showCancel?: boolean }> = (
           Remove
         </Button>
       </Box>
-    </form>
+    </Box>
   );
 };
 

@@ -19,7 +19,7 @@ describe("AddTeam Component", () => {
 
   test("submit button is enabled when name is filled", () => {
     render(<AddTeamForm />);
-    fireEvent.change(screen.getByPlaceholderText("Enter Team Name"), {
+    fireEvent.change(screen.getByLabelText(/Enter Team Name/i), {
       target: { value: "Engineering" },
     });
     expect(screen.getByRole("button", { name: /Create/i })).not.toBeDisabled();
@@ -29,7 +29,7 @@ describe("AddTeam Component", () => {
     const mockedCreateTeam = createTeam as jest.MockedFunction<typeof createTeam>;
     render(<AddTeamForm />);
 
-    fireEvent.change(screen.getByPlaceholderText("Enter Team Name"), {
+    fireEvent.change(screen.getByLabelText(/Enter Team Name/i), {
       target: { value: "Engineering" },
     });
     fireEvent.click(screen.getByRole("button", { name: /Create/i }));
@@ -44,7 +44,7 @@ describe("AddTeam Component", () => {
     const onSuccess = jest.fn();
     render(<AddTeamForm onSuccess={onSuccess} />);
 
-    const input = screen.getByPlaceholderText("Enter Team Name");
+    const input = screen.getByLabelText(/Enter Team Name/i);
     fireEvent.change(input, { target: { value: "Engineering" } });
     fireEvent.click(screen.getByRole("button", { name: /Create/i }));
 
@@ -60,7 +60,7 @@ describe("AddTeam Component", () => {
     );
     render(<AddTeamForm />);
 
-    fireEvent.change(screen.getByPlaceholderText("Enter Team Name"), {
+    fireEvent.change(screen.getByLabelText(/Enter Team Name/i), {
       target: { value: "Engineering" },
     });
     fireEvent.click(screen.getByRole("button", { name: /Create/i }));

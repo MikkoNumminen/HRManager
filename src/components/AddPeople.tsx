@@ -1,9 +1,8 @@
 "use client";
 
-import { activeButtonStyles, smallButtonStyles } from "@/muiStyles";
+import { activeButtonStyles, formStyles, smallButtonStyles, textFieldStyles } from "@/muiStyles";
 import { createPerson } from "@/serverActions";
-import { collectedPageForm, inputField } from "@/tailwindStyles";
-import { Box, Button, Link, Typography } from "@mui/material";
+import { Box, Button, Link, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 
 const AddPersonForm: React.FC<{ onSuccess?: () => void }> = ({ onSuccess }) => {
@@ -28,26 +27,27 @@ const AddPersonForm: React.FC<{ onSuccess?: () => void }> = ({ onSuccess }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className={collectedPageForm}>
+    <Box component="form" onSubmit={handleSubmit} sx={formStyles}>
       <Typography variant="h5">Add Person</Typography>
       {submitError && <Typography color="error">{submitError}</Typography>}
-      <input
-        type="text"
+      <TextField
+        label="Enter Name"
         name="name"
-        placeholder="Enter Name"
+        size="small"
         required
-        className={inputField}
         value={name}
         onChange={(e) => setName(e.target.value)}
+        sx={textFieldStyles}
       />
-      <input
-        type="email"
+      <TextField
+        label="Enter Email"
         name="email"
-        placeholder="Enter Email"
+        type="email"
+        size="small"
         required
-        className={inputField}
         value={email}
         onChange={(e) => setEmail(e.target.value)}
+        sx={textFieldStyles}
       />
       <Box display="flex" gap={1} justifyContent="flex-end">
         <Link href=".." sx={smallButtonStyles}>
@@ -57,7 +57,7 @@ const AddPersonForm: React.FC<{ onSuccess?: () => void }> = ({ onSuccess }) => {
           Create
         </Button>
       </Box>
-    </form>
+    </Box>
   );
 };
 

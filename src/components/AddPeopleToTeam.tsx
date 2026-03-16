@@ -1,13 +1,12 @@
 "use client";
 
 import { addMember, getPersons } from "@/serverActions";
-import { collectedPageForm, header } from "@/tailwindStyles";
+import { activeButtonStyles, formStyles, headerStyles, smallButtonStyles } from "@/muiStyles";
 import { Box, Button, Link, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { PersonCheckBoxList } from "./PersonCheckboxList";
 import { Person } from "@prisma/client";
-import { activeButtonStyles, smallButtonStyles } from "@/muiStyles";
 
 const AddMemberForm: React.FC<{ teamID: string; showCancel?: boolean; excludeIds?: string[] }> = ({ teamID, showCancel = true, excludeIds = [] }) => {
   const [selectedMember, setSelectedMember] = useState<string>("");
@@ -52,20 +51,20 @@ const AddMemberForm: React.FC<{ teamID: string; showCancel?: boolean; excludeIds
   };
 
   return (
-    <form onSubmit={handleSubmit} className={collectedPageForm}>
-      <header className={header}>
-        <Typography variant="h4">Add Member to Team</Typography>
-      </header>
+    <Box component="form" onSubmit={handleSubmit} sx={formStyles}>
+      <Box sx={headerStyles}>
+        <Typography variant="h5">Add Member to Team</Typography>
+      </Box>
       {submitError && <Typography color="error">{submitError}</Typography>}
 
-      <Box className="pl-2 mb-2">
-        <Typography>Select Member</Typography>
+      <Box sx={{ pl: 1, mb: 1 }}>
+        <Typography variant="body2">Select Member</Typography>
         {loadingPersons ? (
           <Typography>Loading...</Typography>
         ) : errorPersons ? (
           <Typography>{errorPersons}</Typography>
         ) : (
-          <ul>
+          <Box>
             {persons.filter((p) => !excludeIds.includes(p.id)).map((p) => (
               <PersonCheckBoxList
                 key={p.id}
@@ -75,7 +74,7 @@ const AddMemberForm: React.FC<{ teamID: string; showCancel?: boolean; excludeIds
                 onSelect={(personID: string) => setSelectedMember(personID)}
               />
             ))}
-          </ul>
+          </Box>
         )}
       </Box>
 
@@ -85,7 +84,7 @@ const AddMemberForm: React.FC<{ teamID: string; showCancel?: boolean; excludeIds
           Add Member
         </Button>
       </Box>
-    </form>
+    </Box>
   );
 };
 

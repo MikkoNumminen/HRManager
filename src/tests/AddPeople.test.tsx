@@ -19,7 +19,7 @@ describe("AddPerson Component", () => {
 
   test("submit button is disabled when only name is filled", () => {
     render(<AddPersonForm />);
-    fireEvent.change(screen.getByPlaceholderText("Enter Name"), {
+    fireEvent.change(screen.getByLabelText(/Enter Name/i), {
       target: { value: "John" },
     });
     expect(screen.getByRole("button", { name: /Create/i })).toBeDisabled();
@@ -27,10 +27,10 @@ describe("AddPerson Component", () => {
 
   test("submit button is disabled when email is invalid format", () => {
     render(<AddPersonForm />);
-    fireEvent.change(screen.getByPlaceholderText("Enter Name"), {
+    fireEvent.change(screen.getByLabelText(/Enter Name/i), {
       target: { value: "John" },
     });
-    fireEvent.change(screen.getByPlaceholderText("Enter Email"), {
+    fireEvent.change(screen.getByLabelText(/Enter Email/i), {
       target: { value: "notanemail" },
     });
     expect(screen.getByRole("button", { name: /Create/i })).toBeDisabled();
@@ -38,10 +38,10 @@ describe("AddPerson Component", () => {
 
   test("submit button is enabled when name and valid email are filled", () => {
     render(<AddPersonForm />);
-    fireEvent.change(screen.getByPlaceholderText("Enter Name"), {
+    fireEvent.change(screen.getByLabelText(/Enter Name/i), {
       target: { value: "John" },
     });
-    fireEvent.change(screen.getByPlaceholderText("Enter Email"), {
+    fireEvent.change(screen.getByLabelText(/Enter Email/i), {
       target: { value: "john@example.com" },
     });
     expect(screen.getByRole("button", { name: /Create/i })).not.toBeDisabled();
@@ -51,10 +51,10 @@ describe("AddPerson Component", () => {
     const mockedCreatePerson = createPerson as jest.MockedFunction<typeof createPerson>;
     render(<AddPersonForm />);
 
-    fireEvent.change(screen.getByPlaceholderText("Enter Name"), {
+    fireEvent.change(screen.getByLabelText(/Enter Name/i), {
       target: { value: "John Doe" },
     });
-    fireEvent.change(screen.getByPlaceholderText("Enter Email"), {
+    fireEvent.change(screen.getByLabelText(/Enter Email/i), {
       target: { value: "john.doe@example.com" },
     });
     fireEvent.click(screen.getByRole("button", { name: /Create/i }));
@@ -69,8 +69,8 @@ describe("AddPerson Component", () => {
     const onSuccess = jest.fn();
     render(<AddPersonForm onSuccess={onSuccess} />);
 
-    const nameInput = screen.getByPlaceholderText("Enter Name");
-    const emailInput = screen.getByPlaceholderText("Enter Email");
+    const nameInput = screen.getByLabelText(/Enter Name/i);
+    const emailInput = screen.getByLabelText(/Enter Email/i);
     fireEvent.change(nameInput, { target: { value: "John Doe" } });
     fireEvent.change(emailInput, { target: { value: "john@example.com" } });
     fireEvent.click(screen.getByRole("button", { name: /Create/i }));
@@ -88,10 +88,10 @@ describe("AddPerson Component", () => {
     );
     render(<AddPersonForm />);
 
-    fireEvent.change(screen.getByPlaceholderText("Enter Name"), {
+    fireEvent.change(screen.getByLabelText(/Enter Name/i), {
       target: { value: "John Doe" },
     });
-    fireEvent.change(screen.getByPlaceholderText("Enter Email"), {
+    fireEvent.change(screen.getByLabelText(/Enter Email/i), {
       target: { value: "john@example.com" },
     });
     fireEvent.click(screen.getByRole("button", { name: /Create/i }));

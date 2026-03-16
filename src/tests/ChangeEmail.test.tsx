@@ -31,7 +31,7 @@ describe("Update Email", () => {
 
   test("submit button is disabled when email format is invalid", () => {
     render(<UpdateEmailForm personID={personID} />);
-    fireEvent.change(screen.getByPlaceholderText("Enter New Email"), {
+    fireEvent.change(screen.getByLabelText(/Enter New Email/i), {
       target: { value: "notanemail" },
     });
     expect(screen.getByRole("button", { name: /Change/i })).toBeDisabled();
@@ -39,7 +39,7 @@ describe("Update Email", () => {
 
   test("submit button is enabled when email format is valid", () => {
     render(<UpdateEmailForm personID={personID} />);
-    fireEvent.change(screen.getByPlaceholderText("Enter New Email"), {
+    fireEvent.change(screen.getByLabelText(/Enter New Email/i), {
       target: { value: "valid@example.com" },
     });
     expect(screen.getByRole("button", { name: /Change/i })).not.toBeDisabled();
@@ -49,7 +49,7 @@ describe("Update Email", () => {
     const mockedUpdateEmail = updateEmail as jest.MockedFunction<typeof updateEmail>;
     render(<UpdateEmailForm personID={personID} />);
 
-    fireEvent.change(screen.getByPlaceholderText("Enter New Email"), {
+    fireEvent.change(screen.getByLabelText(/Enter New Email/i), {
       target: { value: "new.email@example.com" },
     });
     fireEvent.click(screen.getByRole("button", { name: /Change/i }));
@@ -66,7 +66,7 @@ describe("Update Email", () => {
     );
     render(<UpdateEmailForm personID={personID} />);
 
-    fireEvent.change(screen.getByPlaceholderText("Enter New Email"), {
+    fireEvent.change(screen.getByLabelText(/Enter New Email/i), {
       target: { value: "taken@example.com" },
     });
     fireEvent.click(screen.getByRole("button", { name: /Change/i }));
@@ -80,7 +80,7 @@ describe("Update Email", () => {
 
   test("should handle form input change", () => {
     render(<UpdateEmailForm personID={personID} />);
-    const emailInput = screen.getByPlaceholderText("Enter New Email") as HTMLInputElement;
+    const emailInput = screen.getByLabelText(/Enter New Email/i) as HTMLInputElement;
     fireEvent.change(emailInput, { target: { value: "updated.email@example.com" } });
     expect(emailInput.value).toBe("updated.email@example.com");
   });

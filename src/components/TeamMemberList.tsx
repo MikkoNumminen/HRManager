@@ -1,19 +1,20 @@
+import { Box, Typography } from "@mui/material";
+
 type TeamMemberListProps = {
-    teamName: string;
-    members: {
-        name: string;
-        email: string;
-    }[];
+  teamName: string;
+  members: {
+    name: string;
+    email: string;
+  }[];
 };
-  
-  export function TeamMemberList({ teamName, members }: TeamMemberListProps) {
-    return (
-      <li className="flex gap-1 items-center p-2 py-1">
-        <span className="flex flex-col border-t pt-2">
-          <span><strong>Team Name:</strong> {teamName}</span>
-          <span><strong>Team Members:</strong> {members.map((m) => m.name + ", " )}</span>
-        </span>
-      </li>
-    );
-  }
-  
+
+export function TeamMemberList({ teamName, members }: TeamMemberListProps) {
+  return (
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1, px: 1, py: 0.5 }}>
+      <Box sx={{ display: "flex", flexDirection: "column", borderTop: "1px solid", borderColor: "divider", pt: 1 }}>
+        <Typography variant="body2"><strong>Team Name:</strong> {teamName}</Typography>
+        <Typography variant="body2"><strong>Team Members:</strong> {members.map((m) => m.name + ", ")}</Typography>
+      </Box>
+    </Box>
+  );
+}

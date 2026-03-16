@@ -1,9 +1,8 @@
 "use client";
 
-import { activeButtonStyles, smallButtonStyles } from "@/muiStyles";
+import { activeButtonStyles, formStyles, smallButtonStyles, textFieldStyles } from "@/muiStyles";
 import { updatePosition } from "@/serverActions";
-import { collectedPageForm, inputField } from "@/tailwindStyles";
-import { Box, Button, Link, Typography } from "@mui/material";
+import { Box, Button, Link, TextField, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -29,25 +28,29 @@ const UpdatePositionForm: React.FC<{ personID: string; showCancel?: boolean }> =
   };
 
   return (
-    <form onSubmit={handleSubmit} className={collectedPageForm}>
+    <Box component="form" onSubmit={handleSubmit} sx={formStyles}>
       <Typography variant="h5">Change Position</Typography>
       {submitError && <Typography color="error">{submitError}</Typography>}
-      <input
-        type="text"
+      <TextField
+        label="Enter New Position"
         name="name"
-        placeholder="Enter New Position"
+        size="small"
         required
-        className={inputField}
         value={newPosition}
         onChange={(e) => setNewPosition(e.target.value)}
+        sx={textFieldStyles}
       />
       <Box display="flex" gap={1} justifyContent="flex-end">
         {showCancel && <Link href={`/managePersons`} sx={smallButtonStyles}>Cancel</Link>}
-        <Button type="submit" disabled={newPosition.trim().length === 0} sx={{ ...smallButtonStyles, ...(newPosition.trim().length > 0 && activeButtonStyles) }}>
+        <Button
+          type="submit"
+          disabled={newPosition.trim().length === 0}
+          sx={{ ...smallButtonStyles, ...(newPosition.trim().length > 0 && activeButtonStyles) }}
+        >
           Change
         </Button>
       </Box>
-    </form>
+    </Box>
   );
 };
 

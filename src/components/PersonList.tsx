@@ -1,3 +1,5 @@
+import { Box, Typography } from "@mui/material";
+
 type PersonListProps = {
   id: string;
   name: string;
@@ -7,12 +9,12 @@ type PersonListProps = {
 
 export function PersonList({ name, position, email }: PersonListProps) {
   return (
-    <li className="flex gap-1 items-center p-2 py-1">
-      <span className="flex flex-col border-t pt-2">
-        <span><strong>Name:</strong> {name}</span>
-        <span><strong>Position:</strong> {position}</span>
-        <span><strong>Email:</strong> {email}</span>
-      </span>
-    </li>
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1, px: 1, py: 0.5 }}>
+      <Box sx={{ display: "flex", flexDirection: "column", borderTop: "1px solid", borderColor: "divider", pt: 1 }}>
+        <Typography variant="body2"><strong>Name:</strong> {name}</Typography>
+        <Typography variant="body2"><strong>Position:</strong> {position}</Typography>
+        <Typography variant="body2"><strong>Email:</strong> {email}</Typography>
+      </Box>
+    </Box>
   );
 }

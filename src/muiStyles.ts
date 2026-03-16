@@ -10,6 +10,40 @@ export const colors = {
   hoverOverlay: "rgba(255, 255, 255, 0.1)",
 };
 
+export const formStyles = {
+  display: "flex",
+  flexDirection: "column" as const,
+  gap: 2,
+  border: `1px solid ${colors.slate300}`,
+  borderRadius: "4px",
+  p: 2,
+  mb: 2,
+};
+
+export const headerStyles = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  mb: 2,
+};
+
+export const textFieldStyles = {
+  "& .MuiOutlinedInput-root": {
+    color: colors.slate300,
+    "& fieldset": { borderColor: colors.slate300 },
+    "&:hover fieldset": { borderColor: colors.slate100 },
+    "&.Mui-focused fieldset": { borderColor: colors.slate100 },
+  },
+  "& .MuiInputLabel-root": { color: colors.slate400 },
+  "& .MuiInputLabel-root.Mui-focused": { color: colors.slate100 },
+};
+
+export const radioStyles = {
+  color: colors.slate300,
+  "&.Mui-checked": { color: colors.slate300 },
+  p: "2px 8px",
+};
+
 export const smallButtonStyles = {
   border: `1px solid ${colors.slate300}`,
   borderColor: colors.slate300,

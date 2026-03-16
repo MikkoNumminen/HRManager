@@ -1,4 +1,5 @@
-import { checkboxLabel } from "@/tailwindStyles";
+import { FormControlLabel, Radio, Typography } from "@mui/material";
+import { colors, radioStyles } from "@/muiStyles";
 
 type PersonListProps = {
   id: string;
@@ -14,21 +15,16 @@ export function RemovePersonCheckBoxList({
   email,
 }: PersonListProps) {
   return (
-    <li className="flex gap-1 items-center">
-      <input
-        id={id}
-        type="radio"
-        name="personID"
-        value={id}
-        className="cursor-pointer peer"
-      />
-      <label
-        htmlFor={id}
-        className={checkboxLabel}
-      >
-        <strong>Name:</strong> {name} <strong>Position:</strong> {position}{" "}
-        <strong>Email:</strong> {email}
-      </label>
-    </li>
+    <FormControlLabel
+      value={id}
+      control={<Radio name="personID" value={id} sx={radioStyles} size="small" />}
+      label={
+        <Typography sx={{ color: colors.slate100, fontSize: "0.875rem" }}>
+          <strong>Name:</strong> {name} <strong>Position:</strong> {position}{" "}
+          <strong>Email:</strong> {email}
+        </Typography>
+      }
+      sx={{ display: "flex", alignItems: "center", mx: 0, mb: 0.5 }}
+    />
   );
 }

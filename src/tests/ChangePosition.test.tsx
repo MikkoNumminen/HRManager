@@ -31,7 +31,7 @@ describe("UpdatePosition Component", () => {
 
   test("submit button is disabled when position is only whitespace", () => {
     render(<UpdatePositionForm personID={personID} />);
-    fireEvent.change(screen.getByPlaceholderText("Enter New Position"), {
+    fireEvent.change(screen.getByLabelText(/Enter New Position/i), {
       target: { value: "   " },
     });
     expect(screen.getByRole("button", { name: /Change/i })).toBeDisabled();
@@ -39,7 +39,7 @@ describe("UpdatePosition Component", () => {
 
   test("submit button is enabled when position has content", () => {
     render(<UpdatePositionForm personID={personID} />);
-    fireEvent.change(screen.getByPlaceholderText("Enter New Position"), {
+    fireEvent.change(screen.getByLabelText(/Enter New Position/i), {
       target: { value: "Senior Developer" },
     });
     expect(screen.getByRole("button", { name: /Change/i })).not.toBeDisabled();
@@ -49,7 +49,7 @@ describe("UpdatePosition Component", () => {
     const mockedUpdatePosition = updatePosition as jest.MockedFunction<typeof updatePosition>;
     render(<UpdatePositionForm personID={personID} />);
 
-    fireEvent.change(screen.getByPlaceholderText("Enter New Position"), {
+    fireEvent.change(screen.getByLabelText(/Enter New Position/i), {
       target: { value: "Senior Developer" },
     });
     fireEvent.click(screen.getByRole("button", { name: /Change/i }));
@@ -66,7 +66,7 @@ describe("UpdatePosition Component", () => {
     );
     render(<UpdatePositionForm personID={personID} />);
 
-    fireEvent.change(screen.getByPlaceholderText("Enter New Position"), {
+    fireEvent.change(screen.getByLabelText(/Enter New Position/i), {
       target: { value: "Senior Developer" },
     });
     fireEvent.click(screen.getByRole("button", { name: /Change/i }));
@@ -78,7 +78,7 @@ describe("UpdatePosition Component", () => {
 
   test("should handle form input change", () => {
     render(<UpdatePositionForm personID={personID} />);
-    const positionInput = screen.getByPlaceholderText("Enter New Position") as HTMLInputElement;
+    const positionInput = screen.getByLabelText(/Enter New Position/i) as HTMLInputElement;
     fireEvent.change(positionInput, { target: { value: "Lead Developer" } });
     expect(positionInput.value).toBe("Lead Developer");
   });

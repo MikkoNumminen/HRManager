@@ -1,13 +1,12 @@
 "use client";
 
 import { removeMember, getPersons } from "@/serverActions";
-import { collectedPageForm, header } from "@/tailwindStyles";
+import { activeButtonStyles, formStyles, headerStyles, smallButtonStyles } from "@/muiStyles";
 import { Box, Button, Link, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { PersonCheckBoxList } from "./PersonCheckboxList";
 import { Person } from "@prisma/client";
-import { activeButtonStyles, smallButtonStyles } from "@/muiStyles";
 
 const RemoveMemberForm: React.FC<{ teamID: string; showCancel?: boolean; includeOnlyIds?: string[] }> = ({ teamID, showCancel = true, includeOnlyIds }) => {
   const [selectedMember, setSelectedMember] = useState<string>("");
@@ -17,7 +16,6 @@ const RemoveMemberForm: React.FC<{ teamID: string; showCancel?: boolean; include
   const [submitError, setSubmitError] = useState<string | null>(null);
   const router = useRouter();
 
-  // Fetch persons on component mount
   useEffect(() => {
     const fetchPersons = async () => {
       try {
@@ -53,20 +51,20 @@ const RemoveMemberForm: React.FC<{ teamID: string; showCancel?: boolean; include
   };
 
   return (
-    <form onSubmit={handleSubmit} className={collectedPageForm}>
-      <header className={header}>
-        <Typography variant="h4">Remove Member from Team</Typography>
-      </header>
+    <Box component="form" onSubmit={handleSubmit} sx={formStyles}>
+      <Box sx={headerStyles}>
+        <Typography variant="h5">Remove Member from Team</Typography>
+      </Box>
       {submitError && <Typography color="error">{submitError}</Typography>}
 
-      <Box className="pl-2 mb-2">
-        <Typography>Select Member</Typography>
+      <Box sx={{ pl: 1, mb: 1 }}>
+        <Typography variant="body2">Select Member</Typography>
         {loadingPersons ? (
           <Typography>Loading...</Typography>
         ) : errorPersons ? (
           <Typography>{errorPersons}</Typography>
         ) : (
-          <ul>
+          <Box>
             {persons.filter((p) => !includeOnlyIds || includeOnlyIds.includes(p.id)).map((p) => (
               <PersonCheckBoxList
                 key={p.id}
@@ -76,7 +74,7 @@ const RemoveMemberForm: React.FC<{ teamID: string; showCancel?: boolean; include
                 onSelect={(personID: string) => setSelectedMember(personID)}
               />
             ))}
-          </ul>
+          </Box>
         )}
       </Box>
 
@@ -86,7 +84,7 @@ const RemoveMemberForm: React.FC<{ teamID: string; showCancel?: boolean; include
           Remove Member
         </Button>
       </Box>
-    </form>
+    </Box>
   );
 };
 

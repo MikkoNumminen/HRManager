@@ -1,9 +1,8 @@
 "use client";
 
-import { activeButtonStyles, smallButtonStyles } from "@/muiStyles";
+import { activeButtonStyles, formStyles, smallButtonStyles, textFieldStyles } from "@/muiStyles";
 import { updateEmail } from "@/serverActions";
-import { collectedPageForm, inputField } from "@/tailwindStyles";
-import { Box, Button, Link, Typography } from "@mui/material";
+import { Box, Button, Link, TextField, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -32,17 +31,18 @@ const UpdateEmailForm: React.FC<{ personID: string; showCancel?: boolean }> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className={collectedPageForm}>
+    <Box component="form" onSubmit={handleSubmit} sx={formStyles}>
       <Typography variant="h5">Change Email</Typography>
       {submitError && <Typography color="error">{submitError}</Typography>}
-      <input
-        type="email"
+      <TextField
+        label="Enter New Email"
         name="name"
-        placeholder="Enter New Email"
+        type="email"
+        size="small"
         required
-        className={inputField}
         value={newEmail}
         onChange={(e) => setNewEmail(e.target.value)}
+        sx={textFieldStyles}
       />
       <Box display="flex" gap={1} justifyContent="flex-end">
         {showCancel && <Link href={`/managePersons`} sx={smallButtonStyles}>Cancel</Link>}
@@ -50,7 +50,7 @@ const UpdateEmailForm: React.FC<{ personID: string; showCancel?: boolean }> = ({
           Change
         </Button>
       </Box>
-    </form>
+    </Box>
   );
 };
 

@@ -1,6 +1,5 @@
 "use client";
 
-import { header } from "@/tailwindStyles";
 import { getPersons, getTeams } from "@/serverActions";
 import { useEffect, useState } from "react";
 import { Person } from "@prisma/client";
