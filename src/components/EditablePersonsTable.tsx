@@ -63,7 +63,7 @@ const PersonTable: React.FC<PersonTableProps> = ({ persons }) => {
             </TableRow>
           ) : (
             persons.map((person) => (
-              <Tooltip key={person.id} title={`Click to manage ${person.name}`} placement="top" arrow>
+              <Tooltip key={person.id} title={`Click to manage ${person.name}`} placement="right" arrow>
                 <TableRow
                   hover
                   onClick={() => handleRowClick(person.id)}

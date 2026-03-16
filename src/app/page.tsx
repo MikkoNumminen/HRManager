@@ -54,7 +54,7 @@ export default async function Home() {
           Persons
         </Typography>
         <Link href="/managePersons" sx={{ textDecoration: "none" }}>
-          <Tooltip title="Go to Persons Manager" arrow>
+          <Tooltip title="Go to Persons Manager" placement="right" arrow>
             <Box component="div" sx={boxStyles}>
               <PersonTable persons={persons} />
             </Box>
@@ -65,7 +65,7 @@ export default async function Home() {
           Teams
         </Typography>
         <Link href="/manageTeams" sx={{ textDecoration: "none" }}>
-          <Tooltip title="Go to Teams Manager" arrow>
+          <Tooltip title="Go to Teams Manager" placement="right" arrow>
             <Box component="div" sx={boxStyles}>
               <TeamsTable combinedTeams={teamsData} />
             </Box>

@@ -1,7 +1,9 @@
+"use client";
+
 import { PersonSchema } from "@/schemas";
 import { colors, radioStyles } from "@/muiStyles";
 import { z } from "zod";
-import { FormControlLabel, Radio, Typography } from "@mui/material";
+import { FormControlLabel, Radio, Tooltip, Typography } from "@mui/material";
 
 type PersonListProps = z.infer<typeof PersonSchema> & {
   onSelect: (personID: string) => void;
@@ -22,6 +24,7 @@ export function PersonCheckBoxList({
   const inputId = `${groupName}-${id}`;
 
   return (
+    <Tooltip title={`Click to select ${name}`} placement="right" arrow>
     <FormControlLabel
       value={id}
       control={
@@ -52,5 +55,6 @@ export function PersonCheckBoxList({
       }
       sx={{ display: "flex", alignItems: "center", mx: 0, mb: 0.5 }}
     />
+    </Tooltip>
   );
 }

@@ -1,5 +1,8 @@
+"use client";
+
 import React from "react";
 import {
+  Box,
   Paper,
   Table,
   TableBody,
@@ -8,7 +11,6 @@ import {
   TableHead,
   TableRow,
   Typography,
-  Box,
 } from "@mui/material";
 
 interface CombinedTeam {

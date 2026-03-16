@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Box,
   Paper,
@@ -9,6 +11,7 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
+
 
 interface Person {
   id: string;

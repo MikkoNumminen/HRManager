@@ -68,7 +68,7 @@ const EditableTeamsTable: React.FC<CombinedTeamProps> = ({ combinedTeams }) => {
             </TableRow>
           ) : (
             combinedTeams.map((team) => (
-              <Tooltip key={team.teamId} title={`Click to manage ${team.teamName}`} placement="top" arrow>
+              <Tooltip key={team.teamId} title={`Click to manage ${team.teamName}`} placement="right" arrow>
                 <TableRow
                   hover
                   onClick={() => handleRowClick(team.teamId)}
