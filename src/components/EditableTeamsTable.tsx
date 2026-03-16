@@ -15,19 +15,7 @@ import {
 } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { colors } from "@/muiStyles";
-
-interface CombinedTeam {
-  teamName: string;
-  teamId: string;
-  teamManagerId: string | null;
-  managerName: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-  members?: {
-    name: string;
-    email: string;
-  }[];
-}
+import { CombinedTeam } from "@/schemas";
 
 interface CombinedTeamProps {
   combinedTeams: CombinedTeam[];

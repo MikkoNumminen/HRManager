@@ -1,12 +1,8 @@
 import { FormControlLabel, Radio, Typography } from "@mui/material";
 import { colors, radioStyles } from "@/muiStyles";
+import { Person } from "@/schemas";
 
-type PersonListProps = {
-  id: string;
-  name: string;
-  position: string;
-  email: string;
-};
+type PersonListProps = Pick<Person, "id" | "name" | "position" | "email">;
 
 export function RemovePersonCheckBoxList({
   id,

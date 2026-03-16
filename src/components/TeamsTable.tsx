@@ -12,18 +12,7 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-
-interface CombinedTeam {
-  teamName: string;
-  teamId: string;
-  managerName: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-  members: {
-    name: string;
-    email: string;
-  }[];
-}
+import { CombinedTeam } from "@/schemas";
 
 interface CombinedTeamProps {
   combinedTeams: CombinedTeam[];

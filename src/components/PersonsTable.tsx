@@ -11,16 +11,7 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-
-
-interface Person {
-  id: string;
-  name: string;
-  position: string | null;
-  email: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-}
+import { Person } from "@/schemas";
 
 interface PersonTableProps {
   persons: Person[];

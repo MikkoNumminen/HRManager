@@ -24,12 +24,9 @@
         -E2E Testing with Playwright or Cypress?
         -Testing: https://vitest.dev/ ?
         -Accessibility Testing Example with Axe?
-  TODO: Give return value with zod schema?: type Team = z.infer<typeof TeamSchema> 
-        Parse array for return value?: PersonSchema.array().parse
   TODO: Refactor: getPerson(personId)
   TODO: Validate/check: FormData ?
   TODO: Remove the rest of the Tailwind from the codebase?
-  TODO: Use Zod: Data integrity and type safety. KEEP UPDATE!
   TODO: aria-labels?
   TODO: Check if this is what is wanted: ON DELETE RESTRICT ON UPDATE CASCADE
 */

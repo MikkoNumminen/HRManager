@@ -1,11 +1,10 @@
 "use client";
 
-import { PersonSchema } from "@/schemas";
+import { Person } from "@/schemas";
 import { colors, radioStyles } from "@/muiStyles";
-import { z } from "zod";
 import { FormControlLabel, Radio, Tooltip, Typography } from "@mui/material";
 
-type PersonListProps = z.infer<typeof PersonSchema> & {
+type PersonListProps = Person & {
   onSelect: (personID: string) => void;
   groupName: string;
   selectedId: string;

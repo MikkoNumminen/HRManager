@@ -1,14 +1,6 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import PersonTable from "@/components/PersonsTable";
-
-interface Person {
-  id: string;
-  name: string;
-  position: string;
-  email: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
+import { Person } from "@/schemas";
 
 const mockPersons: Person[] = [
   {

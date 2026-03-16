@@ -14,15 +14,7 @@ import {
 } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { colors } from "@/muiStyles";
-
-interface Person {
-  id: string;
-  name: string;
-  position: string | null;
-  email: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-}
+import { Person } from "@/schemas";
 
 interface PersonTableProps {
   persons: Person[];

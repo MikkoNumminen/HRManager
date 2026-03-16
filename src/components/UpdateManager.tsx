@@ -5,7 +5,7 @@ import { activeButtonStyles, formStyles, headerStyles, smallButtonStyles } from 
 import { Box, Button, Link, Typography } from "@mui/material";
 import { useActionState, useState } from "react";
 import { PersonCheckBoxList } from "./PersonCheckboxList";
-import { Person } from "@prisma/client";
+import { Person } from "@/schemas";
 
 type FormState = { error: string | null };
 
