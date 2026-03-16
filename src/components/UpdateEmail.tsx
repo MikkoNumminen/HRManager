@@ -2,7 +2,7 @@
 
 import { activeButtonStyles, formStyles, smallButtonStyles, textFieldStyles } from "@/muiStyles";
 import { updateEmail } from "@/serverActions";
-import { Box, Button, Link, TextField, Typography } from "@mui/material";
+import { Box, Button, Link, TextField, Tooltip, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -34,16 +34,17 @@ const UpdateEmailForm: React.FC<{ personID: string; showCancel?: boolean }> = ({
     <Box component="form" onSubmit={handleSubmit} sx={formStyles}>
       <Typography variant="h5">Change Email</Typography>
       {submitError && <Typography color="error">{submitError}</Typography>}
-      <TextField
-        label="Enter New Email"
-        name="name"
-        type="email"
-        size="small"
-        required
-        value={newEmail}
-        onChange={(e) => setNewEmail(e.target.value)}
-        sx={textFieldStyles}
-      />
+      <Tooltip title="Required — must be a valid email address" placement="right" arrow>
+        <TextField
+          label="Enter New Email"
+          name="name"
+          type="email"
+          size="small"
+          value={newEmail}
+          onChange={(e) => setNewEmail(e.target.value)}
+          sx={textFieldStyles}
+        />
+      </Tooltip>
       <Box display="flex" gap={1} justifyContent="flex-end">
         {showCancel && <Link href={`/managePersons`} sx={smallButtonStyles}>Cancel</Link>}
         <Button type="submit" disabled={!isValid} sx={{ ...smallButtonStyles, ...(isValid && activeButtonStyles) }}>

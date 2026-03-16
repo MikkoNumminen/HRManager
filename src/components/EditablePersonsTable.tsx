@@ -9,6 +9,7 @@ import {
   TableRow,
   TableCell,
   TableBody,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
@@ -62,17 +63,17 @@ const PersonTable: React.FC<PersonTableProps> = ({ persons }) => {
             </TableRow>
           ) : (
             persons.map((person) => (
-              <TableRow
-                key={person.id}
-                hover
-                onClick={() => handleRowClick(person.id)}
-                sx={{
-                  "&:hover": {
-                    cursor: "pointer",
-                    backgroundColor: colors.rowHover,
-                  },
-                }}
-              >
+              <Tooltip key={person.id} title={`Click to manage ${person.name}`} placement="top" arrow>
+                <TableRow
+                  hover
+                  onClick={() => handleRowClick(person.id)}
+                  sx={{
+                    "&:hover": {
+                      cursor: "pointer",
+                      backgroundColor: colors.rowHover,
+                    },
+                  }}
+                >
                 <TableCell>{person.name}</TableCell>
                 <TableCell>{person.position === "-" ? "" : person.position}</TableCell>
                 <TableCell>{person.email}</TableCell>
@@ -82,7 +83,8 @@ const PersonTable: React.FC<PersonTableProps> = ({ persons }) => {
                 <TableCell>
                   {new Date(person.updatedAt).toLocaleString()}
                 </TableCell>
-              </TableRow>
+                </TableRow>
+              </Tooltip>
             ))
           )}
         </TableBody>

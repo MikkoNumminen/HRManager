@@ -2,7 +2,7 @@
 
 import { activeButtonStyles, formStyles, smallButtonStyles, textFieldStyles } from "@/muiStyles";
 import { updatePosition } from "@/serverActions";
-import { Box, Button, Link, TextField, Typography } from "@mui/material";
+import { Box, Button, Link, TextField, Tooltip, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -31,15 +31,16 @@ const UpdatePositionForm: React.FC<{ personID: string; showCancel?: boolean }> =
     <Box component="form" onSubmit={handleSubmit} sx={formStyles}>
       <Typography variant="h5">Change Position</Typography>
       {submitError && <Typography color="error">{submitError}</Typography>}
-      <TextField
-        label="Enter New Position"
-        name="name"
-        size="small"
-        required
-        value={newPosition}
-        onChange={(e) => setNewPosition(e.target.value)}
-        sx={textFieldStyles}
-      />
+      <Tooltip title="Required" placement="right" arrow>
+        <TextField
+          label="Enter New Position"
+          name="name"
+          size="small"
+          value={newPosition}
+          onChange={(e) => setNewPosition(e.target.value)}
+          sx={textFieldStyles}
+        />
+      </Tooltip>
       <Box display="flex" gap={1} justifyContent="flex-end">
         {showCancel && <Link href={`/managePersons`} sx={smallButtonStyles}>Cancel</Link>}
         <Button

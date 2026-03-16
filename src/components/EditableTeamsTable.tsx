@@ -9,6 +9,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Tooltip,
   Typography,
   Box,
 } from "@mui/material";
@@ -67,17 +68,17 @@ const EditableTeamsTable: React.FC<CombinedTeamProps> = ({ combinedTeams }) => {
             </TableRow>
           ) : (
             combinedTeams.map((team) => (
-              <TableRow
-                key={team.teamId}
-                hover
-                onClick={() => handleRowClick(team.teamId)}
-                sx={{
-                  "&:hover": {
-                    cursor: "pointer",
-                    backgroundColor: colors.rowHover,
-                  },
-                }}
-              >
+              <Tooltip key={team.teamId} title={`Click to manage ${team.teamName}`} placement="top" arrow>
+                <TableRow
+                  hover
+                  onClick={() => handleRowClick(team.teamId)}
+                  sx={{
+                    "&:hover": {
+                      cursor: "pointer",
+                      backgroundColor: colors.rowHover,
+                    },
+                  }}
+                >
                 <TableCell>{team.teamName}</TableCell>
                 <TableCell>
                   {team.managerName || "No Manager Assigned"}
@@ -99,7 +100,8 @@ const EditableTeamsTable: React.FC<CombinedTeamProps> = ({ combinedTeams }) => {
                 <TableCell>
                   {new Date(team.updatedAt).toLocaleString()}
                 </TableCell>
-              </TableRow>
+                </TableRow>
+              </Tooltip>
             ))
           )}
         </TableBody>

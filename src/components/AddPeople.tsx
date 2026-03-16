@@ -2,7 +2,7 @@
 
 import { activeButtonStyles, formStyles, smallButtonStyles, textFieldStyles } from "@/muiStyles";
 import { createPerson } from "@/serverActions";
-import { Box, Button, Link, TextField, Typography } from "@mui/material";
+import { Box, Button, Link, TextField, Tooltip, Typography } from "@mui/material";
 import { useState } from "react";
 
 const AddPersonForm: React.FC<{ onSuccess?: () => void }> = ({ onSuccess }) => {
@@ -30,29 +30,29 @@ const AddPersonForm: React.FC<{ onSuccess?: () => void }> = ({ onSuccess }) => {
     <Box component="form" onSubmit={handleSubmit} sx={formStyles}>
       <Typography variant="h5">Add Person</Typography>
       {submitError && <Typography color="error">{submitError}</Typography>}
-      <TextField
-        label="Enter Name"
-        name="name"
-        size="small"
-        required
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        sx={textFieldStyles}
-      />
-      <TextField
-        label="Enter Email"
-        name="email"
-        type="email"
-        size="small"
-        required
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        sx={textFieldStyles}
-      />
+      <Tooltip title="Required" placement="right" arrow>
+        <TextField
+          label="Enter Name"
+          name="name"
+          size="small"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          sx={textFieldStyles}
+        />
+      </Tooltip>
+      <Tooltip title="Required — must be a valid email address" placement="right" arrow>
+        <TextField
+          label="Enter Email"
+          name="email"
+          type="email"
+          size="small"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          sx={textFieldStyles}
+        />
+      </Tooltip>
       <Box display="flex" gap={1} justifyContent="flex-end">
-        <Link href=".." sx={smallButtonStyles}>
-          Cancel
-        </Link>
+        <Link href=".." sx={smallButtonStyles}>Cancel</Link>
         <Button type="submit" disabled={!isValid} sx={{ ...smallButtonStyles, ...(isValid && activeButtonStyles) }}>
           Create
         </Button>
