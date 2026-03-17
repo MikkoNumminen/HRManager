@@ -2,7 +2,9 @@
 
 import React from "react";
 import {
+  Avatar,
   Box,
+  Chip,
   Paper,
   Table,
   TableBody,
@@ -13,12 +15,46 @@ import {
   Typography,
 } from "@mui/material";
 import { CombinedTeam } from "@/schemas";
+import { colors } from "@/muiStyles";
 
 interface CombinedTeamProps {
   combinedTeams: CombinedTeam[];
+  minimal?: boolean;
 }
 
-const TeamsTable: React.FC<CombinedTeamProps> = ({ combinedTeams }) => {
+const TeamsTable: React.FC<CombinedTeamProps> = ({ combinedTeams, minimal = false }) => {
+  if (minimal) {
+    return combinedTeams.length === 0 ? (
+      <Typography sx={{ color: colors.slate400, textAlign: "center", py: 2 }}>
+        No Teams Available
+      </Typography>
+    ) : (
+      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+        {combinedTeams.map((team) => {
+          const initials = team.teamName
+            .split(" ")
+            .map((n) => n[0])
+            .join("")
+            .toUpperCase()
+            .slice(0, 2);
+          return (
+            <Chip
+              key={team.teamId}
+              avatar={<Avatar sx={{ bgcolor: colors.slate600, color: `${colors.slate100} !important`, fontSize: "0.75rem" }}>{initials}</Avatar>}
+              label={team.teamName}
+              variant="outlined"
+              sx={{
+                color: colors.slate100,
+                borderColor: colors.slate300,
+                "& .MuiChip-label": { fontWeight: 500 },
+              }}
+            />
+          );
+        })}
+      </Box>
+    );
+  }
+
   return (
     <TableContainer component={Paper} sx={{ marginBottom: "20px" }}>
       <Table sx={{ minWidth: 650, maxWidth: 1020 }} aria-label="teams table">

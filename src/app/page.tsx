@@ -64,7 +64,7 @@ export default async function Home() {
           <Typography variant="h6" gutterBottom>
             Persons
           </Typography>
-          <PersonTable persons={persons} />
+          <PersonTable persons={persons} minimal />
         </Box>
       )}
 
@@ -84,7 +84,7 @@ export default async function Home() {
           <Typography variant="h6" gutterBottom>
             Teams
           </Typography>
-          <TeamsTable combinedTeams={teamsData} />
+          <TeamsTable combinedTeams={teamsData} minimal />
         </Box>
       )}
 
