@@ -263,3 +263,14 @@ export async function removeMember(data: FormData) {
   revalidatePath("/manageTeams");
   redirect("..");
 }
+
+export async function resetAll() {
+  await prisma.$transaction(async (prisma) => {
+    await prisma.teamMember.deleteMany();
+    await prisma.team.deleteMany();
+    await prisma.person.deleteMany();
+  });
+  revalidatePath("/");
+  revalidatePath("/managePersons");
+  revalidatePath("/manageTeams");
+}

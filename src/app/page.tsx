@@ -35,6 +35,7 @@ import { Box, Link, Tooltip, Typography } from "@mui/material";
 import PersonTable from "@/components/PersonsTable";
 import TeamsTable from "@/components/TeamsTable";
 import TopBar from "@/components/TopBar";
+import ResetAll from "@/components/ResetAll";
 import { boxStyles } from "@/muiStyles";
 import { getPersons, getTeams } from "@/queries";
 
@@ -66,6 +67,8 @@ export default async function Home() {
           </Box>
         </Tooltip>
       </Link>
+
+      <ResetAll />
     </>
   );
 }
