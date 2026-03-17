@@ -5,6 +5,8 @@ import { Typography } from "@mui/material";
 import AddPeopleToTeam from "@/components/AddPeopleToTeam";
 import RemoveMemberFromTeam from "@/components/RemoveMemberFromTeam";
 import TopBar from "@/components/TopBar";
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -13,6 +15,9 @@ export default async function TeamPage({
 }: {
   params: Promise<{ teamId: string }>;
 }) {
+  const session = await auth();
+  if (!session) redirect("/");
+
   const { teamId } = await params;
 
   if (!UUID_REGEX.test(teamId)) {

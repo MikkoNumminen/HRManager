@@ -38,10 +38,12 @@ import TopBar from "@/components/TopBar";
 import ResetAll from "@/components/ResetAll";
 import { boxStyles } from "@/muiStyles";
 import { getPersons, getTeams } from "@/queries";
+import { auth } from "@/auth";
 
 export default async function Home() {
+  const session = await auth();
   const persons = await getPersons();
-  const teamsData = await getTeams();
+  const teamsData = session ? await getTeams() : [];
 
   return (
     <>
@@ -57,16 +59,18 @@ export default async function Home() {
         </Tooltip>
       </Link>
 
-      <Link href="/manageTeams" sx={{ textDecoration: "none" }}>
-        <Tooltip title="Go to Teams Manager" placement="right" arrow>
-          <Box component="div" sx={boxStyles}>
-            <Typography variant="h6" gutterBottom>
-              Teams
-            </Typography>
-            <TeamsTable combinedTeams={teamsData} />
-          </Box>
-        </Tooltip>
-      </Link>
+      {session && (
+        <Link href="/manageTeams" sx={{ textDecoration: "none" }}>
+          <Tooltip title="Go to Teams Manager" placement="right" arrow>
+            <Box component="div" sx={boxStyles}>
+              <Typography variant="h6" gutterBottom>
+                Teams
+              </Typography>
+              <TeamsTable combinedTeams={teamsData} />
+            </Box>
+          </Tooltip>
+        </Link>
+      )}
 
       <ResetAll />
     </>

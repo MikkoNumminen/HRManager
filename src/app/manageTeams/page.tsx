@@ -4,8 +4,13 @@ import EditableTeamsTable from "@/components/EditableTeamsTable";
 import TopBar from "@/components/TopBar";
 import { colors } from "@/muiStyles";
 import { getTeams } from "@/queries";
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
 
 export default async function ManageTeamsPage() {
+  const session = await auth();
+  if (!session) redirect("/");
+
   const teams = await getTeams();
 
   return (
