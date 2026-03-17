@@ -9,6 +9,7 @@ A full-stack HR management system for managing employees and teams — built wit
 ![Prisma](https://img.shields.io/badge/Prisma-6-2D3748?style=flat-square&logo=prisma)
 ![Zod](https://img.shields.io/badge/Zod-4-3E67B1?style=flat-square&logo=zod)
 ![Jest](https://img.shields.io/badge/Tested_with-Jest_30-C21325?style=flat-square&logo=jest)
+![Prettier](https://img.shields.io/badge/Formatted_with-Prettier-F7B93E?style=flat-square&logo=prettier)
 
 ---
 
@@ -16,6 +17,7 @@ A full-stack HR management system for managing employees and teams — built wit
 
 - **People management** — add, update and remove employees with name, email and position
 - **Team management** — create teams, assign managers, add and remove members
+- **Authentication** — NextAuth v5 with Google and GitHub OAuth; guest mode with read-only views
 - **Relational integrity** — database constraints enforced at ORM level with cascading rules
 - **Dark UI** — MUI dark theme with consistent component styling throughout
 - **Type-safe** — end-to-end TypeScript with Zod schema validation and centralized inferred types
@@ -34,8 +36,27 @@ npm install
 
 ### 2. Configure environment
 
+Copy the example and fill in your values:
+
 ```bash
-echo 'DATABASE_URL="file:./dev.db"' > .env
+cp .env.example .env
+```
+
+Required variables:
+
+| Variable            | Description                  |
+| ------------------- | ---------------------------- |
+| `DATABASE_URL`      | Prisma database URL          |
+| `AUTH_SECRET`       | NextAuth secret (random key) |
+| `AUTH_GOOGLE_ID`    | Google OAuth client ID       |
+| `AUTH_GOOGLE_SECRET`| Google OAuth client secret   |
+| `AUTH_GITHUB_ID`    | GitHub OAuth client ID       |
+| `AUTH_GITHUB_SECRET`| GitHub OAuth client secret   |
+
+Generate an auth secret:
+
+```bash
+npx auth secret
 ```
 
 ### 3. Set up the database
@@ -58,6 +79,12 @@ Open [http://localhost:3000](http://localhost:3000).
 npm test
 ```
 
+### Format code
+
+```bash
+npm run format
+```
+
 ---
 
 ## Tech stack
@@ -71,8 +98,10 @@ npm test
 | ORM               | Prisma 6 (`relationLoadStrategy: 'join'`)    |
 | Database          | SQLite (dev)                                 |
 | Validation        | Zod 4                                        |
+| Auth              | NextAuth v5 (JWT, Google + GitHub OAuth)     |
 | Testing           | Jest 30 + React Testing Library              |
 | Linting           | ESLint 9 (flat config)                       |
+| Formatting        | Prettier 3                                   |
 
 ---
 
@@ -85,11 +114,17 @@ The app uses Next.js App Router with a clear separation of concerns:
 - **Read queries** (`queries.ts`) are separated from mutations and validated through Zod schemas
 - **Centralized types** (`schemas.ts`) — Zod schemas export inferred `Person` and `CombinedTeam` types used across all components
 - **Forms** use React 19's `useActionState` for error handling with built-in pending state
+- **Auth** (`auth.ts`) — NextAuth v5 with JWT strategy; protected routes redirect unauthenticated users; guest mode shows read-only chip views
 
 ```
 src/
-├── app/              # Pages (async Server Components) and routes
+├── app/
+│   ├── api/auth/[...nextauth]/  # NextAuth route handler
+│   ├── managePersons/           # Person management (auth-protected)
+│   └── manageTeams/             # Team management (auth-protected)
 ├── components/       # Reusable MUI client components
+├── tests/            # Jest tests
+├── auth.ts           # NextAuth v5 configuration
 ├── db.ts             # Prisma singleton
 ├── muiStyles.ts      # Centralised style tokens and component styles
 ├── queries.ts        # Read-only data fetching (Prisma + Zod validation)
@@ -103,8 +138,6 @@ prisma/
 
 ## Roadmap
 
-- User authentication (NextAuth)
-- Top navigation bar
 - Department-level grouping
 - CI/CD pipeline (GitHub Actions)
 - Cloud deployment (AWS Fargate + RDS)
