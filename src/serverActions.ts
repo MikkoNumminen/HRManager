@@ -1,5 +1,6 @@
 "use server";
 import { prisma } from "@/db";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 export async function createPerson(data: FormData) {
@@ -30,6 +31,8 @@ export async function createPerson(data: FormData) {
       },
     });
   });
+  revalidatePath("/managePersons");
+  revalidatePath("/");
 }
 
 export async function removePerson(data: FormData) {
@@ -51,6 +54,8 @@ export async function removePerson(data: FormData) {
       },
     });
   });
+  revalidatePath("/managePersons");
+  revalidatePath("/");
 }
 
 export async function updatePosition(data: FormData) {
@@ -70,6 +75,7 @@ export async function updatePosition(data: FormData) {
       data: { position: newPosition },
     });
   });
+  revalidatePath("/managePersons");
 }
 
 export async function updateEmail(data: FormData) {
@@ -97,6 +103,7 @@ export async function updateEmail(data: FormData) {
       data: { email: newEmail },
     });
   });
+  revalidatePath("/managePersons");
 }
 
 export async function addManager(data: FormData) {
@@ -134,7 +141,8 @@ export async function addManager(data: FormData) {
       });
     }
   });
-
+  revalidatePath("/manageTeams");
+  revalidatePath("/");
   redirect("/");
 }
 
@@ -170,7 +178,7 @@ export async function addMember(data: FormData) {
       },
     });
   });
-
+  revalidatePath("/manageTeams");
   redirect("..");
 }
 
@@ -188,8 +196,8 @@ export async function createTeam(data: FormData) {
       },
     });
   });
-
-  redirect("/");
+  revalidatePath("/manageTeams");
+  revalidatePath("/");
 }
 
 export async function removeTeam(data: FormData) {
@@ -205,7 +213,8 @@ export async function removeTeam(data: FormData) {
       },
     });
   });
-
+  revalidatePath("/manageTeams");
+  revalidatePath("/");
   redirect("/");
 }
 
@@ -251,6 +260,6 @@ export async function removeMember(data: FormData) {
       });
     }
   });
-
+  revalidatePath("/manageTeams");
   redirect("..");
 }
