@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import PersonTable from "@/components/EditablePersonsTable";
 import AddPersonForm from "@/components/AddPeople";
 import TopBar from "@/components/TopBar";
@@ -15,6 +15,7 @@ export default async function ManagePersonsPage() {
         <AddPersonForm />
       </Box>
       <Box sx={{ border: `1px solid ${colors.slate300}`, borderRadius: "4px", padding: "20px" }}>
+        <Typography variant="h5" mb={2}>Persons</Typography>
         <PersonTable persons={persons} />
       </Box>
     </>
