@@ -23,16 +23,32 @@ describe("Remove People", () => {
     jest.clearAllMocks();
   });
 
-  test("submit button is enabled", () => {
+  test("remove button is enabled", () => {
     render(<RemovePersonForm personID={personID} />);
     expect(screen.getByRole("button", { name: /Remove/i })).not.toBeDisabled();
   });
 
-  test("submits the form and calls removePerson", async () => {
+  test("opens confirmation dialog when remove is clicked", () => {
+    render(<RemovePersonForm personID={personID} />);
+    fireEvent.click(screen.getByRole("button", { name: /Remove/i }));
+    expect(screen.getByText(/Are you sure you want to remove this person/)).toBeInTheDocument();
+  });
+
+  test("closes dialog when cancel is clicked", async () => {
+    render(<RemovePersonForm personID={personID} />);
+    fireEvent.click(screen.getByRole("button", { name: /Remove/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Cancel/i }));
+    await waitFor(() => {
+      expect(screen.queryByText(/Are you sure you want to remove this person/)).not.toBeInTheDocument();
+    });
+  });
+
+  test("submits the form after confirming dialog", async () => {
     const mockedRemovePerson = removePerson as jest.MockedFunction<typeof removePerson>;
     render(<RemovePersonForm personID={personID} />);
 
-    fireEvent.click(screen.getByRole("button", { name: /Remove/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^Remove$/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^Remove$/i }));
 
     await waitFor(() => {
       expect(mockedRemovePerson).toHaveBeenCalledWith(expect.any(FormData));
@@ -46,15 +62,11 @@ describe("Remove People", () => {
     );
     render(<RemovePersonForm personID={personID} />);
 
-    fireEvent.click(screen.getByRole("button", { name: /Remove/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^Remove$/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^Remove$/i }));
 
     await waitFor(() => {
       expect(screen.getByText("Removal failed")).toBeInTheDocument();
     });
-  });
-
-  test("does not show Cancel button", () => {
-    render(<RemovePersonForm personID={personID} />);
-    expect(screen.queryByText("Cancel")).not.toBeInTheDocument();
   });
 });

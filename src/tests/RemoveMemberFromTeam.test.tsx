@@ -67,12 +67,34 @@ describe("RemoveMemberFromTeam Component", () => {
     expect(screen.getByRole("button", { name: /Remove Member/i })).not.toBeDisabled();
   });
 
-  test("submits the form and calls removeMember", async () => {
+  test("opens confirmation dialog when remove member is clicked", () => {
+    render(<RemoveMemberFromTeam teamID={teamID} persons={mockPersons} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Alice" }));
+    fireEvent.click(screen.getByRole("button", { name: /Remove Member/i }));
+
+    expect(screen.getByText(/Are you sure you want to remove Alice/)).toBeInTheDocument();
+  });
+
+  test("closes dialog when cancel is clicked", async () => {
+    render(<RemoveMemberFromTeam teamID={teamID} persons={mockPersons} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Alice" }));
+    fireEvent.click(screen.getByRole("button", { name: /Remove Member/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Cancel/i }));
+
+    await waitFor(() => {
+      expect(screen.queryByText(/Are you sure you want to remove Alice/)).not.toBeInTheDocument();
+    });
+  });
+
+  test("submits the form after confirming dialog", async () => {
     (removeMember as jest.Mock).mockResolvedValue(undefined);
     render(<RemoveMemberFromTeam teamID={teamID} persons={mockPersons} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Alice" }));
     fireEvent.click(screen.getByRole("button", { name: /Remove Member/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^Remove$/i }));
 
     await waitFor(() => {
       expect(removeMember).toHaveBeenCalledWith(expect.any(FormData));
@@ -85,6 +107,7 @@ describe("RemoveMemberFromTeam Component", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Alice" }));
     fireEvent.click(screen.getByRole("button", { name: /Remove Member/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^Remove$/i }));
 
     await waitFor(() => {
       expect(screen.getByText("Person is not a member")).toBeInTheDocument();

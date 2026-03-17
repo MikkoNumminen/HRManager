@@ -13,16 +13,32 @@ describe("RemoveTeam Component", () => {
     jest.clearAllMocks();
   });
 
-  test("submit button is enabled", () => {
+  test("remove button is enabled", () => {
     render(<RemoveTeamForm teamID={teamID} />);
     expect(screen.getByRole("button", { name: /Remove/i })).not.toBeDisabled();
   });
 
-  test("submits the form and calls removeTeam", async () => {
+  test("opens confirmation dialog when remove is clicked", () => {
+    render(<RemoveTeamForm teamID={teamID} />);
+    fireEvent.click(screen.getByRole("button", { name: /Remove/i }));
+    expect(screen.getByText(/Are you sure you want to remove this team/)).toBeInTheDocument();
+  });
+
+  test("closes dialog when cancel is clicked", async () => {
+    render(<RemoveTeamForm teamID={teamID} />);
+    fireEvent.click(screen.getByRole("button", { name: /Remove/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Cancel/i }));
+    await waitFor(() => {
+      expect(screen.queryByText(/Are you sure you want to remove this team/)).not.toBeInTheDocument();
+    });
+  });
+
+  test("submits the form after confirming dialog", async () => {
     const mockedRemoveTeam = removeTeam as jest.MockedFunction<typeof removeTeam>;
     render(<RemoveTeamForm teamID={teamID} />);
 
-    fireEvent.click(screen.getByRole("button", { name: /Remove/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^Remove$/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^Remove$/i }));
 
     await waitFor(() => {
       expect(mockedRemoveTeam).toHaveBeenCalledWith(expect.any(FormData));
@@ -35,15 +51,11 @@ describe("RemoveTeam Component", () => {
     );
     render(<RemoveTeamForm teamID={teamID} />);
 
-    fireEvent.click(screen.getByRole("button", { name: /Remove/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^Remove$/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^Remove$/i }));
 
     await waitFor(() => {
       expect(screen.getByText("Removal failed")).toBeInTheDocument();
     });
-  });
-
-  test("does not show Cancel button", () => {
-    render(<RemoveTeamForm teamID={teamID} />);
-    expect(screen.queryByText("Cancel")).not.toBeInTheDocument();
   });
 });

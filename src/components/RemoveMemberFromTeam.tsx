@@ -3,14 +3,17 @@
 import { removeMember } from "@/serverActions";
 import { activeButtonStyles, formStyles, headerStyles, smallButtonStyles } from "@/muiStyles";
 import { Box, Button, Typography } from "@mui/material";
-import { useActionState, useState } from "react";
+import { useActionState, useRef, useState } from "react";
 import { PersonSelectCard } from "./PersonSelectCard";
 import { Person } from "@/schemas";
+import ConfirmDialog from "./ConfirmDialog";
 
 type FormState = { error: string | null };
 
 const RemoveMemberForm: React.FC<{ teamID: string; persons: Person[]; includeOnlyIds?: string[] }> = ({ teamID, persons, includeOnlyIds }) => {
   const [selectedMember, setSelectedMember] = useState<string>("");
+  const formRef = useRef<HTMLFormElement>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const [state, formAction, isPending] = useActionState(
     async (_prev: FormState, formData: FormData): Promise<FormState> => {
@@ -25,9 +28,10 @@ const RemoveMemberForm: React.FC<{ teamID: string; persons: Person[]; includeOnl
   );
 
   const filteredPersons = persons.filter((p) => !includeOnlyIds || includeOnlyIds.includes(p.id));
+  const selectedName = filteredPersons.find((p) => p.id === selectedMember)?.name;
 
   return (
-    <Box component="form" action={formAction} sx={formStyles}>
+    <Box component="form" action={formAction} ref={formRef} sx={formStyles}>
       <Box sx={headerStyles}>
         <Typography variant="h5">Remove Member from Team</Typography>
       </Box>
@@ -49,10 +53,25 @@ const RemoveMemberForm: React.FC<{ teamID: string; persons: Person[]; includeOnl
       </Box>
 
       <Box display="flex" gap={1} justifyContent="flex-end">
-        <Button type="submit" disabled={!selectedMember || isPending} sx={{ ...smallButtonStyles, ...(selectedMember && activeButtonStyles) }}>
+        <Button
+          disabled={!selectedMember || isPending}
+          onClick={() => setDialogOpen(true)}
+          sx={{ ...smallButtonStyles, ...(selectedMember && activeButtonStyles) }}
+        >
           Remove Member
         </Button>
       </Box>
+      <ConfirmDialog
+        open={dialogOpen}
+        title="Remove Member"
+        message={`Are you sure you want to remove ${selectedName ?? "this member"} from the team?`}
+        confirmLabel="Remove"
+        onConfirm={() => {
+          setDialogOpen(false);
+          formRef.current?.requestSubmit();
+        }}
+        onCancel={() => setDialogOpen(false)}
+      />
     </Box>
   );
 };
