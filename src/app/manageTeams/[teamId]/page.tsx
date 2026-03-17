@@ -1,7 +1,7 @@
 import UpdateManagerForm from "@/components/UpdateManager";
 import RemoveTeamForm from "@/components/RemoveTeam";
 import { getPersons, getTeams } from "@/queries";
-import { Box } from "@mui/material";
+import { Typography } from "@mui/material";
 import AddPeopleToTeam from "@/components/AddPeopleToTeam";
 import RemoveMemberFromTeam from "@/components/RemoveMemberFromTeam";
 import TopBar from "@/components/TopBar";
@@ -34,30 +34,22 @@ export default async function TeamPage({
   return (
     <>
       <TopBar title={`Manage ${team.teamName}`} backHref="/manageTeams" />
-      <Box mb={2}>
-        <RemoveTeamForm teamID={teamId} />
-      </Box>
-      <Box mb={2}>
-        <UpdateManagerForm
-          teamID={teamId}
-          persons={persons}
-          excludeIds={team.teamManagerId ? [team.teamManagerId] : []}
-        />
-      </Box>
-      <Box mb={2}>
-        <AddPeopleToTeam
-          teamID={teamId}
-          persons={persons}
-          excludeIds={managerAndMemberIds}
-        />
-      </Box>
-      <Box mb={2}>
-        <RemoveMemberFromTeam
-          teamID={teamId}
-          persons={persons}
-          includeOnlyIds={memberIds}
-        />
-      </Box>
+      <RemoveTeamForm teamID={teamId} />
+      <UpdateManagerForm
+        teamID={teamId}
+        persons={persons}
+        excludeIds={team.teamManagerId ? [team.teamManagerId] : []}
+      />
+      <AddPeopleToTeam
+        teamID={teamId}
+        persons={persons}
+        excludeIds={managerAndMemberIds}
+      />
+      <RemoveMemberFromTeam
+        teamID={teamId}
+        persons={persons}
+        includeOnlyIds={memberIds}
+      />
     </>
   );
 }

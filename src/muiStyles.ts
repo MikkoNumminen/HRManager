@@ -17,7 +17,7 @@ export const formStyles = {
   border: `1px solid ${colors.slate300}`,
   borderRadius: "4px",
   p: 2,
-  mb: 2,
+  mb: 1.5,
 };
 
 export const headerStyles = {
@@ -126,7 +126,7 @@ export const boxStyles = {
   padding: "20px",
   border: `1px solid ${colors.slate300}`,
   borderRadius: "4px",
-  mb: 2,
+  mb: 1.5,
   transition: "background-color 0.3s ease",
   "&:hover": {
     backgroundColor: colors.hoverOverlay,
