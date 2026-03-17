@@ -46,6 +46,7 @@ prisma/
 
 ## Commit style
 [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
+- Do **not** run `git commit` — only provide the commit message as text so the user can commit manually.
 
 ## Testing
 - Run `npm test` after every change.
