@@ -49,8 +49,8 @@ export function PersonCheckBoxList({
               fontSize: "0.875rem",
             }}
           >
-            <strong>Name:</strong> {name} <strong>Position:</strong> {position || ""}{" "}
-            <strong>Email:</strong> {email || "No email provided"}
+            <strong>Name:</strong> {name} <strong>Position:</strong> {position ?? ""}{" "}
+            <strong>Email:</strong> {email ?? ""}
           </Typography>
         }
         sx={{ display: "flex", alignItems: "center", mx: 0, mb: 0.5 }}

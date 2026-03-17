@@ -1,10 +1,10 @@
 import { z } from "zod";
 
 export const PersonSchema = z.object({
-  id: z.string(),
+  id: z.string().uuid(),
   name: z.string().min(1),
-  position: z.string(),
-  email: z.string(),
+  position: z.string().nullable(),
+  email: z.string().nullable(),
   createdAt: z.date(),
   updatedAt: z.date(),
 });
@@ -12,15 +12,15 @@ export const PersonSchema = z.object({
 export type Person = z.infer<typeof PersonSchema>;
 
 export const TeamMemberSchema = z.object({
-  personId: z.string(),
+  personId: z.string().uuid(),
   name: z.string(),
-  email: z.string(),
+  email: z.string().nullable(),
 });
 
 export const TeamSchema = z.object({
-  teamId: z.string(),
+  teamId: z.string().uuid(),
   teamName: z.string().min(1),
-  teamManagerId: z.string().nullable(),
+  teamManagerId: z.string().uuid().nullable(),
   managerName: z.string().nullable(),
   createdAt: z.date(),
   updatedAt: z.date(),

@@ -11,8 +11,8 @@ export function RemovePersonCheckBoxList({ id, name, position, email }: PersonLi
       control={<Radio name="personID" value={id} sx={radioStyles} size="small" />}
       label={
         <Typography sx={{ color: colors.slate100, fontSize: "0.875rem" }}>
-          <strong>Name:</strong> {name} <strong>Position:</strong> {position}{" "}
-          <strong>Email:</strong> {email}
+          <strong>Name:</strong> {name} <strong>Position:</strong> {position ?? ""}{" "}
+          <strong>Email:</strong> {email ?? ""}
         </Typography>
       }
       sx={{ display: "flex", alignItems: "center", mx: 0, mb: 0.5 }}

@@ -72,12 +72,21 @@ describe("EditablePersonsTable Component", () => {
     expect(screen.getByText(/No Persons Available/)).toBeInTheDocument();
   });
 
-  test("should render position as empty when value is dash", () => {
-    const personsWithDash: Person[] = [{ ...mockPersons[0], position: "-" }];
-    render(<EditablePersonsTable persons={personsWithDash} />);
+  test("should render position as empty when value is null", () => {
+    const personsWithNull: Person[] = [{ ...mockPersons[0], position: null }];
+    render(<EditablePersonsTable persons={personsWithNull} />);
 
     const row = screen.getByText("John Doe").closest("tr")!;
     const cells = row.querySelectorAll("td");
     expect(cells[1].textContent).toBe("");
+  });
+
+  test("should render email as empty when value is null", () => {
+    const personsWithNull: Person[] = [{ ...mockPersons[0], email: null }];
+    render(<EditablePersonsTable persons={personsWithNull} />);
+
+    const row = screen.getByText("John Doe").closest("tr")!;
+    const cells = row.querySelectorAll("td");
+    expect(cells[2].textContent).toBe("");
   });
 });

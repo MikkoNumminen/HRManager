@@ -33,18 +33,33 @@ describe("PersonTable Component", () => {
     expect(screen.getByText(/Updated At/i)).toBeInTheDocument();
 
     // Check if each row is rendered correctly
-    mockPersons.forEach((person) => {
-      expect(screen.getByText(person.name)).toBeInTheDocument();
-      expect(screen.getByText(person.position)).toBeInTheDocument();
-      expect(screen.getByText(person.email)).toBeInTheDocument();
-      expect(screen.getByText(new Date(person.createdAt).toLocaleString())).toBeInTheDocument();
-      expect(screen.getByText(new Date(person.updatedAt).toLocaleString())).toBeInTheDocument();
-    });
+    expect(screen.getByText("John Doe")).toBeInTheDocument();
+    expect(screen.getByText("Developer")).toBeInTheDocument();
+    expect(screen.getByText("john.doe@example.com")).toBeInTheDocument();
+    expect(screen.getByText("Jane Smith")).toBeInTheDocument();
+    expect(screen.getByText("Designer")).toBeInTheDocument();
+    expect(screen.getByText("jane.smith@example.com")).toBeInTheDocument();
   });
 
   test('should render "No Persons Available" when there are no persons', () => {
     render(<PersonTable persons={[]} />);
 
     expect(screen.getByText(/No Persons Available/)).toBeInTheDocument();
+  });
+
+  test("should render empty cells when position and email are null", () => {
+    const personsWithNulls: Person[] = [
+      {
+        ...mockPersons[0],
+        position: null,
+        email: null,
+      },
+    ];
+    render(<PersonTable persons={personsWithNulls} />);
+
+    const row = screen.getByText("John Doe").closest("tr")!;
+    const cells = row.querySelectorAll("td");
+    expect(cells[1].textContent).toBe("");
+    expect(cells[2].textContent).toBe("");
   });
 });

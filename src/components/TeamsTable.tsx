@@ -94,7 +94,7 @@ const TeamsTable: React.FC<CombinedTeamProps> = ({ combinedTeams, minimal = fals
                 <TableCell>
                   <Box>
                     {team.members.map((member) => (
-                      <Typography key={`${team.teamId}-${member.name}`} variant="body2">
+                      <Typography key={member.personId} variant="body2">
                         {member.name}
                       </Typography>
                     ))}

@@ -44,14 +44,14 @@ cp .env.example .env
 
 Required variables:
 
-| Variable            | Description                  |
-| ------------------- | ---------------------------- |
-| `DATABASE_URL`      | Prisma database URL          |
-| `AUTH_SECRET`       | NextAuth secret (random key) |
-| `AUTH_GOOGLE_ID`    | Google OAuth client ID       |
-| `AUTH_GOOGLE_SECRET`| Google OAuth client secret   |
-| `AUTH_GITHUB_ID`    | GitHub OAuth client ID       |
-| `AUTH_GITHUB_SECRET`| GitHub OAuth client secret   |
+| Variable             | Description                  |
+| -------------------- | ---------------------------- |
+| `DATABASE_URL`       | Prisma database URL          |
+| `AUTH_SECRET`        | NextAuth secret (random key) |
+| `AUTH_GOOGLE_ID`     | Google OAuth client ID       |
+| `AUTH_GOOGLE_SECRET` | Google OAuth client secret   |
+| `AUTH_GITHUB_ID`     | GitHub OAuth client ID       |
+| `AUTH_GITHUB_SECRET` | GitHub OAuth client secret   |
 
 Generate an auth secret:
 

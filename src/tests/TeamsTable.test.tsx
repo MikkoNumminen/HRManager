@@ -7,23 +7,25 @@ describe("TeamsTable Component", () => {
     {
       teamName: "Development",
       teamId: "1",
+      teamManagerId: "mgr-1",
       managerName: "Manager1",
       createdAt: new Date("2023-01-01T10:00:00Z"),
       updatedAt: new Date("2023-01-10T10:00:00Z"),
       members: [
-        { name: "John Doe", email: "john.doe@example.com" },
-        { name: "Jane Smith", email: "jane.smith@example.com" },
+        { personId: "p1", name: "John Doe", email: "john.doe@example.com" },
+        { personId: "p2", name: "Jane Smith", email: "jane.smith@example.com" },
       ],
     },
     {
       teamName: "Design",
       teamId: "2",
+      teamManagerId: "mgr-2",
       managerName: "Manager2",
       createdAt: new Date("2023-02-01T11:00:00Z"),
       updatedAt: new Date("2023-02-10T11:00:00Z"),
       members: [
-        { name: "Alice Brown", email: "alice.brown@example.com" },
-        { name: "Bob White", email: "bob.white@example.com" },
+        { personId: "p3", name: "Alice Brown", email: "alice.brown@example.com" },
+        { personId: "p4", name: "Bob White", email: "bob.white@example.com" },
       ],
     },
   ];

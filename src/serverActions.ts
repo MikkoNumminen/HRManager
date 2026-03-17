@@ -3,6 +3,14 @@ import { prisma } from "@/db";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function validateUUID(value: string, fieldName: string): void {
+  if (!UUID_REGEX.test(value)) {
+    throw new Error(`Invalid ${fieldName} format`);
+  }
+}
+
 export async function createPerson(data: FormData) {
   const name = data.get("name")?.valueOf();
   if (typeof name !== "string" || name.trim().length === 0) {
@@ -36,10 +44,11 @@ export async function createPerson(data: FormData) {
 }
 
 export async function removePerson(data: FormData) {
-  const personIDs = data.getAll("personID") as string[];
-  if (!Array.isArray(personIDs) || personIDs.length === 0) {
+  const personIDs = data.getAll("personID").filter((v): v is string => typeof v === "string");
+  if (personIDs.length === 0) {
     throw new Error("No personID selected");
   }
+  personIDs.forEach((id) => validateUUID(id, "personID"));
 
   await prisma.$transaction(async (prisma) => {
     await prisma.teamMember.deleteMany({
@@ -63,6 +72,7 @@ export async function updatePosition(data: FormData) {
   if (!personID) {
     throw new Error("No personID provided");
   }
+  validateUUID(personID, "personID");
 
   const newPosition = data.get("name")?.toString().trim();
   if (!newPosition) {
@@ -83,6 +93,7 @@ export async function updateEmail(data: FormData) {
   if (!personID) {
     throw new Error("No personID selected");
   }
+  validateUUID(personID, "personID");
 
   const newEmail = data.get("name")?.toString().trim();
   if (!newEmail) {
@@ -107,19 +118,21 @@ export async function updateEmail(data: FormData) {
 }
 
 export async function addManager(data: FormData) {
-  const teamID = data.getAll("teamID") as string[];
-  const personID = data.get("personID") as string;
+  const teamIDs = data.getAll("teamID").filter((v): v is string => typeof v === "string");
+  const personID = data.get("personID")?.toString();
 
-  if (!Array.isArray(teamID) || teamID.length === 0) {
+  if (teamIDs.length === 0) {
     throw new Error("No teamID selected");
   }
   if (!personID) {
     throw new Error("No personID provided");
   }
+  teamIDs.forEach((id) => validateUUID(id, "teamID"));
+  validateUUID(personID, "personID");
 
   await prisma.$transaction(async (prisma) => {
     await prisma.team.update({
-      where: { teamId: teamID[0] },
+      where: { teamId: teamIDs[0] },
       data: { teamManagerId: personID },
     });
 
@@ -127,7 +140,7 @@ export async function addManager(data: FormData) {
       where: {
         personId_teamId: {
           personId: personID,
-          teamId: teamID[0],
+          teamId: teamIDs[0],
         },
       },
     });
@@ -136,7 +149,7 @@ export async function addManager(data: FormData) {
       await prisma.teamMember.create({
         data: {
           personId: personID,
-          teamId: teamID[0],
+          teamId: teamIDs[0],
         },
       });
     }
@@ -156,6 +169,8 @@ export async function addMember(data: FormData) {
   if (!personID) {
     throw new Error("No personID selected");
   }
+  validateUUID(teamID, "teamID");
+  validateUUID(personID, "personID");
 
   await prisma.$transaction(async (prisma) => {
     const existingMember = await prisma.teamMember.findUnique({
@@ -201,15 +216,16 @@ export async function createTeam(data: FormData) {
 }
 
 export async function removeTeam(data: FormData) {
-  const teamID = data.getAll("teamID") as string[];
-  if (!Array.isArray(teamID) || teamID.length === 0) {
+  const teamIDs = data.getAll("teamID").filter((v): v is string => typeof v === "string");
+  if (teamIDs.length === 0) {
     throw new Error("No teamID selected");
   }
+  teamIDs.forEach((id) => validateUUID(id, "teamID"));
 
   await prisma.$transaction(async (prisma) => {
     await prisma.team.deleteMany({
       where: {
-        teamId: { in: teamID },
+        teamId: { in: teamIDs },
       },
     });
   });
@@ -219,8 +235,8 @@ export async function removeTeam(data: FormData) {
 }
 
 export async function removeMember(data: FormData) {
-  const teamID = data.get("teamID") as string;
-  const personID = data.get("personID") as string;
+  const teamID = data.get("teamID")?.toString();
+  const personID = data.get("personID")?.toString();
 
   if (!teamID) {
     throw new Error("No teamID selected");
@@ -228,6 +244,8 @@ export async function removeMember(data: FormData) {
   if (!personID) {
     throw new Error("No personID selected");
   }
+  validateUUID(teamID, "teamID");
+  validateUUID(personID, "personID");
 
   await prisma.$transaction(async (prisma) => {
     const existingMember = await prisma.teamMember.findUnique({

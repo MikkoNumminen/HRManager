@@ -67,8 +67,8 @@ const PersonTable: React.FC<PersonTableProps> = ({ persons }) => {
                   }}
                 >
                   <TableCell>{person.name}</TableCell>
-                  <TableCell>{person.position === "-" ? "" : person.position}</TableCell>
-                  <TableCell>{person.email}</TableCell>
+                  <TableCell>{person.position ?? ""}</TableCell>
+                  <TableCell>{person.email ?? ""}</TableCell>
                   <TableCell>{new Date(person.createdAt).toLocaleString()}</TableCell>
                   <TableCell>{new Date(person.updatedAt).toLocaleString()}</TableCell>
                 </TableRow>

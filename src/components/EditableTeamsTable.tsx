@@ -73,7 +73,7 @@ const EditableTeamsTable: React.FC<CombinedTeamProps> = ({ combinedTeams }) => {
                     <Box>
                       {team.members && team.members.length > 0
                         ? team.members.map((member) => (
-                            <Typography key={member.email} variant="body2">
+                            <Typography key={member.personId} variant="body2">
                               {member?.name || "Unknown Name"}
                             </Typography>
                           ))
