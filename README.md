@@ -34,6 +34,10 @@ A full-stack HR management system for managing employees and teams — built wit
 npm install
 ```
 
+> This downloads all the packages the project needs to run. Think of it like going to the store and buying all the ingredients before you can cook. Node.js reads the `package.json` shopping list and grabs everything from the internet into a `node_modules` folder.
+
+---
+
 ### 2. Configure environment
 
 Copy the example and fill in your values:
@@ -41,6 +45,8 @@ Copy the example and fill in your values:
 ```bash
 cp .env.example .env
 ```
+
+> The app needs some secret keys and settings to work — things like database location and login credentials. These are kept in a `.env` file that is never committed to git (so your secrets stay yours). The `.env.example` file is a blank template with all the right variable names already in it. You copy it, then fill in the real values.
 
 Required variables:
 
@@ -59,11 +65,19 @@ Generate an auth secret:
 npx auth secret
 ```
 
+> `AUTH_SECRET` is a random string that NextAuth uses to sign and encrypt login session tokens. It has to be secret and unpredictable — you never write this yourself. The command above generates a cryptographically secure value and prints it so you can paste it into your `.env`. For Google and GitHub credentials, you register an OAuth app in each provider's developer console and copy the client ID and secret they give you.
+
+---
+
 ### 3. Set up the database
 
 ```bash
 npx prisma migrate dev --name init
 ```
+
+> This creates the SQLite database file (`prisma/dev.db`) and builds all the tables according to the schema in `prisma/schema.prisma`. It also generates the Prisma client — the type-safe query builder the app uses to talk to the database. You only need to run this once on a fresh clone, or again whenever the schema changes.
+
+---
 
 ### 4. Start the dev server
 
@@ -71,7 +85,11 @@ npx prisma migrate dev --name init
 npm run dev
 ```
 
+> This starts the Next.js development server with hot reload. Any file you save will automatically update in the browser without a full restart. The app will be available at the address below.
+
 Open [http://localhost:3000](http://localhost:3000).
+
+---
 
 ### Run tests
 
@@ -79,11 +97,17 @@ Open [http://localhost:3000](http://localhost:3000).
 npm test
 ```
 
+> Runs all Jest unit and integration tests. Tests live in `src/tests/` and cover the core components and server actions. Run this after making changes to make sure nothing is broken.
+
+---
+
 ### Format code
 
 ```bash
 npm run format
 ```
+
+> Runs Prettier across all source files and rewrites them to match the project's code style. This is the source of truth for formatting — consistent indentation, quote style, trailing commas, and line width. Run `npm run format:check` if you want to verify formatting without changing any files.
 
 ---
 
