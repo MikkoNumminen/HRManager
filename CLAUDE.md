@@ -65,7 +65,8 @@ prisma/
 
 ## Formatting
 
-- Prettier is the source of truth for code style. Run `npm run format` to format all files.
+- Prettier is the source of truth for code style.
+- Run `npm run format` after every completed change to format all files.
 - `npm run format:check` verifies formatting without modifying files.
 - ESLint uses `eslint-config-prettier` to disable rules that conflict with Prettier.
 
