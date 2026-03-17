@@ -10,9 +10,10 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 type FormState = { error: string | null };
 
-const UpdateEmailForm: React.FC<{ personID: string }> = ({ personID }) => {
-  const [newEmail, setNewEmail] = useState("");
-  const isValid = EMAIL_REGEX.test(newEmail.trim());
+const UpdateEmailForm: React.FC<{ personID: string; currentEmail?: string }> = ({ personID, currentEmail }) => {
+  const [newEmail, setNewEmail] = useState(currentEmail ?? "");
+  const isChanged = newEmail.trim() !== (currentEmail ?? "");
+  const isValid = EMAIL_REGEX.test(newEmail.trim()) && isChanged;
   const router = useRouter();
 
   const [state, formAction, isPending] = useActionState(
@@ -41,6 +42,7 @@ const UpdateEmailForm: React.FC<{ personID: string }> = ({ personID }) => {
           size="small"
           value={newEmail}
           onChange={(e) => setNewEmail(e.target.value)}
+          helperText={!currentEmail ? "No email set" : undefined}
           sx={textFieldStyles}
         />
       </Tooltip>

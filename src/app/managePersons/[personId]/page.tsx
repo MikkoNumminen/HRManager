@@ -32,10 +32,10 @@ export default async function PersonPage({
         <RemovePersonForm personID={personId} />
       </Box>
       <Box mb={2}>
-        <UpdatePositionForm personID={personId} />
+        <UpdatePositionForm personID={personId} currentPosition={person.position || undefined} />
       </Box>
       <Box mb={2}>
-        <UpdateEmailForm personID={personId} />
+        <UpdateEmailForm personID={personId} currentEmail={person.email || undefined} />
       </Box>
     </>
   );

@@ -8,9 +8,10 @@ import { useActionState, useState } from "react";
 
 type FormState = { error: string | null };
 
-const UpdatePositionForm: React.FC<{ personID: string }> = ({ personID }) => {
-  const [newPosition, setNewPosition] = useState("");
-  const isValid = newPosition.trim().length > 0;
+const UpdatePositionForm: React.FC<{ personID: string; currentPosition?: string }> = ({ personID, currentPosition }) => {
+  const [newPosition, setNewPosition] = useState(currentPosition ?? "");
+  const isChanged = newPosition.trim() !== (currentPosition ?? "");
+  const isValid = newPosition.trim().length > 0 && isChanged;
   const router = useRouter();
 
   const [state, formAction, isPending] = useActionState(
