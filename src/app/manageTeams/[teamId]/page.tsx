@@ -10,11 +10,7 @@ import { redirect } from "next/navigation";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-export default async function TeamPage({
-  params,
-}: {
-  params: Promise<{ teamId: string }>;
-}) {
+export default async function TeamPage({ params }: { params: Promise<{ teamId: string }> }) {
   const session = await auth();
   if (!session) redirect("/");
 
@@ -32,9 +28,7 @@ export default async function TeamPage({
   }
 
   const memberIds = team.members.map((m) => m.personId);
-  const managerAndMemberIds = team.teamManagerId
-    ? [team.teamManagerId, ...memberIds]
-    : memberIds;
+  const managerAndMemberIds = team.teamManagerId ? [team.teamManagerId, ...memberIds] : memberIds;
 
   return (
     <>
@@ -45,16 +39,8 @@ export default async function TeamPage({
         persons={persons}
         excludeIds={team.teamManagerId ? [team.teamManagerId] : []}
       />
-      <AddPeopleToTeam
-        teamID={teamId}
-        persons={persons}
-        excludeIds={managerAndMemberIds}
-      />
-      <RemoveMemberFromTeam
-        teamID={teamId}
-        persons={persons}
-        includeOnlyIds={memberIds}
-      />
+      <AddPeopleToTeam teamID={teamId} persons={persons} excludeIds={managerAndMemberIds} />
+      <RemoveMemberFromTeam teamID={teamId} persons={persons} includeOnlyIds={memberIds} />
     </>
   );
 }

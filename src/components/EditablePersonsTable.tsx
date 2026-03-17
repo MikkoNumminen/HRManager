@@ -43,19 +43,19 @@ const PersonTable: React.FC<PersonTableProps> = ({ persons }) => {
           {persons.length === 0 ? (
             <TableRow>
               <TableCell colSpan={5}>
-                <Box
-                  display="flex"
-                  justifyContent="center"
-                  alignItems="center"
-                  height="100px"
-                >
+                <Box display="flex" justifyContent="center" alignItems="center" height="100px">
                   <Typography align="center">No Persons Available</Typography>
                 </Box>
               </TableCell>
             </TableRow>
           ) : (
             persons.map((person) => (
-              <Tooltip key={person.id} title={`Click to manage ${person.name}`} placement="right" arrow>
+              <Tooltip
+                key={person.id}
+                title={`Click to manage ${person.name}`}
+                placement="right"
+                arrow
+              >
                 <TableRow
                   hover
                   onClick={() => handleRowClick(person.id)}
@@ -66,15 +66,11 @@ const PersonTable: React.FC<PersonTableProps> = ({ persons }) => {
                     },
                   }}
                 >
-                <TableCell>{person.name}</TableCell>
-                <TableCell>{person.position === "-" ? "" : person.position}</TableCell>
-                <TableCell>{person.email}</TableCell>
-                <TableCell>
-                  {new Date(person.createdAt).toLocaleString()}
-                </TableCell>
-                <TableCell>
-                  {new Date(person.updatedAt).toLocaleString()}
-                </TableCell>
+                  <TableCell>{person.name}</TableCell>
+                  <TableCell>{person.position === "-" ? "" : person.position}</TableCell>
+                  <TableCell>{person.email}</TableCell>
+                  <TableCell>{new Date(person.createdAt).toLocaleString()}</TableCell>
+                  <TableCell>{new Date(person.updatedAt).toLocaleString()}</TableCell>
                 </TableRow>
               </Tooltip>
             ))

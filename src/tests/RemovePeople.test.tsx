@@ -39,7 +39,9 @@ describe("Remove People", () => {
     fireEvent.click(screen.getByRole("button", { name: /Remove/i }));
     fireEvent.click(screen.getByRole("button", { name: /Cancel/i }));
     await waitFor(() => {
-      expect(screen.queryByText(/Are you sure you want to remove this person/)).not.toBeInTheDocument();
+      expect(
+        screen.queryByText(/Are you sure you want to remove this person/),
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -58,7 +60,7 @@ describe("Remove People", () => {
 
   test("shows error message when removePerson fails", async () => {
     (removePerson as jest.MockedFunction<typeof removePerson>).mockRejectedValue(
-      new Error("Removal failed")
+      new Error("Removal failed"),
     );
     render(<RemovePersonForm personID={personID} />);
 

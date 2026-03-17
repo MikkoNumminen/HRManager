@@ -19,7 +19,10 @@ const AddPersonForm: React.FC = () => {
         await createPerson(formData);
         return { error: null, success: true };
       } catch (error) {
-        return { error: error instanceof Error ? error.message : "An error occurred", success: false };
+        return {
+          error: error instanceof Error ? error.message : "An error occurred",
+          success: false,
+        };
       }
     },
     { error: null, success: false },
@@ -58,7 +61,11 @@ const AddPersonForm: React.FC = () => {
         />
       </Tooltip>
       <Box display="flex" gap={1} justifyContent="flex-end">
-        <Button type="submit" disabled={!isValid || isPending} sx={{ ...smallButtonStyles, ...(isValid && activeButtonStyles) }}>
+        <Button
+          type="submit"
+          disabled={!isValid || isPending}
+          sx={{ ...smallButtonStyles, ...(isValid && activeButtonStyles) }}
+        >
           Create
         </Button>
       </Box>

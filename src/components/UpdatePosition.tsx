@@ -8,7 +8,10 @@ import { useActionState, useState } from "react";
 
 type FormState = { error: string | null };
 
-const UpdatePositionForm: React.FC<{ personID: string; currentPosition?: string }> = ({ personID, currentPosition }) => {
+const UpdatePositionForm: React.FC<{ personID: string; currentPosition?: string }> = ({
+  personID,
+  currentPosition,
+}) => {
   const [newPosition, setNewPosition] = useState(currentPosition ?? "");
   const isChanged = newPosition.trim() !== (currentPosition ?? "");
   const isValid = newPosition.trim().length > 0 && isChanged;
@@ -43,7 +46,11 @@ const UpdatePositionForm: React.FC<{ personID: string; currentPosition?: string 
         />
       </Tooltip>
       <Box display="flex" gap={1} justifyContent="flex-end">
-<Button type="submit" disabled={!isValid || isPending} sx={{ ...smallButtonStyles, ...(isValid && activeButtonStyles) }}>
+        <Button
+          type="submit"
+          disabled={!isValid || isPending}
+          sx={{ ...smallButtonStyles, ...(isValid && activeButtonStyles) }}
+        >
           Change
         </Button>
       </Box>

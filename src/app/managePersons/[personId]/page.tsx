@@ -9,11 +9,7 @@ import { redirect } from "next/navigation";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-export default async function PersonPage({
-  params,
-}: {
-  params: Promise<{ personId: string }>;
-}) {
+export default async function PersonPage({ params }: { params: Promise<{ personId: string }> }) {
   const session = await auth();
   if (!session) redirect("/");
 

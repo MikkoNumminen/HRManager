@@ -62,17 +62,17 @@ npm test
 
 ## Tech stack
 
-| Layer | Technology |
-|---|---|
-| Framework | Next.js 16 (App Router, Server Components) |
-| UI library | React 19 (`useActionState`, `<form action>`) |
-| Component library | MUI v7 (Material UI) |
-| Language | TypeScript 5.9 |
-| ORM | Prisma 6 (`relationLoadStrategy: 'join'`) |
-| Database | SQLite (dev) |
-| Validation | Zod 4 |
-| Testing | Jest 30 + React Testing Library |
-| Linting | ESLint 9 (flat config) |
+| Layer             | Technology                                   |
+| ----------------- | -------------------------------------------- |
+| Framework         | Next.js 16 (App Router, Server Components)   |
+| UI library        | React 19 (`useActionState`, `<form action>`) |
+| Component library | MUI v7 (Material UI)                         |
+| Language          | TypeScript 5.9                               |
+| ORM               | Prisma 6 (`relationLoadStrategy: 'join'`)    |
+| Database          | SQLite (dev)                                 |
+| Validation        | Zod 4                                        |
+| Testing           | Jest 30 + React Testing Library              |
+| Linting           | ESLint 9 (flat config)                       |
 
 ---
 

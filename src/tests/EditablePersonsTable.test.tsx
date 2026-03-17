@@ -73,9 +73,7 @@ describe("EditablePersonsTable Component", () => {
   });
 
   test("should render position as empty when value is dash", () => {
-    const personsWithDash: Person[] = [
-      { ...mockPersons[0], position: "-" },
-    ];
+    const personsWithDash: Person[] = [{ ...mockPersons[0], position: "-" }];
     render(<EditablePersonsTable persons={personsWithDash} />);
 
     const row = screen.getByText("John Doe").closest("tr")!;

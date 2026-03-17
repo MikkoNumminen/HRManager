@@ -9,7 +9,11 @@ import { Person } from "@/schemas";
 
 type FormState = { error: string | null };
 
-const UpdateManagerForm: React.FC<{ teamID: string; persons: Person[]; excludeIds?: string[] }> = ({ teamID, persons, excludeIds = [] }) => {
+const UpdateManagerForm: React.FC<{ teamID: string; persons: Person[]; excludeIds?: string[] }> = ({
+  teamID,
+  persons,
+  excludeIds = [],
+}) => {
   const [newManager, setNewManager] = useState<string>("");
 
   const [state, formAction, isPending] = useActionState(
@@ -36,7 +40,14 @@ const UpdateManagerForm: React.FC<{ teamID: string; persons: Person[]; excludeId
       <input type="hidden" name="teamID" value={teamID} />
       <input type="hidden" name="personID" value={newManager} />
 
-      <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))", gap: 1, mb: 1 }}>
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))",
+          gap: 1,
+          mb: 1,
+        }}
+      >
         {filteredPersons.map((p) => (
           <PersonSelectCard
             key={p.id}
@@ -49,7 +60,11 @@ const UpdateManagerForm: React.FC<{ teamID: string; persons: Person[]; excludeId
       </Box>
 
       <Box display="flex" gap={1} justifyContent="flex-end">
-        <Button type="submit" disabled={!newManager || isPending} sx={{ ...smallButtonStyles, ...(newManager && activeButtonStyles) }}>
+        <Button
+          type="submit"
+          disabled={!newManager || isPending}
+          sx={{ ...smallButtonStyles, ...(newManager && activeButtonStyles) }}
+        >
           Add Manager
         </Button>
       </Box>

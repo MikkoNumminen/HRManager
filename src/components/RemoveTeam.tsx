@@ -30,11 +30,7 @@ const RemoveTeamForm: React.FC<{ teamID: string }> = ({ teamID }) => {
       {state.error && <Typography color="error">{state.error}</Typography>}
       <input type="hidden" name="teamID" value={teamID} />
       <Box display="flex" gap={1} justifyContent="flex-end">
-        <Button
-          disabled={isPending}
-          onClick={() => setDialogOpen(true)}
-          sx={smallButtonStyles}
-        >
+        <Button disabled={isPending} onClick={() => setDialogOpen(true)} sx={smallButtonStyles}>
           Remove
         </Button>
       </Box>

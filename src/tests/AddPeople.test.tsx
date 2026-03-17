@@ -81,7 +81,7 @@ describe("AddPerson Component", () => {
 
   test("shows error message when createPerson fails", async () => {
     (createPerson as jest.MockedFunction<typeof createPerson>).mockRejectedValue(
-      new Error("A person with this email already exists")
+      new Error("A person with this email already exists"),
     );
     render(<AddPersonForm />);
 
@@ -94,9 +94,7 @@ describe("AddPerson Component", () => {
     fireEvent.click(screen.getByRole("button", { name: /Create/i }));
 
     await waitFor(() => {
-      expect(
-        screen.getByText("A person with this email already exists")
-      ).toBeInTheDocument();
+      expect(screen.getByText("A person with this email already exists")).toBeInTheDocument();
     });
   });
 });

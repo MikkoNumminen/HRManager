@@ -4,12 +4,7 @@ import { Person } from "@/schemas";
 
 type PersonListProps = Pick<Person, "id" | "name" | "position" | "email">;
 
-export function RemovePersonCheckBoxList({
-  id,
-  name,
-  position,
-  email,
-}: PersonListProps) {
+export function RemovePersonCheckBoxList({ id, name, position, email }: PersonListProps) {
   return (
     <FormControlLabel
       value={id}

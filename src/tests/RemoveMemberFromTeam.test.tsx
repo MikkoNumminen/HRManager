@@ -49,7 +49,9 @@ describe("RemoveMemberFromTeam Component", () => {
   });
 
   test("shows only members in includeOnlyIds", () => {
-    render(<RemoveMemberFromTeam teamID={teamID} persons={mockPersons} includeOnlyIds={["person-1"]} />);
+    render(
+      <RemoveMemberFromTeam teamID={teamID} persons={mockPersons} includeOnlyIds={["person-1"]} />,
+    );
 
     expect(screen.getByText(/Alice/)).toBeInTheDocument();
     expect(screen.queryByText(/Bob/)).not.toBeInTheDocument();

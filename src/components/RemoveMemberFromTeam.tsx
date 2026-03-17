@@ -10,7 +10,11 @@ import ConfirmDialog from "./ConfirmDialog";
 
 type FormState = { error: string | null };
 
-const RemoveMemberForm: React.FC<{ teamID: string; persons: Person[]; includeOnlyIds?: string[] }> = ({ teamID, persons, includeOnlyIds }) => {
+const RemoveMemberForm: React.FC<{
+  teamID: string;
+  persons: Person[];
+  includeOnlyIds?: string[];
+}> = ({ teamID, persons, includeOnlyIds }) => {
   const [selectedMember, setSelectedMember] = useState<string>("");
   const formRef = useRef<HTMLFormElement>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -40,7 +44,14 @@ const RemoveMemberForm: React.FC<{ teamID: string; persons: Person[]; includeOnl
       <input type="hidden" name="teamID" value={teamID} />
       <input type="hidden" name="personID" value={selectedMember} />
 
-      <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))", gap: 1, mb: 1 }}>
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))",
+          gap: 1,
+          mb: 1,
+        }}
+      >
         {filteredPersons.map((p) => (
           <PersonSelectCard
             key={p.id}

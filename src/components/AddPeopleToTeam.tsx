@@ -9,7 +9,11 @@ import { Person } from "@/schemas";
 
 type FormState = { error: string | null };
 
-const AddMemberForm: React.FC<{ teamID: string; persons: Person[]; excludeIds?: string[] }> = ({ teamID, persons, excludeIds = [] }) => {
+const AddMemberForm: React.FC<{ teamID: string; persons: Person[]; excludeIds?: string[] }> = ({
+  teamID,
+  persons,
+  excludeIds = [],
+}) => {
   const [selectedMember, setSelectedMember] = useState<string>("");
 
   const [state, formAction, isPending] = useActionState(
@@ -36,7 +40,14 @@ const AddMemberForm: React.FC<{ teamID: string; persons: Person[]; excludeIds?: 
       <input type="hidden" name="teamID" value={teamID} />
       <input type="hidden" name="personID" value={selectedMember} />
 
-      <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))", gap: 1, mb: 1 }}>
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))",
+          gap: 1,
+          mb: 1,
+        }}
+      >
         {filteredPersons.map((p) => (
           <PersonSelectCard
             key={p.id}
@@ -49,7 +60,11 @@ const AddMemberForm: React.FC<{ teamID: string; persons: Person[]; excludeIds?: 
       </Box>
 
       <Box display="flex" gap={1} justifyContent="flex-end">
-        <Button type="submit" disabled={!selectedMember || isPending} sx={{ ...smallButtonStyles, ...(selectedMember && activeButtonStyles) }}>
+        <Button
+          type="submit"
+          disabled={!selectedMember || isPending}
+          sx={{ ...smallButtonStyles, ...(selectedMember && activeButtonStyles) }}
+        >
           Add Member
         </Button>
       </Box>

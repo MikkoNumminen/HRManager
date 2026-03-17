@@ -19,7 +19,14 @@ type Props = {
   onCancel: () => void;
 };
 
-export default function ConfirmDialog({ open, title, message, confirmLabel = "Confirm", onConfirm, onCancel }: Props) {
+export default function ConfirmDialog({
+  open,
+  title,
+  message,
+  confirmLabel = "Confirm",
+  onConfirm,
+  onCancel,
+}: Props) {
   return (
     <Dialog
       open={open}

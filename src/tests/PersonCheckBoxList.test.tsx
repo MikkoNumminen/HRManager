@@ -29,12 +29,18 @@ describe("PersonSelectCard", () => {
 
   test("aria-pressed is false when not selected", () => {
     render(<PersonSelectCard person={defaultPerson} selected={false} onSelect={jest.fn()} />);
-    expect(screen.getByRole("button", { name: "John Doe" })).toHaveAttribute("aria-pressed", "false");
+    expect(screen.getByRole("button", { name: "John Doe" })).toHaveAttribute(
+      "aria-pressed",
+      "false",
+    );
   });
 
   test("aria-pressed is true when selected", () => {
     render(<PersonSelectCard person={defaultPerson} selected={true} onSelect={jest.fn()} />);
-    expect(screen.getByRole("button", { name: "John Doe" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: "John Doe" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
   });
 
   test("calls onSelect with person id when clicked while not selected", () => {

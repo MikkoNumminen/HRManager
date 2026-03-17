@@ -33,11 +33,7 @@ const RemovePersonForm: React.FC<{ personID: string }> = ({ personID }) => {
       {state.error && <Typography color="error">{state.error}</Typography>}
       <input type="hidden" name="personID" value={personID} />
       <Box display="flex" gap={1} justifyContent="flex-end">
-        <Button
-          disabled={isPending}
-          onClick={() => setDialogOpen(true)}
-          sx={smallButtonStyles}
-        >
+        <Button disabled={isPending} onClick={() => setDialogOpen(true)} sx={smallButtonStyles}>
           Remove
         </Button>
       </Box>

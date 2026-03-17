@@ -61,7 +61,7 @@ describe("UpdatePosition Component", () => {
 
   test("shows error message when updatePosition fails", async () => {
     (updatePosition as jest.MockedFunction<typeof updatePosition>).mockRejectedValue(
-      new Error("Update failed")
+      new Error("Update failed"),
     );
     render(<UpdatePositionForm personID={personID} />);
 

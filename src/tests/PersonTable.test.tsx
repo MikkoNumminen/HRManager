@@ -37,12 +37,8 @@ describe("PersonTable Component", () => {
       expect(screen.getByText(person.name)).toBeInTheDocument();
       expect(screen.getByText(person.position)).toBeInTheDocument();
       expect(screen.getByText(person.email)).toBeInTheDocument();
-      expect(
-        screen.getByText(new Date(person.createdAt).toLocaleString())
-      ).toBeInTheDocument();
-      expect(
-        screen.getByText(new Date(person.updatedAt).toLocaleString())
-      ).toBeInTheDocument();
+      expect(screen.getByText(new Date(person.createdAt).toLocaleString())).toBeInTheDocument();
+      expect(screen.getByText(new Date(person.updatedAt).toLocaleString())).toBeInTheDocument();
     });
   });
 

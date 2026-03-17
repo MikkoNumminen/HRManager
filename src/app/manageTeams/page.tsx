@@ -18,7 +18,9 @@ export default async function ManageTeamsPage() {
       <TopBar title="Manage Teams" backHref="/" />
       <AddTeamForm />
       <Box sx={{ border: `1px solid ${colors.slate300}`, borderRadius: "4px", padding: "20px" }}>
-        <Typography variant="h5" mb={1}>Teams</Typography>
+        <Typography variant="h5" mb={1}>
+          Teams
+        </Typography>
         <EditableTeamsTable combinedTeams={teams} />
       </Box>
     </>

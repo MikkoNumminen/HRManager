@@ -44,19 +44,19 @@ const EditableTeamsTable: React.FC<CombinedTeamProps> = ({ combinedTeams }) => {
           {combinedTeams.length === 0 ? (
             <TableRow>
               <TableCell colSpan={5}>
-                <Box
-                  display="flex"
-                  justifyContent="center"
-                  alignItems="center"
-                  height="100px"
-                >
+                <Box display="flex" justifyContent="center" alignItems="center" height="100px">
                   <Typography align="center">No Teams Available</Typography>
                 </Box>
               </TableCell>
             </TableRow>
           ) : (
             combinedTeams.map((team) => (
-              <Tooltip key={team.teamId} title={`Click to manage ${team.teamName}`} placement="right" arrow>
+              <Tooltip
+                key={team.teamId}
+                title={`Click to manage ${team.teamName}`}
+                placement="right"
+                arrow
+              >
                 <TableRow
                   hover
                   onClick={() => handleRowClick(team.teamId)}
@@ -67,27 +67,21 @@ const EditableTeamsTable: React.FC<CombinedTeamProps> = ({ combinedTeams }) => {
                     },
                   }}
                 >
-                <TableCell>{team.teamName}</TableCell>
-                <TableCell>
-                  {team.managerName || "No Manager Assigned"}
-                </TableCell>
-                <TableCell>
-                  <Box>
-                    {team.members && team.members.length > 0 ? (
-                      team.members.map((member) => (
-                        <Typography key={member.email} variant="body2">
-                          {member?.name || "Unknown Name"}
-                        </Typography>
-                      ))
-                    ) : null}
-                  </Box>
-                </TableCell>
-                <TableCell>
-                  {new Date(team.createdAt).toLocaleString()}
-                </TableCell>
-                <TableCell>
-                  {new Date(team.updatedAt).toLocaleString()}
-                </TableCell>
+                  <TableCell>{team.teamName}</TableCell>
+                  <TableCell>{team.managerName || "No Manager Assigned"}</TableCell>
+                  <TableCell>
+                    <Box>
+                      {team.members && team.members.length > 0
+                        ? team.members.map((member) => (
+                            <Typography key={member.email} variant="body2">
+                              {member?.name || "Unknown Name"}
+                            </Typography>
+                          ))
+                        : null}
+                    </Box>
+                  </TableCell>
+                  <TableCell>{new Date(team.createdAt).toLocaleString()}</TableCell>
+                  <TableCell>{new Date(team.updatedAt).toLocaleString()}</TableCell>
                 </TableRow>
               </Tooltip>
             ))

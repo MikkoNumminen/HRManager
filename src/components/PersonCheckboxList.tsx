@@ -24,36 +24,37 @@ export function PersonCheckBoxList({
 
   return (
     <Tooltip title={`Click to select ${name}`} placement="right" arrow>
-    <FormControlLabel
-      value={id}
-      control={
-        <Radio
-          id={inputId}
-          name={groupName}
-          value={id}
-          checked={isSelected}
-          onChange={() => onSelect(id)}
-          onClick={() => { if (isSelected) onSelect(""); }}
-          sx={radioStyles}
-          size="small"
-        />
-      }
-      label={
-        <Typography
-          sx={{
-            textDecoration: isSelected ? "line-through" : "none",
-            color: isSelected ? colors.slate400 : colors.slate100,
-            cursor: "pointer",
-            fontSize: "0.875rem",
-          }}
-        >
-          <strong>Name:</strong> {name} <strong>Position:</strong>{" "}
-          {position || ""} <strong>Email:</strong>{" "}
-          {email || "No email provided"}
-        </Typography>
-      }
-      sx={{ display: "flex", alignItems: "center", mx: 0, mb: 0.5 }}
-    />
+      <FormControlLabel
+        value={id}
+        control={
+          <Radio
+            id={inputId}
+            name={groupName}
+            value={id}
+            checked={isSelected}
+            onChange={() => onSelect(id)}
+            onClick={() => {
+              if (isSelected) onSelect("");
+            }}
+            sx={radioStyles}
+            size="small"
+          />
+        }
+        label={
+          <Typography
+            sx={{
+              textDecoration: isSelected ? "line-through" : "none",
+              color: isSelected ? colors.slate400 : colors.slate100,
+              cursor: "pointer",
+              fontSize: "0.875rem",
+            }}
+          >
+            <strong>Name:</strong> {name} <strong>Position:</strong> {position || ""}{" "}
+            <strong>Email:</strong> {email || "No email provided"}
+          </Typography>
+        }
+        sx={{ display: "flex", alignItems: "center", mx: 0, mb: 0.5 }}
+      />
     </Tooltip>
   );
 }

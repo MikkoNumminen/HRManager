@@ -29,7 +29,9 @@ describe("RemoveTeam Component", () => {
     fireEvent.click(screen.getByRole("button", { name: /Remove/i }));
     fireEvent.click(screen.getByRole("button", { name: /Cancel/i }));
     await waitFor(() => {
-      expect(screen.queryByText(/Are you sure you want to remove this team/)).not.toBeInTheDocument();
+      expect(
+        screen.queryByText(/Are you sure you want to remove this team/),
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -47,7 +49,7 @@ describe("RemoveTeam Component", () => {
 
   test("shows error message when removeTeam fails", async () => {
     (removeTeam as jest.MockedFunction<typeof removeTeam>).mockRejectedValue(
-      new Error("Removal failed")
+      new Error("Removal failed"),
     );
     render(<RemoveTeamForm teamID={teamID} />);
 

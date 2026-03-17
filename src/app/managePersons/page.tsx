@@ -18,7 +18,9 @@ export default async function ManagePersonsPage() {
       <TopBar title="Manage Persons" backHref="/" />
       <AddPersonForm />
       <Box sx={{ border: `1px solid ${colors.slate300}`, borderRadius: "4px", padding: "20px" }}>
-        <Typography variant="h5" mb={1}>Persons</Typography>
+        <Typography variant="h5" mb={1}>
+          Persons
+        </Typography>
         <PersonTable persons={persons} />
       </Box>
     </>

@@ -40,7 +40,17 @@ const TeamsTable: React.FC<CombinedTeamProps> = ({ combinedTeams, minimal = fals
           return (
             <Chip
               key={team.teamId}
-              avatar={<Avatar sx={{ bgcolor: colors.slate600, color: `${colors.slate100} !important`, fontSize: "0.75rem" }}>{initials}</Avatar>}
+              avatar={
+                <Avatar
+                  sx={{
+                    bgcolor: colors.slate600,
+                    color: `${colors.slate100} !important`,
+                    fontSize: "0.75rem",
+                  }}
+                >
+                  {initials}
+                </Avatar>
+              }
               label={team.teamName}
               variant="outlined"
               sx={{
@@ -71,12 +81,7 @@ const TeamsTable: React.FC<CombinedTeamProps> = ({ combinedTeams, minimal = fals
           {combinedTeams.length === 0 ? (
             <TableRow>
               <TableCell colSpan={5}>
-                <Box
-                  display="flex"
-                  justifyContent="center"
-                  alignItems="center"
-                  height="100px"
-                >
+                <Box display="flex" justifyContent="center" alignItems="center" height="100px">
                   <Typography align="center">No Teams Available</Typography>
                 </Box>
               </TableCell>
@@ -95,12 +100,8 @@ const TeamsTable: React.FC<CombinedTeamProps> = ({ combinedTeams, minimal = fals
                     ))}
                   </Box>
                 </TableCell>
-                <TableCell>
-                  {new Date(team.createdAt).toLocaleString()}
-                </TableCell>
-                <TableCell>
-                  {new Date(team.updatedAt).toLocaleString()}
-                </TableCell>
+                <TableCell>{new Date(team.createdAt).toLocaleString()}</TableCell>
+                <TableCell>{new Date(team.updatedAt).toLocaleString()}</TableCell>
               </TableRow>
             ))
           )}

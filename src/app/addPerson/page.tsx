@@ -21,8 +21,12 @@ export default function Page() {
           <TextField name="name" label="Enter Name" size="small" sx={textFieldStyles} />
           <TextField name="email" label="Enter Email" size="small" sx={textFieldStyles} />
           <Box display="flex" gap={1} justifyContent="flex-end">
-            <Button component={Link} href=".." sx={smallButtonStyles}>Cancel</Button>
-            <Button type="submit" sx={smallButtonStyles}>Create</Button>
+            <Button component={Link} href=".." sx={smallButtonStyles}>
+              Cancel
+            </Button>
+            <Button type="submit" sx={smallButtonStyles}>
+              Create
+            </Button>
           </Box>
         </Box>
       </form>

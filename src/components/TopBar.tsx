@@ -1,6 +1,17 @@
 "use client";
 
-import { AppBar, Avatar, Box, Button, Divider, IconButton, Menu, MenuItem, Toolbar, Typography } from "@mui/material";
+import {
+  AppBar,
+  Avatar,
+  Box,
+  Button,
+  Divider,
+  IconButton,
+  Menu,
+  MenuItem,
+  Toolbar,
+  Typography,
+} from "@mui/material";
 import { avatarStyles, colors, userMenuItemStyles, userMenuStyles } from "@/muiStyles";
 import Link from "next/link";
 import { useSession, signIn, signOut } from "next-auth/react";
@@ -18,13 +29,24 @@ export default function TopBar({ title, backHref }: TopBarProps) {
 
   const user = session?.user;
   const initials = user?.name
-    ? user.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
+    ? user.name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2)
     : undefined;
 
   return (
     <AppBar
       position="static"
-      sx={{ mb: 1.5, backgroundColor: colors.slate600, borderRadius: "4px", border: `1px solid ${colors.slate300}`, ...(backHref && { ml: "-44px", width: "calc(100% + 44px)" }) }}
+      sx={{
+        mb: 1.5,
+        backgroundColor: colors.slate600,
+        borderRadius: "4px",
+        border: `1px solid ${colors.slate300}`,
+        ...(backHref && { ml: "-44px", width: "calc(100% + 44px)" }),
+      }}
       elevation={0}
     >
       <Toolbar sx={backHref ? { pl: "44px" } : {}}>
@@ -65,7 +87,10 @@ export default function TopBar({ title, backHref }: TopBarProps) {
               </Box>
               <Divider sx={{ borderColor: colors.slate300 }} />
               <MenuItem
-                onClick={() => { setAnchorEl(null); signOut(); }}
+                onClick={() => {
+                  setAnchorEl(null);
+                  signOut();
+                }}
                 sx={userMenuItemStyles}
               >
                 Sign out
@@ -75,7 +100,13 @@ export default function TopBar({ title, backHref }: TopBarProps) {
         ) : (
           <Button
             onClick={() => signIn()}
-            sx={{ color: colors.slate300, border: `1px solid ${colors.slate300}`, borderRadius: "4px", px: 2, "&:hover": { backgroundColor: colors.hoverOverlay } }}
+            sx={{
+              color: colors.slate300,
+              border: `1px solid ${colors.slate300}`,
+              borderRadius: "4px",
+              px: 2,
+              "&:hover": { backgroundColor: colors.hoverOverlay },
+            }}
           >
             Sign in
           </Button>

@@ -53,7 +53,7 @@ describe("AddTeam Component", () => {
 
   test("shows error message when createTeam fails", async () => {
     (createTeam as jest.MockedFunction<typeof createTeam>).mockRejectedValue(
-      new Error("Team already exists")
+      new Error("Team already exists"),
     );
     render(<AddTeamForm />);
 

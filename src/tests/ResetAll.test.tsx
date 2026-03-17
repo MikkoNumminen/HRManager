@@ -24,7 +24,9 @@ describe("ResetAll Component", () => {
   test("opens confirmation dialog when button is clicked", () => {
     render(<ResetAll />);
     fireEvent.click(screen.getByRole("button", { name: /Reset All Data/i }));
-    expect(screen.getByText(/Are you sure you want to delete all persons and teams/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Are you sure you want to delete all persons and teams/),
+    ).toBeInTheDocument();
   });
 
   test("closes dialog when cancel is clicked", async () => {
@@ -32,7 +34,9 @@ describe("ResetAll Component", () => {
     fireEvent.click(screen.getByRole("button", { name: /Reset All Data/i }));
     fireEvent.click(screen.getByRole("button", { name: /Cancel/i }));
     await waitFor(() => {
-      expect(screen.queryByText(/Are you sure you want to delete all persons and teams/)).not.toBeInTheDocument();
+      expect(
+        screen.queryByText(/Are you sure you want to delete all persons and teams/),
+      ).not.toBeInTheDocument();
     });
   });
 

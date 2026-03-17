@@ -28,9 +28,18 @@ export default async function Page() {
             ))}
           </Box>
           <Box display="flex" gap={1} justifyContent="flex-end">
-            <TextField name="name" label="New Position" size="small" sx={{ ...textFieldStyles, flexGrow: 1 }} />
-            <Button component={Link} href=".." sx={smallButtonStyles}>Cancel</Button>
-            <Button type="submit" sx={smallButtonStyles}>Change</Button>
+            <TextField
+              name="name"
+              label="New Position"
+              size="small"
+              sx={{ ...textFieldStyles, flexGrow: 1 }}
+            />
+            <Button component={Link} href=".." sx={smallButtonStyles}>
+              Cancel
+            </Button>
+            <Button type="submit" sx={smallButtonStyles}>
+              Change
+            </Button>
           </Box>
         </Box>
       </form>

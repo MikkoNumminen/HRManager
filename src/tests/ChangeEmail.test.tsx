@@ -61,7 +61,7 @@ describe("Update Email", () => {
 
   test("shows error message when updateEmail fails", async () => {
     (updateEmail as jest.MockedFunction<typeof updateEmail>).mockRejectedValue(
-      new Error("A person with this email already exists")
+      new Error("A person with this email already exists"),
     );
     render(<UpdateEmailForm personID={personID} />);
 
@@ -71,9 +71,7 @@ describe("Update Email", () => {
     fireEvent.click(screen.getByRole("button", { name: /Change/i }));
 
     await waitFor(() => {
-      expect(
-        screen.getByText("A person with this email already exists")
-      ).toBeInTheDocument();
+      expect(screen.getByText("A person with this email already exists")).toBeInTheDocument();
     });
   });
 

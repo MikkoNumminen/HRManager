@@ -43,11 +43,12 @@ export async function getTeams() {
         managerName: team.manager?.name ?? null,
         createdAt: team.createdAt,
         updatedAt: team.updatedAt,
-        members: team.members?.map((member) => ({
-          personId: member.personId,
-          name: member.person.name ?? "",
-          email: member.person.email ?? "",
-        })) ?? [],
+        members:
+          team.members?.map((member) => ({
+            personId: member.personId,
+            name: member.person.name ?? "",
+            email: member.person.email ?? "",
+          })) ?? [],
       };
 
       try {

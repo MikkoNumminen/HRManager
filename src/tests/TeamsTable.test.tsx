@@ -47,12 +47,8 @@ describe("TeamsTable Component", () => {
       team.members.forEach((member) => {
         expect(screen.getByText(member.name)).toBeInTheDocument();
       });
-      expect(
-        screen.getByText(new Date(team.createdAt).toLocaleString())
-      ).toBeInTheDocument();
-      expect(
-        screen.getByText(new Date(team.updatedAt).toLocaleString())
-      ).toBeInTheDocument();
+      expect(screen.getByText(new Date(team.createdAt).toLocaleString())).toBeInTheDocument();
+      expect(screen.getByText(new Date(team.updatedAt).toLocaleString())).toBeInTheDocument();
     });
   });
 

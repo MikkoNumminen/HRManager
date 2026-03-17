@@ -29,8 +29,12 @@ export default async function Page() {
           </Box>
 
           <Box display="flex" gap={1} justifyContent="flex-end">
-            <Button component={Link} href=".." sx={smallButtonStyles}>Cancel</Button>
-            <Button type="submit" sx={smallButtonStyles}>Remove</Button>
+            <Button component={Link} href=".." sx={smallButtonStyles}>
+              Cancel
+            </Button>
+            <Button type="submit" sx={smallButtonStyles}>
+              Remove
+            </Button>
           </Box>
         </Box>
       </form>

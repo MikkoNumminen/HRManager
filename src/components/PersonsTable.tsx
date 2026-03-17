@@ -39,7 +39,17 @@ const PersonTable: React.FC<PersonTableProps> = ({ persons, minimal = false }) =
           return (
             <Chip
               key={person.id}
-              avatar={<Avatar sx={{ bgcolor: colors.slate600, color: `${colors.slate100} !important`, fontSize: "0.75rem" }}>{initials}</Avatar>}
+              avatar={
+                <Avatar
+                  sx={{
+                    bgcolor: colors.slate600,
+                    color: `${colors.slate100} !important`,
+                    fontSize: "0.75rem",
+                  }}
+                >
+                  {initials}
+                </Avatar>
+              }
               label={person.name}
               variant="outlined"
               sx={{
@@ -70,12 +80,7 @@ const PersonTable: React.FC<PersonTableProps> = ({ persons, minimal = false }) =
           {persons.length === 0 ? (
             <TableRow>
               <TableCell colSpan={5}>
-                <Box
-                  display="flex"
-                  justifyContent="center"
-                  alignItems="center"
-                  height="100px"
-                >
+                <Box display="flex" justifyContent="center" alignItems="center" height="100px">
                   <Typography align="center">No Persons Available</Typography>
                 </Box>
               </TableCell>
@@ -86,12 +91,8 @@ const PersonTable: React.FC<PersonTableProps> = ({ persons, minimal = false }) =
                 <TableCell>{person.name}</TableCell>
                 <TableCell>{person.position === "-" ? "" : person.position}</TableCell>
                 <TableCell>{person.email}</TableCell>
-                <TableCell>
-                  {new Date(person.createdAt).toLocaleString()}
-                </TableCell>
-                <TableCell>
-                  {new Date(person.updatedAt).toLocaleString()}
-                </TableCell>
+                <TableCell>{new Date(person.createdAt).toLocaleString()}</TableCell>
+                <TableCell>{new Date(person.updatedAt).toLocaleString()}</TableCell>
               </TableRow>
             ))
           )}

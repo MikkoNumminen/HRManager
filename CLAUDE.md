@@ -1,35 +1,47 @@
 # HRManager – Claude Code Rules
 
 ## Project overview
+
 A full-stack HR management system for managing employees and teams.
 Built with Next.js 16 (App Router), React 19, MUI v7, Prisma 6, Zod 4, TypeScript 5.9, Jest 30.
 
 ## Tech stack
-| Layer | Technology |
-|---|---|
-| Framework | Next.js 16 (App Router, Server Components) |
-| UI | React 19 + MUI v7 — dark theme throughout, no Tailwind |
-| Language | TypeScript 5.9 |
-| ORM | Prisma 6 (`relationLoadStrategy: 'join'`) |
-| Database | SQLite (dev), `prisma/dev.db` (not committed) |
-| Validation | Zod 4 |
-| Testing | Jest 30 + React Testing Library |
-| Linting | ESLint 9 (flat config) |
+
+| Layer      | Technology                                                     |
+| ---------- | -------------------------------------------------------------- |
+| Framework  | Next.js 16 (App Router, Server Components)                     |
+| UI         | React 19 + MUI v7 — dark theme throughout, no Tailwind         |
+| Language   | TypeScript 5.9                                                 |
+| ORM        | Prisma 6 (`relationLoadStrategy: 'join'`)                      |
+| Database   | SQLite (dev), `prisma/dev.db` (not committed)                  |
+| Validation | Zod 4                                                          |
+| Auth       | NextAuth v5 (JWT strategy, Google + GitHub OAuth)              |
+| Testing    | Jest 30 + React Testing Library                                |
+| Linting    | ESLint 9 (flat config)                                         |
+| Formatting | Prettier 3 (`printWidth: 100`, double quotes, trailing commas) |
 
 ## Architecture
+
 - **Reads** go in `queries.ts` (no `"use server"`). Validated through Zod schemas.
 - **Mutations** go in `serverActions.ts` (marked `"use server"`). Always inside `prisma.$transaction()` — even single operations.
 - Pages are async Server Components that fetch data and pass it as props to Client Components. No `useEffect` data fetching.
 - Forms use React 19's `useActionState` with `action=` prop, not `onSubmit`.
 - Types are derived from Zod schemas in `schemas.ts` via `z.infer` — `Person` and `CombinedTeam`. Do not create duplicate interfaces in components.
 - MUI style tokens and component styles are centralized in `muiStyles.ts`.
+- **Auth** is configured in `auth.ts` (NextAuth v5). Protected routes use `auth()` + `redirect("/")` in Server Components. Client components use `useSession` via `SessionProvider` wrapper in layout.
+- **Guest mode**: unauthenticated users see read-only minimal views (MUI Chips) of Persons and Teams on the main page. Manage routes (`/managePersons`, `/manageTeams`) redirect to `/`.
 
 ## File structure
+
 ```
 src/
-├── app/              # Pages (async Server Components)
+├── app/
+│   ├── api/auth/[...nextauth]/  # NextAuth route handler
+│   ├── managePersons/           # Person management (auth-protected)
+│   └── manageTeams/             # Team management (auth-protected)
 ├── components/       # Reusable MUI client components
 ├── tests/            # Jest tests
+├── auth.ts           # NextAuth v5 configuration
 ├── db.ts             # Prisma singleton
 ├── muiStyles.ts      # Centralised MUI style tokens
 ├── queries.ts        # Read-only data fetching
@@ -40,23 +52,32 @@ prisma/
 ```
 
 ## Data model
+
 - **Person** — name, email, title, optional manager (FK to Person). Can belong to multiple teams.
 - **Team** — name, manager (FK to Person), members via TeamMember join table.
 - **TeamMember** — join table between Person and Team, cascade delete on removal.
 
 ## Commit style
+
 [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
+
 - Do **not** run `git commit` — only provide the commit message as text so the user can commit manually.
 
+## Formatting
+
+- Prettier is the source of truth for code style. Run `npm run format` to format all files.
+- `npm run format:check` verifies formatting without modifying files.
+- ESLint uses `eslint-config-prettier` to disable rules that conflict with Prettier.
+
 ## Testing
+
 - Run `npm test` after every change.
 - Update affected tests when modifying component APIs.
 - Tests live in `src/tests/`.
 - Do not mock core logic — test real functionality.
 
 ## Roadmap (do not implement unless asked)
-- User authentication (NextAuth)
-- Top navigation bar
+
 - Department-level grouping
 - CI/CD pipeline (GitHub Actions)
 - Cloud deployment (AWS Fargate + RDS)
