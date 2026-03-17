@@ -4,6 +4,8 @@ import UpdatePositionForm from "@/components/UpdatePosition";
 import TopBar from "@/components/TopBar";
 import { getPersons } from "@/queries";
 import { Typography } from "@mui/material";
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -12,6 +14,9 @@ export default async function PersonPage({
 }: {
   params: Promise<{ personId: string }>;
 }) {
+  const session = await auth();
+  if (!session) redirect("/");
+
   const { personId } = await params;
 
   if (!UUID_REGEX.test(personId)) {

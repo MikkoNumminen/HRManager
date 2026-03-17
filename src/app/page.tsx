@@ -43,23 +43,32 @@ import { auth } from "@/auth";
 export default async function Home() {
   const session = await auth();
   const persons = await getPersons();
-  const teamsData = session ? await getTeams() : [];
+  const teamsData = await getTeams();
 
   return (
     <>
       <TopBar title="Human Resources Management System" />
-      <Link href="/managePersons" sx={{ textDecoration: "none" }}>
-        <Tooltip title="Go to Persons Manager" placement="right" arrow>
-          <Box component="div" sx={boxStyles}>
-            <Typography variant="h6" gutterBottom>
-              Persons
-            </Typography>
-            <PersonTable persons={persons} />
-          </Box>
-        </Tooltip>
-      </Link>
+      {session ? (
+        <Link href="/managePersons" sx={{ textDecoration: "none" }}>
+          <Tooltip title="Go to Persons Manager" placement="right" arrow>
+            <Box component="div" sx={boxStyles}>
+              <Typography variant="h6" gutterBottom>
+                Persons
+              </Typography>
+              <PersonTable persons={persons} />
+            </Box>
+          </Tooltip>
+        </Link>
+      ) : (
+        <Box sx={boxStyles}>
+          <Typography variant="h6" gutterBottom>
+            Persons
+          </Typography>
+          <PersonTable persons={persons} />
+        </Box>
+      )}
 
-      {session && (
+      {session ? (
         <Link href="/manageTeams" sx={{ textDecoration: "none" }}>
           <Tooltip title="Go to Teams Manager" placement="right" arrow>
             <Box component="div" sx={boxStyles}>
@@ -70,9 +79,16 @@ export default async function Home() {
             </Box>
           </Tooltip>
         </Link>
+      ) : (
+        <Box sx={boxStyles}>
+          <Typography variant="h6" gutterBottom>
+            Teams
+          </Typography>
+          <TeamsTable combinedTeams={teamsData} />
+        </Box>
       )}
 
-      <ResetAll />
+      {session && <ResetAll />}
     </>
   );
 }

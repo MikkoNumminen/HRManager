@@ -4,8 +4,13 @@ import AddPersonForm from "@/components/AddPeople";
 import TopBar from "@/components/TopBar";
 import { colors } from "@/muiStyles";
 import { getPersons } from "@/queries";
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
 
 export default async function ManagePersonsPage() {
+  const session = await auth();
+  if (!session) redirect("/");
+
   const persons = await getPersons();
 
   return (
