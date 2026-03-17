@@ -47,23 +47,23 @@ export default async function Home() {
         <Typography variant="h4" gutterBottom sx={{ marginBottom: "20px" }}>
           Human Resources Management System
         </Typography>
-        <Typography variant="h6" gutterBottom>
-          Persons
-        </Typography>
         <Link href="/managePersons" sx={{ textDecoration: "none" }}>
           <Tooltip title="Go to Persons Manager" placement="right" arrow>
             <Box component="div" sx={boxStyles}>
+              <Typography variant="h6" gutterBottom>
+                Persons
+              </Typography>
               <PersonTable persons={persons} />
             </Box>
           </Tooltip>
         </Link>
 
-        <Typography variant="h6" gutterBottom>
-          Teams
-        </Typography>
         <Link href="/manageTeams" sx={{ textDecoration: "none" }}>
           <Tooltip title="Go to Teams Manager" placement="right" arrow>
             <Box component="div" sx={boxStyles}>
+              <Typography variant="h6" gutterBottom>
+                Teams
+              </Typography>
               <TeamsTable combinedTeams={teamsData} />
             </Box>
           </Tooltip>

@@ -101,6 +101,9 @@ export const activeButtonStyles = {
 export const boxStyles = {
   flex: "1",
   padding: "20px",
+  border: `1px solid ${colors.slate300}`,
+  borderRadius: "4px",
+  mb: 2,
   transition: "background-color 0.3s ease",
   "&:hover": {
     backgroundColor: colors.hoverOverlay,
