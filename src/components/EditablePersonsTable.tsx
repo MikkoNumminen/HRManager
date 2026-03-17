@@ -28,7 +28,7 @@ const PersonTable: React.FC<PersonTableProps> = ({ persons }) => {
   };
 
   return (
-    <TableContainer component={Paper} sx={{ marginBottom: "20px" }}>
+    <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650, maxWidth: 1020 }} aria-label="person table">
         <TableHead>
           <TableRow>

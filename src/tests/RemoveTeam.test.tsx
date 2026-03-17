@@ -42,13 +42,8 @@ describe("RemoveTeam Component", () => {
     });
   });
 
-  test("shows Cancel button by default", () => {
+  test("does not show Cancel button", () => {
     render(<RemoveTeamForm teamID={teamID} />);
-    expect(screen.getByText("Cancel")).toBeInTheDocument();
-  });
-
-  test("hides Cancel button when showCancel is false", () => {
-    render(<RemoveTeamForm teamID={teamID} showCancel={false} />);
     expect(screen.queryByText("Cancel")).not.toBeInTheDocument();
   });
 });

@@ -1,6 +1,8 @@
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import AddTeamForm from "@/components/AddTeam";
 import EditableTeamsTable from "@/components/EditableTeamsTable";
+import TopBar from "@/components/TopBar";
+import { colors } from "@/muiStyles";
 import { getTeams } from "@/queries";
 
 export default async function ManageTeamsPage() {
@@ -8,13 +10,13 @@ export default async function ManageTeamsPage() {
 
   return (
     <>
-      <Typography variant="h4" mb={2}>
-        Manage Teams
-      </Typography>
+      <TopBar title="Manage Teams" backHref="/" />
       <Box mb={4}>
         <AddTeamForm />
       </Box>
-      <EditableTeamsTable combinedTeams={teams} />
+      <Box sx={{ border: `1px solid ${colors.slate300}`, borderRadius: "4px", padding: "20px" }}>
+        <EditableTeamsTable combinedTeams={teams} />
+      </Box>
     </>
   );
 }

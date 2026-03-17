@@ -2,7 +2,7 @@
 
 import { activeButtonStyles, formStyles, smallButtonStyles, textFieldStyles } from "@/muiStyles";
 import { createTeam } from "@/serverActions";
-import { Box, Button, Link, TextField, Tooltip, Typography } from "@mui/material";
+import { Box, Button, TextField, Tooltip, Typography } from "@mui/material";
 import { useActionState, useEffect, useState } from "react";
 
 type FormState = { error: string | null; success: boolean };
@@ -44,7 +44,6 @@ const AddTeamForm: React.FC = () => {
         />
       </Tooltip>
       <Box display="flex" gap={1} justifyContent="flex-end">
-        <Link href=".." sx={smallButtonStyles}>Cancel</Link>
         <Button type="submit" disabled={!isValid || isPending} sx={{ ...smallButtonStyles, ...(isValid && activeButtonStyles) }}>
           Create
         </Button>

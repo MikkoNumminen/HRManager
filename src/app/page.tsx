@@ -31,9 +31,10 @@
   TODO: Check if this is what is wanted: ON DELETE RESTRICT ON UPDATE CASCADE
 */
 
-import { Box, Typography, Link, Tooltip } from "@mui/material";
+import { Box, Link, Tooltip, Typography } from "@mui/material";
 import PersonTable from "@/components/PersonsTable";
 import TeamsTable from "@/components/TeamsTable";
+import TopBar from "@/components/TopBar";
 import { boxStyles } from "@/muiStyles";
 import { getPersons, getTeams } from "@/queries";
 
@@ -44,9 +45,7 @@ export default async function Home() {
   return (
     <Box sx={{ display: "flex" }}>
       <Box sx={{ flex: "1", padding: "20px" }}>
-        <Typography variant="h4" gutterBottom sx={{ marginBottom: "20px" }}>
-          Human Resources Management System
-        </Typography>
+        <TopBar title="Human Resources Management System" />
         <Link href="/managePersons" sx={{ textDecoration: "none" }}>
           <Tooltip title="Go to Persons Manager" placement="right" arrow>
             <Box component="div" sx={boxStyles}>

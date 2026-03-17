@@ -1,6 +1,8 @@
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import PersonTable from "@/components/EditablePersonsTable";
 import AddPersonForm from "@/components/AddPeople";
+import TopBar from "@/components/TopBar";
+import { colors } from "@/muiStyles";
 import { getPersons } from "@/queries";
 
 export default async function ManagePersonsPage() {
@@ -8,13 +10,13 @@ export default async function ManagePersonsPage() {
 
   return (
     <>
-      <Typography variant="h4" mb={2}>
-        Manage Persons
-      </Typography>
+      <TopBar title="Manage Persons" backHref="/" />
       <Box mb={4}>
         <AddPersonForm />
       </Box>
-      <PersonTable persons={persons} />
+      <Box sx={{ border: `1px solid ${colors.slate300}`, borderRadius: "4px", padding: "20px" }}>
+        <PersonTable persons={persons} />
+      </Box>
     </>
   );
 }

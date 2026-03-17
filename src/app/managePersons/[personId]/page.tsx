@@ -1,8 +1,9 @@
 import RemovePersonForm from "@/components/RemovePerson";
 import UpdateEmailForm from "@/components/UpdateEmail";
 import UpdatePositionForm from "@/components/UpdatePosition";
+import TopBar from "@/components/TopBar";
 import { getPersons } from "@/queries";
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -26,15 +27,15 @@ export default async function PersonPage({
 
   return (
     <>
-      <Typography variant="h4" mb={2}>Manage {person.name}</Typography>
+      <TopBar title={`Manage ${person.name}`} backHref="/managePersons" />
       <Box mb={2}>
         <RemovePersonForm personID={personId} />
       </Box>
       <Box mb={2}>
-        <UpdatePositionForm personID={personId} showCancel={false} />
+        <UpdatePositionForm personID={personId} />
       </Box>
       <Box mb={2}>
-        <UpdateEmailForm personID={personId} showCancel={false} />
+        <UpdateEmailForm personID={personId} />
       </Box>
     </>
   );

@@ -2,13 +2,13 @@
 
 import { activeButtonStyles, formStyles, smallButtonStyles, textFieldStyles } from "@/muiStyles";
 import { updatePosition } from "@/serverActions";
-import { Box, Button, Link, TextField, Tooltip, Typography } from "@mui/material";
+import { Box, Button, TextField, Tooltip, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useActionState, useState } from "react";
 
 type FormState = { error: string | null };
 
-const UpdatePositionForm: React.FC<{ personID: string; showCancel?: boolean }> = ({ personID, showCancel = true }) => {
+const UpdatePositionForm: React.FC<{ personID: string }> = ({ personID }) => {
   const [newPosition, setNewPosition] = useState("");
   const isValid = newPosition.trim().length > 0;
   const router = useRouter();
@@ -42,8 +42,7 @@ const UpdatePositionForm: React.FC<{ personID: string; showCancel?: boolean }> =
         />
       </Tooltip>
       <Box display="flex" gap={1} justifyContent="flex-end">
-        {showCancel && <Link href={`/managePersons`} sx={smallButtonStyles}>Cancel</Link>}
-        <Button type="submit" disabled={!isValid || isPending} sx={{ ...smallButtonStyles, ...(isValid && activeButtonStyles) }}>
+<Button type="submit" disabled={!isValid || isPending} sx={{ ...smallButtonStyles, ...(isValid && activeButtonStyles) }}>
           Change
         </Button>
       </Box>

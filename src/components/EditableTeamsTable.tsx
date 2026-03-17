@@ -29,7 +29,7 @@ const EditableTeamsTable: React.FC<CombinedTeamProps> = ({ combinedTeams }) => {
   };
 
   return (
-    <TableContainer component={Paper} sx={{ marginBottom: "20px" }}>
+    <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650, maxWidth: 1020 }} aria-label="teams table">
         <TableHead>
           <TableRow>

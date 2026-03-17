@@ -2,7 +2,7 @@
 
 import { activeButtonStyles, formStyles, smallButtonStyles, textFieldStyles } from "@/muiStyles";
 import { updateEmail } from "@/serverActions";
-import { Box, Button, Link, TextField, Tooltip, Typography } from "@mui/material";
+import { Box, Button, TextField, Tooltip, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useActionState, useState } from "react";
 
@@ -10,7 +10,7 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 type FormState = { error: string | null };
 
-const UpdateEmailForm: React.FC<{ personID: string; showCancel?: boolean }> = ({ personID, showCancel = true }) => {
+const UpdateEmailForm: React.FC<{ personID: string }> = ({ personID }) => {
   const [newEmail, setNewEmail] = useState("");
   const isValid = EMAIL_REGEX.test(newEmail.trim());
   const router = useRouter();
@@ -45,8 +45,7 @@ const UpdateEmailForm: React.FC<{ personID: string; showCancel?: boolean }> = ({
         />
       </Tooltip>
       <Box display="flex" gap={1} justifyContent="flex-end">
-        {showCancel && <Link href={`/managePersons`} sx={smallButtonStyles}>Cancel</Link>}
-        <Button type="submit" disabled={!isValid || isPending} sx={{ ...smallButtonStyles, ...(isValid && activeButtonStyles) }}>
+<Button type="submit" disabled={!isValid || isPending} sx={{ ...smallButtonStyles, ...(isValid && activeButtonStyles) }}>
           Change
         </Button>
       </Box>

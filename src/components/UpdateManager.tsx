@@ -2,14 +2,14 @@
 
 import { addManager } from "@/serverActions";
 import { activeButtonStyles, formStyles, headerStyles, smallButtonStyles } from "@/muiStyles";
-import { Box, Button, Link, Typography } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import { useActionState, useState } from "react";
 import { PersonCheckBoxList } from "./PersonCheckboxList";
 import { Person } from "@/schemas";
 
 type FormState = { error: string | null };
 
-const UpdateManagerForm: React.FC<{ teamID: string; persons: Person[]; showCancel?: boolean; excludeIds?: string[] }> = ({ teamID, persons, showCancel = true, excludeIds = [] }) => {
+const UpdateManagerForm: React.FC<{ teamID: string; persons: Person[]; excludeIds?: string[] }> = ({ teamID, persons, excludeIds = [] }) => {
   const [newManager, setNewManager] = useState<string>("");
 
   const [state, formAction, isPending] = useActionState(
@@ -50,8 +50,7 @@ const UpdateManagerForm: React.FC<{ teamID: string; persons: Person[]; showCance
       </Box>
 
       <Box display="flex" gap={1} justifyContent="flex-end">
-        {showCancel && <Link href={`/manageTeams`} sx={smallButtonStyles}>Cancel</Link>}
-        <Button type="submit" disabled={!newManager || isPending} sx={{ ...smallButtonStyles, ...(newManager && activeButtonStyles) }}>
+<Button type="submit" disabled={!newManager || isPending} sx={{ ...smallButtonStyles, ...(newManager && activeButtonStyles) }}>
           Add Manager
         </Button>
       </Box>

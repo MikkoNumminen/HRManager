@@ -2,13 +2,13 @@
 
 import { formStyles, smallButtonStyles } from "@/muiStyles";
 import { removePerson } from "@/serverActions";
-import { Box, Button, Link, Typography } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useActionState } from "react";
 
 type FormState = { error: string | null };
 
-const RemovePersonForm: React.FC<{ personID: string; showCancel?: boolean }> = ({ personID, showCancel = true }) => {
+const RemovePersonForm: React.FC<{ personID: string }> = ({ personID }) => {
   const router = useRouter();
 
   const [state, formAction, isPending] = useActionState(
@@ -30,8 +30,7 @@ const RemovePersonForm: React.FC<{ personID: string; showCancel?: boolean }> = (
       {state.error && <Typography color="error">{state.error}</Typography>}
       <input type="hidden" name="personID" value={personID} />
       <Box display="flex" gap={1} justifyContent="flex-end">
-        {showCancel && <Link href={`/managePersons`} sx={smallButtonStyles}>Cancel</Link>}
-        <Button type="submit" disabled={isPending} sx={smallButtonStyles}>
+<Button type="submit" disabled={isPending} sx={smallButtonStyles}>
           Remove
         </Button>
       </Box>

@@ -53,13 +53,8 @@ describe("Remove People", () => {
     });
   });
 
-  test("shows Cancel button by default", () => {
+  test("does not show Cancel button", () => {
     render(<RemovePersonForm personID={personID} />);
-    expect(screen.getByText("Cancel")).toBeInTheDocument();
-  });
-
-  test("hides Cancel button when showCancel is false", () => {
-    render(<RemovePersonForm personID={personID} showCancel={false} />);
     expect(screen.queryByText("Cancel")).not.toBeInTheDocument();
   });
 });

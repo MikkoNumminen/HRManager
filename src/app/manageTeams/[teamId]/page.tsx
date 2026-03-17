@@ -1,9 +1,10 @@
 import UpdateManagerForm from "@/components/UpdateManager";
 import RemoveTeamForm from "@/components/RemoveTeam";
 import { getPersons, getTeams } from "@/queries";
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import AddPeopleToTeam from "@/components/AddPeopleToTeam";
 import RemoveMemberFromTeam from "@/components/RemoveMemberFromTeam";
+import TopBar from "@/components/TopBar";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -32,7 +33,7 @@ export default async function TeamPage({
 
   return (
     <>
-      <Typography variant="h4" mb={2}>Manage {team.teamName}</Typography>
+      <TopBar title={`Manage ${team.teamName}`} backHref="/manageTeams" />
       <Box mb={2}>
         <RemoveTeamForm teamID={teamId} />
       </Box>
@@ -40,7 +41,6 @@ export default async function TeamPage({
         <UpdateManagerForm
           teamID={teamId}
           persons={persons}
-          showCancel={false}
           excludeIds={team.teamManagerId ? [team.teamManagerId] : []}
         />
       </Box>
@@ -48,7 +48,6 @@ export default async function TeamPage({
         <AddPeopleToTeam
           teamID={teamId}
           persons={persons}
-          showCancel={false}
           excludeIds={managerAndMemberIds}
         />
       </Box>
@@ -56,7 +55,6 @@ export default async function TeamPage({
         <RemoveMemberFromTeam
           teamID={teamId}
           persons={persons}
-          showCancel={false}
           includeOnlyIds={memberIds}
         />
       </Box>

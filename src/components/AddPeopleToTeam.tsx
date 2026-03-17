@@ -2,14 +2,14 @@
 
 import { addMember } from "@/serverActions";
 import { activeButtonStyles, formStyles, headerStyles, smallButtonStyles } from "@/muiStyles";
-import { Box, Button, Link, Typography } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import { useActionState, useState } from "react";
 import { PersonCheckBoxList } from "./PersonCheckboxList";
 import { Person } from "@/schemas";
 
 type FormState = { error: string | null };
 
-const AddMemberForm: React.FC<{ teamID: string; persons: Person[]; showCancel?: boolean; excludeIds?: string[] }> = ({ teamID, persons, showCancel = true, excludeIds = [] }) => {
+const AddMemberForm: React.FC<{ teamID: string; persons: Person[]; excludeIds?: string[] }> = ({ teamID, persons, excludeIds = [] }) => {
   const [selectedMember, setSelectedMember] = useState<string>("");
 
   const [state, formAction, isPending] = useActionState(
@@ -50,8 +50,7 @@ const AddMemberForm: React.FC<{ teamID: string; persons: Person[]; showCancel?: 
       </Box>
 
       <Box display="flex" gap={1} justifyContent="flex-end">
-        {showCancel && <Link href={`/manageTeams`} sx={smallButtonStyles}>Cancel</Link>}
-        <Button type="submit" disabled={!selectedMember || isPending} sx={{ ...smallButtonStyles, ...(selectedMember && activeButtonStyles) }}>
+<Button type="submit" disabled={!selectedMember || isPending} sx={{ ...smallButtonStyles, ...(selectedMember && activeButtonStyles) }}>
           Add Member
         </Button>
       </Box>
