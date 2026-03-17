@@ -60,7 +60,7 @@ export default async function Home() {
           </Tooltip>
         </Link>
       ) : (
-        <Box sx={boxStyles}>
+        <Box sx={{ ...boxStyles, "&:hover": {}, cursor: "default" }}>
           <Typography variant="h6" gutterBottom>
             Persons
           </Typography>
@@ -80,7 +80,7 @@ export default async function Home() {
           </Tooltip>
         </Link>
       ) : (
-        <Box sx={boxStyles}>
+        <Box sx={{ ...boxStyles, "&:hover": {}, cursor: "default" }}>
           <Typography variant="h6" gutterBottom>
             Teams
           </Typography>
