@@ -215,7 +215,7 @@ export async function removeTeam(data: FormData) {
   });
   revalidatePath("/manageTeams");
   revalidatePath("/");
-  redirect("/");
+  redirect("/manageTeams");
 }
 
 export async function removeMember(data: FormData) {
