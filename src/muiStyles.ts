@@ -98,6 +98,29 @@ export const activeButtonStyles = {
   },
 };
 
+export const avatarStyles = {
+  width: 32,
+  height: 32,
+  border: `1px solid ${colors.slate300}`,
+  fontSize: "0.875rem",
+};
+
+export const userMenuStyles = {
+  "& .MuiPaper-root": {
+    backgroundColor: colors.slate600,
+    border: `1px solid ${colors.slate300}`,
+    borderRadius: "4px",
+    minWidth: 200,
+  },
+};
+
+export const userMenuItemStyles = {
+  color: colors.slate100,
+  "&:hover": {
+    backgroundColor: colors.hoverOverlay,
+  },
+};
+
 export const boxStyles = {
   flex: "1",
   padding: "20px",
