@@ -7,7 +7,7 @@ export const colors = {
   green400: "rgb(74 222 128)",
   green900: "rgb(20 83 45)",
   rowHover: "#f0f0f0",
-  hoverOverlay: "rgba(255, 255, 255, 0.1)",
+  hoverOverlay: "rgba(255, 255, 255, 0.04)",
 };
 
 export const formStyles = {
