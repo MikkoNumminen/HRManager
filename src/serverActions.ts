@@ -143,7 +143,7 @@ export async function addManager(data: FormData) {
   });
   revalidatePath("/manageTeams");
   revalidatePath("/");
-  redirect("/");
+  redirect("/manageTeams");
 }
 
 export async function addMember(data: FormData) {
