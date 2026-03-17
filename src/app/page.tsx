@@ -43,31 +43,29 @@ export default async function Home() {
   const teamsData = await getTeams();
 
   return (
-    <Box sx={{ display: "flex" }}>
-      <Box sx={{ flex: "1", padding: "20px" }}>
-        <TopBar title="Human Resources Management System" />
-        <Link href="/managePersons" sx={{ textDecoration: "none" }}>
-          <Tooltip title="Go to Persons Manager" placement="right" arrow>
-            <Box component="div" sx={boxStyles}>
-              <Typography variant="h6" gutterBottom>
-                Persons
-              </Typography>
-              <PersonTable persons={persons} />
-            </Box>
-          </Tooltip>
-        </Link>
+    <>
+      <TopBar title="Human Resources Management System" />
+      <Link href="/managePersons" sx={{ textDecoration: "none" }}>
+        <Tooltip title="Go to Persons Manager" placement="right" arrow>
+          <Box component="div" sx={boxStyles}>
+            <Typography variant="h6" gutterBottom>
+              Persons
+            </Typography>
+            <PersonTable persons={persons} />
+          </Box>
+        </Tooltip>
+      </Link>
 
-        <Link href="/manageTeams" sx={{ textDecoration: "none" }}>
-          <Tooltip title="Go to Teams Manager" placement="right" arrow>
-            <Box component="div" sx={boxStyles}>
-              <Typography variant="h6" gutterBottom>
-                Teams
-              </Typography>
-              <TeamsTable combinedTeams={teamsData} />
-            </Box>
-          </Tooltip>
-        </Link>
-      </Box>
-    </Box>
+      <Link href="/manageTeams" sx={{ textDecoration: "none" }}>
+        <Tooltip title="Go to Teams Manager" placement="right" arrow>
+          <Box component="div" sx={boxStyles}>
+            <Typography variant="h6" gutterBottom>
+              Teams
+            </Typography>
+            <TeamsTable combinedTeams={teamsData} />
+          </Box>
+        </Tooltip>
+      </Link>
+    </>
   );
 }
