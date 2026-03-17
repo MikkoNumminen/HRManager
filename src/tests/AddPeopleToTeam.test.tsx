@@ -56,9 +56,7 @@ describe("AddPeopleToTeam Component", () => {
   test("submit button is enabled after selecting a person", () => {
     render(<AddPeopleToTeam teamID={teamID} persons={mockPersons} />);
 
-    const radios = screen.getAllByRole("radio");
-    fireEvent.click(radios[0]);
-
+    fireEvent.click(screen.getByRole("button", { name: "Alice" }));
     expect(screen.getByRole("button", { name: /Add Member/i })).not.toBeDisabled();
   });
 
@@ -73,7 +71,7 @@ describe("AddPeopleToTeam Component", () => {
     (addMember as jest.Mock).mockResolvedValue(undefined);
     render(<AddPeopleToTeam teamID={teamID} persons={mockPersons} />);
 
-    fireEvent.click(screen.getAllByRole("radio")[0]);
+    fireEvent.click(screen.getByRole("button", { name: "Alice" }));
     fireEvent.click(screen.getByRole("button", { name: /Add Member/i }));
 
     await waitFor(() => {
@@ -85,7 +83,7 @@ describe("AddPeopleToTeam Component", () => {
     (addMember as jest.Mock).mockRejectedValue(new Error("Person is already a member"));
     render(<AddPeopleToTeam teamID={teamID} persons={mockPersons} />);
 
-    fireEvent.click(screen.getAllByRole("radio")[0]);
+    fireEvent.click(screen.getByRole("button", { name: "Alice" }));
     fireEvent.click(screen.getByRole("button", { name: /Add Member/i }));
 
     await waitFor(() => {

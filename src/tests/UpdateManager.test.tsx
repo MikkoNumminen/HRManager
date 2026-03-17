@@ -46,7 +46,7 @@ describe("UpdateManager Component", () => {
   test("submit button is enabled after selecting a person", () => {
     render(<UpdateManagerForm teamID={teamID} persons={mockPersons} />);
 
-    fireEvent.click(screen.getAllByRole("radio")[0]);
+    fireEvent.click(screen.getByRole("button", { name: "Alice" }));
     expect(screen.getByRole("button", { name: /Add Manager/i })).not.toBeDisabled();
   });
 
@@ -61,7 +61,7 @@ describe("UpdateManager Component", () => {
     (addManager as jest.Mock).mockResolvedValue(undefined);
     render(<UpdateManagerForm teamID={teamID} persons={mockPersons} />);
 
-    fireEvent.click(screen.getAllByRole("radio")[0]);
+    fireEvent.click(screen.getByRole("button", { name: "Alice" }));
     fireEvent.click(screen.getByRole("button", { name: /Add Manager/i }));
 
     await waitFor(() => {
@@ -73,7 +73,7 @@ describe("UpdateManager Component", () => {
     (addManager as jest.Mock).mockRejectedValue(new Error("Manager assignment failed"));
     render(<UpdateManagerForm teamID={teamID} persons={mockPersons} />);
 
-    fireEvent.click(screen.getAllByRole("radio")[0]);
+    fireEvent.click(screen.getByRole("button", { name: "Alice" }));
     fireEvent.click(screen.getByRole("button", { name: /Add Manager/i }));
 
     await waitFor(() => {

@@ -1,57 +1,53 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import { PersonCheckBoxList } from "../components/PersonCheckboxList";
+import { PersonSelectCard } from "../components/PersonSelectCard";
 
-const defaultProps = {
+const defaultPerson = {
   id: "person-1",
   name: "John Doe",
   position: "Developer",
   email: "john@example.com",
   createdAt: new Date(),
   updatedAt: new Date(),
-  groupName: "test-group",
-  selectedId: "",
-  onSelect: jest.fn(),
 };
 
-describe("PersonCheckBoxList", () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
+describe("PersonSelectCard", () => {
+  test("renders person name and position", () => {
+    render(<PersonSelectCard person={defaultPerson} selected={false} onSelect={jest.fn()} />);
+    expect(screen.getByText("John Doe")).toBeInTheDocument();
+    expect(screen.getByText("Developer")).toBeInTheDocument();
   });
 
-  test("renders name, position and email", () => {
-    render(<PersonCheckBoxList {...defaultProps} />);
-    expect(screen.getByText(/John Doe/)).toBeInTheDocument();
-    expect(screen.getByText(/Developer/)).toBeInTheDocument();
-    expect(screen.getByText(/john@example.com/)).toBeInTheDocument();
+  test("renders avatar initials from name", () => {
+    render(<PersonSelectCard person={defaultPerson} selected={false} onSelect={jest.fn()} />);
+    expect(screen.getByText("JD")).toBeInTheDocument();
   });
 
-  test("radio input uses groupName as name attribute", () => {
-    render(<PersonCheckBoxList {...defaultProps} />);
-    const radio = screen.getByRole("radio") as HTMLInputElement;
-    expect(radio.name).toBe("test-group");
+  test("card has role=button with aria-label of person name", () => {
+    render(<PersonSelectCard person={defaultPerson} selected={false} onSelect={jest.fn()} />);
+    expect(screen.getByRole("button", { name: "John Doe" })).toBeInTheDocument();
   });
 
-  test("radio is not checked when selectedId does not match", () => {
-    render(<PersonCheckBoxList {...defaultProps} selectedId="other-id" />);
-    expect(screen.getByRole("radio")).not.toBeChecked();
+  test("aria-pressed is false when not selected", () => {
+    render(<PersonSelectCard person={defaultPerson} selected={false} onSelect={jest.fn()} />);
+    expect(screen.getByRole("button", { name: "John Doe" })).toHaveAttribute("aria-pressed", "false");
   });
 
-  test("radio is checked when selectedId matches id", () => {
-    render(<PersonCheckBoxList {...defaultProps} selectedId="person-1" />);
-    expect(screen.getByRole("radio")).toBeChecked();
+  test("aria-pressed is true when selected", () => {
+    render(<PersonSelectCard person={defaultPerson} selected={true} onSelect={jest.fn()} />);
+    expect(screen.getByRole("button", { name: "John Doe" })).toHaveAttribute("aria-pressed", "true");
   });
 
-  test("calls onSelect with id when radio is changed", () => {
+  test("calls onSelect with person id when clicked while not selected", () => {
     const onSelect = jest.fn();
-    render(<PersonCheckBoxList {...defaultProps} onSelect={onSelect} />);
-    fireEvent.click(screen.getByRole("radio"));
+    render(<PersonSelectCard person={defaultPerson} selected={false} onSelect={onSelect} />);
+    fireEvent.click(screen.getByRole("button", { name: "John Doe" }));
     expect(onSelect).toHaveBeenCalledWith("person-1");
   });
 
-  test("calls onSelect with empty string when already selected radio is clicked", () => {
+  test("calls onSelect with empty string when clicked while selected (deselect)", () => {
     const onSelect = jest.fn();
-    render(<PersonCheckBoxList {...defaultProps} selectedId="person-1" onSelect={onSelect} />);
-    fireEvent.click(screen.getByRole("radio"));
+    render(<PersonSelectCard person={defaultPerson} selected={true} onSelect={onSelect} />);
+    fireEvent.click(screen.getByRole("button", { name: "John Doe" }));
     expect(onSelect).toHaveBeenCalledWith("");
   });
 });

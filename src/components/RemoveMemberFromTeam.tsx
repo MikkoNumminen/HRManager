@@ -4,7 +4,7 @@ import { removeMember } from "@/serverActions";
 import { activeButtonStyles, formStyles, headerStyles, smallButtonStyles } from "@/muiStyles";
 import { Box, Button, Typography } from "@mui/material";
 import { useActionState, useState } from "react";
-import { PersonCheckBoxList } from "./PersonCheckboxList";
+import { PersonSelectCard } from "./PersonSelectCard";
 import { Person } from "@/schemas";
 
 type FormState = { error: string | null };
@@ -24,6 +24,8 @@ const RemoveMemberForm: React.FC<{ teamID: string; persons: Person[]; includeOnl
     { error: null },
   );
 
+  const filteredPersons = persons.filter((p) => !includeOnlyIds || includeOnlyIds.includes(p.id));
+
   return (
     <Box component="form" action={formAction} sx={formStyles}>
       <Box sx={headerStyles}>
@@ -34,23 +36,20 @@ const RemoveMemberForm: React.FC<{ teamID: string; persons: Person[]; includeOnl
       <input type="hidden" name="teamID" value={teamID} />
       <input type="hidden" name="personID" value={selectedMember} />
 
-      <Box sx={{ pl: 1, mb: 1 }}>
-        <Typography variant="body2">Select Member</Typography>
-        <Box>
-          {persons.filter((p) => !includeOnlyIds || includeOnlyIds.includes(p.id)).map((p) => (
-            <PersonCheckBoxList
-              key={p.id}
-              {...p}
-              groupName="removeMember-personID"
-              selectedId={selectedMember}
-              onSelect={(personID: string) => setSelectedMember(personID)}
-            />
-          ))}
-        </Box>
+      <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))", gap: 1, mb: 1 }}>
+        {filteredPersons.map((p) => (
+          <PersonSelectCard
+            key={p.id}
+            person={p}
+            selected={selectedMember === p.id}
+            onSelect={setSelectedMember}
+            variant="remove"
+          />
+        ))}
       </Box>
 
       <Box display="flex" gap={1} justifyContent="flex-end">
-<Button type="submit" disabled={!selectedMember || isPending} sx={{ ...smallButtonStyles, ...(selectedMember && activeButtonStyles) }}>
+        <Button type="submit" disabled={!selectedMember || isPending} sx={{ ...smallButtonStyles, ...(selectedMember && activeButtonStyles) }}>
           Remove Member
         </Button>
       </Box>

@@ -4,7 +4,7 @@ import { addManager } from "@/serverActions";
 import { activeButtonStyles, formStyles, headerStyles, smallButtonStyles } from "@/muiStyles";
 import { Box, Button, Typography } from "@mui/material";
 import { useActionState, useState } from "react";
-import { PersonCheckBoxList } from "./PersonCheckboxList";
+import { PersonSelectCard } from "./PersonSelectCard";
 import { Person } from "@/schemas";
 
 type FormState = { error: string | null };
@@ -24,6 +24,8 @@ const UpdateManagerForm: React.FC<{ teamID: string; persons: Person[]; excludeId
     { error: null },
   );
 
+  const filteredPersons = persons.filter((p) => !excludeIds.includes(p.id));
+
   return (
     <Box component="form" action={formAction} sx={formStyles}>
       <Box sx={headerStyles}>
@@ -34,23 +36,20 @@ const UpdateManagerForm: React.FC<{ teamID: string; persons: Person[]; excludeId
       <input type="hidden" name="teamID" value={teamID} />
       <input type="hidden" name="personID" value={newManager} />
 
-      <Box sx={{ pl: 1, mb: 1 }}>
-        <Typography variant="body2">Select Manager</Typography>
-        <Box>
-          {persons.filter((p) => !excludeIds.includes(p.id)).map((p) => (
-            <PersonCheckBoxList
-              key={p.id}
-              {...p}
-              groupName="addManager-personID"
-              selectedId={newManager}
-              onSelect={(personID: string) => setNewManager(personID)}
-            />
-          ))}
-        </Box>
+      <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))", gap: 1, mb: 1 }}>
+        {filteredPersons.map((p) => (
+          <PersonSelectCard
+            key={p.id}
+            person={p}
+            selected={newManager === p.id}
+            onSelect={setNewManager}
+            variant="add"
+          />
+        ))}
       </Box>
 
       <Box display="flex" gap={1} justifyContent="flex-end">
-<Button type="submit" disabled={!newManager || isPending} sx={{ ...smallButtonStyles, ...(newManager && activeButtonStyles) }}>
+        <Button type="submit" disabled={!newManager || isPending} sx={{ ...smallButtonStyles, ...(newManager && activeButtonStyles) }}>
           Add Manager
         </Button>
       </Box>

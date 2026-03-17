@@ -63,7 +63,7 @@ describe("RemoveMemberFromTeam Component", () => {
   test("submit button is enabled after selecting a person", () => {
     render(<RemoveMemberFromTeam teamID={teamID} persons={mockPersons} />);
 
-    fireEvent.click(screen.getAllByRole("radio")[0]);
+    fireEvent.click(screen.getByRole("button", { name: "Alice" }));
     expect(screen.getByRole("button", { name: /Remove Member/i })).not.toBeDisabled();
   });
 
@@ -71,7 +71,7 @@ describe("RemoveMemberFromTeam Component", () => {
     (removeMember as jest.Mock).mockResolvedValue(undefined);
     render(<RemoveMemberFromTeam teamID={teamID} persons={mockPersons} />);
 
-    fireEvent.click(screen.getAllByRole("radio")[0]);
+    fireEvent.click(screen.getByRole("button", { name: "Alice" }));
     fireEvent.click(screen.getByRole("button", { name: /Remove Member/i }));
 
     await waitFor(() => {
@@ -83,7 +83,7 @@ describe("RemoveMemberFromTeam Component", () => {
     (removeMember as jest.Mock).mockRejectedValue(new Error("Person is not a member"));
     render(<RemoveMemberFromTeam teamID={teamID} persons={mockPersons} />);
 
-    fireEvent.click(screen.getAllByRole("radio")[0]);
+    fireEvent.click(screen.getByRole("button", { name: "Alice" }));
     fireEvent.click(screen.getByRole("button", { name: /Remove Member/i }));
 
     await waitFor(() => {
