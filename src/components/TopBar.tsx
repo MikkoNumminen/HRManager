@@ -13,10 +13,10 @@ export default function TopBar({ title, backHref }: TopBarProps) {
   return (
     <AppBar
       position="static"
-      sx={{ mb: 2, backgroundColor: colors.slate600, borderRadius: "4px", border: `1px solid ${colors.slate300}` }}
+      sx={{ mb: 2, backgroundColor: colors.slate600, borderRadius: "4px", border: `1px solid ${colors.slate300}`, ...(backHref && { ml: "-44px", width: "calc(100% + 44px)" }) }}
       elevation={0}
     >
-      <Toolbar>
+      <Toolbar sx={backHref ? { pl: "44px" } : {}}>
         {backHref && (
           <Button
             component={Link}
