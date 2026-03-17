@@ -25,7 +25,6 @@ export async function getPersons() {
 export async function getTeams() {
   try {
     const teams = await prisma.team.findMany({
-      relationLoadStrategy: "join",
       include: {
         manager: true,
         members: {
