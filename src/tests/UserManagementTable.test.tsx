@@ -1,0 +1,78 @@
+import { render, screen } from "@testing-library/react";
+import UserManagementTable from "../components/UserManagementTable";
+import { AppUser } from "../schemas";
+
+jest.mock("next/navigation", () => ({
+  useRouter: () => ({ push: jest.fn() }),
+}));
+
+const mockUsers: AppUser[] = [
+  {
+    id: "aaa-111",
+    email: "alice@example.com",
+    name: "Alice",
+    image: null,
+    role: "superuser",
+    createdAt: new Date("2026-01-01"),
+    updatedAt: new Date("2026-01-01"),
+  },
+  {
+    id: "bbb-222",
+    email: "bob@example.com",
+    name: "Bob",
+    image: null,
+    role: "administrator",
+    createdAt: new Date("2026-02-01"),
+    updatedAt: new Date("2026-02-01"),
+  },
+  {
+    id: "ccc-333",
+    email: "carol@example.com",
+    name: null,
+    image: null,
+    role: "user",
+    createdAt: new Date("2026-03-01"),
+    updatedAt: new Date("2026-03-01"),
+  },
+];
+
+describe("UserManagementTable", () => {
+  // Shows a message when there are no users
+  test("renders empty state when no users", () => {
+    render(<UserManagementTable users={[]} />);
+    expect(screen.getByText("No Users Found")).toBeInTheDocument();
+  });
+
+  // Shows all user rows with their names and emails
+  test("renders all users with name and email", () => {
+    render(<UserManagementTable users={mockUsers} />);
+    expect(screen.getByText("Alice")).toBeInTheDocument();
+    expect(screen.getByText("alice@example.com")).toBeInTheDocument();
+    expect(screen.getByText("Bob")).toBeInTheDocument();
+    expect(screen.getByText("bob@example.com")).toBeInTheDocument();
+    expect(screen.getByText("carol@example.com")).toBeInTheDocument();
+  });
+
+  // Shows role chips for each user
+  test("renders role chips for each user", () => {
+    render(<UserManagementTable users={mockUsers} />);
+    expect(screen.getByText("superuser")).toBeInTheDocument();
+    expect(screen.getByText("administrator")).toBeInTheDocument();
+    expect(screen.getByText("user")).toBeInTheDocument();
+  });
+
+  // Shows a dash when user has no name
+  test("shows dash for users without a name", () => {
+    render(<UserManagementTable users={mockUsers} />);
+    expect(screen.getByText("-")).toBeInTheDocument();
+  });
+
+  // Has the correct table headers
+  test("renders correct table headers", () => {
+    render(<UserManagementTable users={mockUsers} />);
+    expect(screen.getByText("Name")).toBeInTheDocument();
+    expect(screen.getByText("Email")).toBeInTheDocument();
+    expect(screen.getByText("Role")).toBeInTheDocument();
+    expect(screen.getByText("Created At")).toBeInTheDocument();
+  });
+});

@@ -98,6 +98,16 @@ export default function TopBar({ title, backHref }: TopBarProps) {
                 </Typography>
               </Box>
               <Divider sx={{ borderColor: colors.slate300 }} />
+              {session?.user?.permissions?.["admin:manage_users"] && (
+                <MenuItem
+                  component={Link}
+                  href="/admin"
+                  onClick={() => setAnchorEl(null)}
+                  sx={userMenuItemStyles}
+                >
+                  User Management
+                </MenuItem>
+              )}
               <MenuItem
                 onClick={() => {
                   setAnchorEl(null);
