@@ -30,6 +30,7 @@ Built with Next.js 16 (App Router), React 19, MUI v7, Prisma 6, Zod 4, TypeScrip
 - MUI style tokens and component styles are centralized in `muiStyles.ts`.
 - **Auth** is configured in `auth.ts` (NextAuth v5). Protected routes use `auth()` + `redirect("/")` in Server Components. Client components use `useSession` via `SessionProvider` wrapper in layout.
 - **Guest mode**: unauthenticated users see read-only minimal views (MUI Chips) of Persons and Teams on the main page. Manage routes (`/managePersons`, `/manageTeams`) redirect to `/`.
+- **Client-heavy rendering**: Keep the server thin — it handles only data fetching, auth, and validation. All rendering logic, UI state, filtering, sorting, and heavy computation belong in Client Components so the server stays lightweight and responsive. Security-sensitive logic (auth checks, input sanitization, access control, database queries) must always remain server-side — never trust the client for authorization or data integrity.
 
 ## File structure
 
