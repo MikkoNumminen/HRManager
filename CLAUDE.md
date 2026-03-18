@@ -30,6 +30,7 @@ This is a **portfolio / showcase project**. The goal is to demonstrate technical
 - Forms use React 19's `useActionState` with `action=` prop, not `onSubmit`.
 - Types are derived from Zod schemas in `schemas.ts` via `z.infer` — `Person` and `CombinedTeam`. Do not create duplicate interfaces in components.
 - MUI style tokens and component styles are centralized in `muiStyles.ts`.
+- **Info tooltips**: Use MUI `Tooltip` with `arrow` and `cursor: "help"` on column headers or labels that may not be self-explanatory. Keep tooltip text concise but informative. Apply this consistently across all data tables and editor views.
 - **Auth** is configured in `auth.ts` (NextAuth v5). Protected routes use `auth()` + `redirect("/")` in Server Components. Client components use `useSession` via `SessionProvider` wrapper in layout.
 - **Guest mode**: unauthenticated users see read-only minimal views (MUI Chips) of Persons and Teams on the main page. Manage routes (`/managePersons`, `/manageTeams`) redirect to `/`.
 - **Client-heavy rendering**: Keep the server thin — it handles only data fetching, auth, and validation. All rendering logic, UI state, filtering, sorting, and heavy computation belong in Client Components so the server stays lightweight and responsive. Security-sensitive logic (auth checks, input sanitization, access control, database queries) must always remain server-side — never trust the client for authorization or data integrity.
