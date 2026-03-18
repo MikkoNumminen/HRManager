@@ -27,17 +27,17 @@ describe("TopBar", () => {
 
   test("does not render back button when backHref is not provided", () => {
     render(<TopBar title="Home" />);
-    expect(screen.queryByText("←")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Go back")).not.toBeInTheDocument();
   });
 
   test("renders back button when backHref is provided", () => {
     render(<TopBar title="Manage Persons" backHref="/" />);
-    expect(screen.getByText("←")).toBeInTheDocument();
+    expect(screen.getByLabelText("Go back")).toBeInTheDocument();
   });
 
   test("back button links to the correct href", () => {
     render(<TopBar title="Manage Persons" backHref="/managePersons" />);
-    const link = screen.getByText("←").closest("a");
+    const link = screen.getByLabelText("Go back").closest("a");
     expect(link).toHaveAttribute("href", "/managePersons");
   });
 

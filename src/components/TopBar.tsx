@@ -12,6 +12,7 @@ import {
   Toolbar,
   Typography,
 } from "@mui/material";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { avatarStyles, colors, userMenuItemStyles, userMenuStyles } from "@/muiStyles";
 import Link from "next/link";
 import { useSession, signIn, signOut } from "next-auth/react";
@@ -45,19 +46,30 @@ export default function TopBar({ title, backHref }: TopBarProps) {
         backgroundColor: colors.slate600,
         borderRadius: "4px",
         border: `1px solid ${colors.slate300}`,
-        ...(backHref && { ml: "-44px", width: "calc(100% + 44px)" }),
+        ...(backHref && { ml: "-48px", width: "calc(100% + 48px)" }),
       }}
       elevation={0}
     >
-      <Toolbar sx={backHref ? { pl: "44px" } : {}}>
+      <Toolbar
+        sx={{
+          position: "relative",
+          ...(backHref && { paddingLeft: "64px !important" }),
+        }}
+      >
         {backHref && (
-          <Button
+          <IconButton
             component={Link}
             href={backHref}
-            sx={{ color: colors.slate300, mr: 2, minWidth: "auto", px: 1 }}
+            aria-label="Go back"
+            sx={{
+              position: "absolute",
+              left: 4,
+              color: colors.slate100,
+              "&:hover": { backgroundColor: colors.hoverOverlay },
+            }}
           >
-            ←
-          </Button>
+            <ArrowBackIcon />
+          </IconButton>
         )}
         <Box sx={{ flexGrow: 1 }}>
           <Typography variant="h6">{title}</Typography>
