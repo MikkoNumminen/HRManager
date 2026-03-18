@@ -88,6 +88,7 @@ prisma/
 - Tests live in `src/tests/`.
 - Do not mock core logic — test real functionality.
 - Always add a comment above each test explaining what it does in plain, simple language ("Barney style").
+- **Every new schema, component, or module must have corresponding tests.** Never leave new code untested — if you add it, you test it.
 
 ## Roadmap (do not implement unless asked)
 
