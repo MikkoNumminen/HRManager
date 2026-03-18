@@ -2,34 +2,35 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import TeamsTable from "@/components/TeamsTable";
 
-describe("TeamsTable Component", () => {
-  const mockCombinedTeams = [
-    {
-      teamName: "Development",
-      teamId: "1",
-      teamManagerId: "mgr-1",
-      managerName: "Manager1",
-      createdAt: new Date("2023-01-01T10:00:00Z"),
-      updatedAt: new Date("2023-01-10T10:00:00Z"),
-      members: [
-        { personId: "p1", name: "John Doe", email: "john.doe@example.com" },
-        { personId: "p2", name: "Jane Smith", email: "jane.smith@example.com" },
-      ],
-    },
-    {
-      teamName: "Design",
-      teamId: "2",
-      teamManagerId: "mgr-2",
-      managerName: "Manager2",
-      createdAt: new Date("2023-02-01T11:00:00Z"),
-      updatedAt: new Date("2023-02-10T11:00:00Z"),
-      members: [
-        { personId: "p3", name: "Alice Brown", email: "alice.brown@example.com" },
-        { personId: "p4", name: "Bob White", email: "bob.white@example.com" },
-      ],
-    },
-  ];
+const mockCombinedTeams = [
+  {
+    teamName: "Development",
+    teamId: "1",
+    teamManagerId: "mgr-1",
+    managerName: "Manager1",
+    createdAt: new Date("2023-01-01T10:00:00Z"),
+    updatedAt: new Date("2023-01-10T10:00:00Z"),
+    members: [
+      { personId: "p1", name: "John Doe", email: "john.doe@example.com" },
+      { personId: "p2", name: "Jane Smith", email: "jane.smith@example.com" },
+    ],
+  },
+  {
+    teamName: "Design",
+    teamId: "2",
+    teamManagerId: "mgr-2",
+    managerName: "Manager2",
+    createdAt: new Date("2023-02-01T11:00:00Z"),
+    updatedAt: new Date("2023-02-10T11:00:00Z"),
+    members: [
+      { personId: "p3", name: "Alice Brown", email: "alice.brown@example.com" },
+      { personId: "p4", name: "Bob White", email: "bob.white@example.com" },
+    ],
+  },
+];
 
+describe("TeamsTable Component", () => {
+  // Check that all five column headers show up in the table.
   test("should render the table headers correctly", () => {
     render(<TeamsTable combinedTeams={mockCombinedTeams} />);
 
@@ -40,6 +41,7 @@ describe("TeamsTable Component", () => {
     expect(screen.getByText(/Updated At/)).toBeInTheDocument();
   });
 
+  // Each team's name, manager, members, and timestamps should all be visible.
   test("should render the team data correctly", () => {
     render(<TeamsTable combinedTeams={mockCombinedTeams} />);
 
@@ -54,8 +56,54 @@ describe("TeamsTable Component", () => {
     });
   });
 
+  // No teams? Show a friendly message instead of an empty table.
   test('should render "No Teams Available" when there are no teams', () => {
     render(<TeamsTable combinedTeams={[]} />);
+
+    expect(screen.getByText(/No Teams Available/)).toBeInTheDocument();
+  });
+
+  // When a team has no manager, the table should display a fallback text.
+  test('should render "No Manager Assigned" when managerName is null', () => {
+    const teamNoManager = [
+      {
+        ...mockCombinedTeams[0],
+        teamManagerId: null,
+        managerName: null,
+      },
+    ];
+    render(<TeamsTable combinedTeams={teamNoManager} />);
+
+    expect(screen.getByText("No Manager Assigned")).toBeInTheDocument();
+  });
+});
+
+describe("TeamsTable minimal mode", () => {
+  // In minimal mode, teams show as compact chips instead of the full table.
+  // This is the guest view on the homepage.
+  test("renders chips instead of a table when minimal is true", () => {
+    render(<TeamsTable combinedTeams={mockCombinedTeams} minimal />);
+
+    expect(screen.getByText("Development")).toBeInTheDocument();
+    expect(screen.getByText("Design")).toBeInTheDocument();
+
+    // Should NOT have table headers — chips mode has no table structure.
+    expect(screen.queryByText(/Team Manager/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Created At/)).not.toBeInTheDocument();
+  });
+
+  // Each chip shows initials from the team name in a little avatar.
+  // "Development" becomes "D", "Design" becomes "D" too (first letter of each word, max 2).
+  test("renders avatar initials in chips", () => {
+    const teamsWithMultiWord = [{ ...mockCombinedTeams[0], teamName: "Dev Ops" }];
+    render(<TeamsTable combinedTeams={teamsWithMultiWord} minimal />);
+
+    expect(screen.getByText("DO")).toBeInTheDocument();
+  });
+
+  // Empty list in minimal mode should show the same empty message.
+  test('renders "No Teams Available" in minimal mode when empty', () => {
+    render(<TeamsTable combinedTeams={[]} minimal />);
 
     expect(screen.getByText(/No Teams Available/)).toBeInTheDocument();
   });
