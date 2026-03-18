@@ -9,7 +9,7 @@
     "lint": "next lint",
     "test": "jest --verbose",
     "test:server": "DATABASE_URL=file:./prisma/test.db npx prisma db push --skip-generate --accept-data-loss && jest --config jest.config.server.ts --verbose",
-    "test:all": "npm test && npm run test:server",
+    "test:all": "DATABASE_URL=file:./prisma/test.db npx prisma db push --skip-generate --accept-data-loss && jest --config jest.config.all.ts --runInBand --verbose",
     "test:watch": "jest --watchAll",
     "format": "prettier --write .",
     "format:check": "prettier --check ."

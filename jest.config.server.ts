@@ -4,7 +4,9 @@ import type { Config } from "jest";
 const createJestConfig = nextJest({ dir: "./" });
 
 const config: Config = {
+  displayName: "server",
   testEnvironment: "node",
+  maxWorkers: 1,
   testMatch: ["<rootDir>/src/tests/server/**/*.test.ts"],
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
