@@ -1,5 +1,6 @@
 node_modules/
 .next/
 prisma/dev.db
+prisma/test.db
 prisma/migrations/
 coverage/
