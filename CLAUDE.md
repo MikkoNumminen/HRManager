@@ -7,6 +7,8 @@ Built with Next.js 16 (App Router), React 19, MUI v7, Prisma 6, Zod 4, TypeScrip
 
 This is a **portfolio / showcase project**. The goal is to demonstrate technical depth and breadth, not to ship the leanest possible product. Features are intentionally built to production-grade complexity (e.g. granular per-user RBAC instead of simple role checks) to showcase what the developer can build. When in doubt, favour the more thorough implementation.
 
+`README.md` is the **show window for potential employers** — it must always reflect the current state of the project accurately, with up-to-date test counts, feature lists, architecture descriptions, and file structure. Keep it polished and impressive.
+
 ## Tech stack
 
 | Layer      | Technology                                                     |
