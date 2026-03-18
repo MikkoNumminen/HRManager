@@ -292,3 +292,72 @@ export async function resetAll() {
   revalidatePath("/managePersons");
   revalidatePath("/manageTeams");
 }
+
+export async function seedMockData(clearExisting: boolean = true) {
+  await prisma.$transaction(async (prisma) => {
+    if (clearExisting) {
+      await prisma.teamMember.deleteMany();
+      await prisma.team.deleteMany();
+      await prisma.person.deleteMany();
+    }
+
+    // Upsert persons — find existing by email or create new
+    const personSeeds = [
+      { name: "Alice Johnson", position: "Engineering Manager", email: "alice@example.com" },
+      { name: "Bob Williams", position: "Senior Developer", email: "bob@example.com" },
+      { name: "Carol Davis", position: "UX Designer", email: "carol@example.com" },
+      { name: "Dave Martinez", position: "Backend Developer", email: "dave@example.com" },
+      { name: "Eve Thompson", position: "QA Engineer", email: "eve@example.com" },
+      { name: "Frank Lee", position: "Product Owner", email: "frank@example.com" },
+    ];
+    const persons = [];
+    for (const p of personSeeds) {
+      const person = await prisma.person.upsert({
+        where: { email: p.email },
+        update: {},
+        create: p,
+      });
+      persons.push(person);
+    }
+    const [alice, bob, carol, dave, eve, frank] = persons;
+
+    // Upsert teams — find existing by name or create new
+    const teamSeeds = [
+      { teamName: "Engineering", teamManagerId: alice.id },
+      { teamName: "Design", teamManagerId: carol.id },
+      { teamName: "Platform", teamManagerId: null },
+    ];
+    const teams = [];
+    for (const t of teamSeeds) {
+      const team = await prisma.team.upsert({
+        where: { teamName: t.teamName },
+        update: {},
+        create: t,
+      });
+      teams.push(team);
+    }
+    const [engineering, design, platform] = teams;
+
+    // Add members — skip if already a member
+    const memberships = [
+      { personId: alice.id, teamId: engineering.teamId },
+      { personId: bob.id, teamId: engineering.teamId },
+      { personId: dave.id, teamId: engineering.teamId },
+      { personId: eve.id, teamId: engineering.teamId },
+      { personId: carol.id, teamId: design.teamId },
+      { personId: frank.id, teamId: design.teamId },
+      { personId: dave.id, teamId: platform.teamId },
+    ];
+    for (const m of memberships) {
+      const existing = await prisma.teamMember.findUnique({
+        where: { personId_teamId: { personId: m.personId, teamId: m.teamId } },
+      });
+      if (!existing) {
+        await prisma.teamMember.create({ data: m });
+      }
+    }
+  });
+  revalidatePath("/");
+  revalidatePath("/managePersons");
+  revalidatePath("/manageTeams");
+}
