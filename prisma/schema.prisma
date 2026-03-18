@@ -40,3 +40,34 @@ model TeamMember {
 
   @@unique([personId, teamId])
 }
+
+model User {
+  id          String           @id @default(uuid())
+  email       String           @unique
+  name        String?
+  image       String?
+  role        String           @default("user")
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  permissions UserPermission[]
+}
+
+model Permission {
+  id          String           @id @default(uuid())
+  key         String           @unique
+  description String?
+  users       UserPermission[]
+}
+
+model UserPermission {
+  id           String   @id @default(uuid())
+  userId       String
+  permissionId String
+  granted      Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, permissionId])
+}
