@@ -17,11 +17,13 @@ describe("getPersons", () => {
     await testPrisma.$disconnect();
   });
 
+  // An empty database should give back an empty list, not an error.
   test("returns empty array when no persons exist", async () => {
     const result = await getPersons();
     expect(result).toEqual([]);
   });
 
+  // Put two people in, get two people out. Simple as that.
   test("returns all persons from the database", async () => {
     await testPrisma.person.create({
       data: { name: "Alice", email: "alice@example.com" },
@@ -37,6 +39,8 @@ describe("getPersons", () => {
     expect(names).toEqual(["Alice", "Bob"]);
   });
 
+  // Make sure every field comes back as the right type — strings are strings,
+  // dates are dates. This catches sneaky bugs where the DB returns something unexpected.
   test("returns persons with correct field types", async () => {
     await testPrisma.person.create({
       data: { name: "Charlie", email: "charlie@example.com", position: "Manager" },
@@ -51,6 +55,8 @@ describe("getPersons", () => {
     expect(person.updatedAt).toBeInstanceOf(Date);
   });
 
+  // Position and email are optional in the database. If they weren't filled in,
+  // they should come back as null — not undefined, not empty string.
   test("returns null for missing position and email", async () => {
     await testPrisma.person.create({
       data: { name: "NoFields" },
@@ -73,11 +79,14 @@ describe("getTeams", () => {
     await testPrisma.$disconnect();
   });
 
+  // No teams in the database? You get an empty list, not a crash.
   test("returns empty array when no teams exist", async () => {
     const result = await getTeams();
     expect(result).toEqual([]);
   });
 
+  // A team without a manager should show null for both the manager ID and name.
+  // This is the default state when you first create a team.
   test("returns team with null manager when no manager assigned", async () => {
     await testPrisma.team.create({
       data: { teamName: "No Manager Team" },
@@ -89,6 +98,8 @@ describe("getTeams", () => {
     expect(team.managerName).toBeNull();
   });
 
+  // When a team has a manager, we should get both the manager's ID
+  // and their actual name — so the UI can display "Managed by Team Lead".
   test("returns team with manager details", async () => {
     const manager = await testPrisma.person.create({
       data: { name: "Team Lead", email: "lead@example.com" },
@@ -103,6 +114,8 @@ describe("getTeams", () => {
     expect(team.managerName).toBe("Team Lead");
   });
 
+  // A team with no members should have an empty array, not null or undefined.
+  // The UI relies on being able to call .map() on this without crashing.
   test("returns team with empty members array when no members", async () => {
     await testPrisma.team.create({
       data: { teamName: "Empty Team" },
@@ -112,6 +125,8 @@ describe("getTeams", () => {
     expect(team.members).toEqual([]);
   });
 
+  // Each member should come back with their personId, name, and email.
+  // This is the shape the frontend components expect to render the member list.
   test("returns team members with correct shape", async () => {
     const person = await testPrisma.person.create({
       data: { name: "Member One", email: "member@example.com" },
@@ -132,6 +147,7 @@ describe("getTeams", () => {
     });
   });
 
+  // If a team member never provided an email, it should be null in the output.
   test("returns member with null email", async () => {
     const person = await testPrisma.person.create({
       data: { name: "No Email" },
@@ -147,6 +163,8 @@ describe("getTeams", () => {
     expect(result.members[0].email).toBeNull();
   });
 
+  // The real-world scenario: multiple teams, people in multiple teams.
+  // Person A is in both teams, Person B is only in Alpha. Counts should match.
   test("returns multiple teams with multiple members", async () => {
     const p1 = await testPrisma.person.create({
       data: { name: "Person A", email: "a@example.com" },
@@ -179,6 +197,8 @@ describe("getTeams", () => {
     expect(beta.members).toHaveLength(1);
   });
 
+  // Double-check that every field on a team object is the right type.
+  // Catches issues where the database returns something the schema doesn't expect.
   test("returns correct field types on team", async () => {
     await testPrisma.team.create({
       data: { teamName: "Type Check Team" },

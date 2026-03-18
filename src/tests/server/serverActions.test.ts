@@ -5,7 +5,8 @@ jest.mock("@/db", () => ({
   prisma: require("./testDb").testPrisma,
 }));
 
-// Mock Next.js server functions
+// Mock Next.js server functions — these don't exist in a test environment,
+// but the server actions call them after every mutation.
 jest.mock("next/cache", () => ({
   revalidatePath: jest.fn(),
 }));
@@ -26,7 +27,8 @@ import {
   resetAll,
 } from "@/serverActions";
 
-// Helper to build FormData
+// Helper to build FormData — server actions receive form submissions,
+// so we simulate that by packing key-value pairs into a FormData object.
 function formData(entries: Record<string, string | string[]>): FormData {
   const fd = new FormData();
   for (const [key, value] of Object.entries(entries)) {
@@ -46,6 +48,7 @@ describe("createPerson", () => {
     await testPrisma.$disconnect();
   });
 
+  // The happy path: give it a name and email, check it actually ends up in the database.
   test("creates a person with name and email", async () => {
     await createPerson(formData({ name: "Alice", email: "alice@test.com" }));
 
@@ -55,6 +58,7 @@ describe("createPerson", () => {
     expect(persons[0].email).toBe("alice@test.com");
   });
 
+  // If someone types "  Bob  " with extra spaces, we should store "Bob".
   test("trims whitespace from name", async () => {
     await createPerson(formData({ name: "  Bob  ", email: "bob@test.com" }));
 
@@ -63,34 +67,41 @@ describe("createPerson", () => {
     expect(person.email).toBe("bob@test.com");
   });
 
+  // You can't add a person with no name — that's just a blank row.
   test("throws on empty name", async () => {
     await expect(createPerson(formData({ name: "", email: "x@test.com" }))).rejects.toThrow(
       "Invalid Name",
     );
   });
 
+  // Spaces don't count as a name either. Nice try though.
   test("throws on whitespace-only name", async () => {
     await expect(createPerson(formData({ name: "   ", email: "x@test.com" }))).rejects.toThrow(
       "Invalid Name",
     );
   });
 
+  // Email is required — we use it as a unique identifier and for contact info.
   test("throws on missing email", async () => {
     await expect(createPerson(formData({ name: "Alice" }))).rejects.toThrow("Email is required");
   });
 
+  // An empty string is not an email address.
   test("throws on empty email", async () => {
     await expect(createPerson(formData({ name: "Alice", email: "" }))).rejects.toThrow(
       "Email is required",
     );
   });
 
+  // "not-an-email" doesn't have an @ sign — the regex catches this.
   test("throws on invalid email format", async () => {
     await expect(createPerson(formData({ name: "Alice", email: "not-an-email" }))).rejects.toThrow(
       "Invalid email format",
     );
   });
 
+  // Two people can't share the same email — the database enforces uniqueness,
+  // but we check first to give a friendly error message.
   test("throws on duplicate email", async () => {
     await createPerson(formData({ name: "Alice", email: "dup@test.com" }));
     await expect(createPerson(formData({ name: "Bob", email: "dup@test.com" }))).rejects.toThrow(
@@ -98,6 +109,7 @@ describe("createPerson", () => {
     );
   });
 
+  // When you first create someone, they don't have a job title yet — position starts as null.
   test("sets position to null by default", async () => {
     await createPerson(formData({ name: "Alice", email: "alice@test.com" }));
 
@@ -113,6 +125,7 @@ describe("removePerson", () => {
     await testPrisma.$disconnect();
   });
 
+  // Delete a person and verify they're actually gone from the database.
   test("removes a person by ID", async () => {
     const person = await testPrisma.person.create({
       data: { name: "ToRemove", email: "remove@test.com" },
@@ -123,6 +136,9 @@ describe("removePerson", () => {
     expect(remaining).toHaveLength(0);
   });
 
+  // If someone is on a team and gets deleted, their team membership
+  // has to be cleaned up first — otherwise the database would have
+  // orphan records pointing to a person that no longer exists.
   test("removes person's team memberships before deleting", async () => {
     const person = await testPrisma.person.create({
       data: { name: "Member", email: "member@test.com" },
@@ -142,6 +158,8 @@ describe("removePerson", () => {
     expect(persons).toHaveLength(0);
   });
 
+  // You can select multiple people and delete them all at once.
+  // The form sends multiple values under the same "personID" key.
   test("removes multiple persons at once", async () => {
     const p1 = await testPrisma.person.create({
       data: { name: "One", email: "one@test.com" },
@@ -155,10 +173,12 @@ describe("removePerson", () => {
     expect(remaining).toHaveLength(0);
   });
 
+  // If the form is submitted without selecting anyone, we should get a clear error.
   test("throws when no personID provided", async () => {
     await expect(removePerson(formData({}))).rejects.toThrow("No personID selected");
   });
 
+  // IDs have to be valid UUIDs — this stops someone from injecting garbage into the query.
   test("throws on invalid UUID", async () => {
     await expect(removePerson(formData({ personID: "bad-id" }))).rejects.toThrow(
       "Invalid personID format",
@@ -173,6 +193,7 @@ describe("updatePosition", () => {
     await testPrisma.$disconnect();
   });
 
+  // Change someone's job title and verify the database actually saved it.
   test("updates a person's position", async () => {
     const person = await testPrisma.person.create({
       data: { name: "Alice", email: "alice@test.com" },
@@ -184,16 +205,20 @@ describe("updatePosition", () => {
     expect(updated!.position).toBe("Senior Dev");
   });
 
+  // We need to know WHOSE position to update — can't do it without an ID.
   test("throws when no personID provided", async () => {
     await expect(updatePosition(formData({ name: "Dev" }))).rejects.toThrow("No personID provided");
   });
 
+  // The ID has to be a proper UUID, not some random string.
   test("throws on invalid UUID", async () => {
     await expect(updatePosition(formData({ personID: "bad", name: "Dev" }))).rejects.toThrow(
       "Invalid personID format",
     );
   });
 
+  // You can't set someone's position to nothing — that's what null is for,
+  // and there's no UI flow for deliberately blanking out a position.
   test("throws when position is empty", async () => {
     const person = await testPrisma.person.create({
       data: { name: "Alice", email: "alice@test.com" },
@@ -211,6 +236,7 @@ describe("updateEmail", () => {
     await testPrisma.$disconnect();
   });
 
+  // Change someone's email and make sure the new one is saved.
   test("updates a person's email", async () => {
     const person = await testPrisma.person.create({
       data: { name: "Alice", email: "old@test.com" },
@@ -222,6 +248,8 @@ describe("updateEmail", () => {
     expect(updated!.email).toBe("new@test.com");
   });
 
+  // Can't change your email to one that someone else already has.
+  // Email is unique across the whole system.
   test("throws on duplicate email", async () => {
     const p1 = await testPrisma.person.create({
       data: { name: "Alice", email: "alice@test.com" },
@@ -235,6 +263,7 @@ describe("updateEmail", () => {
     ).rejects.toThrow("A person with this email already exists");
   });
 
+  // The new email has to actually look like an email address.
   test("throws on invalid email format", async () => {
     const person = await testPrisma.person.create({
       data: { name: "Alice", email: "alice@test.com" },
@@ -244,6 +273,8 @@ describe("updateEmail", () => {
     );
   });
 
+  // You can't update to an empty email — if you want to remove it,
+  // that would need a different operation entirely.
   test("throws when email is empty", async () => {
     const person = await testPrisma.person.create({
       data: { name: "Alice", email: "alice@test.com" },
@@ -253,6 +284,7 @@ describe("updateEmail", () => {
     );
   });
 
+  // Same UUID check as everywhere else — no garbage IDs allowed.
   test("throws on invalid UUID", async () => {
     await expect(updateEmail(formData({ personID: "nope", name: "a@b.com" }))).rejects.toThrow(
       "Invalid personID format",
@@ -267,6 +299,7 @@ describe("createTeam", () => {
     await testPrisma.$disconnect();
   });
 
+  // Create a team and verify it shows up in the database with no manager assigned yet.
   test("creates a team with null manager", async () => {
     await createTeam(formData({ name: "New Team" }));
 
@@ -276,6 +309,7 @@ describe("createTeam", () => {
     expect(teams[0].teamManagerId).toBeNull();
   });
 
+  // Extra spaces around the team name get cleaned up before saving.
   test("trims whitespace from team name", async () => {
     await createTeam(formData({ name: "  Trimmed  " }));
 
@@ -283,10 +317,12 @@ describe("createTeam", () => {
     expect(team.teamName).toBe("Trimmed");
   });
 
+  // A team with no name is not a team — you have to call it something.
   test("throws on empty name", async () => {
     await expect(createTeam(formData({ name: "" }))).rejects.toThrow("Invalid Name");
   });
 
+  // Spaces alone don't count as a team name, just like with person names.
   test("throws on whitespace-only name", async () => {
     await expect(createTeam(formData({ name: "   " }))).rejects.toThrow("Invalid Name");
   });
@@ -299,6 +335,7 @@ describe("removeTeam", () => {
     await testPrisma.$disconnect();
   });
 
+  // Delete a team and confirm it's gone.
   test("removes a team", async () => {
     const team = await testPrisma.team.create({
       data: { teamName: "To Delete" },
@@ -309,6 +346,9 @@ describe("removeTeam", () => {
     expect(teams).toHaveLength(0);
   });
 
+  // When a team is deleted, all its membership records should be automatically
+  // cleaned up (cascade delete). But the people themselves should still exist —
+  // deleting a team doesn't fire the employees!
   test("cascade deletes team members when team is removed", async () => {
     const person = await testPrisma.person.create({
       data: { name: "Alice", email: "alice@test.com" },
@@ -329,10 +369,12 @@ describe("removeTeam", () => {
     expect(persons).toHaveLength(1);
   });
 
+  // Can't delete nothing — you have to actually select a team first.
   test("throws when no teamID provided", async () => {
     await expect(removeTeam(formData({}))).rejects.toThrow("No teamID selected");
   });
 
+  // Team IDs are UUIDs — random strings won't fly.
   test("throws on invalid UUID", async () => {
     await expect(removeTeam(formData({ teamID: "invalid" }))).rejects.toThrow(
       "Invalid teamID format",
@@ -347,6 +389,7 @@ describe("addManager", () => {
     await testPrisma.$disconnect();
   });
 
+  // Assign a person as the team's manager and verify it sticks.
   test("assigns a manager to a team", async () => {
     const person = await testPrisma.person.create({
       data: { name: "Manager", email: "mgr@test.com" },
@@ -361,6 +404,8 @@ describe("addManager", () => {
     expect(updated!.teamManagerId).toBe(person.id);
   });
 
+  // When you make someone the manager, they should also become a team member
+  // automatically — a manager who's not on the team doesn't make sense.
   test("adds manager as team member if not already a member", async () => {
     const person = await testPrisma.person.create({
       data: { name: "Manager", email: "mgr@test.com" },
@@ -378,6 +423,8 @@ describe("addManager", () => {
     expect(members[0].personId).toBe(person.id);
   });
 
+  // If the new manager is already on the team, don't add them twice.
+  // The membership table has a unique constraint on (personId, teamId).
   test("does not duplicate membership if manager is already a member", async () => {
     const person = await testPrisma.person.create({
       data: { name: "Manager", email: "mgr@test.com" },
@@ -397,18 +444,21 @@ describe("addManager", () => {
     expect(members).toHaveLength(1);
   });
 
+  // You have to say which team gets the manager.
   test("throws when no teamID provided", async () => {
     await expect(
       addManager(formData({ personID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" })),
     ).rejects.toThrow("No teamID selected");
   });
 
+  // You have to say who becomes the manager.
   test("throws when no personID provided", async () => {
     await expect(
       addManager(formData({ teamID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" })),
     ).rejects.toThrow("No personID provided");
   });
 
+  // Garbage IDs get caught before they hit the database.
   test("throws on invalid UUID", async () => {
     await expect(addManager(formData({ teamID: "bad", personID: "bad" }))).rejects.toThrow(
       "Invalid",
@@ -423,6 +473,7 @@ describe("addMember", () => {
     await testPrisma.$disconnect();
   });
 
+  // Add a person to a team and check the membership record exists.
   test("adds a person as a team member", async () => {
     const person = await testPrisma.person.create({
       data: { name: "Alice", email: "alice@test.com" },
@@ -439,6 +490,8 @@ describe("addMember", () => {
     expect(members[0].teamId).toBe(team.teamId);
   });
 
+  // You can't add the same person to the same team twice.
+  // The function checks for this and throws a clear error.
   test("throws on duplicate membership", async () => {
     const person = await testPrisma.person.create({
       data: { name: "Alice", email: "alice@test.com" },
@@ -455,18 +508,21 @@ describe("addMember", () => {
     );
   });
 
+  // Have to specify which team to add the member to.
   test("throws when no teamID provided", async () => {
     await expect(
       addMember(formData({ personID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" })),
     ).rejects.toThrow("No teamID selected");
   });
 
+  // Have to specify which person to add.
   test("throws when no personID provided", async () => {
     await expect(
       addMember(formData({ teamID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" })),
     ).rejects.toThrow("No personID selected");
   });
 
+  // UUID validation — same as every other action.
   test("throws on invalid UUID", async () => {
     await expect(addMember(formData({ teamID: "x", personID: "y" }))).rejects.toThrow("Invalid");
   });
@@ -479,6 +535,7 @@ describe("removeMember", () => {
     await testPrisma.$disconnect();
   });
 
+  // Remove someone from a team. They still exist as a person, just not on this team anymore.
   test("removes a member from a team", async () => {
     const person = await testPrisma.person.create({
       data: { name: "Alice", email: "alice@test.com" },
@@ -496,6 +553,8 @@ describe("removeMember", () => {
     expect(members).toHaveLength(0);
   });
 
+  // If you remove someone who was also the manager, the team's manager
+  // should be set to null — you can't manage a team you're not on.
   test("unsets manager if removed member was the manager", async () => {
     const person = await testPrisma.person.create({
       data: { name: "Manager", email: "mgr@test.com" },
@@ -513,6 +572,8 @@ describe("removeMember", () => {
     expect(updated!.teamManagerId).toBeNull();
   });
 
+  // Removing a regular member should NOT affect the manager.
+  // Only removing the manager themselves clears the manager field.
   test("does not unset manager if removed member is not the manager", async () => {
     const manager = await testPrisma.person.create({
       data: { name: "Manager", email: "mgr@test.com" },
@@ -536,6 +597,7 @@ describe("removeMember", () => {
     expect(updated!.teamManagerId).toBe(manager.id);
   });
 
+  // Can't remove someone who isn't on the team in the first place.
   test("throws if person is not a member", async () => {
     const person = await testPrisma.person.create({
       data: { name: "Alice", email: "alice@test.com" },
@@ -549,12 +611,14 @@ describe("removeMember", () => {
     ).rejects.toThrow("Person is not a member of the team");
   });
 
+  // Need to know which team to remove the member from.
   test("throws when no teamID provided", async () => {
     await expect(
       removeMember(formData({ personID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" })),
     ).rejects.toThrow("No teamID selected");
   });
 
+  // UUID check — keeps bad data out.
   test("throws on invalid UUID", async () => {
     await expect(removeMember(formData({ teamID: "x", personID: "y" }))).rejects.toThrow("Invalid");
   });
@@ -567,6 +631,8 @@ describe("resetAll", () => {
     await testPrisma.$disconnect();
   });
 
+  // The nuclear option: wipe everything — all people, all teams, all memberships.
+  // Used for starting fresh. Verify every table is empty afterward.
   test("deletes all persons, teams, and team members", async () => {
     const person = await testPrisma.person.create({
       data: { name: "Alice", email: "alice@test.com" },
@@ -585,6 +651,7 @@ describe("resetAll", () => {
     expect(await testPrisma.teamMember.findMany()).toHaveLength(0);
   });
 
+  // Resetting an already empty database should just work without complaining.
   test("succeeds on empty database", async () => {
     await expect(resetAll()).resolves.not.toThrow();
   });
