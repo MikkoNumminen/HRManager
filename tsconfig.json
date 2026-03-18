@@ -21,8 +21,15 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "target": "ES2017"
+    "target": "ES2017",
+    "types": ["@testing-library/jest-dom"]
   },
-  "include": ["src", "next-env.d.ts", ".next/types/**/*.ts", ".next/dev/types/**/*.ts"],
+  "include": [
+    "src",
+    "jest.setup.ts",
+    "next-env.d.ts",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
+  ],
   "exclude": ["node_modules"]
 }

@@ -65,17 +65,26 @@ export default async function Home() {
   return (
     <>
       <TopBar title="Human Resources Management System" />
-      {session && canManagePersons ? (
-        <Link href="/managePersons" sx={{ textDecoration: "none" }}>
-          <Tooltip title="Go to Persons Manager" placement="right" arrow>
-            <Box component="div" sx={boxStyles}>
-              <Typography variant="h6" gutterBottom>
-                Persons
-              </Typography>
-              <PersonTable persons={persons} />
-            </Box>
-          </Tooltip>
-        </Link>
+      {session ? (
+        canManagePersons ? (
+          <Link href="/managePersons" sx={{ textDecoration: "none" }}>
+            <Tooltip title="Go to Persons Manager" placement="right" arrow>
+              <Box component="div" sx={boxStyles}>
+                <Typography variant="h6" gutterBottom>
+                  Persons
+                </Typography>
+                <PersonTable persons={persons} />
+              </Box>
+            </Tooltip>
+          </Link>
+        ) : (
+          <Box sx={{ ...boxStyles, "&:hover": {}, cursor: "default" }}>
+            <Typography variant="h6" gutterBottom>
+              Persons
+            </Typography>
+            <PersonTable persons={persons} />
+          </Box>
+        )
       ) : (
         <Box sx={{ ...boxStyles, "&:hover": {}, cursor: "default" }}>
           <Typography variant="h6" gutterBottom>
@@ -85,17 +94,26 @@ export default async function Home() {
         </Box>
       )}
 
-      {session && canManageTeams ? (
-        <Link href="/manageTeams" sx={{ textDecoration: "none" }}>
-          <Tooltip title="Go to Teams Manager" placement="right" arrow>
-            <Box component="div" sx={boxStyles}>
-              <Typography variant="h6" gutterBottom>
-                Teams
-              </Typography>
-              <TeamsTable combinedTeams={teamsData} />
-            </Box>
-          </Tooltip>
-        </Link>
+      {session ? (
+        canManageTeams ? (
+          <Link href="/manageTeams" sx={{ textDecoration: "none" }}>
+            <Tooltip title="Go to Teams Manager" placement="right" arrow>
+              <Box component="div" sx={boxStyles}>
+                <Typography variant="h6" gutterBottom>
+                  Teams
+                </Typography>
+                <TeamsTable combinedTeams={teamsData} />
+              </Box>
+            </Tooltip>
+          </Link>
+        ) : (
+          <Box sx={{ ...boxStyles, "&:hover": {}, cursor: "default" }}>
+            <Typography variant="h6" gutterBottom>
+              Teams
+            </Typography>
+            <TeamsTable combinedTeams={teamsData} />
+          </Box>
+        )
       ) : (
         <Box sx={{ ...boxStyles, "&:hover": {}, cursor: "default" }}>
           <Typography variant="h6" gutterBottom>
