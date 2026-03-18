@@ -2,6 +2,7 @@
 import { prisma } from "@/db";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { requirePermission, seedPermissions } from "@/permissions";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -12,6 +13,7 @@ function validateUUID(value: string, fieldName: string): void {
 }
 
 export async function createPerson(data: FormData) {
+  await requirePermission("person:create");
   const name = data.get("name")?.valueOf();
   if (typeof name !== "string" || name.trim().length === 0) {
     throw new Error("Invalid Name");
@@ -44,6 +46,7 @@ export async function createPerson(data: FormData) {
 }
 
 export async function removePerson(data: FormData) {
+  await requirePermission("person:delete");
   const personIDs = data.getAll("personID").filter((v): v is string => typeof v === "string");
   if (personIDs.length === 0) {
     throw new Error("No personID selected");
@@ -68,6 +71,7 @@ export async function removePerson(data: FormData) {
 }
 
 export async function updatePosition(data: FormData) {
+  await requirePermission("person:update_position");
   const personID = data.get("personID")?.toString();
   if (!personID) {
     throw new Error("No personID provided");
@@ -89,6 +93,7 @@ export async function updatePosition(data: FormData) {
 }
 
 export async function updateEmail(data: FormData) {
+  await requirePermission("person:update_email");
   const personID = data.get("personID")?.toString();
   if (!personID) {
     throw new Error("No personID selected");
@@ -118,6 +123,7 @@ export async function updateEmail(data: FormData) {
 }
 
 export async function addManager(data: FormData) {
+  await requirePermission("team:update_manager");
   const teamIDs = data.getAll("teamID").filter((v): v is string => typeof v === "string");
   const personID = data.get("personID")?.toString();
 
@@ -160,6 +166,7 @@ export async function addManager(data: FormData) {
 }
 
 export async function addMember(data: FormData) {
+  await requirePermission("team:add_member");
   const teamID = data.get("teamID")?.toString();
   const personID = data.get("personID")?.toString();
 
@@ -198,6 +205,7 @@ export async function addMember(data: FormData) {
 }
 
 export async function createTeam(data: FormData) {
+  await requirePermission("team:create");
   const name = data.get("name")?.valueOf();
   if (typeof name !== "string" || name.trim().length === 0) {
     throw new Error("Invalid Name");
@@ -216,6 +224,7 @@ export async function createTeam(data: FormData) {
 }
 
 export async function removeTeam(data: FormData) {
+  await requirePermission("team:delete");
   const teamIDs = data.getAll("teamID").filter((v): v is string => typeof v === "string");
   if (teamIDs.length === 0) {
     throw new Error("No teamID selected");
@@ -235,6 +244,7 @@ export async function removeTeam(data: FormData) {
 }
 
 export async function removeMember(data: FormData) {
+  await requirePermission("team:remove_member");
   const teamID = data.get("teamID")?.toString();
   const personID = data.get("personID")?.toString();
 
@@ -283,6 +293,7 @@ export async function removeMember(data: FormData) {
 }
 
 export async function resetAll() {
+  await requirePermission("data:reset");
   await prisma.$transaction(async (prisma) => {
     await prisma.teamMember.deleteMany();
     await prisma.team.deleteMany();
@@ -294,6 +305,7 @@ export async function resetAll() {
 }
 
 export async function seedMockData(clearExisting: boolean = true) {
+  await requirePermission("data:seed");
   await prisma.$transaction(async (prisma) => {
     if (clearExisting) {
       await prisma.teamMember.deleteMany();
@@ -360,4 +372,82 @@ export async function seedMockData(clearExisting: boolean = true) {
   revalidatePath("/");
   revalidatePath("/managePersons");
   revalidatePath("/manageTeams");
+}
+
+export async function initializePermissions() {
+  await requirePermission("admin:manage_users");
+  await seedPermissions();
+}
+
+export async function updateUserRole(data: FormData) {
+  await requirePermission("admin:manage_users");
+
+  const userId = data.get("userId")?.toString();
+  const newRole = data.get("role")?.toString();
+
+  if (!userId) throw new Error("No userId provided");
+  if (!newRole) throw new Error("No role provided");
+  validateUUID(userId, "userId");
+
+  const validRoles = ["administrator", "user", "guest"];
+  if (!validRoles.includes(newRole)) {
+    throw new Error("Invalid role. Cannot assign superuser role through the UI.");
+  }
+
+  const targetUser = await prisma.user.findUnique({ where: { id: userId } });
+  if (!targetUser) throw new Error("User not found");
+  if (targetUser.role === "superuser") {
+    throw new Error("Cannot change the superuser's role");
+  }
+
+  await prisma.$transaction(async (tx) => {
+    await tx.user.update({
+      where: { id: userId },
+      data: { role: newRole },
+    });
+  });
+  revalidatePath("/admin");
+}
+
+export async function updateUserPermission(data: FormData) {
+  await requirePermission("admin:assign_permissions");
+
+  const userId = data.get("userId")?.toString();
+  const permissionKey = data.get("permissionKey")?.toString();
+  const action = data.get("action")?.toString();
+
+  if (!userId) throw new Error("No userId provided");
+  if (!permissionKey) throw new Error("No permissionKey provided");
+  if (!action) throw new Error("No action provided");
+  validateUUID(userId, "userId");
+
+  const targetUser = await prisma.user.findUnique({ where: { id: userId } });
+  if (!targetUser) throw new Error("User not found");
+  if (targetUser.role === "superuser") {
+    throw new Error("Cannot modify superuser permissions");
+  }
+
+  const permission = await prisma.permission.findUnique({ where: { key: permissionKey } });
+  if (!permission) throw new Error("Permission not found");
+
+  await prisma.$transaction(async (tx) => {
+    if (action === "reset") {
+      await tx.userPermission.deleteMany({
+        where: { userId, permissionId: permission.id },
+      });
+    } else {
+      const granted = action === "grant";
+      await tx.userPermission.upsert({
+        where: {
+          userId_permissionId: {
+            userId,
+            permissionId: permission.id,
+          },
+        },
+        update: { granted },
+        create: { userId, permissionId: permission.id, granted },
+      });
+    }
+  });
+  revalidatePath("/admin");
 }
