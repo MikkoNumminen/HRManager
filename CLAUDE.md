@@ -76,6 +76,7 @@ prisma/
 - Update affected tests when modifying component APIs.
 - Tests live in `src/tests/`.
 - Do not mock core logic — test real functionality.
+- Always add a comment above each test explaining what it does in plain, simple language ("Barney style").
 
 ## Roadmap (do not implement unless asked)
 
