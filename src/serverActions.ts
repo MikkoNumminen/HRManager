@@ -368,29 +368,34 @@ export async function seedMockData(clearExisting: boolean = true) {
         await prisma.teamMember.create({ data: m });
       }
     }
-    // Seed mock users — never touch the real superuser
-    const mockUserSeeds = [
-      { email: "admin@example.com", name: "Jane Admin", role: "administrator" },
-      { email: "user1@example.com", name: "John User", role: "user" },
-      { email: "user2@example.com", name: "Sarah User", role: "user" },
-      { email: "guest@example.com", name: "Demo Guest", role: "guest" },
-    ];
+  });
 
-    if (clearExisting) {
-      // Delete mock users (non-superuser with @example.com emails) and their permission overrides
-      await prisma.userPermission.deleteMany({
+  // Seed mock users in a separate transaction — seedPermissions() opens its own
+  // transaction internally, so this must run outside the main transaction to avoid
+  // SQLite deadlock (single-writer)
+  const mockUserSeeds = [
+    { email: "admin@example.com", name: "Jane Admin", role: "administrator" },
+    { email: "user1@example.com", name: "John User", role: "user" },
+    { email: "user2@example.com", name: "Sarah User", role: "user" },
+    { email: "guest@example.com", name: "Demo Guest", role: "guest" },
+  ];
+
+  if (clearExisting) {
+    await prisma.$transaction(async (tx) => {
+      await tx.userPermission.deleteMany({
         where: { user: { email: { endsWith: "@example.com" } } },
       });
-      await prisma.user.deleteMany({
+      await tx.user.deleteMany({
         where: { email: { endsWith: "@example.com" } },
       });
-    }
+    });
+  }
 
-    // Ensure permission catalog exists
-    await seedPermissions();
+  await seedPermissions();
 
+  await prisma.$transaction(async (tx) => {
     for (const u of mockUserSeeds) {
-      const user = await prisma.user.upsert({
+      const user = await tx.user.upsert({
         where: { email: u.email },
         update: {},
         create: u,
@@ -398,9 +403,9 @@ export async function seedMockData(clearExisting: boolean = true) {
 
       // Give admin@example.com a custom override: grant data:seed
       if (u.email === "admin@example.com") {
-        const seedPerm = await prisma.permission.findUnique({ where: { key: "data:seed" } });
+        const seedPerm = await tx.permission.findUnique({ where: { key: "data:seed" } });
         if (seedPerm) {
-          await prisma.userPermission.upsert({
+          await tx.userPermission.upsert({
             where: { userId_permissionId: { userId: user.id, permissionId: seedPerm.id } },
             update: { granted: true },
             create: { userId: user.id, permissionId: seedPerm.id, granted: true },
@@ -410,11 +415,11 @@ export async function seedMockData(clearExisting: boolean = true) {
 
       // Give user1@example.com a custom override: grant person:create
       if (u.email === "user1@example.com") {
-        const createPerm = await prisma.permission.findUnique({
+        const createPerm = await tx.permission.findUnique({
           where: { key: "person:create" },
         });
         if (createPerm) {
-          await prisma.userPermission.upsert({
+          await tx.userPermission.upsert({
             where: { userId_permissionId: { userId: user.id, permissionId: createPerm.id } },
             update: { granted: true },
             create: { userId: user.id, permissionId: createPerm.id, granted: true },
@@ -423,6 +428,7 @@ export async function seedMockData(clearExisting: boolean = true) {
       }
     }
   });
+
   revalidatePath("/");
   revalidatePath("/managePersons");
   revalidatePath("/manageTeams");

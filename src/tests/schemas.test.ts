@@ -1,4 +1,10 @@
-import { PersonSchema, TeamMemberSchema, TeamSchema } from "@/schemas";
+import {
+  PersonSchema,
+  TeamMemberSchema,
+  TeamSchema,
+  UserSchema,
+  PermissionsSchema,
+} from "@/schemas";
 
 const VALID_UUID = "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11";
 const VALID_UUID_2 = "c2ddfe11-be2d-4af9-8c7e-8ddadf592c33";
@@ -200,5 +206,118 @@ describe("TeamSchema", () => {
   test("rejects non-date createdAt", () => {
     const team = { ...validTeam, createdAt: "yesterday" };
     expect(() => TeamSchema.parse(team)).toThrow();
+  });
+});
+
+describe("UserSchema", () => {
+  const validUser = {
+    id: VALID_UUID,
+    email: "alice@example.com",
+    name: "Alice",
+    image: "https://example.com/avatar.png",
+    role: "administrator" as const,
+    createdAt: NOW,
+    updatedAt: NOW,
+  };
+
+  // A complete user with all fields should parse without any issues.
+  test("accepts a fully valid user", () => {
+    expect(() => UserSchema.parse(validUser)).not.toThrow();
+  });
+
+  // Name and image are optional in OAuth — some providers don't give them.
+  test("accepts null name and image", () => {
+    const user = { ...validUser, name: null, image: null };
+    const result = UserSchema.parse(user);
+    expect(result.name).toBeNull();
+    expect(result.image).toBeNull();
+  });
+
+  // All four roles should be accepted — superuser, administrator, user, guest.
+  test("accepts all four valid roles", () => {
+    for (const role of ["superuser", "administrator", "user", "guest"]) {
+      expect(() => UserSchema.parse({ ...validUser, role })).not.toThrow();
+    }
+  });
+
+  // A made-up role like "moderator" should be rejected — only the four defined roles are valid.
+  test("rejects invalid role", () => {
+    const user = { ...validUser, role: "moderator" };
+    expect(() => UserSchema.parse(user)).toThrow();
+  });
+
+  // The email must be a proper email format — "not-an-email" won't fly.
+  test("rejects invalid email format", () => {
+    const user = { ...validUser, email: "not-an-email" };
+    expect(() => UserSchema.parse(user)).toThrow();
+  });
+
+  // Every user needs an email — it's how we identify them from OAuth.
+  test("rejects missing email", () => {
+    const { email: _, ...user } = validUser;
+    expect(() => UserSchema.parse(user)).toThrow();
+  });
+
+  // The ID has to be a proper UUID, not some random text.
+  test("rejects invalid UUID for id", () => {
+    const user = { ...validUser, id: "bad-id" };
+    expect(() => UserSchema.parse(user)).toThrow();
+  });
+
+  // Every user needs an ID — can't skip it.
+  test("rejects missing id", () => {
+    const { id: _, ...user } = validUser;
+    expect(() => UserSchema.parse(user)).toThrow();
+  });
+
+  // Timestamps must be real Date objects, not strings or numbers.
+  test("rejects non-date createdAt", () => {
+    const user = { ...validUser, createdAt: "yesterday" };
+    expect(() => UserSchema.parse(user)).toThrow();
+  });
+
+  // Same for updatedAt — must be a Date.
+  test("rejects non-date updatedAt", () => {
+    const user = { ...validUser, updatedAt: 12345 };
+    expect(() => UserSchema.parse(user)).toThrow();
+  });
+
+  // What goes in should come back out exactly the same.
+  test("preserves all fields after parsing", () => {
+    const result = UserSchema.parse(validUser);
+    expect(result).toEqual(validUser);
+  });
+});
+
+describe("PermissionsSchema", () => {
+  // A map of permission keys to booleans should parse fine.
+  test("accepts a valid permissions record", () => {
+    const perms = { "person:create": true, "person:delete": false, "team:read": true };
+    expect(() => PermissionsSchema.parse(perms)).not.toThrow();
+  });
+
+  // An empty permissions object is valid — it just means no permissions listed.
+  test("accepts an empty object", () => {
+    const result = PermissionsSchema.parse({});
+    expect(result).toEqual({});
+  });
+
+  // Permission values must be booleans — strings like "yes" are not allowed.
+  test("rejects non-boolean values", () => {
+    const perms = { "person:create": "yes" };
+    expect(() => PermissionsSchema.parse(perms)).toThrow();
+  });
+
+  // Permission values must be booleans — numbers are not allowed either.
+  test("rejects numeric values", () => {
+    const perms = { "person:create": 1 };
+    expect(() => PermissionsSchema.parse(perms)).toThrow();
+  });
+
+  // What goes in should come back out exactly the same.
+  test("preserves all entries after parsing", () => {
+    const perms = { "data:reset": true, "data:seed": false };
+    const result = PermissionsSchema.parse(perms);
+    expect(result).toEqual(perms);
   });
 });
