@@ -38,6 +38,8 @@ import {
   removeTeam,
   removeMember,
   resetAll,
+  updateUserRole,
+  updateUserPermission,
 } from "@/serverActions";
 
 // Helper to build FormData — server actions receive form submissions,
@@ -667,5 +669,220 @@ describe("resetAll", () => {
   // Resetting an already empty database should just work without complaining.
   test("succeeds on empty database", async () => {
     await expect(resetAll()).resolves.not.toThrow();
+  });
+});
+
+describe("updateUserRole", () => {
+  beforeEach(() => cleanDb());
+  afterAll(async () => {
+    await cleanDb();
+    await testPrisma.$disconnect();
+  });
+
+  // Change a user's role from "user" to "administrator" and verify it saved.
+  test("updates a user's role", async () => {
+    const user = await testPrisma.user.create({
+      data: { email: "alice@test.com", name: "Alice", role: "user" },
+    });
+
+    await updateUserRole(formData({ userId: user.id, role: "administrator" }));
+
+    const updated = await testPrisma.user.findUnique({ where: { id: user.id } });
+    expect(updated!.role).toBe("administrator");
+  });
+
+  // You can't assign the "superuser" role through the UI — it's bootstrapped only.
+  test("throws when trying to assign superuser role", async () => {
+    const user = await testPrisma.user.create({
+      data: { email: "alice@test.com", name: "Alice", role: "user" },
+    });
+
+    await expect(updateUserRole(formData({ userId: user.id, role: "superuser" }))).rejects.toThrow(
+      "Invalid role",
+    );
+  });
+
+  // Can't change the superuser's role — it's permanent and locked.
+  test("throws when trying to change the superuser's role", async () => {
+    const user = await testPrisma.user.create({
+      data: { email: "super@test.com", name: "Super", role: "superuser" },
+    });
+
+    await expect(updateUserRole(formData({ userId: user.id, role: "user" }))).rejects.toThrow(
+      "Cannot change the superuser's role",
+    );
+  });
+
+  // Can't update a user that doesn't exist.
+  test("throws when user not found", async () => {
+    await expect(
+      updateUserRole(formData({ userId: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", role: "user" })),
+    ).rejects.toThrow("User not found");
+  });
+
+  // UUID validation — garbage IDs get caught early.
+  test("throws on invalid UUID", async () => {
+    await expect(updateUserRole(formData({ userId: "bad-id", role: "user" }))).rejects.toThrow(
+      "Invalid userId format",
+    );
+  });
+
+  // Both fields are required — no partial submissions.
+  test("throws when userId is missing", async () => {
+    await expect(updateUserRole(formData({ role: "user" }))).rejects.toThrow("No userId provided");
+  });
+
+  // Role field is also required.
+  test("throws when role is missing", async () => {
+    await expect(
+      updateUserRole(formData({ userId: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" })),
+    ).rejects.toThrow("No role provided");
+  });
+});
+
+describe("updateUserPermission", () => {
+  beforeEach(() => cleanDb());
+  afterAll(async () => {
+    await cleanDb();
+    await testPrisma.$disconnect();
+  });
+
+  // Grant a permission override to a user and verify it's stored.
+  test("grants a permission override", async () => {
+    const user = await testPrisma.user.create({
+      data: { email: "alice@test.com", name: "Alice", role: "user" },
+    });
+    const perm = await testPrisma.permission.create({
+      data: { key: "person:create", description: "Create persons" },
+    });
+
+    await updateUserPermission(
+      formData({ userId: user.id, permissionKey: "person:create", action: "grant" }),
+    );
+
+    const override = await testPrisma.userPermission.findUnique({
+      where: { userId_permissionId: { userId: user.id, permissionId: perm.id } },
+    });
+    expect(override).not.toBeNull();
+    expect(override!.granted).toBe(true);
+  });
+
+  // Deny a permission explicitly — creates an override with granted=false.
+  test("denies a permission override", async () => {
+    const user = await testPrisma.user.create({
+      data: { email: "alice@test.com", name: "Alice", role: "administrator" },
+    });
+    const perm = await testPrisma.permission.create({
+      data: { key: "person:create", description: "Create persons" },
+    });
+
+    await updateUserPermission(
+      formData({ userId: user.id, permissionKey: "person:create", action: "deny" }),
+    );
+
+    const override = await testPrisma.userPermission.findUnique({
+      where: { userId_permissionId: { userId: user.id, permissionId: perm.id } },
+    });
+    expect(override).not.toBeNull();
+    expect(override!.granted).toBe(false);
+  });
+
+  // Reset removes the override entirely — user falls back to role default.
+  test("resets a permission override", async () => {
+    const user = await testPrisma.user.create({
+      data: { email: "alice@test.com", name: "Alice", role: "user" },
+    });
+    const perm = await testPrisma.permission.create({
+      data: { key: "person:create", description: "Create persons" },
+    });
+    await testPrisma.userPermission.create({
+      data: { userId: user.id, permissionId: perm.id, granted: true },
+    });
+
+    await updateUserPermission(
+      formData({ userId: user.id, permissionKey: "person:create", action: "reset" }),
+    );
+
+    const overrides = await testPrisma.userPermission.findMany({
+      where: { userId: user.id },
+    });
+    expect(overrides).toHaveLength(0);
+  });
+
+  // Granting the same permission twice should upsert, not duplicate.
+  test("upserts when granting an already-overridden permission", async () => {
+    const user = await testPrisma.user.create({
+      data: { email: "alice@test.com", name: "Alice", role: "user" },
+    });
+    const perm = await testPrisma.permission.create({
+      data: { key: "person:create", description: "Create persons" },
+    });
+    await testPrisma.userPermission.create({
+      data: { userId: user.id, permissionId: perm.id, granted: false },
+    });
+
+    await updateUserPermission(
+      formData({ userId: user.id, permissionKey: "person:create", action: "grant" }),
+    );
+
+    const override = await testPrisma.userPermission.findUnique({
+      where: { userId_permissionId: { userId: user.id, permissionId: perm.id } },
+    });
+    expect(override!.granted).toBe(true);
+  });
+
+  // Can't modify the superuser's permissions — they always have everything.
+  test("throws when trying to modify superuser permissions", async () => {
+    const user = await testPrisma.user.create({
+      data: { email: "super@test.com", name: "Super", role: "superuser" },
+    });
+    await testPrisma.permission.create({
+      data: { key: "person:create", description: "Create persons" },
+    });
+
+    await expect(
+      updateUserPermission(
+        formData({ userId: user.id, permissionKey: "person:create", action: "grant" }),
+      ),
+    ).rejects.toThrow("Cannot modify superuser permissions");
+  });
+
+  // Can't modify permissions for a user that doesn't exist.
+  test("throws when user not found", async () => {
+    await testPrisma.permission.create({
+      data: { key: "person:create", description: "Create persons" },
+    });
+
+    await expect(
+      updateUserPermission(
+        formData({
+          userId: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+          permissionKey: "person:create",
+          action: "grant",
+        }),
+      ),
+    ).rejects.toThrow("User not found");
+  });
+
+  // Can't grant a permission that doesn't exist in the catalog.
+  test("throws when permission key not found", async () => {
+    const user = await testPrisma.user.create({
+      data: { email: "alice@test.com", name: "Alice", role: "user" },
+    });
+
+    await expect(
+      updateUserPermission(
+        formData({ userId: user.id, permissionKey: "fake:permission", action: "grant" }),
+      ),
+    ).rejects.toThrow("Permission not found");
+  });
+
+  // UUID validation on the userId field.
+  test("throws on invalid UUID", async () => {
+    await expect(
+      updateUserPermission(
+        formData({ userId: "bad", permissionKey: "person:create", action: "grant" }),
+      ),
+    ).rejects.toThrow("Invalid userId format");
   });
 });

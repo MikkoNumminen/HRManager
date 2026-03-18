@@ -11,7 +11,7 @@ jest.mock("@/auth", () => ({
   auth: jest.fn(),
 }));
 
-import { getPersons, getTeams } from "@/queries";
+import { getPersons, getTeams, getUsers, getUserById, getAllPermissionKeys } from "@/queries";
 
 describe("getPersons", () => {
   beforeEach(async () => {
@@ -216,5 +216,142 @@ describe("getTeams", () => {
     expect(team.createdAt).toBeInstanceOf(Date);
     expect(team.updatedAt).toBeInstanceOf(Date);
     expect(Array.isArray(team.members)).toBe(true);
+  });
+});
+
+describe("getUsers", () => {
+  beforeEach(async () => {
+    await cleanDb();
+  });
+
+  afterAll(async () => {
+    await cleanDb();
+    await testPrisma.$disconnect();
+  });
+
+  // An empty user table should return an empty list.
+  test("returns empty array when no users exist", async () => {
+    const result = await getUsers();
+    expect(result).toEqual([]);
+  });
+
+  // Add two users and verify both come back with correct data.
+  test("returns all users from the database", async () => {
+    await testPrisma.user.create({
+      data: { email: "alice@test.com", name: "Alice", role: "administrator" },
+    });
+    await testPrisma.user.create({
+      data: { email: "bob@test.com", name: "Bob", role: "user" },
+    });
+
+    const result = await getUsers();
+    expect(result).toHaveLength(2);
+    const emails = result.map((u) => u.email).sort();
+    expect(emails).toEqual(["alice@test.com", "bob@test.com"]);
+  });
+
+  // Users should come back sorted by createdAt (earliest first).
+  test("returns users ordered by creation date", async () => {
+    await testPrisma.user.create({
+      data: { email: "second@test.com", name: "Second", role: "user" },
+    });
+    await testPrisma.user.create({
+      data: { email: "first@test.com", name: "First", role: "superuser" },
+    });
+
+    const result = await getUsers();
+    expect(result[0].email).toBe("second@test.com");
+    expect(result[1].email).toBe("first@test.com");
+  });
+
+  // Check that every field has the right type after Zod parsing.
+  test("returns users with correct field types", async () => {
+    await testPrisma.user.create({
+      data: { email: "alice@test.com", name: "Alice", role: "user" },
+    });
+
+    const [user] = await getUsers();
+    expect(typeof user.id).toBe("string");
+    expect(typeof user.email).toBe("string");
+    expect(typeof user.role).toBe("string");
+    expect(user.createdAt).toBeInstanceOf(Date);
+    expect(user.updatedAt).toBeInstanceOf(Date);
+  });
+
+  // Name and image are nullable — OAuth doesn't always provide them.
+  test("returns null for missing name and image", async () => {
+    await testPrisma.user.create({
+      data: { email: "anon@test.com", role: "user" },
+    });
+
+    const [user] = await getUsers();
+    expect(user.name).toBeNull();
+    expect(user.image).toBeNull();
+  });
+});
+
+describe("getUserById", () => {
+  beforeEach(async () => {
+    await cleanDb();
+  });
+
+  afterAll(async () => {
+    await cleanDb();
+    await testPrisma.$disconnect();
+  });
+
+  // Look up a user by ID and get back their data plus resolved permissions.
+  test("returns user with overrides and resolved permissions", async () => {
+    const user = await testPrisma.user.create({
+      data: { email: "alice@test.com", name: "Alice", role: "user" },
+    });
+
+    const result = await getUserById(user.id);
+    expect(result).not.toBeNull();
+    expect(result!.email).toBe("alice@test.com");
+    expect(result!.overrides).toEqual([]);
+    expect(result!.resolvedPermissions).toBeDefined();
+    expect(typeof result!.resolvedPermissions["person:read"]).toBe("boolean");
+  });
+
+  // A user with permission overrides should have them listed.
+  test("includes permission overrides", async () => {
+    const user = await testPrisma.user.create({
+      data: { email: "alice@test.com", name: "Alice", role: "user" },
+    });
+    const perm = await testPrisma.permission.create({
+      data: { key: "person:create", description: "Create persons" },
+    });
+    await testPrisma.userPermission.create({
+      data: { userId: user.id, permissionId: perm.id, granted: true },
+    });
+
+    const result = await getUserById(user.id);
+    expect(result!.overrides).toHaveLength(1);
+    expect(result!.overrides[0]).toEqual({ key: "person:create", granted: true });
+  });
+
+  // Looking up a non-existent user should return null, not crash.
+  test("returns null for non-existent user", async () => {
+    const result = await getUserById("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11");
+    expect(result).toBeNull();
+  });
+});
+
+describe("getAllPermissionKeys", () => {
+  // Should return all 15 permission keys defined in the system.
+  test("returns all 15 permission keys", async () => {
+    const keys = await getAllPermissionKeys();
+    expect(keys).toHaveLength(15);
+    expect(keys).toContain("person:create");
+    expect(keys).toContain("admin:manage_users");
+  });
+
+  // The returned array should be a copy, not a reference to the original.
+  test("returns a new array (not the original reference)", async () => {
+    const keys1 = await getAllPermissionKeys();
+    const keys2 = await getAllPermissionKeys();
+    expect(keys1).not.toBe(keys2);
+    expect(keys1).toEqual(keys2);
   });
 });
