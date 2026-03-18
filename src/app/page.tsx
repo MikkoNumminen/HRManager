@@ -39,16 +39,33 @@ import ResetAll from "@/components/ResetAll";
 import { boxStyles } from "@/muiStyles";
 import { getPersons, getTeams } from "@/queries";
 import { auth } from "@/auth";
+import { getUserPermissions } from "@/permissions";
 
 export default async function Home() {
   const session = await auth();
   const persons = await getPersons();
   const teamsData = await getTeams();
+  const permissions = await getUserPermissions();
+
+  const canManagePersons =
+    permissions["person:create"] ||
+    permissions["person:delete"] ||
+    permissions["person:update_position"] ||
+    permissions["person:update_email"];
+
+  const canManageTeams =
+    permissions["team:create"] ||
+    permissions["team:delete"] ||
+    permissions["team:update_manager"] ||
+    permissions["team:add_member"] ||
+    permissions["team:remove_member"];
+
+  const canAccessDevTools = permissions["data:reset"] || permissions["data:seed"];
 
   return (
     <>
       <TopBar title="Human Resources Management System" />
-      {session ? (
+      {session && canManagePersons ? (
         <Link href="/managePersons" sx={{ textDecoration: "none" }}>
           <Tooltip title="Go to Persons Manager" placement="right" arrow>
             <Box component="div" sx={boxStyles}>
@@ -68,7 +85,7 @@ export default async function Home() {
         </Box>
       )}
 
-      {session ? (
+      {session && canManageTeams ? (
         <Link href="/manageTeams" sx={{ textDecoration: "none" }}>
           <Tooltip title="Go to Teams Manager" placement="right" arrow>
             <Box component="div" sx={boxStyles}>
@@ -88,7 +105,7 @@ export default async function Home() {
         </Box>
       )}
 
-      {session && <ResetAll />}
+      {session && canAccessDevTools && <ResetAll permissions={permissions} />}
     </>
   );
 }

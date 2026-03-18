@@ -6,17 +6,27 @@ import { colors } from "@/muiStyles";
 import { getTeams } from "@/queries";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
+import { getUserPermissions } from "@/permissions";
 
 export default async function ManageTeamsPage() {
   const session = await auth();
   if (!session) redirect("/");
+
+  const permissions = await getUserPermissions();
+  const canManageTeams =
+    permissions["team:create"] ||
+    permissions["team:delete"] ||
+    permissions["team:update_manager"] ||
+    permissions["team:add_member"] ||
+    permissions["team:remove_member"];
+  if (!canManageTeams) redirect("/");
 
   const teams = await getTeams();
 
   return (
     <>
       <TopBar title="Manage Teams" backHref="/" />
-      <AddTeamForm />
+      {permissions["team:create"] && <AddTeamForm />}
       <Box sx={{ border: `1px solid ${colors.slate300}`, borderRadius: "4px", padding: "20px" }}>
         <Typography variant="h5" mb={1}>
           Teams

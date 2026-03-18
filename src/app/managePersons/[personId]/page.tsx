@@ -6,6 +6,7 @@ import { getPersons } from "@/queries";
 import { Typography } from "@mui/material";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
+import { getUserPermissions } from "@/permissions";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -13,6 +14,7 @@ export default async function PersonPage({ params }: { params: Promise<{ personI
   const session = await auth();
   if (!session) redirect("/");
 
+  const permissions = await getUserPermissions();
   const { personId } = await params;
 
   if (!UUID_REGEX.test(personId)) {
@@ -29,9 +31,13 @@ export default async function PersonPage({ params }: { params: Promise<{ personI
   return (
     <>
       <TopBar title={`Manage ${person.name}`} backHref="/managePersons" />
-      <RemovePersonForm personID={personId} />
-      <UpdatePositionForm personID={personId} currentPosition={person.position || undefined} />
-      <UpdateEmailForm personID={personId} currentEmail={person.email || undefined} />
+      {permissions["person:delete"] && <RemovePersonForm personID={personId} />}
+      {permissions["person:update_position"] && (
+        <UpdatePositionForm personID={personId} currentPosition={person.position || undefined} />
+      )}
+      {permissions["person:update_email"] && (
+        <UpdateEmailForm personID={personId} currentEmail={person.email || undefined} />
+      )}
     </>
   );
 }

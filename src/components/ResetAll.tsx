@@ -14,8 +14,9 @@ import {
 } from "@mui/material";
 import { useRef, useState, useTransition } from "react";
 import ConfirmDialog from "./ConfirmDialog";
+import { Permissions } from "@/schemas";
 
-export default function ResetAll() {
+export default function ResetAll({ permissions }: { permissions: Permissions }) {
   const formRef = useRef<HTMLFormElement>(null);
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
   const [seedDialogOpen, setSeedDialogOpen] = useState(false);
@@ -41,24 +42,32 @@ export default function ResetAll() {
       </Box>
       {error && <Typography color="error">{error}</Typography>}
       <Box display="flex" gap={1} justifyContent="flex-end">
-        <Button disabled={isPending} onClick={() => setSeedDialogOpen(true)} sx={smallButtonStyles}>
-          Load Mock Data
-        </Button>
-        <Button
-          disabled={isPending}
-          onClick={() => setResetDialogOpen(true)}
-          sx={{
-            ...smallButtonStyles,
-            borderColor: "#f87171",
-            color: "#f87171",
-            "&:hover": {
-              backgroundColor: "rgba(248, 113, 113, 0.1)",
+        {permissions["data:seed"] && (
+          <Button
+            disabled={isPending}
+            onClick={() => setSeedDialogOpen(true)}
+            sx={smallButtonStyles}
+          >
+            Load Mock Data
+          </Button>
+        )}
+        {permissions["data:reset"] && (
+          <Button
+            disabled={isPending}
+            onClick={() => setResetDialogOpen(true)}
+            sx={{
+              ...smallButtonStyles,
               borderColor: "#f87171",
-            },
-          }}
-        >
-          Reset All Data
-        </Button>
+              color: "#f87171",
+              "&:hover": {
+                backgroundColor: "rgba(248, 113, 113, 0.1)",
+                borderColor: "#f87171",
+              },
+            }}
+          >
+            Reset All Data
+          </Button>
+        )}
       </Box>
       <Box
         component="form"
