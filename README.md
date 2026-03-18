@@ -22,7 +22,7 @@ A full-stack HR management system for managing employees and teams — built wit
 - **Dark UI** — MUI dark theme with consistent component styling throughout
 - **Type-safe** — end-to-end TypeScript with Zod schema validation and centralized inferred types
 - **Server-first** — async Server Components for data fetching, Server Actions for mutations
-- **Tested** — Jest unit and integration tests covering core components and server actions
+- **Thoroughly tested** — 218 Jest tests across three layers: Zod schemas, Prisma queries, server actions, and all UI components (99%+ line coverage)
 
 ---
 
@@ -94,10 +94,12 @@ Open [http://localhost:3000](http://localhost:3000).
 ### Run tests
 
 ```bash
-npm test
+npm test            # UI + schema tests (jsdom)
+npm run test:server # query + server action tests (Node, real SQLite)
+npm run test:all    # both suites
 ```
 
-> Runs all Jest unit and integration tests. Tests live in `src/tests/` and cover the core components and server actions. Run this after making changes to make sure nothing is broken.
+> The project has **218 tests** split into two suites. `npm test` runs the client-side tests — component rendering, user interactions, form validation, and Zod schema parsing — all in a jsdom environment. `npm run test:server` runs the server-side tests against a real SQLite test database — every Prisma query, every server action mutation, UUID validation, duplicate prevention, and cascade deletes. The test database (`prisma/test.db`) is created automatically the first time you run it and never touches your dev data.
 
 ---
 
@@ -157,6 +159,29 @@ src/
 prisma/
 └── schema.prisma     # Data model and migrations
 ```
+
+---
+
+## Testing
+
+218 tests across 22 test suites, covering every layer of the application:
+
+| Layer              | Tests | What's covered                                                                                                                                                                |
+| ------------------ | ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Zod schemas**    | 27    | Valid data, missing fields, invalid UUIDs, nullable fields, wrong types                                                                                                       |
+| **Prisma queries** | 12    | `getPersons` and `getTeams` against a real SQLite DB — empty state, null managers, member shapes, multi-team scenarios                                                        |
+| **Server actions** | 50    | All 10 mutations — create, update, delete for persons/teams/members, UUID validation, duplicate email prevention, cascade deletes, whitespace trimming, transaction atomicity |
+| **UI components**  | 129   | Rendering, user interactions, keyboard accessibility, form validation, minimal/chip views, empty states, null field handling, router navigation                               |
+
+```
+Coverage summary
+  Statements : 98.74%
+  Branches   : 90.60%
+  Functions  : 98.73%
+  Lines      : 99.64%
+```
+
+Server-side tests run against an isolated test database (`prisma/test.db`) — the dev database is never touched.
 
 ---
 
