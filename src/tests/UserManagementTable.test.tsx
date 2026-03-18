@@ -1,9 +1,10 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import UserManagementTable from "../components/UserManagementTable";
 import { AppUser } from "../schemas";
 
+const mockPush = jest.fn();
 jest.mock("next/navigation", () => ({
-  useRouter: () => ({ push: jest.fn() }),
+  useRouter: () => ({ push: mockPush }),
 }));
 
 const mockUsers: AppUser[] = [
@@ -74,5 +75,13 @@ describe("UserManagementTable", () => {
     expect(screen.getByText("Email")).toBeInTheDocument();
     expect(screen.getByText("Role")).toBeInTheDocument();
     expect(screen.getByText("Created At")).toBeInTheDocument();
+  });
+
+  // Clicking a user row should navigate to their admin detail page
+  test("navigates to admin page when row is clicked", () => {
+    mockPush.mockClear();
+    render(<UserManagementTable users={mockUsers} />);
+    fireEvent.click(screen.getByText("Alice"));
+    expect(mockPush).toHaveBeenCalledWith("/admin/aaa-111");
   });
 });

@@ -1,5 +1,6 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import UserPermissionEditor from "../components/UserPermissionEditor";
+import { updateUserRole, updateUserPermission } from "../serverActions";
 
 jest.mock("../serverActions", () => ({
   updateUserRole: jest.fn(),
@@ -160,5 +161,216 @@ describe("UserPermissionEditor", () => {
     );
     const saveButton = screen.getByRole("button", { name: /Save Role/i });
     expect(saveButton).toBeDisabled();
+  });
+
+  // Clicking Grant on a denied permission should call updateUserPermission
+  test("calls updateUserPermission when Grant is clicked", async () => {
+    (updateUserPermission as jest.Mock).mockResolvedValue(undefined);
+    render(
+      <UserPermissionEditor
+        user={baseUser}
+        allPermissionKeys={allKeys}
+        roleDefaults={roleDefaults}
+        canAssignPermissions={true}
+      />,
+    );
+    // admin:manage_users is denied (not in admin defaults), so Grant button exists for it
+    const grantButtons = screen.getAllByText("Grant");
+    fireEvent.click(grantButtons[0]);
+
+    await waitFor(() => {
+      expect(updateUserPermission).toHaveBeenCalled();
+    });
+  });
+
+  // Clicking Deny on an allowed permission should call updateUserPermission
+  test("calls updateUserPermission when Deny is clicked", async () => {
+    (updateUserPermission as jest.Mock).mockResolvedValue(undefined);
+    render(
+      <UserPermissionEditor
+        user={baseUser}
+        allPermissionKeys={allKeys}
+        roleDefaults={roleDefaults}
+        canAssignPermissions={true}
+      />,
+    );
+    // person:create is allowed (in admin defaults), so Deny button exists for it
+    const denyButtons = screen.getAllByText("Deny");
+    fireEvent.click(denyButtons[0]);
+
+    await waitFor(() => {
+      expect(updateUserPermission).toHaveBeenCalled();
+    });
+  });
+
+  // Clicking Reset on an overridden permission should call updateUserPermission with reset action
+  test("calls updateUserPermission when Reset is clicked", async () => {
+    (updateUserPermission as jest.Mock).mockResolvedValue(undefined);
+    const userWithOverride = {
+      ...baseUser,
+      overrides: [{ key: "admin:manage_users", granted: true }],
+    };
+    render(
+      <UserPermissionEditor
+        user={userWithOverride}
+        allPermissionKeys={allKeys}
+        roleDefaults={roleDefaults}
+        canAssignPermissions={true}
+      />,
+    );
+    fireEvent.click(screen.getByText("Reset"));
+
+    await waitFor(() => {
+      expect(updateUserPermission).toHaveBeenCalled();
+    });
+  });
+
+  // Shows error message when permission action fails
+  test("shows error when permission action fails", async () => {
+    (updateUserPermission as jest.Mock).mockRejectedValue(new Error("Action failed"));
+    render(
+      <UserPermissionEditor
+        user={baseUser}
+        allPermissionKeys={allKeys}
+        roleDefaults={roleDefaults}
+        canAssignPermissions={true}
+      />,
+    );
+    const grantButtons = screen.getAllByText("Grant");
+    fireEvent.click(grantButtons[0]);
+
+    await waitFor(() => {
+      expect(screen.getByText("Action failed")).toBeInTheDocument();
+    });
+  });
+
+  // Shows "Denied" override chip when a permission is explicitly denied
+  test("shows Denied override chip", () => {
+    const userWithDenyOverride = {
+      ...baseUser,
+      overrides: [{ key: "person:create", granted: false }],
+    };
+    render(
+      <UserPermissionEditor
+        user={userWithDenyOverride}
+        allPermissionKeys={allKeys}
+        roleDefaults={roleDefaults}
+        canAssignPermissions={true}
+      />,
+    );
+    // "Denied" appears in role defaults and effective columns too, so check multiple exist
+    const deniedChips = screen.getAllByText("Denied");
+    expect(deniedChips.length).toBeGreaterThanOrEqual(2);
+  });
+
+  // Tooltip headers should be present on Role Default, Override, Effective, Actions
+  test("renders column headers with tooltip help cursors", () => {
+    render(
+      <UserPermissionEditor
+        user={baseUser}
+        allPermissionKeys={allKeys}
+        roleDefaults={roleDefaults}
+        canAssignPermissions={true}
+      />,
+    );
+    // Multiple domain groups create duplicate headers, so use getAllByText
+    expect(screen.getAllByText("Role Default").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Override").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Effective").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Actions").length).toBeGreaterThan(0);
+  });
+
+  // Permission groups should show domain headers (capitalized)
+  test("renders domain group headers", () => {
+    render(
+      <UserPermissionEditor
+        user={baseUser}
+        allPermissionKeys={allKeys}
+        roleDefaults={roleDefaults}
+        canAssignPermissions={true}
+      />,
+    );
+    expect(screen.getByText("person")).toBeInTheDocument();
+    expect(screen.getByText("admin")).toBeInTheDocument();
+  });
+
+  // Changing the role dropdown should enable the Save Role button
+  test("enables Save Role button when role is changed", () => {
+    render(
+      <UserPermissionEditor
+        user={baseUser}
+        allPermissionKeys={allKeys}
+        roleDefaults={roleDefaults}
+        canAssignPermissions={true}
+      />,
+    );
+    // Save Role starts disabled
+    expect(screen.getByRole("button", { name: /Save Role/i })).toBeDisabled();
+
+    // Change role via the Select
+    fireEvent.mouseDown(screen.getByRole("combobox"));
+    fireEvent.click(screen.getByRole("option", { name: /User/i }));
+
+    // Save Role should now be enabled
+    expect(screen.getByRole("button", { name: /Save Role/i })).not.toBeDisabled();
+  });
+
+  // Submitting the role form calls updateUserRole via useActionState
+  test("calls updateUserRole when Save Role is submitted", async () => {
+    (updateUserRole as jest.Mock).mockResolvedValue(undefined);
+    render(
+      <UserPermissionEditor
+        user={baseUser}
+        allPermissionKeys={allKeys}
+        roleDefaults={roleDefaults}
+        canAssignPermissions={true}
+      />,
+    );
+
+    // Change role to enable the button
+    fireEvent.mouseDown(screen.getByRole("combobox"));
+    fireEvent.click(screen.getByRole("option", { name: /User/i }));
+
+    // Submit the form
+    fireEvent.click(screen.getByRole("button", { name: /Save Role/i }));
+
+    await waitFor(() => {
+      expect(updateUserRole).toHaveBeenCalled();
+    });
+  });
+
+  // Shows error message when role update fails
+  test("shows error when role update fails", async () => {
+    (updateUserRole as jest.Mock).mockRejectedValue(new Error("Role update failed"));
+    render(
+      <UserPermissionEditor
+        user={baseUser}
+        allPermissionKeys={allKeys}
+        roleDefaults={roleDefaults}
+        canAssignPermissions={true}
+      />,
+    );
+
+    fireEvent.mouseDown(screen.getByRole("combobox"));
+    fireEvent.click(screen.getByRole("option", { name: /User/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Save Role/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText("Role update failed")).toBeInTheDocument();
+    });
+  });
+
+  // Shows "Unknown" when user name is null
+  test("shows Unknown when user name is null", () => {
+    const nullNameUser = { ...baseUser, name: null as string | null };
+    render(
+      <UserPermissionEditor
+        user={nullNameUser}
+        allPermissionKeys={allKeys}
+        roleDefaults={roleDefaults}
+        canAssignPermissions={true}
+      />,
+    );
+    expect(screen.getByText("Unknown (alice@example.com)")).toBeInTheDocument();
   });
 });

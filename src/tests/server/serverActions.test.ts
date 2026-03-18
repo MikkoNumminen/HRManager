@@ -38,6 +38,8 @@ import {
   removeTeam,
   removeMember,
   resetAll,
+  seedMockData,
+  initializePermissions,
   updateUserRole,
   updateUserPermission,
 } from "@/serverActions";
@@ -296,6 +298,13 @@ describe("updateEmail", () => {
     });
     await expect(updateEmail(formData({ personID: person.id, name: "" }))).rejects.toThrow(
       "New Email is missing",
+    );
+  });
+
+  // Need to know whose email to update — can't do it without an ID.
+  test("throws when no personID provided", async () => {
+    await expect(updateEmail(formData({ name: "a@b.com" }))).rejects.toThrow(
+      "No personID selected",
     );
   });
 
@@ -633,6 +642,13 @@ describe("removeMember", () => {
     ).rejects.toThrow("No teamID selected");
   });
 
+  // Need to know which person to remove.
+  test("throws when no personID provided", async () => {
+    await expect(
+      removeMember(formData({ teamID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" })),
+    ).rejects.toThrow("No personID selected");
+  });
+
   // UUID check — keeps bad data out.
   test("throws on invalid UUID", async () => {
     await expect(removeMember(formData({ teamID: "x", personID: "y" }))).rejects.toThrow("Invalid");
@@ -884,5 +900,138 @@ describe("updateUserPermission", () => {
         formData({ userId: "bad", permissionKey: "person:create", action: "grant" }),
       ),
     ).rejects.toThrow("Invalid userId format");
+  });
+
+  // All three required fields must be present — no partial submissions.
+  test("throws when userId is missing", async () => {
+    await expect(
+      updateUserPermission(formData({ permissionKey: "person:create", action: "grant" })),
+    ).rejects.toThrow("No userId provided");
+  });
+
+  // Permission key is required.
+  test("throws when permissionKey is missing", async () => {
+    await expect(
+      updateUserPermission(
+        formData({ userId: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", action: "grant" }),
+      ),
+    ).rejects.toThrow("No permissionKey provided");
+  });
+
+  // Action is required.
+  test("throws when action is missing", async () => {
+    await expect(
+      updateUserPermission(
+        formData({
+          userId: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+          permissionKey: "person:create",
+        }),
+      ),
+    ).rejects.toThrow("No action provided");
+  });
+});
+
+describe("seedMockData", () => {
+  beforeEach(() => cleanDb());
+  afterAll(async () => {
+    await cleanDb();
+    await testPrisma.$disconnect();
+  });
+
+  // Seeds 6 persons into the database.
+  test("creates 6 persons", async () => {
+    await seedMockData();
+
+    const persons = await testPrisma.person.findMany();
+    expect(persons).toHaveLength(6);
+  });
+
+  // Seeds 3 teams with the correct names.
+  test("creates 3 teams", async () => {
+    await seedMockData();
+
+    const teams = await testPrisma.team.findMany({ orderBy: { teamName: "asc" } });
+    expect(teams).toHaveLength(3);
+    expect(teams.map((t) => t.teamName)).toEqual(["Design", "Engineering", "Platform"]);
+  });
+
+  // Seeds team memberships — 7 total across the three teams.
+  test("creates team memberships", async () => {
+    await seedMockData();
+
+    const members = await testPrisma.teamMember.findMany();
+    expect(members).toHaveLength(7);
+  });
+
+  // Assigns managers to Engineering (Alice) and Design (Carol); Platform has none.
+  test("assigns correct managers to teams", async () => {
+    await seedMockData();
+
+    const engineering = await testPrisma.team.findUnique({
+      where: { teamName: "Engineering" },
+      include: { manager: true },
+    });
+    expect(engineering!.manager!.name).toBe("Alice Johnson");
+
+    const design = await testPrisma.team.findUnique({
+      where: { teamName: "Design" },
+      include: { manager: true },
+    });
+    expect(design!.manager!.name).toBe("Carol Davis");
+
+    const platform = await testPrisma.team.findUnique({ where: { teamName: "Platform" } });
+    expect(platform!.teamManagerId).toBeNull();
+  });
+
+  // Seeds 4 mock users for the admin panel demo.
+  test("creates 4 mock users", async () => {
+    await seedMockData();
+
+    const users = await testPrisma.user.findMany({ orderBy: { email: "asc" } });
+    expect(users).toHaveLength(4);
+    expect(users.map((u) => u.role)).toEqual(
+      expect.arrayContaining(["administrator", "user", "user", "guest"]),
+    );
+  });
+
+  // Running seedMockData twice with clearExisting=true should not duplicate data.
+  test("is idempotent when clearExisting is true", async () => {
+    await seedMockData(true);
+    await seedMockData(true);
+
+    const persons = await testPrisma.person.findMany();
+    expect(persons).toHaveLength(6);
+    const teams = await testPrisma.team.findMany();
+    expect(teams).toHaveLength(3);
+    const users = await testPrisma.user.findMany();
+    expect(users).toHaveLength(4);
+  });
+
+  // With clearExisting=false, existing data should be preserved alongside seeded data.
+  test("preserves existing data when clearExisting is false", async () => {
+    await testPrisma.person.create({
+      data: { name: "Pre-existing", email: "existing@test.com" },
+    });
+
+    await seedMockData(false);
+
+    const persons = await testPrisma.person.findMany();
+    expect(persons).toHaveLength(7); // 6 seeded + 1 pre-existing
+    expect(persons.some((p) => p.email === "existing@test.com")).toBe(true);
+  });
+});
+
+describe("initializePermissions", () => {
+  beforeEach(() => cleanDb());
+  afterAll(async () => {
+    await cleanDb();
+    await testPrisma.$disconnect();
+  });
+
+  // Calls seedPermissions (mocked) — verifies the function runs without error.
+  test("calls seedPermissions successfully", async () => {
+    const { seedPermissions } = require("@/permissions");
+    await initializePermissions();
+    expect(seedPermissions).toHaveBeenCalled();
   });
 });

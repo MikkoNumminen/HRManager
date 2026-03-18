@@ -1,12 +1,32 @@
-import { resolvePermissions, ROLE_DEFAULTS, PERMISSION_KEYS } from "../permissions";
+import {
+  resolvePermissions,
+  ROLE_DEFAULTS,
+  PERMISSION_KEYS,
+  getCurrentUser,
+  getUserPermissions,
+  hasPermission,
+  requirePermission,
+} from "../permissions";
 
+const mockAuth = jest.fn();
 jest.mock("../auth", () => ({
-  auth: jest.fn(),
+  auth: (...args: unknown[]) => mockAuth(...args),
 }));
 
+const mockFindUnique = jest.fn();
 jest.mock("../db", () => ({
-  prisma: {},
+  prisma: {
+    user: {
+      get findUnique() {
+        return mockFindUnique;
+      },
+    },
+  },
 }));
+
+beforeEach(() => {
+  jest.clearAllMocks();
+});
 
 describe("Permission Resolution", () => {
   // Superuser gets all permissions no matter what overrides say
@@ -94,5 +114,173 @@ describe("Permission Resolution", () => {
   // There are exactly 15 permission keys
   test("PERMISSION_KEYS has 15 entries", () => {
     expect(PERMISSION_KEYS).toHaveLength(15);
+  });
+});
+
+describe("getCurrentUser", () => {
+  // If there's no session (not logged in), return null.
+  test("returns null when no session exists", async () => {
+    mockAuth.mockResolvedValue(null);
+    const result = await getCurrentUser();
+    expect(result).toBeNull();
+  });
+
+  // If the session has no email, return null.
+  test("returns null when session has no email", async () => {
+    mockAuth.mockResolvedValue({ user: { name: "Alice" } });
+    const result = await getCurrentUser();
+    expect(result).toBeNull();
+  });
+
+  // If the user exists in the DB, return their record with permissions included.
+  test("returns user from database when session has email", async () => {
+    mockAuth.mockResolvedValue({ user: { email: "alice@test.com" } });
+    const mockUser = {
+      id: "123",
+      email: "alice@test.com",
+      role: "user",
+      permissions: [],
+    };
+    mockFindUnique.mockResolvedValue(mockUser);
+
+    const result = await getCurrentUser();
+    expect(result).toEqual(mockUser);
+    expect(mockFindUnique).toHaveBeenCalledWith({
+      where: { email: "alice@test.com" },
+      include: { permissions: { include: { permission: true } } },
+    });
+  });
+
+  // If the user has an email in session but isn't in the DB, return null.
+  test("returns null when user not found in database", async () => {
+    mockAuth.mockResolvedValue({ user: { email: "ghost@test.com" } });
+    mockFindUnique.mockResolvedValue(null);
+
+    const result = await getCurrentUser();
+    expect(result).toBeNull();
+  });
+});
+
+describe("getUserPermissions", () => {
+  // When given a userId, look up that user directly in the DB.
+  test("resolves permissions for a specific userId", async () => {
+    mockFindUnique.mockResolvedValue({
+      id: "123",
+      role: "administrator",
+      permissions: [{ permission: { key: "data:reset" }, granted: true }],
+    });
+
+    const result = await getUserPermissions("123");
+    expect(result["person:create"]).toBe(true);
+    expect(result["data:reset"]).toBe(true);
+  });
+
+  // When the userId doesn't match anyone, fall back to guest permissions.
+  test("returns guest permissions when userId not found", async () => {
+    mockFindUnique.mockResolvedValue(null);
+
+    const result = await getUserPermissions("nonexistent");
+    expect(result["person:read"]).toBe(true);
+    expect(result["person:create"]).toBe(false);
+  });
+
+  // When no userId is given, use the current session user.
+  test("resolves permissions for current session user when no userId", async () => {
+    mockAuth.mockResolvedValue({ user: { email: "alice@test.com" } });
+    mockFindUnique.mockResolvedValue({
+      id: "123",
+      role: "user",
+      permissions: [{ permission: { key: "person:create" }, granted: true }],
+    });
+
+    const result = await getUserPermissions();
+    expect(result["person:create"]).toBe(true);
+    expect(result["person:read"]).toBe(true);
+    expect(result["team:create"]).toBe(false);
+  });
+
+  // When no userId and no session, fall back to guest permissions.
+  test("returns guest permissions when not logged in and no userId", async () => {
+    mockAuth.mockResolvedValue(null);
+
+    const result = await getUserPermissions();
+    expect(result["person:read"]).toBe(true);
+    expect(result["person:create"]).toBe(false);
+  });
+});
+
+describe("hasPermission", () => {
+  // Returns true when the current user has the requested permission.
+  test("returns true when permission is allowed", async () => {
+    mockAuth.mockResolvedValue({ user: { email: "alice@test.com" } });
+    mockFindUnique.mockResolvedValue({
+      id: "123",
+      role: "administrator",
+      permissions: [],
+    });
+
+    const result = await hasPermission("person:create");
+    expect(result).toBe(true);
+  });
+
+  // Returns false when the current user lacks the requested permission.
+  test("returns false when permission is denied", async () => {
+    mockAuth.mockResolvedValue({ user: { email: "alice@test.com" } });
+    mockFindUnique.mockResolvedValue({
+      id: "123",
+      role: "user",
+      permissions: [],
+    });
+
+    const result = await hasPermission("person:create");
+    expect(result).toBe(false);
+  });
+
+  // Returns false for a completely unknown permission key.
+  test("returns false for unknown permission key", async () => {
+    mockAuth.mockResolvedValue({ user: { email: "alice@test.com" } });
+    mockFindUnique.mockResolvedValue({
+      id: "123",
+      role: "administrator",
+      permissions: [],
+    });
+
+    const result = await hasPermission("fake:permission");
+    expect(result).toBe(false);
+  });
+});
+
+describe("requirePermission", () => {
+  // Does not throw when the user has the requested permission.
+  test("does not throw when permission is allowed", async () => {
+    mockAuth.mockResolvedValue({ user: { email: "alice@test.com" } });
+    mockFindUnique.mockResolvedValue({
+      id: "123",
+      role: "administrator",
+      permissions: [],
+    });
+
+    await expect(requirePermission("person:create")).resolves.not.toThrow();
+  });
+
+  // Throws "Permission denied" when the user lacks the requested permission.
+  test("throws when permission is denied", async () => {
+    mockAuth.mockResolvedValue({ user: { email: "alice@test.com" } });
+    mockFindUnique.mockResolvedValue({
+      id: "123",
+      role: "user",
+      permissions: [],
+    });
+
+    await expect(requirePermission("person:create")).rejects.toThrow(
+      "Permission denied: person:create",
+    );
+  });
+
+  // Throws when there's no session at all (guest).
+  test("throws for unauthenticated user", async () => {
+    mockAuth.mockResolvedValue(null);
+
+    await expect(requirePermission("person:create")).rejects.toThrow("Permission denied");
   });
 });

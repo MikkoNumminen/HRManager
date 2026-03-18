@@ -93,4 +93,53 @@ describe("TopBar", () => {
     render(<TopBar title="Home" />);
     expect(screen.getByText("AS")).toBeInTheDocument();
   });
+
+  // Shows the "User Management" menu item when user has admin:manage_users permission
+  test("shows User Management link when user has admin permission", () => {
+    mockUseSession.mockReturnValue({
+      data: {
+        user: {
+          name: "Alice Smith",
+          email: "alice@example.com",
+          image: null,
+          permissions: { "admin:manage_users": true },
+        },
+      },
+      status: "authenticated",
+    });
+    render(<TopBar title="Home" />);
+    fireEvent.click(screen.getByLabelText("User menu"));
+    expect(screen.getByText("User Management")).toBeInTheDocument();
+    const link = screen.getByText("User Management").closest("a");
+    expect(link).toHaveAttribute("href", "/admin");
+  });
+
+  // Hides the "User Management" menu item when user lacks admin permission
+  test("hides User Management link when user lacks admin permission", () => {
+    mockUseSession.mockReturnValue({
+      data: {
+        user: {
+          name: "Alice Smith",
+          email: "alice@example.com",
+          image: null,
+          permissions: { "admin:manage_users": false },
+        },
+      },
+      status: "authenticated",
+    });
+    render(<TopBar title="Home" />);
+    fireEvent.click(screen.getByLabelText("User menu"));
+    expect(screen.queryByText("User Management")).not.toBeInTheDocument();
+  });
+
+  // Hides the "User Management" menu item when permissions object is missing entirely
+  test("hides User Management link when no permissions in session", () => {
+    mockUseSession.mockReturnValue({
+      data: { user: { name: "Alice Smith", email: "alice@example.com", image: null } },
+      status: "authenticated",
+    });
+    render(<TopBar title="Home" />);
+    fireEvent.click(screen.getByLabelText("User menu"));
+    expect(screen.queryByText("User Management")).not.toBeInTheDocument();
+  });
 });
