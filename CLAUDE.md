@@ -40,13 +40,16 @@ This is a **portfolio / showcase project**. The goal is to demonstrate technical
 src/
 ├── app/
 │   ├── api/auth/[...nextauth]/  # NextAuth route handler
-│   ├── managePersons/           # Person management (auth-protected)
-│   └── manageTeams/             # Team management (auth-protected)
+│   ├── admin/                   # User management (superuser-protected)
+│   ├── managePersons/           # Person management (permission-protected)
+│   └── manageTeams/             # Team management (permission-protected)
 ├── components/       # Reusable MUI client components
 ├── tests/            # Jest tests
-├── auth.ts           # NextAuth v5 configuration
+├── types/            # TypeScript module augmentations (next-auth.d.ts)
+├── auth.ts           # NextAuth v5 configuration + RBAC callbacks
 ├── db.ts             # Prisma singleton
 ├── muiStyles.ts      # Centralised MUI style tokens
+├── permissions.ts    # RBAC: role defaults, permission resolution, guards
 ├── queries.ts        # Read-only data fetching
 ├── schemas.ts        # Zod schemas and inferred types
 └── serverActions.ts  # Mutation server actions
@@ -59,6 +62,9 @@ prisma/
 - **Person** — name, email, title, optional manager (FK to Person). Can belong to multiple teams.
 - **Team** — name, manager (FK to Person), members via TeamMember join table.
 - **TeamMember** — join table between Person and Team, cascade delete on removal.
+- **User** — authenticated identity (email, name, image, role). Linked to NextAuth OAuth.
+- **Permission** — catalog of 15 granular permission keys (e.g. `person:create`, `team:delete`).
+- **UserPermission** — per-user permission overrides (grant/deny) with role-default fallback.
 
 ## Commit style
 
@@ -66,6 +72,7 @@ prisma/
 
 - Do **not** run `git commit` — only provide the commit message as text so the user can commit manually.
 - On large multi-file features, **pause at natural commit boundaries** and provide a commit message before continuing. Don't wait until everything is done — commit early and often at logical checkpoints (e.g. schema + migration, then core logic, then UI, then tests).
+- Changes to `CLAUDE.md` or `README.md` must be committed **separately** from code changes — always provide a dedicated `docs()` commit message for them.
 
 ## Formatting
 
