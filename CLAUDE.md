@@ -5,6 +5,8 @@
 A full-stack HR management system for managing employees and teams.
 Built with Next.js 16 (App Router), React 19, MUI v7, Prisma 6, Zod 4, TypeScript 5.9, Jest 30.
 
+This is a **portfolio / showcase project**. The goal is to demonstrate technical depth and breadth, not to ship the leanest possible product. Features are intentionally built to production-grade complexity (e.g. granular per-user RBAC instead of simple role checks) to showcase what the developer can build. When in doubt, favour the more thorough implementation.
+
 ## Tech stack
 
 | Layer      | Technology                                                     |
@@ -63,6 +65,7 @@ prisma/
 [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
 
 - Do **not** run `git commit` — only provide the commit message as text so the user can commit manually.
+- On large multi-file features, **pause at natural commit boundaries** and provide a commit message before continuing. Don't wait until everything is done — commit early and often at logical checkpoints (e.g. schema + migration, then core logic, then UI, then tests).
 
 ## Formatting
 
