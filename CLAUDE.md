@@ -83,7 +83,7 @@ prisma/
 
 ## Testing
 
-- Run `npm test` after every change.
+- Run `npm run test:all` after every change — this runs both client and server test suites. Never use `npm test` alone.
 - Update affected tests when modifying component APIs.
 - Tests live in `src/tests/`.
 - Do not mock core logic — test real functionality.
