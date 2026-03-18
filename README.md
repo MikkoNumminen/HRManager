@@ -1,6 +1,6 @@
 # HRManager
 
-A full-stack HR management system for managing employees and teams — built with Next.js 16, React 19, MUI v7, Prisma, and TypeScript.
+A full-stack HR management system for managing employees and teams — built with Next.js 16, React 19, MUI v7, Prisma, and TypeScript. This is a portfolio project intentionally built to production-grade complexity to demonstrate technical depth and breadth.
 
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)
 ![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react)
@@ -17,12 +17,16 @@ A full-stack HR management system for managing employees and teams — built wit
 
 - **People management** — add, update and remove employees with name, email and position
 - **Team management** — create teams, assign managers, add and remove members
-- **Authentication** — NextAuth v5 with Google and GitHub OAuth; guest mode with read-only views
+- **Granular RBAC** — four roles (superuser, administrator, user, guest) with 15 permission keys and per-user overrides (grant/deny individual permissions on top of role defaults)
+- **Admin UI** — user management panel with role assignment, per-user permission editor with role default / override / effective columns, and info tooltips
+- **Authentication** — NextAuth v5 with Google and GitHub OAuth; JWT strategy with permission-enriched tokens; automatic superuser bootstrapping on first login
+- **Guest mode** — unauthenticated users see read-only chip views of persons and teams; manage routes redirect to home
+- **Permission-aware UI** — server-side permission guards on all mutations; client-side conditional rendering hides UI elements the user can't access
 - **Relational integrity** — database constraints enforced at ORM level with cascading rules
 - **Dark UI** — MUI dark theme with consistent component styling throughout
 - **Type-safe** — end-to-end TypeScript with Zod schema validation and centralized inferred types
-- **Server-first** — async Server Components for data fetching, Server Actions for mutations
-- **Thoroughly tested** — 218 Jest tests across three layers: Zod schemas, Prisma queries, server actions, and all UI components (99%+ line coverage)
+- **Server-first** — async Server Components for data fetching, Server Actions for mutations inside `$transaction` blocks
+- **Thoroughly tested** — 308 Jest tests across four layers: Zod schemas, Prisma queries, server actions, and all UI components
 
 ---
 
@@ -99,7 +103,7 @@ npm run test:server # query + server action tests (Node, real SQLite)
 npm run test:all    # both suites
 ```
 
-> The project has **218 tests** split into two suites. `npm test` runs the client-side tests — component rendering, user interactions, form validation, and Zod schema parsing — all in a jsdom environment. `npm run test:server` runs the server-side tests against a real SQLite test database — every Prisma query, every server action mutation, UUID validation, duplicate prevention, and cascade deletes. The test database (`prisma/test.db`) is created automatically the first time you run it and never touches your dev data.
+> The project has **308 tests** split into two suites. `npm test` runs the client-side tests — component rendering, user interactions, form validation, Zod schema parsing, and RBAC permission resolution — all in a jsdom environment. `npm run test:server` runs the server-side tests against a real SQLite test database — every Prisma query, every server action mutation (including admin role/permission management), UUID validation, duplicate prevention, and cascade deletes. The test database (`prisma/test.db`) is created automatically the first time you run it and never touches your dev data.
 
 ---
 
@@ -138,48 +142,84 @@ The app uses Next.js App Router with a clear separation of concerns:
 - **Server Components** fetch data at the page level and pass it as props to client components — no `useEffect` data fetching
 - **Server Actions** (`serverActions.ts`) handle all mutations inside `$transaction` blocks for atomicity
 - **Read queries** (`queries.ts`) are separated from mutations and validated through Zod schemas
-- **Centralized types** (`schemas.ts`) — Zod schemas export inferred `Person` and `CombinedTeam` types used across all components
+- **Centralized types** (`schemas.ts`) — Zod schemas export inferred `Person`, `CombinedTeam`, `AppUser`, and `Permissions` types used across all components
 - **Forms** use React 19's `useActionState` for error handling with built-in pending state
 - **Auth** (`auth.ts`) — NextAuth v5 with JWT strategy; protected routes redirect unauthenticated users; guest mode shows read-only chip views
+- **RBAC** (`permissions.ts`) — granular permission system with role defaults, per-user overrides, and server-side guards on every mutation
 
 ```
 src/
 ├── app/
 │   ├── api/auth/[...nextauth]/  # NextAuth route handler
-│   ├── managePersons/           # Person management (auth-protected)
-│   └── manageTeams/             # Team management (auth-protected)
+│   ├── admin/                   # User management (superuser-protected)
+│   ├── managePersons/           # Person management (permission-protected)
+│   └── manageTeams/             # Team management (permission-protected)
 ├── components/       # Reusable MUI client components
-├── tests/            # Jest tests
-├── auth.ts           # NextAuth v5 configuration
+├── tests/            # Jest tests (client + server)
+├── types/            # TypeScript module augmentations (next-auth.d.ts)
+├── auth.ts           # NextAuth v5 configuration + RBAC callbacks
 ├── db.ts             # Prisma singleton
 ├── muiStyles.ts      # Centralised style tokens and component styles
+├── permissions.ts    # RBAC: role defaults, permission resolution, guards
 ├── queries.ts        # Read-only data fetching (Prisma + Zod validation)
 ├── schemas.ts        # Zod schemas and exported TypeScript types
 └── serverActions.ts  # Mutation server actions (Prisma $transaction)
 prisma/
-└── schema.prisma     # Data model and migrations
+└── schema.prisma     # Data model (Person, Team, User, Permission, UserPermission)
 ```
+
+---
+
+## Data model
+
+```
+Person          Team             User              Permission
+├── id          ├── teamId       ├── id             ├── id
+├── name        ├── teamName     ├── email          ├── key
+├── email       ├── managerId    ├── name           └── description
+├── position    └── members[]    ├── role
+└── manager?                     └── permissions[]   UserPermission
+                                                     ├── userId
+                                                     ├── permissionId
+                                                     └── granted
+```
+
+- **Person** — employees with name, email, position, and optional manager (self-referencing FK)
+- **Team** — teams with a name, optional manager (FK to Person), and members via join table
+- **User** — authenticated identity from OAuth, with role (superuser/administrator/user/guest)
+- **Permission** — catalog of 15 granular permission keys (e.g. `person:create`, `team:delete`, `admin:manage_users`)
+- **UserPermission** — per-user permission overrides (grant/deny) with role-default fallback
+
+---
+
+## RBAC permission system
+
+The app implements a granular Role-Based Access Control system with four roles and 15 permission keys:
+
+| Role          | Default permissions                                                   |
+| ------------- | --------------------------------------------------------------------- |
+| Superuser     | All permissions (immutable — cannot be modified or assigned via UI)   |
+| Administrator | All person and team operations (no data reset, seed, or admin access) |
+| User          | Read-only (person:read, team:read)                                    |
+| Guest         | Read-only (same as user, but unauthenticated)                         |
+
+**Permission resolution precedence**: superuser (always all) → explicit UserPermission override → role default.
+
+Individual permissions can be overridden per-user through the admin UI — for example, granting `person:create` to a regular user, or denying `team:delete` from an administrator. The first user to log in via OAuth is automatically bootstrapped as the superuser.
 
 ---
 
 ## Testing
 
-218 tests across 22 test suites, covering every layer of the application:
+308 tests across 26 test suites, covering every layer of the application:
 
-| Layer              | Tests | What's covered                                                                                                                                                                |
-| ------------------ | ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Zod schemas**    | 27    | Valid data, missing fields, invalid UUIDs, nullable fields, wrong types                                                                                                       |
-| **Prisma queries** | 12    | `getPersons` and `getTeams` against a real SQLite DB — empty state, null managers, member shapes, multi-team scenarios                                                        |
-| **Server actions** | 50    | All 10 mutations — create, update, delete for persons/teams/members, UUID validation, duplicate email prevention, cascade deletes, whitespace trimming, transaction atomicity |
-| **UI components**  | 129   | Rendering, user interactions, keyboard accessibility, form validation, minimal/chip views, empty states, null field handling, router navigation                               |
-
-```
-Coverage summary
-  Statements : 98.74%
-  Branches   : 90.60%
-  Functions  : 98.73%
-  Lines      : 99.64%
-```
+| Layer              | Tests | What's covered                                                                                                                                                                                           |
+| ------------------ | ----- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Zod schemas**    | 43    | PersonSchema, TeamSchema, TeamMemberSchema, UserSchema, PermissionsSchema — valid data, missing fields, invalid UUIDs, nullable fields, wrong types, role enum validation                                |
+| **Prisma queries** | 24    | `getPersons`, `getTeams`, `getUsers`, `getUserById`, `getAllPermissionKeys` against real SQLite — empty state, null fields, member shapes, user overrides, permission resolution, ordering               |
+| **Server actions** | 73    | All 13 mutations — CRUD for persons/teams/members, admin role updates, permission override grant/deny/reset, UUID validation, duplicate prevention, cascade deletes, superuser protection                |
+| **RBAC logic**     | 10    | `resolvePermissions` — superuser immunity, role defaults, grant/deny overrides, unknown role fallback, permission key completeness                                                                       |
+| **UI components**  | 158   | All 21 components — rendering, user interactions, keyboard accessibility, form validation, permission-based visibility, role chips, selection cards, minimal/full views, empty states, router navigation |
 
 Server-side tests run against an isolated test database (`prisma/test.db`) — the dev database is never touched.
 
