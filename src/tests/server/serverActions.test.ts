@@ -5,6 +5,19 @@ jest.mock("@/db", () => ({
   prisma: require("./testDb").testPrisma,
 }));
 
+// Mock next-auth — it uses ESM imports that Jest can't parse in CJS mode.
+// The auth module is imported transitively via permissions.ts → auth.ts → next-auth.
+jest.mock("@/auth", () => ({
+  auth: jest.fn(),
+}));
+
+// Mock permissions — requirePermission is a no-op so server action tests focus
+// on data logic. Permission resolution is tested separately in permissions.test.ts.
+jest.mock("@/permissions", () => ({
+  requirePermission: jest.fn(),
+  seedPermissions: jest.fn(),
+}));
+
 // Mock Next.js server functions — these don't exist in a test environment,
 // but the server actions call them after every mutation.
 jest.mock("next/cache", () => ({

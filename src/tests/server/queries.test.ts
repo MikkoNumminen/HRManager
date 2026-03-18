@@ -5,6 +5,12 @@ jest.mock("@/db", () => ({
   prisma: require("./testDb").testPrisma,
 }));
 
+// Mock next-auth — it uses ESM imports that Jest can't parse in CJS mode.
+// The auth module is imported transitively via permissions.ts → auth.ts → next-auth.
+jest.mock("@/auth", () => ({
+  auth: jest.fn(),
+}));
+
 import { getPersons, getTeams } from "@/queries";
 
 describe("getPersons", () => {
