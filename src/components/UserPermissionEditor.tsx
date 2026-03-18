@@ -23,6 +23,7 @@ import {
   TableHead,
   TableRow,
   Paper,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { useActionState, useState, useTransition } from "react";
@@ -198,12 +199,42 @@ export default function UserPermissionEditor({
                   <TableHead>
                     <TableRow>
                       <TableCell sx={{ color: colors.slate400 }}>Permission</TableCell>
-                      <TableCell sx={{ color: colors.slate400 }}>Role Default</TableCell>
-                      <TableCell sx={{ color: colors.slate400 }}>Override</TableCell>
-                      <TableCell sx={{ color: colors.slate400 }}>Effective</TableCell>
-                      <TableCell sx={{ color: colors.slate400 }} align="right">
-                        Actions
-                      </TableCell>
+                      <Tooltip
+                        title="The default access level based on the user's role (e.g. administrators can manage data, regular users can only read)"
+                        placement="top"
+                        arrow
+                      >
+                        <TableCell sx={{ color: colors.slate400, cursor: "help" }}>
+                          Role Default
+                        </TableCell>
+                      </Tooltip>
+                      <Tooltip
+                        title="A per-user override that grants or denies this permission regardless of role defaults"
+                        placement="top"
+                        arrow
+                      >
+                        <TableCell sx={{ color: colors.slate400, cursor: "help" }}>
+                          Override
+                        </TableCell>
+                      </Tooltip>
+                      <Tooltip
+                        title="The actual permission in effect — determined by override if set, otherwise falls back to role default"
+                        placement="top"
+                        arrow
+                      >
+                        <TableCell sx={{ color: colors.slate400, cursor: "help" }}>
+                          Effective
+                        </TableCell>
+                      </Tooltip>
+                      <Tooltip
+                        title="Grant or deny an override, or reset to remove it and revert to role default"
+                        placement="top"
+                        arrow
+                      >
+                        <TableCell sx={{ color: colors.slate400, cursor: "help" }} align="right">
+                          Actions
+                        </TableCell>
+                      </Tooltip>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -260,33 +291,7 @@ export default function UserPermissionEditor({
                           </TableCell>
                           <TableCell align="right">
                             <Box display="flex" gap={0.5} justifyContent="flex-end">
-                              <Button
-                                size="small"
-                                disabled={isPending || (hasOverride && override === true)}
-                                onClick={() => handlePermissionAction(key, "grant")}
-                                sx={{
-                                  color: colors.green400,
-                                  fontSize: "0.7rem",
-                                  minWidth: "auto",
-                                  px: 1,
-                                }}
-                              >
-                                Grant
-                              </Button>
-                              <Button
-                                size="small"
-                                disabled={isPending || (hasOverride && override === false)}
-                                onClick={() => handlePermissionAction(key, "deny")}
-                                sx={{
-                                  color: "#f87171",
-                                  fontSize: "0.7rem",
-                                  minWidth: "auto",
-                                  px: 1,
-                                }}
-                              >
-                                Deny
-                              </Button>
-                              {hasOverride && (
+                              {hasOverride ? (
                                 <Button
                                   size="small"
                                   disabled={isPending}
@@ -299,6 +304,34 @@ export default function UserPermissionEditor({
                                   }}
                                 >
                                   Reset
+                                </Button>
+                              ) : effective ? (
+                                <Button
+                                  size="small"
+                                  disabled={isPending}
+                                  onClick={() => handlePermissionAction(key, "deny")}
+                                  sx={{
+                                    color: "#f87171",
+                                    fontSize: "0.7rem",
+                                    minWidth: "auto",
+                                    px: 1,
+                                  }}
+                                >
+                                  Deny
+                                </Button>
+                              ) : (
+                                <Button
+                                  size="small"
+                                  disabled={isPending}
+                                  onClick={() => handlePermissionAction(key, "grant")}
+                                  sx={{
+                                    color: colors.green400,
+                                    fontSize: "0.7rem",
+                                    minWidth: "auto",
+                                    px: 1,
+                                  }}
+                                >
+                                  Grant
                                 </Button>
                               )}
                             </Box>
