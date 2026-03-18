@@ -368,10 +368,65 @@ export async function seedMockData(clearExisting: boolean = true) {
         await prisma.teamMember.create({ data: m });
       }
     }
+    // Seed mock users — never touch the real superuser
+    const mockUserSeeds = [
+      { email: "admin@example.com", name: "Jane Admin", role: "administrator" },
+      { email: "user1@example.com", name: "John User", role: "user" },
+      { email: "user2@example.com", name: "Sarah User", role: "user" },
+      { email: "guest@example.com", name: "Demo Guest", role: "guest" },
+    ];
+
+    if (clearExisting) {
+      // Delete mock users (non-superuser with @example.com emails) and their permission overrides
+      await prisma.userPermission.deleteMany({
+        where: { user: { email: { endsWith: "@example.com" } } },
+      });
+      await prisma.user.deleteMany({
+        where: { email: { endsWith: "@example.com" } },
+      });
+    }
+
+    // Ensure permission catalog exists
+    await seedPermissions();
+
+    for (const u of mockUserSeeds) {
+      const user = await prisma.user.upsert({
+        where: { email: u.email },
+        update: {},
+        create: u,
+      });
+
+      // Give admin@example.com a custom override: grant data:seed
+      if (u.email === "admin@example.com") {
+        const seedPerm = await prisma.permission.findUnique({ where: { key: "data:seed" } });
+        if (seedPerm) {
+          await prisma.userPermission.upsert({
+            where: { userId_permissionId: { userId: user.id, permissionId: seedPerm.id } },
+            update: { granted: true },
+            create: { userId: user.id, permissionId: seedPerm.id, granted: true },
+          });
+        }
+      }
+
+      // Give user1@example.com a custom override: grant person:create
+      if (u.email === "user1@example.com") {
+        const createPerm = await prisma.permission.findUnique({
+          where: { key: "person:create" },
+        });
+        if (createPerm) {
+          await prisma.userPermission.upsert({
+            where: { userId_permissionId: { userId: user.id, permissionId: createPerm.id } },
+            update: { granted: true },
+            create: { userId: user.id, permissionId: createPerm.id, granted: true },
+          });
+        }
+      }
+    }
   });
   revalidatePath("/");
   revalidatePath("/managePersons");
   revalidatePath("/manageTeams");
+  revalidatePath("/admin");
 }
 
 export async function initializePermissions() {
