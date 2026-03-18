@@ -26,7 +26,7 @@ A full-stack HR management system for managing employees and teams — built wit
 - **Dark UI** — MUI dark theme with consistent component styling throughout
 - **Type-safe** — end-to-end TypeScript with Zod schema validation and centralized inferred types
 - **Server-first** — async Server Components for data fetching, Server Actions for mutations inside `$transaction` blocks
-- **Thoroughly tested** — 308 Jest tests across four layers: Zod schemas, Prisma queries, server actions, and all UI components
+- **Thoroughly tested** — 350 Jest tests across five layers with 93%+ line coverage: Zod schemas, RBAC logic, Prisma queries, server actions, and all UI components
 
 ---
 
@@ -211,17 +211,25 @@ Individual permissions can be overridden per-user through the admin UI — for e
 
 ## Testing
 
-308 tests across 26 test suites, covering every layer of the application:
+350 tests across 26 test suites, covering every layer of the application:
 
-| Layer              | Tests | What's covered                                                                                                                                                                                           |
-| ------------------ | ----- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Zod schemas**    | 43    | PersonSchema, TeamSchema, TeamMemberSchema, UserSchema, PermissionsSchema — valid data, missing fields, invalid UUIDs, nullable fields, wrong types, role enum validation                                |
-| **Prisma queries** | 24    | `getPersons`, `getTeams`, `getUsers`, `getUserById`, `getAllPermissionKeys` against real SQLite — empty state, null fields, member shapes, user overrides, permission resolution, ordering               |
-| **Server actions** | 73    | All 13 mutations — CRUD for persons/teams/members, admin role updates, permission override grant/deny/reset, UUID validation, duplicate prevention, cascade deletes, superuser protection                |
-| **RBAC logic**     | 10    | `resolvePermissions` — superuser immunity, role defaults, grant/deny overrides, unknown role fallback, permission key completeness                                                                       |
-| **UI components**  | 158   | All 21 components — rendering, user interactions, keyboard accessibility, form validation, permission-based visibility, role chips, selection cards, minimal/full views, empty states, router navigation |
+| Layer              | Tests | What's covered                                                                                                                                                                                                                        |
+| ------------------ | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Zod schemas**    | 43    | PersonSchema, TeamSchema, TeamMemberSchema, UserSchema, PermissionsSchema — valid data, missing fields, invalid UUIDs, nullable fields, wrong types, role enum validation                                                             |
+| **Prisma queries** | 23    | `getPersons`, `getTeams`, `getUsers`, `getUserById`, `getAllPermissionKeys` against real SQLite — empty state, null fields, member shapes, user overrides, permission resolution, ordering                                             |
+| **Server actions** | 78    | All 14 mutations — CRUD for persons/teams/members, admin role updates, permission override grant/deny/reset, mock data seeding, UUID validation, duplicate prevention, cascade deletes, superuser protection, idempotent seed with upserts |
+| **RBAC logic**     | 24    | `resolvePermissions`, `getCurrentUser`, `getUserPermissions`, `hasPermission`, `requirePermission` — superuser immunity, role defaults, grant/deny overrides, session lookup, unauthenticated fallback                                 |
+| **UI components**  | 182   | All 21 components — rendering, user interactions, keyboard accessibility, form validation, permission-based visibility, role chips, selection cards, minimal/full views, empty states, router navigation, admin menu links              |
 
-Server-side tests run against an isolated test database (`prisma/test.db`) — the dev database is never touched.
+```
+Coverage summary (combined client + server suites)
+  Statements : 92.51%
+  Branches   : 86.63%
+  Functions  : 92.16%
+  Lines      : 93.46%
+```
+
+Highlights: `queries.ts`, `schemas.ts`, and `serverActions.ts` at 99–100% line coverage. 19 of 21 components at 96%+ line coverage. Server-side tests run against an isolated test database (`prisma/test.db`) — the dev database is never touched.
 
 ---
 
