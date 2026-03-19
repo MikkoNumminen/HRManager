@@ -3,6 +3,7 @@ import { prisma } from "@/db";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requirePermission, seedPermissions } from "@/permissions";
+import { logAudit } from "@/auditLog";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -32,13 +33,20 @@ export async function createPerson(data: FormData) {
     throw new Error("A person with this email already exists");
   }
 
-  await prisma.$transaction(async (prisma) => {
-    await prisma.person.create({
+  await prisma.$transaction(async (tx) => {
+    const person = await tx.person.create({
       data: {
         name: name.trim(),
         position: null,
         email: email.trim(),
       },
+    });
+    await logAudit({
+      action: "create",
+      entityType: "person",
+      entityId: person.id,
+      after: { name: person.name, email: person.email },
+      tx,
     });
   });
   revalidatePath("/managePersons");
@@ -53,18 +61,28 @@ export async function removePerson(data: FormData) {
   }
   personIDs.forEach((id) => validateUUID(id, "personID"));
 
-  await prisma.$transaction(async (prisma) => {
-    await prisma.teamMember.deleteMany({
-      where: {
-        personId: { in: personIDs },
-      },
+  await prisma.$transaction(async (tx) => {
+    const personsToDelete = await tx.person.findMany({
+      where: { id: { in: personIDs } },
     });
 
-    await prisma.person.deleteMany({
-      where: {
-        id: { in: personIDs },
-      },
+    await tx.teamMember.deleteMany({
+      where: { personId: { in: personIDs } },
     });
+
+    await tx.person.deleteMany({
+      where: { id: { in: personIDs } },
+    });
+
+    for (const person of personsToDelete) {
+      await logAudit({
+        action: "delete",
+        entityType: "person",
+        entityId: person.id,
+        before: { name: person.name, email: person.email, position: person.position },
+        tx,
+      });
+    }
   });
   revalidatePath("/managePersons");
   revalidatePath("/");
@@ -83,10 +101,19 @@ export async function updatePosition(data: FormData) {
     throw new Error("New position is missing");
   }
 
-  await prisma.$transaction(async (prisma) => {
-    await prisma.person.update({
+  await prisma.$transaction(async (tx) => {
+    const personBefore = await tx.person.findUnique({ where: { id: personID } });
+    await tx.person.update({
       where: { id: personID },
       data: { position: newPosition },
+    });
+    await logAudit({
+      action: "update",
+      entityType: "person",
+      entityId: personID,
+      before: { position: personBefore?.position },
+      after: { position: newPosition },
+      tx,
     });
   });
   revalidatePath("/managePersons");
@@ -113,10 +140,19 @@ export async function updateEmail(data: FormData) {
     throw new Error("A person with this email already exists");
   }
 
-  await prisma.$transaction(async (prisma) => {
-    await prisma.person.update({
+  await prisma.$transaction(async (tx) => {
+    const personBefore = await tx.person.findUnique({ where: { id: personID } });
+    await tx.person.update({
       where: { id: personID },
       data: { email: newEmail },
+    });
+    await logAudit({
+      action: "update",
+      entityType: "person",
+      entityId: personID,
+      before: { email: personBefore?.email },
+      after: { email: newEmail },
+      tx,
     });
   });
   revalidatePath("/managePersons");
@@ -136,13 +172,22 @@ export async function addManager(data: FormData) {
   teamIDs.forEach((id) => validateUUID(id, "teamID"));
   validateUUID(personID, "personID");
 
-  await prisma.$transaction(async (prisma) => {
-    await prisma.team.update({
+  await prisma.$transaction(async (tx) => {
+    const teamBefore = await tx.team.findUnique({ where: { teamId: teamIDs[0] } });
+    await tx.team.update({
       where: { teamId: teamIDs[0] },
       data: { teamManagerId: personID },
     });
+    await logAudit({
+      action: "update",
+      entityType: "team",
+      entityId: teamIDs[0],
+      before: { teamManagerId: teamBefore?.teamManagerId },
+      after: { teamManagerId: personID },
+      tx,
+    });
 
-    const existingMember = await prisma.teamMember.findUnique({
+    const existingMember = await tx.teamMember.findUnique({
       where: {
         personId_teamId: {
           personId: personID,
@@ -152,11 +197,18 @@ export async function addManager(data: FormData) {
     });
 
     if (!existingMember) {
-      await prisma.teamMember.create({
+      const member = await tx.teamMember.create({
         data: {
           personId: personID,
           teamId: teamIDs[0],
         },
+      });
+      await logAudit({
+        action: "create",
+        entityType: "teamMember",
+        entityId: member.id,
+        after: { personId: personID, teamId: teamIDs[0] },
+        tx,
       });
     }
   });
@@ -179,8 +231,8 @@ export async function addMember(data: FormData) {
   validateUUID(teamID, "teamID");
   validateUUID(personID, "personID");
 
-  await prisma.$transaction(async (prisma) => {
-    const existingMember = await prisma.teamMember.findUnique({
+  await prisma.$transaction(async (tx) => {
+    const existingMember = await tx.teamMember.findUnique({
       where: {
         personId_teamId: {
           personId: personID,
@@ -193,11 +245,18 @@ export async function addMember(data: FormData) {
       throw new Error("Person is already a member of the team");
     }
 
-    await prisma.teamMember.create({
+    const member = await tx.teamMember.create({
       data: {
         personId: personID,
         teamId: teamID,
       },
+    });
+    await logAudit({
+      action: "create",
+      entityType: "teamMember",
+      entityId: member.id,
+      after: { personId: personID, teamId: teamID },
+      tx,
     });
   });
   revalidatePath("/manageTeams");
@@ -211,12 +270,19 @@ export async function createTeam(data: FormData) {
     throw new Error("Invalid Name");
   }
 
-  await prisma.$transaction(async (prisma) => {
-    await prisma.team.create({
+  await prisma.$transaction(async (tx) => {
+    const team = await tx.team.create({
       data: {
         teamName: name.trim(),
         teamManagerId: null,
       },
+    });
+    await logAudit({
+      action: "create",
+      entityType: "team",
+      entityId: team.teamId,
+      after: { teamName: team.teamName },
+      tx,
     });
   });
   revalidatePath("/manageTeams");
@@ -231,12 +297,24 @@ export async function removeTeam(data: FormData) {
   }
   teamIDs.forEach((id) => validateUUID(id, "teamID"));
 
-  await prisma.$transaction(async (prisma) => {
-    await prisma.team.deleteMany({
-      where: {
-        teamId: { in: teamIDs },
-      },
+  await prisma.$transaction(async (tx) => {
+    const teamsToDelete = await tx.team.findMany({
+      where: { teamId: { in: teamIDs } },
     });
+
+    await tx.team.deleteMany({
+      where: { teamId: { in: teamIDs } },
+    });
+
+    for (const team of teamsToDelete) {
+      await logAudit({
+        action: "delete",
+        entityType: "team",
+        entityId: team.teamId,
+        before: { teamName: team.teamName, teamManagerId: team.teamManagerId },
+        tx,
+      });
+    }
   });
   revalidatePath("/manageTeams");
   revalidatePath("/");
@@ -257,8 +335,8 @@ export async function removeMember(data: FormData) {
   validateUUID(teamID, "teamID");
   validateUUID(personID, "personID");
 
-  await prisma.$transaction(async (prisma) => {
-    const existingMember = await prisma.teamMember.findUnique({
+  await prisma.$transaction(async (tx) => {
+    const existingMember = await tx.teamMember.findUnique({
       where: {
         personId_teamId: {
           personId: personID,
@@ -271,7 +349,7 @@ export async function removeMember(data: FormData) {
       throw new Error("Person is not a member of the team");
     }
 
-    await prisma.teamMember.delete({
+    await tx.teamMember.delete({
       where: {
         personId_teamId: {
           personId: personID,
@@ -279,12 +357,27 @@ export async function removeMember(data: FormData) {
         },
       },
     });
+    await logAudit({
+      action: "delete",
+      entityType: "teamMember",
+      entityId: existingMember.id,
+      before: { personId: personID, teamId: teamID },
+      tx,
+    });
 
-    const team = await prisma.team.findUnique({ where: { teamId: teamID } });
+    const team = await tx.team.findUnique({ where: { teamId: teamID } });
     if (team?.teamManagerId === personID) {
-      await prisma.team.update({
+      await tx.team.update({
         where: { teamId: teamID },
         data: { teamManagerId: null },
+      });
+      await logAudit({
+        action: "update",
+        entityType: "team",
+        entityId: teamID,
+        before: { teamManagerId: personID },
+        after: { teamManagerId: null },
+        tx,
       });
     }
   });
@@ -294,10 +387,21 @@ export async function removeMember(data: FormData) {
 
 export async function resetAll() {
   await requirePermission("data:reset");
-  await prisma.$transaction(async (prisma) => {
-    await prisma.teamMember.deleteMany();
-    await prisma.team.deleteMany();
-    await prisma.person.deleteMany();
+  await prisma.$transaction(async (tx) => {
+    const counts = {
+      teamMembers: await tx.teamMember.count(),
+      teams: await tx.team.count(),
+      persons: await tx.person.count(),
+    };
+    await tx.teamMember.deleteMany();
+    await tx.team.deleteMany();
+    await tx.person.deleteMany();
+    await logAudit({
+      action: "reset",
+      entityType: "person",
+      before: counts,
+      tx,
+    });
   });
   revalidatePath("/");
   revalidatePath("/managePersons");
@@ -429,6 +533,12 @@ export async function seedMockData(clearExisting: boolean = true) {
     }
   });
 
+  await logAudit({
+    action: "seed",
+    entityType: "person",
+    after: { clearExisting },
+  });
+
   revalidatePath("/");
   revalidatePath("/managePersons");
   revalidatePath("/manageTeams");
@@ -466,6 +576,14 @@ export async function updateUserRole(data: FormData) {
       where: { id: userId },
       data: { role: newRole },
     });
+    await logAudit({
+      action: "update",
+      entityType: "user",
+      entityId: userId,
+      before: { role: targetUser.role },
+      after: { role: newRole },
+      tx,
+    });
   });
   revalidatePath("/admin");
 }
@@ -496,6 +614,13 @@ export async function updateUserPermission(data: FormData) {
       await tx.userPermission.deleteMany({
         where: { userId, permissionId: permission.id },
       });
+      await logAudit({
+        action: "delete",
+        entityType: "userPermission",
+        entityId: userId,
+        before: { permissionKey, action: "reset" },
+        tx,
+      });
     } else {
       const granted = action === "grant";
       await tx.userPermission.upsert({
@@ -507,6 +632,13 @@ export async function updateUserPermission(data: FormData) {
         },
         update: { granted },
         create: { userId, permissionId: permission.id, granted },
+      });
+      await logAudit({
+        action: "update",
+        entityType: "userPermission",
+        entityId: userId,
+        after: { permissionKey, granted },
+        tx,
       });
     }
   });

@@ -18,6 +18,12 @@ jest.mock("@/permissions", () => ({
   seedPermissions: jest.fn(),
 }));
 
+// Mock audit logging — logAudit calls getCurrentUser() which needs auth.
+// Audit log behavior is tested separately.
+jest.mock("@/auditLog", () => ({
+  logAudit: jest.fn(),
+}));
+
 // Mock Next.js server functions — these don't exist in a test environment,
 // but the server actions call them after every mutation.
 jest.mock("next/cache", () => ({
