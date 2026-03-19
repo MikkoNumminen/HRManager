@@ -213,13 +213,13 @@ Individual permissions can be overridden per-user through the admin UI — for e
 
 350 tests across 26 test suites, covering every layer of the application:
 
-| Layer              | Tests | What's covered                                                                                                                                                                                                                        |
-| ------------------ | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Zod schemas**    | 43    | PersonSchema, TeamSchema, TeamMemberSchema, UserSchema, PermissionsSchema — valid data, missing fields, invalid UUIDs, nullable fields, wrong types, role enum validation                                                             |
-| **Prisma queries** | 23    | `getPersons`, `getTeams`, `getUsers`, `getUserById`, `getAllPermissionKeys` against real SQLite — empty state, null fields, member shapes, user overrides, permission resolution, ordering                                             |
+| Layer              | Tests | What's covered                                                                                                                                                                                                                             |
+| ------------------ | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Zod schemas**    | 43    | PersonSchema, TeamSchema, TeamMemberSchema, UserSchema, PermissionsSchema — valid data, missing fields, invalid UUIDs, nullable fields, wrong types, role enum validation                                                                  |
+| **Prisma queries** | 23    | `getPersons`, `getTeams`, `getUsers`, `getUserById`, `getAllPermissionKeys` against real SQLite — empty state, null fields, member shapes, user overrides, permission resolution, ordering                                                 |
 | **Server actions** | 78    | All 14 mutations — CRUD for persons/teams/members, admin role updates, permission override grant/deny/reset, mock data seeding, UUID validation, duplicate prevention, cascade deletes, superuser protection, idempotent seed with upserts |
-| **RBAC logic**     | 24    | `resolvePermissions`, `getCurrentUser`, `getUserPermissions`, `hasPermission`, `requirePermission` — superuser immunity, role defaults, grant/deny overrides, session lookup, unauthenticated fallback                                 |
-| **UI components**  | 182   | All 21 components — rendering, user interactions, keyboard accessibility, form validation, permission-based visibility, role chips, selection cards, minimal/full views, empty states, router navigation, admin menu links              |
+| **RBAC logic**     | 24    | `resolvePermissions`, `getCurrentUser`, `getUserPermissions`, `hasPermission`, `requirePermission` — superuser immunity, role defaults, grant/deny overrides, session lookup, unauthenticated fallback                                     |
+| **UI components**  | 182   | All 21 components — rendering, user interactions, keyboard accessibility, form validation, permission-based visibility, role chips, selection cards, minimal/full views, empty states, router navigation, admin menu links                 |
 
 ```
 Coverage summary (combined client + server suites)

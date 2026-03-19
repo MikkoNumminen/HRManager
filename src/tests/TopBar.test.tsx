@@ -12,6 +12,11 @@ jest.mock("next-auth/react", () => ({
   signOut: jest.fn(),
 }));
 
+jest.mock("../serverActions", () => ({
+  resetAll: jest.fn(),
+  seedMockData: jest.fn(),
+}));
+
 const mockUseSession = useSession as jest.Mock;
 
 describe("TopBar", () => {
@@ -141,5 +146,74 @@ describe("TopBar", () => {
     render(<TopBar title="Home" />);
     fireEvent.click(screen.getByLabelText("User menu"));
     expect(screen.queryByText("User Management")).not.toBeInTheDocument();
+  });
+
+  // Shows "Load Mock Data" menu item when user has data:seed permission
+  test("shows Load Mock Data when user has data:seed permission", () => {
+    mockUseSession.mockReturnValue({
+      data: { user: { name: "Alice", email: "a@b.com", image: null } },
+      status: "authenticated",
+    });
+    const permissions = { "data:seed": true, "data:reset": false } as never;
+    render(<TopBar title="Home" permissions={permissions} />);
+    fireEvent.click(screen.getByLabelText("User menu"));
+    expect(screen.getByText("Load Mock Data")).toBeInTheDocument();
+    expect(screen.queryByText("Reset All Data")).not.toBeInTheDocument();
+  });
+
+  // Shows "Reset All Data" menu item when user has data:reset permission
+  test("shows Reset All Data when user has data:reset permission", () => {
+    mockUseSession.mockReturnValue({
+      data: { user: { name: "Alice", email: "a@b.com", image: null } },
+      status: "authenticated",
+    });
+    const permissions = { "data:seed": false, "data:reset": true } as never;
+    render(<TopBar title="Home" permissions={permissions} />);
+    fireEvent.click(screen.getByLabelText("User menu"));
+    expect(screen.getByText("Reset All Data")).toBeInTheDocument();
+    expect(screen.queryByText("Load Mock Data")).not.toBeInTheDocument();
+  });
+
+  // Hides dev tools menu items when no permissions are passed
+  test("hides dev tools when no permissions prop", () => {
+    mockUseSession.mockReturnValue({
+      data: { user: { name: "Alice", email: "a@b.com", image: null } },
+      status: "authenticated",
+    });
+    render(<TopBar title="Home" />);
+    fireEvent.click(screen.getByLabelText("User menu"));
+    expect(screen.queryByText("Load Mock Data")).not.toBeInTheDocument();
+    expect(screen.queryByText("Reset All Data")).not.toBeInTheDocument();
+  });
+
+  // Opens seed dialog when "Load Mock Data" is clicked
+  test("opens seed dialog on Load Mock Data click", () => {
+    mockUseSession.mockReturnValue({
+      data: { user: { name: "Alice", email: "a@b.com", image: null } },
+      status: "authenticated",
+    });
+    const permissions = { "data:seed": true } as never;
+    render(<TopBar title="Home" permissions={permissions} />);
+    fireEvent.click(screen.getByLabelText("User menu"));
+    fireEvent.click(screen.getByText("Load Mock Data"));
+    expect(screen.getByText("Keep Existing")).toBeInTheDocument();
+    expect(screen.getByText("Replace All")).toBeInTheDocument();
+  });
+
+  // Opens reset dialog when "Reset All Data" is clicked
+  test("opens reset dialog on Reset All Data click", () => {
+    mockUseSession.mockReturnValue({
+      data: { user: { name: "Alice", email: "a@b.com", image: null } },
+      status: "authenticated",
+    });
+    const permissions = { "data:reset": true } as never;
+    render(<TopBar title="Home" permissions={permissions} />);
+    fireEvent.click(screen.getByLabelText("User menu"));
+    fireEvent.click(screen.getByText("Reset All Data"));
+    expect(
+      screen.getByText(
+        "Are you sure you want to delete all persons and teams? This action cannot be undone.",
+      ),
+    ).toBeInTheDocument();
   });
 });

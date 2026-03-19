@@ -35,7 +35,6 @@ import { Box, Link, Tooltip, Typography } from "@mui/material";
 import PersonTable from "@/components/PersonsTable";
 import TeamsTable from "@/components/TeamsTable";
 import TopBar from "@/components/TopBar";
-import ResetAll from "@/components/ResetAll";
 import { boxStyles } from "@/muiStyles";
 import { getPersons, getTeams } from "@/queries";
 import { auth } from "@/auth";
@@ -60,11 +59,9 @@ export default async function Home() {
     permissions["team:add_member"] ||
     permissions["team:remove_member"];
 
-  const canAccessDevTools = permissions["data:reset"] || permissions["data:seed"];
-
   return (
     <>
-      <TopBar title="Human Resources Management System" />
+      <TopBar title="Human Resources Management System" permissions={permissions} />
       {session ? (
         canManagePersons ? (
           <Link href="/managePersons" sx={{ textDecoration: "none" }}>
@@ -122,8 +119,6 @@ export default async function Home() {
           <TeamsTable combinedTeams={teamsData} minimal />
         </Box>
       )}
-
-      {session && canAccessDevTools && <ResetAll permissions={permissions} />}
     </>
   );
 }
