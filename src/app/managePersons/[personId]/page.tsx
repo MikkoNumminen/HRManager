@@ -30,7 +30,7 @@ export default async function PersonPage({ params }: { params: Promise<{ personI
 
   return (
     <>
-      <TopBar title={`Manage ${person.name}`} backHref="/managePersons" />
+      <TopBar title={`Manage ${person.name}`} backHref="/managePersons" permissions={permissions} />
       {permissions["person:delete"] && <RemovePersonForm personID={personId} />}
       {permissions["person:update_position"] && (
         <UpdatePositionForm personID={personId} currentPosition={person.position || undefined} />

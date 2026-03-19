@@ -580,8 +580,8 @@ export async function updateUserRole(data: FormData) {
       action: "update",
       entityType: "user",
       entityId: userId,
-      before: { role: targetUser.role },
-      after: { role: newRole },
+      before: { role: targetUser.role, targetEmail: targetUser.email },
+      after: { role: newRole, targetEmail: targetUser.email },
       tx,
     });
   });
@@ -618,7 +618,7 @@ export async function updateUserPermission(data: FormData) {
         action: "delete",
         entityType: "userPermission",
         entityId: userId,
-        before: { permissionKey, action: "reset" },
+        before: { permissionKey, action: "reset", targetEmail: targetUser.email },
         tx,
       });
     } else {
@@ -637,7 +637,7 @@ export async function updateUserPermission(data: FormData) {
         action: "update",
         entityType: "userPermission",
         entityId: userId,
-        after: { permissionKey, granted },
+        after: { permissionKey, granted, targetEmail: targetUser.email },
         tx,
       });
     }

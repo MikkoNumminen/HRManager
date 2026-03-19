@@ -25,7 +25,7 @@ export default async function ManageTeamsPage() {
 
   return (
     <>
-      <TopBar title="Manage Teams" backHref="/" />
+      <TopBar title="Manage Teams" backHref="/" permissions={permissions} />
       {permissions["team:create"] && <AddTeamForm />}
       <Box sx={{ border: `1px solid ${colors.slate300}`, borderRadius: "4px", padding: "20px" }}>
         <Typography variant="h5" mb={1}>

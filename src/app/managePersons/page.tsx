@@ -24,7 +24,7 @@ export default async function ManagePersonsPage() {
 
   return (
     <>
-      <TopBar title="Manage Persons" backHref="/" />
+      <TopBar title="Manage Persons" backHref="/" permissions={permissions} />
       {permissions["person:create"] && <AddPersonForm />}
       <Box sx={{ border: `1px solid ${colors.slate300}`, borderRadius: "4px", padding: "20px" }}>
         <Typography variant="h5" mb={1}>

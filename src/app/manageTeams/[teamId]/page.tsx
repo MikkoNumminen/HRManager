@@ -34,7 +34,7 @@ export default async function TeamPage({ params }: { params: Promise<{ teamId: s
 
   return (
     <>
-      <TopBar title={`Manage ${team.teamName}`} backHref="/manageTeams" />
+      <TopBar title={`Manage ${team.teamName}`} backHref="/manageTeams" permissions={permissions} />
       {permissions["team:delete"] && <RemoveTeamForm teamID={teamId} />}
       {permissions["team:update_manager"] && (
         <UpdateManagerForm

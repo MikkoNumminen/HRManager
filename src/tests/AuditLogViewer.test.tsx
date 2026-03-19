@@ -59,6 +59,22 @@ describe("AuditLogViewer", () => {
     expect(screen.getByText("System")).toBeInTheDocument();
   });
 
+  // Shows user name instead of email when userNames map is provided.
+  test("shows user name when userNames map is provided", () => {
+    const log = makelog();
+    const userNames = { "alice@example.com": "Alice Smith" };
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} userNames={userNames} />);
+    expect(screen.getByText("Alice Smith")).toBeInTheDocument();
+  });
+
+  // Falls back to email when the user is not in the userNames map.
+  test("falls back to email when user not in userNames map", () => {
+    const log = makelog();
+    const userNames = { "other@example.com": "Other User" };
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} userNames={userNames} />);
+    expect(screen.getByText("alice@example.com")).toBeInTheDocument();
+  });
+
   // Renders all three filter controls (User, Action, Type).
   test("renders filter controls", () => {
     render(<AuditLogViewer logs={[]} {...defaultProps} />);
@@ -242,16 +258,19 @@ describe("AuditLogViewer", () => {
     expect(screen.getByText("update")).toBeInTheDocument();
   });
 
-  // Describes a user role change in plain language.
+  // Describes a user role change in plain language, showing target name.
   test("describes user role change in Barney style", () => {
     const log = makelog({
       action: "update",
       entityType: "user",
-      before: '{"role":"user"}',
-      after: '{"role":"admin"}',
+      before: '{"role":"user","targetEmail":"bob@test.com"}',
+      after: '{"role":"admin","targetEmail":"bob@test.com"}',
     });
-    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
-    expect(screen.getAllByText('Changed role from "user" to "admin"').length).toBeGreaterThan(0);
+    const userNames = { "bob@test.com": "Bob Jones" };
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} userNames={userNames} />);
+    expect(
+      screen.getAllByText('Changed Bob Jones\'s role from "user" to "admin"').length,
+    ).toBeGreaterThan(0);
   });
 
   // Describes team creation in plain language.
@@ -291,28 +310,32 @@ describe("AuditLogViewer", () => {
     ).toBeGreaterThan(0);
   });
 
-  // Describes permission grant in plain language.
+  // Describes permission grant in plain language, showing target name.
   test("describes permission grant in Barney style", () => {
     const log = makelog({
       action: "update",
       entityType: "userPermission",
-      after: '{"permissionKey":"person:create","granted":true}',
+      after: '{"permissionKey":"person:create","granted":true,"targetEmail":"bob@test.com"}',
     });
-    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
-    expect(screen.getAllByText("Granted the ability to create new people").length).toBeGreaterThan(
-      0,
-    );
+    const userNames = { "bob@test.com": "Bob Jones" };
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} userNames={userNames} />);
+    expect(
+      screen.getAllByText("Granted Bob Jones the ability to create new people").length,
+    ).toBeGreaterThan(0);
   });
 
-  // Describes permission denial in plain language.
+  // Describes permission denial in plain language, showing target name.
   test("describes permission denial in Barney style", () => {
     const log = makelog({
       action: "update",
       entityType: "userPermission",
-      after: '{"permissionKey":"team:delete","granted":false}',
+      after: '{"permissionKey":"team:delete","granted":false,"targetEmail":"bob@test.com"}',
     });
-    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
-    expect(screen.getAllByText("Revoked the ability to delete teams").length).toBeGreaterThan(0);
+    const userNames = { "bob@test.com": "Bob Jones" };
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} userNames={userNames} />);
+    expect(
+      screen.getAllByText("Revoked Bob Jones's ability to delete teams").length,
+    ).toBeGreaterThan(0);
   });
 
   // Describes adding a team member in plain language.
@@ -341,17 +364,18 @@ describe("AuditLogViewer", () => {
     expect(screen.getAllByText("Removed a member from a team").length).toBeGreaterThan(0);
   });
 
-  // Describes resetting a permission override back to role default.
+  // Describes resetting a permission override back to role default, showing target name.
   test("describes userPermission deletion as reset to role default", () => {
     const log = makelog({
       action: "delete",
       entityType: "userPermission",
-      before: '{"permissionKey":"person:create"}',
+      before: '{"permissionKey":"person:create","targetEmail":"bob@test.com"}',
       after: null,
     });
-    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    const userNames = { "bob@test.com": "Bob Jones" };
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} userNames={userNames} />);
     expect(
-      screen.getAllByText('Reset "create new people" back to role default').length,
+      screen.getAllByText('Reset Bob Jones\'s "create new people" back to role default').length,
     ).toBeGreaterThan(0);
   });
 
@@ -498,7 +522,7 @@ describe("AuditLogViewer", () => {
     expect(mockPush).toHaveBeenCalledWith(expect.stringContaining("page=1"));
   });
 
-  // Describes permission reset to role default with unknown permission key.
+  // Falls back to "a user" when targetEmail is missing from permission reset.
   test("falls back to raw key when permission key has no label", () => {
     const log = makelog({
       action: "delete",
@@ -508,11 +532,11 @@ describe("AuditLogViewer", () => {
     });
     render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
     expect(
-      screen.getAllByText('Reset "custom:unknown" back to role default').length,
+      screen.getAllByText('Reset a user\'s "custom:unknown" back to role default').length,
     ).toBeGreaterThan(0);
   });
 
-  // Uses unknown permission key label as-is when granting an unmapped permission.
+  // Falls back to "a user" when targetEmail is missing from permission grant.
   test("falls back to raw key when granting unknown permission", () => {
     const log = makelog({
       action: "update",
@@ -520,6 +544,8 @@ describe("AuditLogViewer", () => {
       after: '{"permissionKey":"custom:action","granted":true}',
     });
     render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
-    expect(screen.getAllByText("Granted the ability to custom:action").length).toBeGreaterThan(0);
+    expect(
+      screen.getAllByText("Granted a user the ability to custom:action").length,
+    ).toBeGreaterThan(0);
   });
 });

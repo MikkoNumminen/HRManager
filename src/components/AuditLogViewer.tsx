@@ -73,10 +73,17 @@ function describeChanges(
   entityType: string,
   before: string | null,
   after: string | null,
+  userNames: Record<string, string>,
 ): string {
   try {
     const b = before ? JSON.parse(before) : null;
     const a = after ? JSON.parse(after) : null;
+
+    const resolveTarget = (): string => {
+      const email = a?.targetEmail ?? b?.targetEmail;
+      if (!email) return "a user";
+      return userNames[email] ?? email;
+    };
 
     if (action === "create") {
       if (entityType === "person") return `Added a new person: ${a?.name ?? "unknown"}`;
@@ -93,7 +100,8 @@ function describeChanges(
       if (entityType === "userPermission") {
         const key = b?.permissionKey ?? "";
         const label = permissionLabels[key] ?? key;
-        return `Reset "${label}" back to role default`;
+        const target = resolveTarget();
+        return `Reset ${target}'s "${label}" back to role default`;
       }
       return "Record deleted";
     }
@@ -113,12 +121,18 @@ function describeChanges(
         }
         return "Updated team details";
       }
-      if (entityType === "user") return `Changed role from "${b?.role}" to "${a?.role}"`;
+      if (entityType === "user") {
+        const target = resolveTarget();
+        return `Changed ${target}'s role from "${b?.role}" to "${a?.role}"`;
+      }
       if (entityType === "userPermission") {
         const granted = a?.granted;
         const key = a?.permissionKey ?? "";
         const label = permissionLabels[key] ?? key;
-        return granted ? `Granted the ability to ${label}` : `Revoked the ability to ${label}`;
+        const target = resolveTarget();
+        return granted
+          ? `Granted ${target} the ability to ${label}`
+          : `Revoked ${target}'s ability to ${label}`;
       }
       return "Record updated";
     }
@@ -147,6 +161,7 @@ interface AuditLogViewerProps {
   currentPage: number;
   pageSize: number;
   userEmails: string[];
+  userNames?: Record<string, string>;
   currentFilters: {
     userEmail?: string;
     action?: string;
@@ -160,6 +175,7 @@ export default function AuditLogViewer({
   currentPage,
   pageSize,
   userEmails,
+  userNames = {},
   currentFilters,
 }: AuditLogViewerProps) {
   const router = useRouter();
@@ -245,24 +261,32 @@ export default function AuditLogViewer({
       </Box>
 
       <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="audit log table">
+        <Table sx={{ tableLayout: "fixed", width: "100%" }} aria-label="audit log table">
           <TableHead>
             <TableRow>
               <Tooltip title="When the action was performed" placement="top" arrow>
-                <TableCell sx={{ color: colors.slate400, cursor: "help" }}>Timestamp</TableCell>
+                <TableCell sx={{ color: colors.slate400, cursor: "help", width: "15%" }}>
+                  Timestamp
+                </TableCell>
               </Tooltip>
               <Tooltip title="The user who performed the action" placement="top" arrow>
-                <TableCell sx={{ color: colors.slate400, cursor: "help" }}>User</TableCell>
+                <TableCell sx={{ color: colors.slate400, cursor: "help", width: "18%" }}>
+                  User
+                </TableCell>
               </Tooltip>
               <Tooltip
                 title="The type of action taken (create, update, delete, etc.)"
                 placement="top"
                 arrow
               >
-                <TableCell sx={{ color: colors.slate400, cursor: "help" }}>Action</TableCell>
+                <TableCell sx={{ color: colors.slate400, cursor: "help", width: "9%" }}>
+                  Action
+                </TableCell>
               </Tooltip>
               <Tooltip title="The type of resource that was affected" placement="top" arrow>
-                <TableCell sx={{ color: colors.slate400, cursor: "help" }}>Type</TableCell>
+                <TableCell sx={{ color: colors.slate400, cursor: "help", width: "10%" }}>
+                  Type
+                </TableCell>
               </Tooltip>
               <Tooltip
                 title="What changed — shows before and after values for updates"
@@ -285,10 +309,30 @@ export default function AuditLogViewer({
             ) : (
               logs.map((log) => (
                 <TableRow key={log.id}>
-                  <TableCell sx={{ whiteSpace: "nowrap" }}>
+                  <TableCell sx={{ whiteSpace: "nowrap", fontSize: "0.8rem" }}>
                     {new Date(log.createdAt).toLocaleString()}
                   </TableCell>
-                  <TableCell>{log.userEmail ?? "System"}</TableCell>
+                  <TableCell
+                    sx={{
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    <Tooltip title={log.userEmail ?? "System"} placement="top" arrow>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          cursor: "help",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {(log.userEmail && userNames[log.userEmail]) ?? log.userEmail ?? "System"}
+                      </Typography>
+                    </Tooltip>
+                  </TableCell>
                   <TableCell>
                     <Chip
                       label={log.action}
@@ -303,9 +347,15 @@ export default function AuditLogViewer({
                     />
                   </TableCell>
                   <TableCell>{entityTypeLabels[log.entityType] ?? log.entityType}</TableCell>
-                  <TableCell sx={{ maxWidth: 300, overflow: "hidden", textOverflow: "ellipsis" }}>
+                  <TableCell>
                     <Tooltip
-                      title={describeChanges(log.action, log.entityType, log.before, log.after)}
+                      title={describeChanges(
+                        log.action,
+                        log.entityType,
+                        log.before,
+                        log.after,
+                        userNames,
+                      )}
                       placement="top"
                       arrow
                     >
@@ -313,12 +363,20 @@ export default function AuditLogViewer({
                         variant="body2"
                         sx={{
                           cursor: "help",
-                          whiteSpace: "nowrap",
+                          display: "-webkit-box",
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: "vertical",
                           overflow: "hidden",
-                          textOverflow: "ellipsis",
+                          wordBreak: "break-word",
                         }}
                       >
-                        {describeChanges(log.action, log.entityType, log.before, log.after)}
+                        {describeChanges(
+                          log.action,
+                          log.entityType,
+                          log.before,
+                          log.after,
+                          userNames,
+                        )}
                       </Typography>
                     </Tooltip>
                   </TableCell>

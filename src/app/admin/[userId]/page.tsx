@@ -35,7 +35,11 @@ export default async function UserPermissionPage({
 
   return (
     <>
-      <TopBar title={`Manage ${user.name ?? user.email}`} backHref="/admin" />
+      <TopBar
+        title={`Manage ${user.name ?? user.email}`}
+        backHref="/admin"
+        permissions={permissions}
+      />
       <UserPermissionEditor
         user={user}
         allPermissionKeys={allPermissionKeys}

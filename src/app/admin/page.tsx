@@ -20,7 +20,7 @@ export default async function AdminPage() {
 
   return (
     <>
-      <TopBar title="User Management" backHref="/" />
+      <TopBar title="User Management" backHref="/" permissions={permissions} />
       <Box
         sx={{
           border: `1px solid ${colors.slate300}`,
