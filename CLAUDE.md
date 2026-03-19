@@ -27,15 +27,18 @@ This is a **portfolio / showcase project**. The goal is to demonstrate technical
 ## Architecture
 
 - **Reads** go in `queries.ts` (no `"use server"`). Validated through Zod schemas.
-- **Mutations** go in `serverActions.ts` (marked `"use server"`). Always inside `prisma.$transaction()` — even single operations.
+- **Mutations** go in `serverActions.ts` (marked `"use server"`). Always inside `prisma.$transaction()` — even single operations. Every mutation is audit-logged via `logAudit()` from `auditLog.ts` inside the same transaction for atomicity.
+- **Audit logging** — `auditLog.ts` provides `logAudit()` which records who, what action, which entity, and before/after JSON snapshots. Uses `getCurrentUser()` for actor identity. Accepts optional `tx` param to run inside an existing transaction. No FK to User — logs survive user deletion.
 - Pages are async Server Components that fetch data and pass it as props to Client Components. No `useEffect` data fetching.
 - Forms use React 19's `useActionState` with `action=` prop, not `onSubmit`.
-- Types are derived from Zod schemas in `schemas.ts` via `z.infer` — `Person` and `CombinedTeam`. Do not create duplicate interfaces in components.
+- Types are derived from Zod schemas in `schemas.ts` via `z.infer` — `Person`, `CombinedTeam`, `AppUser`, `AuditLog`, `Permissions`. Do not create duplicate interfaces in components.
 - MUI style tokens and component styles are centralized in `muiStyles.ts`.
 - **Info tooltips**: Use MUI `Tooltip` with `arrow` and `cursor: "help"` on column headers or labels that may not be self-explanatory. Keep tooltip text concise but informative. Apply this consistently across all data tables and editor views.
 - **Auth** is configured in `auth.ts` (NextAuth v5). Protected routes use `auth()` + `redirect("/")` in Server Components. Client components use `useSession` via `SessionProvider` wrapper in layout.
 - **Guest mode**: unauthenticated users see read-only minimal views (MUI Chips) of Persons and Teams on the main page. Manage routes (`/managePersons`, `/manageTeams`) redirect to `/`.
+- **TopBar** — the user avatar dropdown menu contains: User Management, Audit Log (permission-gated), Load Mock Data, Reset All Data (permission-gated), and Sign Out. Dev tools (seed/reset) are only visible when the `permissions` prop is passed (home page only).
 - **Client-heavy rendering**: Keep the server thin — it handles only data fetching, auth, and validation. All rendering logic, UI state, filtering, sorting, and heavy computation belong in Client Components so the server stays lightweight and responsive. Security-sensitive logic (auth checks, input sanitization, access control, database queries) must always remain server-side — never trust the client for authorization or data integrity.
+- **SQLite single-writer constraint** — SQLite cannot handle concurrent write transactions. Never nest `$transaction` calls. In `seedMockData`, separate transactions run sequentially (main data → cleanup → `seedPermissions()` → user creation) to avoid deadlock.
 
 ## File structure
 
