@@ -27,7 +27,7 @@ A full-stack HR management system for managing employees and teams — built wit
 - **Dark UI** — MUI dark theme with consistent component styling throughout
 - **Type-safe** — end-to-end TypeScript with Zod schema validation and centralized inferred types
 - **Server-first** — async Server Components for data fetching, Server Actions for mutations inside `$transaction` blocks
-- **Thoroughly tested** — 382 Jest tests across six layers with 93%+ line coverage: Zod schemas, RBAC logic, Prisma queries, server actions, audit log queries, and all UI components
+- **Thoroughly tested** — 406 Jest tests across six layers with 92%+ line coverage: Zod schemas, RBAC logic, Prisma queries, server actions, audit logging, and all UI components
 
 ---
 
@@ -104,7 +104,7 @@ npm run test:server # query + server action tests (Node, real SQLite)
 npm run test:all    # both suites
 ```
 
-> The project has **382 tests** split into two suites. `npm test` runs the client-side tests — component rendering, user interactions, form validation, Zod schema parsing, and RBAC permission resolution — all in a jsdom environment. `npm run test:server` runs the server-side tests against a real SQLite test database — every Prisma query, every server action mutation (including admin role/permission management), audit log queries, UUID validation, duplicate prevention, and cascade deletes. The test database (`prisma/test.db`) is created automatically the first time you run it and never touches your dev data.
+> The project has **406 tests** split into two suites. `npm test` runs the client-side tests — component rendering, user interactions, form validation, Zod schema parsing, and RBAC permission resolution — all in a jsdom environment. `npm run test:server` runs the server-side tests against a real SQLite test database — every Prisma query, every server action mutation (including admin role/permission management), audit log creation, audit log queries, UUID validation, duplicate prevention, and cascade deletes. The test database (`prisma/test.db`) is created automatically the first time you run it and never touches your dev data.
 
 ---
 
@@ -224,25 +224,26 @@ Individual permissions can be overridden per-user through the admin UI — for e
 
 ## Testing
 
-382 tests across 26 test suites, covering every layer of the application:
+406 tests across 27 test suites, covering every layer of the application:
 
 | Layer              | Tests | What's covered                                                                                                                                                                                                                                       |
 | ------------------ | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Zod schemas**    | 60    | PersonSchema, TeamSchema, TeamMemberSchema, UserSchema, PermissionsSchema, AuditLogSchema, AuditLogFilterSchema, AuditActionSchema, AuditEntityTypeSchema — valid data, missing fields, invalid UUIDs, nullable fields, wrong types, enum validation |
 | **Prisma queries** | 33    | `getPersons`, `getTeams`, `getUsers`, `getUserById`, `getAllPermissionKeys`, `getAuditLogs`, `getAuditLogUserEmails` against real SQLite — filtering, pagination, ordering, empty state, distinct emails                                             |
 | **Server actions** | 78    | All 14 mutations — CRUD for persons/teams/members, admin role updates, permission override grant/deny/reset, mock data seeding, UUID validation, duplicate prevention, cascade deletes, superuser protection, idempotent seed with upserts           |
+| **Audit logging**  | 6     | `logAudit` — user info capture, null user (unauthenticated), JSON serialization of before/after, undefined handling, null entityId, transaction client usage                                                                                         |
 | **RBAC logic**     | 24    | `resolvePermissions`, `getCurrentUser`, `getUserPermissions`, `hasPermission`, `requirePermission` — superuser immunity, role defaults, grant/deny overrides, session lookup, unauthenticated fallback                                               |
-| **UI components**  | 187   | All 22 components — rendering, user interactions, keyboard accessibility, form validation, permission-based visibility, role chips, selection cards, minimal/full views, empty states, router navigation, admin menu links, audit log viewer         |
+| **UI components**  | 205   | All 23 components — rendering, user interactions, keyboard accessibility, form validation, permission-based visibility, role chips, selection cards, minimal/full views, empty states, router navigation, admin menu links, audit log filtering      |
 
 ```
 Coverage summary (combined client + server suites)
-  Statements : 88.53%
-  Branches   : 81.42%
-  Functions  : 83.69%
-  Lines      : 89.02%
+  Statements : 91.51%
+  Branches   : 86.17%
+  Functions  : 89.13%
+  Lines      : 92.18%
 ```
 
-Highlights: `queries.ts`, `schemas.ts`, and `serverActions.ts` at 97–100% line coverage. Server-side tests run against an isolated test database (`prisma/test.db`) — the dev database is never touched.
+Highlights: `auditLog.ts`, `queries.ts`, `schemas.ts`, and `serverActions.ts` at 97–100% line coverage. Server-side tests run against an isolated test database (`prisma/test.db`) — the dev database is never touched.
 
 ---
 
