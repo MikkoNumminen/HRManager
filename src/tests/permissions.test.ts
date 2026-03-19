@@ -50,6 +50,11 @@ describe("Permission Resolution", () => {
     expect(result["person:create"]).toBe(true);
     expect(result["person:delete"]).toBe(true);
     expect(result["team:create"]).toBe(true);
+    expect(result["department:create"]).toBe(true);
+    expect(result["department:delete"]).toBe(true);
+    expect(result["department:update"]).toBe(true);
+    expect(result["department:assign_team"]).toBe(true);
+    expect(result["department:read"]).toBe(true);
     expect(result["data:reset"]).toBe(false);
     expect(result["admin:manage_users"]).toBe(false);
   });
@@ -60,8 +65,10 @@ describe("Permission Resolution", () => {
 
     expect(result["person:read"]).toBe(true);
     expect(result["team:read"]).toBe(true);
+    expect(result["department:read"]).toBe(true);
     expect(result["person:create"]).toBe(false);
     expect(result["team:create"]).toBe(false);
+    expect(result["department:create"]).toBe(false);
     expect(result["admin:manage_users"]).toBe(false);
   });
 
@@ -71,7 +78,9 @@ describe("Permission Resolution", () => {
 
     expect(result["person:read"]).toBe(true);
     expect(result["team:read"]).toBe(true);
+    expect(result["department:read"]).toBe(true);
     expect(result["person:create"]).toBe(false);
+    expect(result["department:create"]).toBe(false);
   });
 
   // Overrides can grant a permission that is denied by default
@@ -115,9 +124,9 @@ describe("Permission Resolution", () => {
     expect(ROLE_DEFAULTS).toHaveProperty("guest");
   });
 
-  // There are exactly 16 permission keys
-  test("PERMISSION_KEYS has 16 entries", () => {
-    expect(PERMISSION_KEYS).toHaveLength(16);
+  // There are exactly 21 permission keys (16 original + 5 department)
+  test("PERMISSION_KEYS has 21 entries", () => {
+    expect(PERMISSION_KEYS).toHaveLength(21);
   });
 });
 
@@ -291,7 +300,7 @@ describe("requirePermission", () => {
 
 describe("seedPermissions", () => {
   // Calls upsert for every permission key inside a transaction.
-  test("upserts all 16 permission keys inside a transaction", async () => {
+  test("upserts all 21 permission keys inside a transaction", async () => {
     mockTransaction.mockImplementation(async (fn: (tx: unknown) => Promise<void>) => {
       await fn({ permission: { upsert: mockUpsert } });
     });
