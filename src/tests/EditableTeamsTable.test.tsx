@@ -24,6 +24,8 @@ describe("EditableTeamsTable Component", () => {
       teamId: "1",
       teamManagerId: "person-uuid-1",
       managerName: "Alice Manager",
+      departmentId: null,
+      departmentName: null,
       createdAt: new Date("2023-01-01T10:00:00Z"),
       updatedAt: new Date("2023-01-10T10:00:00Z"),
       members: [
@@ -36,6 +38,8 @@ describe("EditableTeamsTable Component", () => {
       teamId: "2",
       teamManagerId: null,
       managerName: null,
+      departmentId: null,
+      departmentName: null,
       createdAt: new Date("2023-02-01T11:00:00Z"),
       updatedAt: new Date("2023-02-10T11:00:00Z"),
       members: [],

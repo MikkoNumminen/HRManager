@@ -8,6 +8,8 @@ const mockCombinedTeams = [
     teamId: "1",
     teamManagerId: "mgr-1",
     managerName: "Manager1",
+    departmentId: null,
+    departmentName: null,
     createdAt: new Date("2023-01-01T10:00:00Z"),
     updatedAt: new Date("2023-01-10T10:00:00Z"),
     members: [
@@ -20,6 +22,8 @@ const mockCombinedTeams = [
     teamId: "2",
     teamManagerId: "mgr-2",
     managerName: "Manager2",
+    departmentId: null,
+    departmentName: null,
     createdAt: new Date("2023-02-01T11:00:00Z"),
     updatedAt: new Date("2023-02-10T11:00:00Z"),
     members: [

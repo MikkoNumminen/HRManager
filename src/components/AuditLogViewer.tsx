@@ -34,6 +34,7 @@ const entityTypeLabels: Record<string, string> = {
   person: "Person",
   team: "Team",
   teamMember: "Team Member",
+  department: "Department",
   user: "User",
   userPermission: "Permission",
 };

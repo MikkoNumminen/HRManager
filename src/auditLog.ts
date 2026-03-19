@@ -4,7 +4,13 @@ import { getCurrentUser } from "@/permissions";
 
 export type AuditAction = "create" | "update" | "delete" | "seed" | "reset";
 
-export type AuditEntityType = "person" | "team" | "teamMember" | "user" | "userPermission";
+export type AuditEntityType =
+  | "person"
+  | "team"
+  | "teamMember"
+  | "department"
+  | "user"
+  | "userPermission";
 
 interface AuditLogParams {
   action: AuditAction;

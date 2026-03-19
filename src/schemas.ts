@@ -22,12 +22,32 @@ export const TeamSchema = z.object({
   teamName: z.string().min(1),
   teamManagerId: z.string().uuid().nullable(),
   managerName: z.string().nullable(),
+  departmentId: z.string().uuid().nullable(),
+  departmentName: z.string().nullable(),
   createdAt: z.date(),
   updatedAt: z.date(),
   members: z.array(TeamMemberSchema),
 });
 
 export type CombinedTeam = z.infer<typeof TeamSchema>;
+
+export const DepartmentTeamSchema = z.object({
+  teamId: z.string().uuid(),
+  teamName: z.string(),
+});
+
+export const DepartmentSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string().min(1),
+  description: z.string().nullable(),
+  headId: z.string().uuid().nullable(),
+  headName: z.string().nullable(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+  teams: z.array(DepartmentTeamSchema),
+});
+
+export type Department = z.infer<typeof DepartmentSchema>;
 
 export const UserSchema = z.object({
   id: z.string().uuid(),
@@ -51,6 +71,7 @@ export const AuditEntityTypeSchema = z.enum([
   "person",
   "team",
   "teamMember",
+  "department",
   "user",
   "userPermission",
 ]);

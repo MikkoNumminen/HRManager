@@ -136,6 +136,8 @@ describe("TeamSchema", () => {
     teamName: "Engineering",
     teamManagerId: VALID_UUID_2,
     managerName: "Alice",
+    departmentId: VALID_UUID,
+    departmentName: "Product",
     createdAt: NOW,
     updatedAt: NOW,
     members: [
@@ -341,16 +343,16 @@ describe("AuditActionSchema", () => {
 });
 
 describe("AuditEntityTypeSchema", () => {
-  // All five entity types should be accepted.
+  // All six entity types should be accepted.
   test("accepts all valid entity types", () => {
-    for (const type of ["person", "team", "teamMember", "user", "userPermission"]) {
+    for (const type of ["person", "team", "teamMember", "department", "user", "userPermission"]) {
       expect(() => AuditEntityTypeSchema.parse(type)).not.toThrow();
     }
   });
 
   // A made-up entity type should be rejected.
   test("rejects invalid entity type", () => {
-    expect(() => AuditEntityTypeSchema.parse("department")).toThrow();
+    expect(() => AuditEntityTypeSchema.parse("invoice")).toThrow();
   });
 });
 

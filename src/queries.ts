@@ -23,6 +23,7 @@ export async function getTeams(): Promise<CombinedTeam[]> {
   const teams = await prisma.team.findMany({
     include: {
       manager: true,
+      department: true,
       members: {
         include: {
           person: true,
@@ -37,6 +38,8 @@ export async function getTeams(): Promise<CombinedTeam[]> {
       teamName: team.teamName,
       teamManagerId: team.teamManagerId ?? null,
       managerName: team.manager?.name ?? null,
+      departmentId: team.departmentId ?? null,
+      departmentName: team.department?.name ?? null,
       createdAt: team.createdAt,
       updatedAt: team.updatedAt,
       members:
