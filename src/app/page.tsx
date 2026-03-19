@@ -34,16 +34,20 @@
 import { Box, Link, Tooltip, Typography } from "@mui/material";
 import PersonTable from "@/components/PersonsTable";
 import TeamsTable from "@/components/TeamsTable";
+import DepartmentsTable from "@/components/DepartmentsTable";
 import TopBar from "@/components/TopBar";
 import { boxStyles } from "@/muiStyles";
-import { getPersons, getTeams } from "@/queries";
+import { getPersons, getTeams, getDepartments } from "@/queries";
 import { auth } from "@/auth";
 import { getUserPermissions } from "@/permissions";
 
 export default async function Home() {
   const session = await auth();
-  const persons = await getPersons();
-  const teamsData = await getTeams();
+  const [persons, teamsData, departments] = await Promise.all([
+    getPersons(),
+    getTeams(),
+    getDepartments(),
+  ]);
   const permissions = await getUserPermissions();
 
   const canManagePersons =
@@ -58,6 +62,12 @@ export default async function Home() {
     permissions["team:update_manager"] ||
     permissions["team:add_member"] ||
     permissions["team:remove_member"];
+
+  const canManageDepartments =
+    permissions["department:create"] ||
+    permissions["department:delete"] ||
+    permissions["department:update"] ||
+    permissions["department:assign_team"];
 
   return (
     <>
@@ -88,6 +98,35 @@ export default async function Home() {
             Persons
           </Typography>
           <PersonTable persons={persons} minimal />
+        </Box>
+      )}
+
+      {session ? (
+        canManageDepartments ? (
+          <Link href="/manageDepartments" sx={{ textDecoration: "none" }}>
+            <Tooltip title="Go to Departments Manager" placement="right" arrow>
+              <Box component="div" sx={boxStyles}>
+                <Typography variant="h6" gutterBottom>
+                  Departments
+                </Typography>
+                <DepartmentsTable departments={departments} />
+              </Box>
+            </Tooltip>
+          </Link>
+        ) : (
+          <Box sx={{ ...boxStyles, "&:hover": {}, cursor: "default" }}>
+            <Typography variant="h6" gutterBottom>
+              Departments
+            </Typography>
+            <DepartmentsTable departments={departments} />
+          </Box>
+        )
+      ) : (
+        <Box sx={{ ...boxStyles, "&:hover": {}, cursor: "default" }}>
+          <Typography variant="h6" gutterBottom>
+            Departments
+          </Typography>
+          <DepartmentsTable departments={departments} minimal />
         </Box>
       )}
 
