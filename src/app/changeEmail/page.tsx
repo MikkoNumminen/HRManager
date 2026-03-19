@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import Link from "next/link";
+export const dynamic = "force-dynamic";
 import { formStyles, headerStyles, smallButtonStyles, textFieldStyles } from "@/muiStyles";
 import { updateEmail } from "@/serverActions";
 import { getPersons } from "@/queries";
@@ -35,7 +35,7 @@ export default async function Page() {
               size="small"
               sx={{ ...textFieldStyles, flexGrow: 1 }}
             />
-            <Button component={Link} href=".." sx={smallButtonStyles}>
+            <Button href=".." sx={smallButtonStyles}>
               Cancel
             </Button>
             <Button type="submit" sx={smallButtonStyles}>

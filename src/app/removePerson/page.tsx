@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import Link from "next/link";
+export const dynamic = "force-dynamic";
 import { RemovePersonCheckBoxList } from "@/components/RemovePersonCheckBoxList";
 import { formStyles, headerStyles, smallButtonStyles } from "@/muiStyles";
 import { removePerson } from "@/serverActions";
@@ -29,7 +29,7 @@ export default async function Page() {
           </Box>
 
           <Box display="flex" gap={1} justifyContent="flex-end">
-            <Button component={Link} href=".." sx={smallButtonStyles}>
+            <Button href=".." sx={smallButtonStyles}>
               Cancel
             </Button>
             <Button type="submit" sx={smallButtonStyles}>

@@ -7,7 +7,7 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getUserPermissions } from "@/permissions";
 import { prisma } from "@/db";
-import { AuditLog } from "@/schemas";
+import { AuditLog, AuditActionSchema, AuditEntityTypeSchema } from "@/schemas";
 
 /**
  * For audit log entries that target a user (role changes, permission changes),
@@ -68,8 +68,14 @@ export default async function AuditLogPage({
 
   const filters = {
     userEmail: typeof params.userEmail === "string" ? params.userEmail : undefined,
-    action: typeof params.action === "string" ? params.action : undefined,
-    entityType: typeof params.entityType === "string" ? params.entityType : undefined,
+    action:
+      typeof params.action === "string"
+        ? AuditActionSchema.safeParse(params.action).data
+        : undefined,
+    entityType:
+      typeof params.entityType === "string"
+        ? AuditEntityTypeSchema.safeParse(params.entityType).data
+        : undefined,
     dateFrom: typeof params.dateFrom === "string" ? new Date(params.dateFrom) : undefined,
     dateTo: typeof params.dateTo === "string" ? new Date(params.dateTo) : undefined,
     page: typeof params.page === "string" ? parseInt(params.page, 10) : 1,
