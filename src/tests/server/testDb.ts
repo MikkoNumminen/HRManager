@@ -5,6 +5,7 @@ export const testPrisma = new PrismaClient({
 });
 
 export async function cleanDb() {
+  await testPrisma.auditLog.deleteMany();
   await testPrisma.userPermission.deleteMany();
   await testPrisma.teamMember.deleteMany();
   await testPrisma.team.deleteMany();

@@ -339,10 +339,10 @@ describe("getUserById", () => {
 });
 
 describe("getAllPermissionKeys", () => {
-  // Should return all 15 permission keys defined in the system.
-  test("returns all 15 permission keys", async () => {
+  // Should return all 16 permission keys defined in the system.
+  test("returns all 16 permission keys", async () => {
     const keys = await getAllPermissionKeys();
-    expect(keys).toHaveLength(15);
+    expect(keys).toHaveLength(16);
     expect(keys).toContain("person:create");
     expect(keys).toContain("admin:manage_users");
   });

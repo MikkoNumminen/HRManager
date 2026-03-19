@@ -17,6 +17,7 @@ export const PERMISSION_KEYS = [
   "data:seed",
   "admin:manage_users",
   "admin:assign_permissions",
+  "admin:view_audit_log",
 ] as const;
 
 export type PermissionKey = (typeof PERMISSION_KEYS)[number];
@@ -35,6 +36,7 @@ export const ROLE_DEFAULTS: Record<string, PermissionKey[]> = {
     "team:add_member",
     "team:remove_member",
     "team:read",
+    "admin:view_audit_log",
   ],
   user: ["person:read", "team:read"],
   guest: ["person:read", "team:read"],
@@ -69,6 +71,7 @@ function formatPermissionDescription(key: PermissionKey): string {
     "data:seed": "Seed mock data",
     "admin:manage_users": "Access user management",
     "admin:assign_permissions": "Grant or revoke user permissions",
+    "admin:view_audit_log": "View audit log history",
   };
   return descriptions[key];
 }

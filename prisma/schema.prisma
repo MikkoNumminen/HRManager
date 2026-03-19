@@ -71,3 +71,20 @@ model UserPermission {
 
   @@unique([userId, permissionId])
 }
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String?
+  userEmail  String?
+  action     String
+  entityType String
+  entityId   String?
+  before     String?
+  after      String?
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([entityType])
+  @@index([createdAt])
+}
