@@ -1,5 +1,16 @@
 import { prisma } from "@/db";
-import { PersonSchema, TeamSchema, UserSchema, Person, CombinedTeam, AppUser } from "./schemas";
+import {
+  PersonSchema,
+  TeamSchema,
+  UserSchema,
+  AuditLogSchema,
+  AuditLogFilterSchema,
+  Person,
+  CombinedTeam,
+  AppUser,
+  AuditLog,
+  AuditLogFilter,
+} from "./schemas";
 import { resolvePermissions, PERMISSION_KEYS } from "@/permissions";
 
 export async function getPersons(): Promise<Person[]> {
@@ -73,4 +84,54 @@ export async function getUserById(userId: string) {
 
 export async function getAllPermissionKeys(): Promise<string[]> {
   return [...PERMISSION_KEYS];
+}
+
+export async function getAuditLogs(
+  filters?: Partial<AuditLogFilter>,
+): Promise<{ logs: AuditLog[]; total: number }> {
+  const parsed = AuditLogFilterSchema.parse(filters ?? {});
+  const { userEmail, action, entityType, dateFrom, dateTo, page, pageSize } = parsed;
+
+  const where: Record<string, unknown> = {};
+
+  if (userEmail) {
+    where.userEmail = { contains: userEmail };
+  }
+  if (action) {
+    where.action = action;
+  }
+  if (entityType) {
+    where.entityType = entityType;
+  }
+  if (dateFrom || dateTo) {
+    where.createdAt = {
+      ...(dateFrom && { gte: dateFrom }),
+      ...(dateTo && { lte: dateTo }),
+    };
+  }
+
+  const [logs, total] = await Promise.all([
+    prisma.auditLog.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    }),
+    prisma.auditLog.count({ where }),
+  ]);
+
+  return {
+    logs: logs.map((log) => AuditLogSchema.parse(log)),
+    total,
+  };
+}
+
+export async function getAuditLogUserEmails(): Promise<string[]> {
+  const results = await prisma.auditLog.findMany({
+    select: { userEmail: true },
+    distinct: ["userEmail"],
+    where: { userEmail: { not: null } },
+    orderBy: { userEmail: "asc" },
+  });
+  return results.map((r) => r.userEmail!);
 }

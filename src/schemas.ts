@@ -44,3 +44,39 @@ export type AppUser = z.infer<typeof UserSchema>;
 export const PermissionsSchema = z.record(z.string(), z.boolean());
 
 export type Permissions = z.infer<typeof PermissionsSchema>;
+
+export const AuditActionSchema = z.enum(["create", "update", "delete", "seed", "reset"]);
+
+export const AuditEntityTypeSchema = z.enum([
+  "person",
+  "team",
+  "teamMember",
+  "user",
+  "userPermission",
+]);
+
+export const AuditLogSchema = z.object({
+  id: z.string().uuid(),
+  userId: z.string().nullable(),
+  userEmail: z.string().nullable(),
+  action: AuditActionSchema,
+  entityType: AuditEntityTypeSchema,
+  entityId: z.string().nullable(),
+  before: z.string().nullable(),
+  after: z.string().nullable(),
+  createdAt: z.date(),
+});
+
+export type AuditLog = z.infer<typeof AuditLogSchema>;
+
+export const AuditLogFilterSchema = z.object({
+  userEmail: z.string().optional(),
+  action: AuditActionSchema.optional(),
+  entityType: AuditEntityTypeSchema.optional(),
+  dateFrom: z.date().optional(),
+  dateTo: z.date().optional(),
+  page: z.number().int().min(1).default(1),
+  pageSize: z.number().int().min(1).max(100).default(25),
+});
+
+export type AuditLogFilter = z.infer<typeof AuditLogFilterSchema>;
