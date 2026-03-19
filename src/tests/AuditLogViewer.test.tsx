@@ -59,27 +59,13 @@ describe("AuditLogViewer", () => {
     expect(screen.getByText("System")).toBeInTheDocument();
   });
 
-  // Shows a dash when entityId is null (e.g. bulk operations).
-  test("shows dash for null entityId", () => {
-    const log = makelog({ entityId: null });
-    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
-    expect(screen.getByText("-")).toBeInTheDocument();
-  });
-
-  // Truncates the entity ID to first 8 characters with ellipsis.
-  test("truncates entity ID to 8 chars", () => {
-    const log = makelog();
-    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
-    expect(screen.getByText("d3eef222…")).toBeInTheDocument();
-  });
-
-  // Renders all three filter controls (User, Action, Entity).
+  // Renders all three filter controls (User, Action, Type).
   test("renders filter controls", () => {
     render(<AuditLogViewer logs={[]} {...defaultProps} />);
     // Each filter has a FormControl with an InputLabel
     expect(screen.getAllByText("User").length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText("Action").length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText("Entity").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Type").length).toBeGreaterThanOrEqual(1);
   });
 
   // Shows the correct entity type label for teamMember.
@@ -126,13 +112,11 @@ describe("AuditLogViewer", () => {
   test("renders column headers", () => {
     render(<AuditLogViewer logs={[]} {...defaultProps} />);
     expect(screen.getByText("Timestamp")).toBeInTheDocument();
-    expect(screen.getByText("Entity ID")).toBeInTheDocument();
     expect(screen.getByText("Changes")).toBeInTheDocument();
-    // "User", "Action", "Entity" appear as both column headers and filter labels —
-    // verify at least 2 of each exist (one filter + one header)
+    // "User", "Action", "Type" appear as both column headers and filter labels
     expect(screen.getAllByText("User").length).toBeGreaterThanOrEqual(2);
     expect(screen.getAllByText("Action").length).toBeGreaterThanOrEqual(2);
-    expect(screen.getAllByText("Entity").length).toBeGreaterThanOrEqual(2);
+    expect(screen.getAllByText("Type").length).toBeGreaterThanOrEqual(2);
   });
 
   // Multiple log entries should each render their own row.
@@ -222,10 +206,10 @@ describe("AuditLogViewer", () => {
     expect(mockPush).toHaveBeenCalled();
   });
 
-  // Changing the entity type filter navigates with updated URL.
-  test("navigates when entity filter changes", () => {
+  // Changing the type filter navigates with updated URL.
+  test("navigates when type filter changes", () => {
     render(<AuditLogViewer logs={[]} {...defaultProps} />);
-    const entitySelect = screen.getAllByRole("combobox")[2]; // third select = Entity
+    const entitySelect = screen.getAllByRole("combobox")[2]; // third select = Type
     fireEvent.mouseDown(entitySelect);
     const teamOption = screen.getByRole("option", { name: "Team" });
     fireEvent.click(teamOption);

@@ -164,14 +164,14 @@ export default function AuditLogViewer({
         </FormControl>
 
         <FormControl size="small">
-          <InputLabel sx={labelStyles}>Entity</InputLabel>
+          <InputLabel sx={labelStyles}>Type</InputLabel>
           <Select
             value={currentFilters.entityType ?? ""}
             onChange={(e) => updateFilter("entityType", e.target.value)}
-            label="Entity"
+            label="Type"
             sx={selectStyles}
           >
-            <MenuItem value="">All Entities</MenuItem>
+            <MenuItem value="">All Types</MenuItem>
             {Object.entries(entityTypeLabels).map(([key, label]) => (
               <MenuItem key={key} value={key}>
                 {label}
@@ -199,10 +199,7 @@ export default function AuditLogViewer({
                 <TableCell sx={{ color: colors.slate400, cursor: "help" }}>Action</TableCell>
               </Tooltip>
               <Tooltip title="The type of resource that was affected" placement="top" arrow>
-                <TableCell sx={{ color: colors.slate400, cursor: "help" }}>Entity</TableCell>
-              </Tooltip>
-              <Tooltip title="The ID of the affected resource" placement="top" arrow>
-                <TableCell sx={{ color: colors.slate400, cursor: "help" }}>Entity ID</TableCell>
+                <TableCell sx={{ color: colors.slate400, cursor: "help" }}>Type</TableCell>
               </Tooltip>
               <Tooltip
                 title="What changed — shows before and after values for updates"
@@ -216,7 +213,7 @@ export default function AuditLogViewer({
           <TableBody>
             {logs.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6}>
+                <TableCell colSpan={5}>
                   <Box display="flex" justifyContent="center" alignItems="center" height="100px">
                     <Typography align="center">No audit log entries found</Typography>
                   </Box>
@@ -243,20 +240,6 @@ export default function AuditLogViewer({
                     />
                   </TableCell>
                   <TableCell>{entityTypeLabels[log.entityType] ?? log.entityType}</TableCell>
-                  <TableCell>
-                    {log.entityId ? (
-                      <Tooltip title={log.entityId} placement="top" arrow>
-                        <Typography
-                          variant="body2"
-                          sx={{ cursor: "help", fontFamily: "monospace", fontSize: "0.8rem" }}
-                        >
-                          {log.entityId.slice(0, 8)}…
-                        </Typography>
-                      </Tooltip>
-                    ) : (
-                      "-"
-                    )}
-                  </TableCell>
                   <TableCell sx={{ maxWidth: 300, overflow: "hidden", textOverflow: "ellipsis" }}>
                     <Tooltip title={formatChanges(log.before, log.after)} placement="top" arrow>
                       <Typography
