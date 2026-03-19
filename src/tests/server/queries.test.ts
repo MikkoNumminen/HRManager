@@ -14,6 +14,7 @@ jest.mock("@/auth", () => ({
 import {
   getPersons,
   getTeams,
+  getDepartments,
   getUsers,
   getUserById,
   getAllPermissionKeys,
@@ -508,5 +509,74 @@ describe("getAuditLogUserEmails", () => {
     });
     const result = await getAuditLogUserEmails();
     expect(result).toEqual(["alice@example.com"]);
+  });
+});
+
+describe("getDepartments", () => {
+  beforeEach(async () => {
+    await cleanDb();
+  });
+
+  afterAll(async () => {
+    await cleanDb();
+  });
+
+  // Returns an empty array when no departments exist.
+  test("returns empty array when no departments exist", async () => {
+    const result = await getDepartments();
+    expect(result).toEqual([]);
+  });
+
+  // Returns all departments with correct fields.
+  test("returns departments with correct field types", async () => {
+    await testPrisma.department.create({
+      data: { name: "Engineering", description: "Dev team" },
+    });
+    const result = await getDepartments();
+    expect(result).toHaveLength(1);
+    expect(result[0].name).toBe("Engineering");
+    expect(result[0].description).toBe("Dev team");
+    expect(result[0].headId).toBeNull();
+    expect(result[0].headName).toBeNull();
+    expect(result[0].teams).toEqual([]);
+    expect(result[0].id).toBeDefined();
+    expect(result[0].createdAt).toBeInstanceOf(Date);
+    expect(result[0].updatedAt).toBeInstanceOf(Date);
+  });
+
+  // Returns the head person's name when a head is assigned.
+  test("includes head name when head is assigned", async () => {
+    const person = await testPrisma.person.create({
+      data: { name: "Alice", email: "alice@test.com" },
+    });
+    await testPrisma.department.create({
+      data: { name: "Product", headId: person.id },
+    });
+    const result = await getDepartments();
+    expect(result[0].headName).toBe("Alice");
+    expect(result[0].headId).toBe(person.id);
+  });
+
+  // Returns teams that belong to the department.
+  test("includes teams assigned to the department", async () => {
+    const dept = await testPrisma.department.create({
+      data: { name: "Engineering" },
+    });
+    await testPrisma.team.create({
+      data: { teamName: "Platform", departmentId: dept.id },
+    });
+    await testPrisma.team.create({
+      data: { teamName: "Frontend", departmentId: dept.id },
+    });
+    const result = await getDepartments();
+    expect(result[0].teams).toHaveLength(2);
+    expect(result[0].teams.map((t) => t.teamName).sort()).toEqual(["Frontend", "Platform"]);
+  });
+
+  // Department with null description returns null.
+  test("returns null description when not set", async () => {
+    await testPrisma.department.create({ data: { name: "Ops" } });
+    const result = await getDepartments();
+    expect(result[0].description).toBeNull();
   });
 });

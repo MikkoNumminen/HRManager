@@ -43,6 +43,12 @@ import {
   createTeam,
   removeTeam,
   removeMember,
+  createDepartment,
+  removeDepartment,
+  updateDepartment,
+  updateDepartmentHead,
+  assignTeamToDepartment,
+  removeTeamFromDepartment,
   resetAll,
   seedMockData,
   initializePermissions,
@@ -1039,5 +1045,200 @@ describe("initializePermissions", () => {
     const { seedPermissions } = require("@/permissions");
     await initializePermissions();
     expect(seedPermissions).toHaveBeenCalled();
+  });
+});
+
+describe("createDepartment", () => {
+  beforeEach(() => cleanDb());
+  afterAll(async () => {
+    await cleanDb();
+  });
+
+  // Creates a department with name and description.
+  test("creates a department with name and description", async () => {
+    await createDepartment(formData({ name: "Engineering", description: "Dev team" }));
+    const departments = await testPrisma.department.findMany();
+    expect(departments).toHaveLength(1);
+    expect(departments[0].name).toBe("Engineering");
+    expect(departments[0].description).toBe("Dev team");
+  });
+
+  // Creates a department with name only (description is optional).
+  test("creates a department without description", async () => {
+    await createDepartment(formData({ name: "Product" }));
+    const departments = await testPrisma.department.findMany();
+    expect(departments).toHaveLength(1);
+    expect(departments[0].description).toBeNull();
+  });
+
+  // Throws when name is empty.
+  test("throws on empty name", async () => {
+    await expect(createDepartment(formData({ name: "" }))).rejects.toThrow("Invalid Name");
+  });
+
+  // Throws when name is missing.
+  test("throws on missing name", async () => {
+    await expect(createDepartment(formData({}))).rejects.toThrow("Invalid Name");
+  });
+});
+
+describe("removeDepartment", () => {
+  beforeEach(() => cleanDb());
+  afterAll(async () => {
+    await cleanDb();
+  });
+
+  // Removes a department and unlinks its teams.
+  test("removes department and unlinks teams", async () => {
+    const dept = await testPrisma.department.create({ data: { name: "Eng" } });
+    await testPrisma.team.create({ data: { teamName: "Platform", departmentId: dept.id } });
+
+    await removeDepartment(formData({ departmentID: dept.id }));
+
+    const departments = await testPrisma.department.findMany();
+    expect(departments).toHaveLength(0);
+    const team = await testPrisma.team.findFirst({ where: { teamName: "Platform" } });
+    expect(team).not.toBeNull();
+    expect(team!.departmentId).toBeNull();
+  });
+
+  // Throws when no departmentID is provided.
+  test("throws on missing departmentID", async () => {
+    await expect(removeDepartment(formData({}))).rejects.toThrow("No departmentID selected");
+  });
+
+  // Throws on invalid UUID.
+  test("throws on invalid UUID", async () => {
+    await expect(removeDepartment(formData({ departmentID: "bad" }))).rejects.toThrow(
+      "Invalid departmentID format",
+    );
+  });
+});
+
+describe("updateDepartment", () => {
+  beforeEach(() => cleanDb());
+  afterAll(async () => {
+    await cleanDb();
+  });
+
+  // Updates department name and description.
+  test("updates department name and description", async () => {
+    const dept = await testPrisma.department.create({
+      data: { name: "Eng", description: "Old" },
+    });
+    await updateDepartment(
+      formData({ departmentID: dept.id, name: "Engineering", description: "New desc" }),
+    );
+    const updated = await testPrisma.department.findUnique({ where: { id: dept.id } });
+    expect(updated!.name).toBe("Engineering");
+    expect(updated!.description).toBe("New desc");
+  });
+
+  // Throws when name is empty.
+  test("throws on empty name", async () => {
+    const dept = await testPrisma.department.create({ data: { name: "Eng" } });
+    await expect(updateDepartment(formData({ departmentID: dept.id, name: "" }))).rejects.toThrow(
+      "Department name is required",
+    );
+  });
+
+  // Throws when departmentID is missing.
+  test("throws on missing departmentID", async () => {
+    await expect(updateDepartment(formData({ name: "X" }))).rejects.toThrow(
+      "No departmentID provided",
+    );
+  });
+});
+
+describe("updateDepartmentHead", () => {
+  beforeEach(() => cleanDb());
+  afterAll(async () => {
+    await cleanDb();
+  });
+
+  // Sets the department head to a person.
+  test("sets department head", async () => {
+    const dept = await testPrisma.department.create({ data: { name: "Eng" } });
+    const person = await testPrisma.person.create({ data: { name: "Alice" } });
+
+    await updateDepartmentHead(formData({ departmentID: dept.id, personID: person.id }));
+
+    const updated = await testPrisma.department.findUnique({ where: { id: dept.id } });
+    expect(updated!.headId).toBe(person.id);
+  });
+
+  // Clears the department head when personID is empty.
+  test("clears department head when personID is empty", async () => {
+    const person = await testPrisma.person.create({ data: { name: "Alice" } });
+    const dept = await testPrisma.department.create({
+      data: { name: "Eng", headId: person.id },
+    });
+
+    await updateDepartmentHead(formData({ departmentID: dept.id, personID: "" }));
+
+    const updated = await testPrisma.department.findUnique({ where: { id: dept.id } });
+    expect(updated!.headId).toBeNull();
+  });
+
+  // Throws when departmentID is missing.
+  test("throws on missing departmentID", async () => {
+    await expect(updateDepartmentHead(formData({}))).rejects.toThrow("No departmentID provided");
+  });
+});
+
+describe("assignTeamToDepartment", () => {
+  beforeEach(() => cleanDb());
+  afterAll(async () => {
+    await cleanDb();
+  });
+
+  // Assigns a team to a department.
+  test("assigns a team to a department", async () => {
+    const dept = await testPrisma.department.create({ data: { name: "Eng" } });
+    const team = await testPrisma.team.create({ data: { teamName: "Platform" } });
+
+    await assignTeamToDepartment(formData({ departmentID: dept.id, teamID: team.teamId }));
+
+    const updated = await testPrisma.team.findUnique({ where: { teamId: team.teamId } });
+    expect(updated!.departmentId).toBe(dept.id);
+  });
+
+  // Throws when departmentID is missing.
+  test("throws on missing departmentID", async () => {
+    await expect(
+      assignTeamToDepartment(formData({ teamID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" })),
+    ).rejects.toThrow("No departmentID provided");
+  });
+
+  // Throws when teamID is missing.
+  test("throws on missing teamID", async () => {
+    await expect(
+      assignTeamToDepartment(formData({ departmentID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" })),
+    ).rejects.toThrow("No teamID provided");
+  });
+});
+
+describe("removeTeamFromDepartment", () => {
+  beforeEach(() => cleanDb());
+  afterAll(async () => {
+    await cleanDb();
+  });
+
+  // Removes a team from its department.
+  test("removes a team from its department", async () => {
+    const dept = await testPrisma.department.create({ data: { name: "Eng" } });
+    const team = await testPrisma.team.create({
+      data: { teamName: "Platform", departmentId: dept.id },
+    });
+
+    await removeTeamFromDepartment(formData({ teamID: team.teamId }));
+
+    const updated = await testPrisma.team.findUnique({ where: { teamId: team.teamId } });
+    expect(updated!.departmentId).toBeNull();
+  });
+
+  // Throws when teamID is missing.
+  test("throws on missing teamID", async () => {
+    await expect(removeTeamFromDepartment(formData({}))).rejects.toThrow("No teamID provided");
   });
 });

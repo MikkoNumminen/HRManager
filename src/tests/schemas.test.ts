@@ -2,6 +2,8 @@ import {
   PersonSchema,
   TeamMemberSchema,
   TeamSchema,
+  DepartmentSchema,
+  DepartmentTeamSchema,
   UserSchema,
   PermissionsSchema,
   AuditLogSchema,
@@ -464,5 +466,87 @@ describe("AuditLogFilterSchema", () => {
   // Invalid action in filter should be rejected.
   test("rejects invalid action filter", () => {
     expect(() => AuditLogFilterSchema.parse({ action: "nope" })).toThrow();
+  });
+});
+
+describe("DepartmentTeamSchema", () => {
+  // A valid department team reference with teamId and teamName.
+  test("accepts a valid department team", () => {
+    expect(() => DepartmentTeamSchema.parse({ teamId: VALID_UUID, teamName: "Eng" })).not.toThrow();
+  });
+
+  // Missing teamId should fail.
+  test("rejects missing teamId", () => {
+    expect(() => DepartmentTeamSchema.parse({ teamName: "Eng" })).toThrow();
+  });
+});
+
+describe("DepartmentSchema", () => {
+  const validDepartment = {
+    id: VALID_UUID,
+    name: "Engineering",
+    description: "Software development",
+    headId: VALID_UUID_2,
+    headName: "Alice",
+    createdAt: NOW,
+    updatedAt: NOW,
+    teams: [{ teamId: VALID_UUID, teamName: "Platform" }],
+  };
+
+  // A complete department with all fields should parse fine.
+  test("accepts a fully valid department", () => {
+    expect(() => DepartmentSchema.parse(validDepartment)).not.toThrow();
+  });
+
+  // Department description can be null.
+  test("accepts null description", () => {
+    const dept = { ...validDepartment, description: null };
+    const result = DepartmentSchema.parse(dept);
+    expect(result.description).toBeNull();
+  });
+
+  // Department head can be null (no head assigned yet).
+  test("accepts null headId and headName", () => {
+    const dept = { ...validDepartment, headId: null, headName: null };
+    const result = DepartmentSchema.parse(dept);
+    expect(result.headId).toBeNull();
+    expect(result.headName).toBeNull();
+  });
+
+  // A department with no teams is valid (empty array).
+  test("accepts empty teams array", () => {
+    const dept = { ...validDepartment, teams: [] };
+    const result = DepartmentSchema.parse(dept);
+    expect(result.teams).toEqual([]);
+  });
+
+  // Department name is required and must be non-empty.
+  test("rejects empty name", () => {
+    const dept = { ...validDepartment, name: "" };
+    expect(() => DepartmentSchema.parse(dept)).toThrow();
+  });
+
+  // Department ID must be a valid UUID.
+  test("rejects invalid UUID for id", () => {
+    const dept = { ...validDepartment, id: "not-a-uuid" };
+    expect(() => DepartmentSchema.parse(dept)).toThrow();
+  });
+
+  // If headId is provided, it must be a valid UUID.
+  test("rejects invalid UUID for headId (non-null)", () => {
+    const dept = { ...validDepartment, headId: "bad" };
+    expect(() => DepartmentSchema.parse(dept)).toThrow();
+  });
+
+  // Teams array is required — missing it should fail.
+  test("rejects missing teams array", () => {
+    const { teams: _, ...dept } = validDepartment;
+    expect(() => DepartmentSchema.parse(dept)).toThrow();
+  });
+
+  // Invalid team inside teams array should fail the whole validation.
+  test("rejects invalid team inside teams array", () => {
+    const dept = { ...validDepartment, teams: [{ teamId: "bad", teamName: "X" }] };
+    expect(() => DepartmentSchema.parse(dept)).toThrow();
   });
 });
