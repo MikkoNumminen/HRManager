@@ -118,9 +118,7 @@ function describeChanges(
         const granted = a?.granted;
         const key = a?.permissionKey ?? "";
         const label = permissionLabels[key] ?? key;
-        return granted
-          ? `Granted the ability to ${label}`
-          : `Revoked the ability to ${label}`;
+        return granted ? `Granted the ability to ${label}` : `Revoked the ability to ${label}`;
       }
       return "Record updated";
     }
@@ -306,7 +304,11 @@ export default function AuditLogViewer({
                   </TableCell>
                   <TableCell>{entityTypeLabels[log.entityType] ?? log.entityType}</TableCell>
                   <TableCell sx={{ maxWidth: 300, overflow: "hidden", textOverflow: "ellipsis" }}>
-                    <Tooltip title={describeChanges(log.action, log.entityType, log.before, log.after)} placement="top" arrow>
+                    <Tooltip
+                      title={describeChanges(log.action, log.entityType, log.before, log.after)}
+                      placement="top"
+                      arrow
+                    >
                       <Typography
                         variant="body2"
                         sx={{

@@ -6,6 +6,7 @@ import {
   getUserPermissions,
   hasPermission,
   requirePermission,
+  seedPermissions,
 } from "../permissions";
 
 const mockAuth = jest.fn();
@@ -13,6 +14,8 @@ jest.mock("../auth", () => ({
   auth: (...args: unknown[]) => mockAuth(...args),
 }));
 
+const mockUpsert = jest.fn();
+const mockTransaction = jest.fn();
 const mockFindUnique = jest.fn();
 jest.mock("../db", () => ({
   prisma: {
@@ -21,6 +24,7 @@ jest.mock("../db", () => ({
         return mockFindUnique;
       },
     },
+    $transaction: (...args: unknown[]) => mockTransaction(...args),
   },
 }));
 
@@ -282,5 +286,62 @@ describe("requirePermission", () => {
     mockAuth.mockResolvedValue(null);
 
     await expect(requirePermission("person:create")).rejects.toThrow("Permission denied");
+  });
+});
+
+describe("seedPermissions", () => {
+  // Calls upsert for every permission key inside a transaction.
+  test("upserts all 16 permission keys inside a transaction", async () => {
+    mockTransaction.mockImplementation(async (fn: (tx: unknown) => Promise<void>) => {
+      await fn({ permission: { upsert: mockUpsert } });
+    });
+    mockUpsert.mockResolvedValue({});
+
+    await seedPermissions();
+
+    expect(mockTransaction).toHaveBeenCalledTimes(1);
+    expect(mockUpsert).toHaveBeenCalledTimes(PERMISSION_KEYS.length);
+  });
+
+  // Each upsert call uses the correct permission key and a human-readable description.
+  test("passes correct key and description to each upsert", async () => {
+    mockTransaction.mockImplementation(async (fn: (tx: unknown) => Promise<void>) => {
+      await fn({ permission: { upsert: mockUpsert } });
+    });
+    mockUpsert.mockResolvedValue({});
+
+    await seedPermissions();
+
+    // Verify a few representative keys have correct descriptions
+    const calls = mockUpsert.mock.calls;
+    const createCall = calls.find(
+      (c: unknown[]) => (c[0] as { where: { key: string } }).where.key === "person:create",
+    );
+    expect(createCall).toBeDefined();
+    expect((createCall![0] as { create: { description: string } }).create.description).toBe(
+      "Create new persons",
+    );
+
+    const auditCall = calls.find(
+      (c: unknown[]) => (c[0] as { where: { key: string } }).where.key === "admin:view_audit_log",
+    );
+    expect(auditCall).toBeDefined();
+    expect((auditCall![0] as { create: { description: string } }).create.description).toBe(
+      "View audit log history",
+    );
+  });
+
+  // Each upsert has an empty update object (no-op on existing records).
+  test("uses empty update object for existing records", async () => {
+    mockTransaction.mockImplementation(async (fn: (tx: unknown) => Promise<void>) => {
+      await fn({ permission: { upsert: mockUpsert } });
+    });
+    mockUpsert.mockResolvedValue({});
+
+    await seedPermissions();
+
+    for (const call of mockUpsert.mock.calls) {
+      expect((call[0] as { update: object }).update).toEqual({});
+    }
   });
 });

@@ -338,4 +338,146 @@ describe("TopBar", () => {
     const avatar = screen.getByAltText("Alice");
     expect(avatar).toHaveAttribute("src", "https://example.com/avatar.png");
   });
+
+  // Shows generic error message when seedMockData throws a non-Error value.
+  test("shows generic error when seedMockData throws non-Error", async () => {
+    (seedMockData as jest.Mock).mockRejectedValue("string error");
+    mockUseSession.mockReturnValue({
+      data: { user: { name: "Alice", email: "a@b.com", image: null } },
+      status: "authenticated",
+    });
+    const permissions = { "data:seed": true } as never;
+    render(<TopBar title="Home" permissions={permissions} />);
+    fireEvent.click(screen.getByLabelText("User menu"));
+    fireEvent.click(screen.getByText("Load Mock Data"));
+    fireEvent.click(screen.getByText("Replace All"));
+    await waitFor(() => {
+      expect(screen.getByText("An error occurred")).toBeInTheDocument();
+    });
+  });
+
+  // Clicking confirm in the reset dialog triggers the resetAll server action.
+  test("calls resetAll when reset confirm is clicked", async () => {
+    const { resetAll } = jest.requireMock("../serverActions");
+    (resetAll as jest.Mock).mockResolvedValue(undefined);
+    mockUseSession.mockReturnValue({
+      data: { user: { name: "Alice", email: "a@b.com", image: null } },
+      status: "authenticated",
+    });
+    const permissions = { "data:reset": true } as never;
+    render(<TopBar title="Home" permissions={permissions} />);
+    fireEvent.click(screen.getByLabelText("User menu"));
+    fireEvent.click(screen.getByText("Reset All Data"));
+    fireEvent.click(screen.getByText("Reset All"));
+    await waitFor(() => {
+      expect(resetAll).toHaveBeenCalled();
+    });
+  });
+
+  // Shows error message when resetAll fails with an Error.
+  test("shows error when resetAll fails", async () => {
+    const { resetAll } = jest.requireMock("../serverActions");
+    (resetAll as jest.Mock).mockRejectedValue(new Error("Reset failed"));
+    mockUseSession.mockReturnValue({
+      data: { user: { name: "Alice", email: "a@b.com", image: null } },
+      status: "authenticated",
+    });
+    const permissions = { "data:reset": true } as never;
+    render(<TopBar title="Home" permissions={permissions} />);
+    fireEvent.click(screen.getByLabelText("User menu"));
+    fireEvent.click(screen.getByText("Reset All Data"));
+    fireEvent.click(screen.getByText("Reset All"));
+    await waitFor(() => {
+      expect(screen.getByText("Reset failed")).toBeInTheDocument();
+    });
+  });
+
+  // Shows generic error when resetAll throws a non-Error value.
+  test("shows generic error when resetAll throws non-Error", async () => {
+    const { resetAll } = jest.requireMock("../serverActions");
+    (resetAll as jest.Mock).mockRejectedValue(42);
+    mockUseSession.mockReturnValue({
+      data: { user: { name: "Alice", email: "a@b.com", image: null } },
+      status: "authenticated",
+    });
+    const permissions = { "data:reset": true } as never;
+    render(<TopBar title="Home" permissions={permissions} />);
+    fireEvent.click(screen.getByLabelText("User menu"));
+    fireEvent.click(screen.getByText("Reset All Data"));
+    fireEvent.click(screen.getByText("Reset All"));
+    await waitFor(() => {
+      expect(screen.getByText("An error occurred")).toBeInTheDocument();
+    });
+  });
+
+  // Closes the reset dialog when cancel is clicked without calling resetAll.
+  test("closes reset dialog on cancel without calling resetAll", async () => {
+    const { resetAll } = jest.requireMock("../serverActions");
+    mockUseSession.mockReturnValue({
+      data: { user: { name: "Alice", email: "a@b.com", image: null } },
+      status: "authenticated",
+    });
+    const permissions = { "data:reset": true } as never;
+    render(<TopBar title="Home" permissions={permissions} />);
+    fireEvent.click(screen.getByLabelText("User menu"));
+    fireEvent.click(screen.getByText("Reset All Data"));
+    // Click Cancel in the confirm dialog
+    fireEvent.click(screen.getByText("Cancel"));
+    await waitFor(() => {
+      expect(
+        screen.queryByText(
+          "Are you sure you want to delete all persons and teams? This action cannot be undone.",
+        ),
+      ).not.toBeInTheDocument();
+    });
+    expect(resetAll).not.toHaveBeenCalled();
+  });
+
+  // Renders avatar fallback icon when user has no name (no initials to show).
+  test("renders avatar fallback when name is missing", () => {
+    mockUseSession.mockReturnValue({
+      data: { user: { email: "a@b.com", image: null } },
+      status: "authenticated",
+    });
+    render(<TopBar title="Home" />);
+    // MUI Avatar renders a PersonIcon fallback when no image or children
+    expect(screen.getByTestId("PersonIcon")).toBeInTheDocument();
+  });
+
+  // Renders user menu items and clicking them does not crash.
+  test("User Management click handler runs without error", () => {
+    mockUseSession.mockReturnValue({
+      data: {
+        user: {
+          name: "Alice",
+          email: "a@b.com",
+          image: null,
+          permissions: { "admin:manage_users": true },
+        },
+      },
+      status: "authenticated",
+    });
+    render(<TopBar title="Home" />);
+    fireEvent.click(screen.getByLabelText("User menu"));
+    // Clicking the menu item triggers setAnchorEl(null) — should not throw
+    expect(() => fireEvent.click(screen.getByText("User Management"))).not.toThrow();
+  });
+
+  // Audit Log menu item click handler runs without error.
+  test("Audit Log click handler runs without error", () => {
+    mockUseSession.mockReturnValue({
+      data: {
+        user: {
+          name: "Alice",
+          email: "a@b.com",
+          image: null,
+          permissions: { "admin:view_audit_log": true },
+        },
+      },
+      status: "authenticated",
+    });
+    render(<TopBar title="Home" />);
+    fireEvent.click(screen.getByLabelText("User menu"));
+    expect(() => fireEvent.click(screen.getByText("Audit Log"))).not.toThrow();
+  });
 });

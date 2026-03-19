@@ -251,9 +251,7 @@ describe("AuditLogViewer", () => {
       after: '{"role":"admin"}',
     });
     render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
-    expect(
-      screen.getAllByText('Changed role from "user" to "admin"').length,
-    ).toBeGreaterThan(0);
+    expect(screen.getAllByText('Changed role from "user" to "admin"').length).toBeGreaterThan(0);
   });
 
   // Describes team creation in plain language.
@@ -276,9 +274,7 @@ describe("AuditLogViewer", () => {
       after: '{"clearExisting":true}',
     });
     render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
-    expect(
-      screen.getAllByText("Loaded mock data (replaced existing)").length,
-    ).toBeGreaterThan(0);
+    expect(screen.getAllByText("Loaded mock data (replaced existing)").length).toBeGreaterThan(0);
   });
 
   // Describes reset action with counts in plain language.
@@ -303,9 +299,9 @@ describe("AuditLogViewer", () => {
       after: '{"permissionKey":"person:create","granted":true}',
     });
     render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
-    expect(
-      screen.getAllByText("Granted the ability to create new people").length,
-    ).toBeGreaterThan(0);
+    expect(screen.getAllByText("Granted the ability to create new people").length).toBeGreaterThan(
+      0,
+    );
   });
 
   // Describes permission denial in plain language.
@@ -316,8 +312,214 @@ describe("AuditLogViewer", () => {
       after: '{"permissionKey":"team:delete","granted":false}',
     });
     render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(screen.getAllByText("Revoked the ability to delete teams").length).toBeGreaterThan(0);
+  });
+
+  // Describes adding a team member in plain language.
+  test("describes teamMember creation in Barney style", () => {
+    const log = makelog({ action: "create", entityType: "teamMember", after: "{}" });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(screen.getAllByText("Added a member to a team").length).toBeGreaterThan(0);
+  });
+
+  // Describes creating an unknown entity type as a generic new record.
+  test("describes unknown entity creation as generic new record", () => {
+    const log = makelog({ action: "create", entityType: "widget", after: "{}" });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(screen.getAllByText("New record created").length).toBeGreaterThan(0);
+  });
+
+  // Describes removing a team member in plain language.
+  test("describes teamMember deletion in Barney style", () => {
+    const log = makelog({
+      action: "delete",
+      entityType: "teamMember",
+      before: "{}",
+      after: null,
+    });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(screen.getAllByText("Removed a member from a team").length).toBeGreaterThan(0);
+  });
+
+  // Describes resetting a permission override back to role default.
+  test("describes userPermission deletion as reset to role default", () => {
+    const log = makelog({
+      action: "delete",
+      entityType: "userPermission",
+      before: '{"permissionKey":"person:create"}',
+      after: null,
+    });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
     expect(
-      screen.getAllByText("Revoked the ability to delete teams").length,
+      screen.getAllByText('Reset "create new people" back to role default').length,
     ).toBeGreaterThan(0);
+  });
+
+  // Describes deleting a team in plain language.
+  test("describes team deletion in Barney style", () => {
+    const log = makelog({
+      action: "delete",
+      entityType: "team",
+      before: '{"teamName":"Marketing"}',
+      after: null,
+    });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(screen.getAllByText("Deleted team: Marketing").length).toBeGreaterThan(0);
+  });
+
+  // Describes deleting an unknown entity type as a generic record deleted.
+  test("describes unknown entity deletion as generic record deleted", () => {
+    const log = makelog({
+      action: "delete",
+      entityType: "widget",
+      before: "{}",
+      after: null,
+    });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(screen.getAllByText("Record deleted").length).toBeGreaterThan(0);
+  });
+
+  // Describes removing a team manager in plain language.
+  test("describes removing team manager in Barney style", () => {
+    const log = makelog({
+      action: "update",
+      entityType: "team",
+      before: '{"teamManagerId":"abc"}',
+      after: '{"teamManagerId":null}',
+    });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(screen.getAllByText("Removed the team manager").length).toBeGreaterThan(0);
+  });
+
+  // Describes changing a team manager in plain language.
+  test("describes changing team manager in Barney style", () => {
+    const log = makelog({
+      action: "update",
+      entityType: "team",
+      before: '{"teamManagerId":"abc"}',
+      after: '{"teamManagerId":"def"}',
+    });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(screen.getAllByText("Changed the team manager").length).toBeGreaterThan(0);
+  });
+
+  // Shows generic team update message when no teamManagerId change.
+  test("describes generic team update in Barney style", () => {
+    const log = makelog({
+      action: "update",
+      entityType: "team",
+      before: '{"teamName":"Old"}',
+      after: '{"teamName":"New"}',
+    });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(screen.getAllByText("Updated team details").length).toBeGreaterThan(0);
+  });
+
+  // Describes updating an unknown entity type as a generic record updated.
+  test("describes unknown entity update as generic record updated", () => {
+    const log = makelog({
+      action: "update",
+      entityType: "widget",
+      before: "{}",
+      after: "{}",
+    });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(screen.getAllByText("Record updated").length).toBeGreaterThan(0);
+  });
+
+  // Describes an email change in plain language.
+  test("describes email change in Barney style", () => {
+    const log = makelog({
+      action: "update",
+      entityType: "person",
+      before: '{"email":"old@test.com"}',
+      after: '{"email":"new@test.com"}',
+    });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(
+      screen.getAllByText('Changed email from "old@test.com" to "new@test.com"').length,
+    ).toBeGreaterThan(0);
+  });
+
+  // Describes seeding without clearing as keeping existing data.
+  test("describes seed without clear as kept existing", () => {
+    const log = makelog({
+      action: "seed",
+      entityType: "person",
+      before: null,
+      after: '{"clearExisting":false}',
+    });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(screen.getAllByText("Loaded mock data (kept existing)").length).toBeGreaterThan(0);
+  });
+
+  // Shows a dash for completely unknown actions.
+  test("shows dash for unknown action type", () => {
+    const log = makelog({ action: "archive", before: null, after: null });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(screen.getAllByText("-").length).toBeGreaterThan(0);
+  });
+
+  // Shows the raw entity type string when it has no label mapping.
+  test("shows raw entity type for unmapped types", () => {
+    const log = makelog({ entityType: "customWidget" });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(screen.getByText("customWidget")).toBeInTheDocument();
+  });
+
+  // Falls back to after string when before is null and after is invalid JSON.
+  test("falls back to after string when before is null and after is invalid JSON", () => {
+    const log = makelog({ before: null, after: "bad-json" });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(screen.getAllByText("bad-json").length).toBeGreaterThan(0);
+  });
+
+  // Uses fallback color for unknown action types on action chip.
+  test("renders action chip with fallback color for unknown action", () => {
+    const log = makelog({ action: "archive" });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(screen.getByText("archive")).toBeInTheDocument();
+  });
+
+  // Navigates when user email filter is changed.
+  test("navigates when user email filter changes", () => {
+    render(
+      <AuditLogViewer
+        logs={[]}
+        {...defaultProps}
+        userEmails={["alice@example.com", "bob@example.com"]}
+      />,
+    );
+    const userSelect = screen.getAllByRole("combobox")[0]; // first select = User
+    fireEvent.mouseDown(userSelect);
+    const emailOption = screen.getByRole("option", { name: "alice@example.com" });
+    fireEvent.click(emailOption);
+    expect(mockPush).toHaveBeenCalledWith(expect.stringContaining("userEmail=alice"));
+    expect(mockPush).toHaveBeenCalledWith(expect.stringContaining("page=1"));
+  });
+
+  // Describes permission reset to role default with unknown permission key.
+  test("falls back to raw key when permission key has no label", () => {
+    const log = makelog({
+      action: "delete",
+      entityType: "userPermission",
+      before: '{"permissionKey":"custom:unknown"}',
+      after: null,
+    });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(
+      screen.getAllByText('Reset "custom:unknown" back to role default').length,
+    ).toBeGreaterThan(0);
+  });
+
+  // Uses unknown permission key label as-is when granting an unmapped permission.
+  test("falls back to raw key when granting unknown permission", () => {
+    const log = makelog({
+      action: "update",
+      entityType: "userPermission",
+      after: '{"permissionKey":"custom:action","granted":true}',
+    });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(screen.getAllByText("Granted the ability to custom:action").length).toBeGreaterThan(0);
   });
 });
