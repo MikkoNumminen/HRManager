@@ -385,16 +385,210 @@ export async function removeMember(data: FormData) {
   redirect("..");
 }
 
+export async function createDepartment(data: FormData) {
+  await requirePermission("department:create");
+  const name = data.get("name")?.valueOf();
+  if (typeof name !== "string" || name.trim().length === 0) {
+    throw new Error("Invalid Name");
+  }
+
+  const description = data.get("description")?.toString().trim() || null;
+
+  await prisma.$transaction(async (tx) => {
+    const department = await tx.department.create({
+      data: {
+        name: name.trim(),
+        description,
+      },
+    });
+    await logAudit({
+      action: "create",
+      entityType: "department",
+      entityId: department.id,
+      after: { name: department.name, description: department.description },
+      tx,
+    });
+  });
+  revalidatePath("/manageDepartments");
+  revalidatePath("/");
+}
+
+export async function removeDepartment(data: FormData) {
+  await requirePermission("department:delete");
+  const departmentIDs = data
+    .getAll("departmentID")
+    .filter((v): v is string => typeof v === "string");
+  if (departmentIDs.length === 0) {
+    throw new Error("No departmentID selected");
+  }
+  departmentIDs.forEach((id) => validateUUID(id, "departmentID"));
+
+  await prisma.$transaction(async (tx) => {
+    const departmentsToDelete = await tx.department.findMany({
+      where: { id: { in: departmentIDs } },
+    });
+
+    await tx.team.updateMany({
+      where: { departmentId: { in: departmentIDs } },
+      data: { departmentId: null },
+    });
+
+    await tx.department.deleteMany({
+      where: { id: { in: departmentIDs } },
+    });
+
+    for (const dept of departmentsToDelete) {
+      await logAudit({
+        action: "delete",
+        entityType: "department",
+        entityId: dept.id,
+        before: { name: dept.name, description: dept.description },
+        tx,
+      });
+    }
+  });
+  revalidatePath("/manageDepartments");
+  revalidatePath("/manageTeams");
+  revalidatePath("/");
+  redirect("/manageDepartments");
+}
+
+export async function updateDepartment(data: FormData) {
+  await requirePermission("department:update");
+  const departmentID = data.get("departmentID")?.toString();
+  if (!departmentID) {
+    throw new Error("No departmentID provided");
+  }
+  validateUUID(departmentID, "departmentID");
+
+  const name = data.get("name")?.toString().trim();
+  if (!name) {
+    throw new Error("Department name is required");
+  }
+
+  const description = data.get("description")?.toString().trim() || null;
+
+  await prisma.$transaction(async (tx) => {
+    const before = await tx.department.findUnique({ where: { id: departmentID } });
+    await tx.department.update({
+      where: { id: departmentID },
+      data: { name, description },
+    });
+    await logAudit({
+      action: "update",
+      entityType: "department",
+      entityId: departmentID,
+      before: { name: before?.name, description: before?.description },
+      after: { name, description },
+      tx,
+    });
+  });
+  revalidatePath("/manageDepartments");
+  revalidatePath("/");
+}
+
+export async function updateDepartmentHead(data: FormData) {
+  await requirePermission("department:update");
+  const departmentID = data.get("departmentID")?.toString();
+  const personID = data.get("personID")?.toString() || null;
+
+  if (!departmentID) {
+    throw new Error("No departmentID provided");
+  }
+  validateUUID(departmentID, "departmentID");
+  if (personID) validateUUID(personID, "personID");
+
+  await prisma.$transaction(async (tx) => {
+    const before = await tx.department.findUnique({ where: { id: departmentID } });
+    await tx.department.update({
+      where: { id: departmentID },
+      data: { headId: personID },
+    });
+    await logAudit({
+      action: "update",
+      entityType: "department",
+      entityId: departmentID,
+      before: { headId: before?.headId },
+      after: { headId: personID },
+      tx,
+    });
+  });
+  revalidatePath("/manageDepartments");
+  revalidatePath("/");
+  redirect("/manageDepartments");
+}
+
+export async function assignTeamToDepartment(data: FormData) {
+  await requirePermission("department:assign_team");
+  const departmentID = data.get("departmentID")?.toString();
+  const teamID = data.get("teamID")?.toString();
+
+  if (!departmentID) throw new Error("No departmentID provided");
+  if (!teamID) throw new Error("No teamID provided");
+  validateUUID(departmentID, "departmentID");
+  validateUUID(teamID, "teamID");
+
+  await prisma.$transaction(async (tx) => {
+    const teamBefore = await tx.team.findUnique({ where: { teamId: teamID } });
+    await tx.team.update({
+      where: { teamId: teamID },
+      data: { departmentId: departmentID },
+    });
+    await logAudit({
+      action: "update",
+      entityType: "team",
+      entityId: teamID,
+      before: { departmentId: teamBefore?.departmentId },
+      after: { departmentId: departmentID },
+      tx,
+    });
+  });
+  revalidatePath("/manageDepartments");
+  revalidatePath("/manageTeams");
+  revalidatePath("/");
+  redirect("/manageDepartments");
+}
+
+export async function removeTeamFromDepartment(data: FormData) {
+  await requirePermission("department:assign_team");
+  const teamID = data.get("teamID")?.toString();
+
+  if (!teamID) throw new Error("No teamID provided");
+  validateUUID(teamID, "teamID");
+
+  await prisma.$transaction(async (tx) => {
+    const teamBefore = await tx.team.findUnique({ where: { teamId: teamID } });
+    await tx.team.update({
+      where: { teamId: teamID },
+      data: { departmentId: null },
+    });
+    await logAudit({
+      action: "update",
+      entityType: "team",
+      entityId: teamID,
+      before: { departmentId: teamBefore?.departmentId },
+      after: { departmentId: null },
+      tx,
+    });
+  });
+  revalidatePath("/manageDepartments");
+  revalidatePath("/manageTeams");
+  revalidatePath("/");
+  redirect("/manageDepartments");
+}
+
 export async function resetAll() {
   await requirePermission("data:reset");
   await prisma.$transaction(async (tx) => {
     const counts = {
       teamMembers: await tx.teamMember.count(),
       teams: await tx.team.count(),
+      departments: await tx.department.count(),
       persons: await tx.person.count(),
     };
     await tx.teamMember.deleteMany();
     await tx.team.deleteMany();
+    await tx.department.deleteMany();
     await tx.person.deleteMany();
     await logAudit({
       action: "reset",
@@ -406,6 +600,7 @@ export async function resetAll() {
   revalidatePath("/");
   revalidatePath("/managePersons");
   revalidatePath("/manageTeams");
+  revalidatePath("/manageDepartments");
 }
 
 export async function seedMockData(clearExisting: boolean = true) {
@@ -414,6 +609,7 @@ export async function seedMockData(clearExisting: boolean = true) {
     if (clearExisting) {
       await prisma.teamMember.deleteMany();
       await prisma.team.deleteMany();
+      await prisma.department.deleteMany();
       await prisma.person.deleteMany();
     }
 
@@ -470,6 +666,35 @@ export async function seedMockData(clearExisting: boolean = true) {
       });
       if (!existing) {
         await prisma.teamMember.create({ data: m });
+      }
+    }
+
+    // Upsert departments and assign teams
+    const departmentSeeds = [
+      {
+        name: "Engineering",
+        description: "Software development and infrastructure",
+        headId: alice.id,
+        teamNames: ["Engineering", "Platform"],
+      },
+      {
+        name: "Product",
+        description: "Product management and design",
+        headId: frank.id,
+        teamNames: ["Design"],
+      },
+    ];
+    for (const d of departmentSeeds) {
+      const dept = await prisma.department.upsert({
+        where: { name: d.name },
+        update: {},
+        create: { name: d.name, description: d.description, headId: d.headId },
+      });
+      for (const teamName of d.teamNames) {
+        await prisma.team.updateMany({
+          where: { teamName, departmentId: null },
+          data: { departmentId: dept.id },
+        });
       }
     }
   });
@@ -542,6 +767,7 @@ export async function seedMockData(clearExisting: boolean = true) {
   revalidatePath("/");
   revalidatePath("/managePersons");
   revalidatePath("/manageTeams");
+  revalidatePath("/manageDepartments");
   revalidatePath("/admin");
 }
 

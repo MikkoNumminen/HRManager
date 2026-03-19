@@ -305,7 +305,7 @@ describe("AuditLogViewer", () => {
     });
     render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
     expect(
-      screen.getAllByText("Cleared all data (5 persons, 2 teams removed)").length,
+      screen.getAllByText("Cleared all data (5 persons, 2 teams, 0 departments removed)").length,
     ).toBeGreaterThan(0);
   });
 

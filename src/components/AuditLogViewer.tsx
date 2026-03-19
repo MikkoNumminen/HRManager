@@ -95,6 +95,7 @@ function describeChanges(
       if (entityType === "person") return `Added a new person: ${a?.name ?? "unknown"}`;
       if (entityType === "team") return `Created a new team: ${a?.teamName ?? "unknown"}`;
       if (entityType === "teamMember") return "Added a member to a team";
+      if (entityType === "department") return `Created a new department: ${a?.name ?? "unknown"}`;
       return "New record created";
     }
 
@@ -103,6 +104,7 @@ function describeChanges(
         return `Removed person: ${b?.name ?? "unknown"} (${b?.email ?? ""})`;
       if (entityType === "team") return `Deleted team: ${b?.teamName ?? "unknown"}`;
       if (entityType === "teamMember") return "Removed a member from a team";
+      if (entityType === "department") return `Deleted department: ${b?.name ?? "unknown"}`;
       if (entityType === "userPermission") {
         const key = b?.permissionKey ?? "";
         const label = permissionLabels[key] ?? key;
@@ -121,11 +123,24 @@ function describeChanges(
         return "Updated person details";
       }
       if (entityType === "team") {
+        if (a?.departmentId !== undefined) {
+          if (a.departmentId === null) return "Removed team from department";
+          return "Assigned team to a department";
+        }
         if (a?.teamManagerId !== undefined) {
           if (a.teamManagerId === null) return "Removed the team manager";
           return "Changed the team manager";
         }
         return "Updated team details";
+      }
+      if (entityType === "department") {
+        if (a?.headId !== undefined) {
+          if (a.headId === null) return "Removed the department head";
+          return "Changed the department head";
+        }
+        if (a?.name !== undefined && b?.name !== a.name)
+          return `Renamed department from "${b?.name}" to "${a?.name}"`;
+        return "Updated department details";
       }
       if (entityType === "user") {
         const target = resolveTarget();
@@ -152,7 +167,8 @@ function describeChanges(
     if (action === "reset") {
       const persons = b?.personCount ?? b?.persons ?? 0;
       const teams = b?.teamCount ?? b?.teams ?? 0;
-      return `Cleared all data (${persons} persons, ${teams} teams removed)`;
+      const departments = b?.departmentCount ?? b?.departments ?? 0;
+      return `Cleared all data (${persons} persons, ${teams} teams, ${departments} departments removed)`;
     }
 
     return "-";
