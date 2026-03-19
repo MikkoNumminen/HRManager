@@ -2,11 +2,13 @@ import { prisma } from "@/db";
 import {
   PersonSchema,
   TeamSchema,
+  DepartmentSchema,
   UserSchema,
   AuditLogSchema,
   AuditLogFilterSchema,
   Person,
   CombinedTeam,
+  Department,
   AppUser,
   AuditLog,
   AuditLogFilter,
@@ -48,6 +50,31 @@ export async function getTeams(): Promise<CombinedTeam[]> {
           name: member.person.name,
           email: member.person.email ?? null,
         })) ?? [],
+    }),
+  );
+}
+
+export async function getDepartments(): Promise<Department[]> {
+  const departments = await prisma.department.findMany({
+    include: {
+      head: true,
+      teams: true,
+    },
+  });
+
+  return departments.map((dept) =>
+    DepartmentSchema.parse({
+      id: dept.id,
+      name: dept.name,
+      description: dept.description ?? null,
+      headId: dept.headId ?? null,
+      headName: dept.head?.name ?? null,
+      createdAt: dept.createdAt,
+      updatedAt: dept.updatedAt,
+      teams: dept.teams.map((t) => ({
+        teamId: t.teamId,
+        teamName: t.teamName,
+      })),
     }),
   );
 }
