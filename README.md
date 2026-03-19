@@ -1,6 +1,6 @@
 # HRManager
 
-A full-stack HR management system for managing employees and teams — built with Next.js 16, React 19, MUI v7, Prisma, and TypeScript. This is a portfolio project intentionally built to production-grade complexity to demonstrate technical depth and breadth.
+A full-stack HR management system for managing employees, teams, and departments — built with Next.js 16, React 19, MUI v7, Prisma, and TypeScript. This is a portfolio project intentionally built to production-grade complexity to demonstrate technical depth and breadth.
 
 [![CI](https://github.com/MikkoNumminen/HRManager/actions/workflows/ci.yml/badge.svg)](https://github.com/MikkoNumminen/HRManager/actions/workflows/ci.yml)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)
@@ -18,18 +18,19 @@ A full-stack HR management system for managing employees and teams — built wit
 
 - **People management** — add, update and remove employees with name, email and position
 - **Team management** — create teams, assign managers, add and remove members
-- **Granular RBAC** — four roles (superuser, administrator, user, guest) with 16 permission keys and per-user overrides (grant/deny individual permissions on top of role defaults)
+- **Department management** — create departments with optional head and description, assign/remove teams, department detail pages with permission-gated actions
+- **Granular RBAC** — four roles (superuser, administrator, user, guest) with 21 permission keys and per-user overrides (grant/deny individual permissions on top of role defaults)
 - **Audit log** — immutable trail of every mutation with who, what, when, and before/after JSON snapshots; filterable admin viewer with pagination, human-readable change descriptions, and user name resolution
 - **Admin UI** — user management panel with role assignment, per-user permission editor with role default / override / effective columns, audit log viewer, and info tooltips
 - **Authentication** — NextAuth v5 with Google and GitHub OAuth; JWT strategy with permission-enriched tokens; automatic superuser bootstrapping on first login
-- **Guest mode** — unauthenticated users see read-only chip views of persons and teams; manage routes redirect to home
+- **Guest mode** — unauthenticated users see read-only chip views of persons, departments, and teams; manage routes redirect to home
 - **Permission-aware UI** — server-side permission guards on all mutations; client-side conditional rendering hides UI elements the user can't access
 - **Relational integrity** — database constraints enforced at ORM level with cascading rules
 - **Dark UI** — MUI dark theme with consistent component styling throughout
 - **Type-safe** — end-to-end TypeScript with Zod schema validation and centralized inferred types
 - **Server-first** — async Server Components for data fetching, Server Actions for mutations inside `$transaction` blocks
 - **CI/CD** — GitHub Actions pipeline runs formatting, linting, full test suite with coverage, and production build on every push and PR
-- **Thoroughly tested** — 441 Jest tests across six layers with 94%+ line coverage: Zod schemas, RBAC logic, Prisma queries, server actions, audit logging, and all UI components
+- **Thoroughly tested** — 533 Jest tests across six layers with 94%+ line coverage: Zod schemas, RBAC logic, Prisma queries, server actions, audit logging, and all UI components
 
 ---
 
@@ -106,7 +107,7 @@ npm run test:server # query + server action tests (Node, real SQLite)
 npm run test:all    # both suites
 ```
 
-> The project has **441 tests** split into two suites. `npm test` runs the client-side tests — component rendering, user interactions, form validation, Zod schema parsing, and RBAC permission resolution — all in a jsdom environment. `npm run test:server` runs the server-side tests against a real SQLite test database — every Prisma query, every server action mutation (including admin role/permission management), audit log creation, audit log queries, UUID validation, duplicate prevention, and cascade deletes. The test database (`prisma/test.db`) is created automatically the first time you run it and never touches your dev data.
+> The project has **533 tests** split into two suites. `npm test` runs the client-side tests — component rendering, user interactions, form validation, Zod schema parsing, and RBAC permission resolution — all in a jsdom environment. `npm run test:server` runs the server-side tests against a real SQLite test database — every Prisma query, every server action mutation (including admin role/permission management and department operations), audit log creation, audit log queries, UUID validation, duplicate prevention, and cascade deletes. The test database (`prisma/test.db`) is created automatically the first time you run it and never touches your dev data.
 
 ---
 
@@ -146,7 +147,7 @@ The app uses Next.js App Router with a clear separation of concerns:
 - **Server Components** fetch data at the page level and pass it as props to client components — no `useEffect` data fetching
 - **Server Actions** (`serverActions.ts`) handle all mutations inside `$transaction` blocks for atomicity
 - **Read queries** (`queries.ts`) are separated from mutations and validated through Zod schemas
-- **Centralized types** (`schemas.ts`) — Zod schemas export inferred `Person`, `CombinedTeam`, `AppUser`, `AuditLog`, and `Permissions` types used across all components
+- **Centralized types** (`schemas.ts`) — Zod schemas export inferred `Person`, `CombinedTeam`, `Department`, `AppUser`, `AuditLog`, and `Permissions` types used across all components
 - **Forms** use React 19's `useActionState` for error handling with built-in pending state
 - **Auth** (`auth.ts`) — NextAuth v5 with JWT strategy; protected routes redirect unauthenticated users; guest mode shows read-only chip views
 - **RBAC** (`permissions.ts`) — granular permission system with role defaults, per-user overrides, and server-side guards on every mutation
@@ -158,6 +159,7 @@ src/
 │   ├── api/auth/[...nextauth]/  # NextAuth route handler
 │   ├── admin/                   # User management (superuser-protected)
 │   │   └── audit/               # Audit log viewer (permission-protected)
+│   ├── manageDepartments/        # Department management (permission-protected)
 │   ├── managePersons/           # Person management (permission-protected)
 │   └── manageTeams/             # Team management (permission-protected)
 ├── components/       # Reusable MUI client components
@@ -172,7 +174,7 @@ src/
 ├── schemas.ts        # Zod schemas and exported TypeScript types
 └── serverActions.ts  # Mutation server actions (Prisma $transaction)
 prisma/
-└── schema.prisma     # Data model (Person, Team, User, Permission, UserPermission, AuditLog)
+└── schema.prisma     # Data model (Person, Team, Department, User, Permission, UserPermission, AuditLog)
 ```
 
 ---
@@ -180,15 +182,15 @@ prisma/
 ## Data model
 
 ```
-Person          Team             User              Permission
-├── id          ├── teamId       ├── id             ├── id
-├── name        ├── teamName     ├── email          ├── key
-├── email       ├── managerId    ├── name           └── description
-├── position    └── members[]    ├── role
-└── manager?                     └── permissions[]   UserPermission
-                                                     ├── userId
-AuditLog                                             ├── permissionId
-├── id                                               └── granted
+Person          Team             Department        User              Permission
+├── id          ├── teamId       ├── id            ├── id             ├── id
+├── name        ├── teamName     ├── name          ├── email          ├── key
+├── email       ├── managerId    ├── description?  ├── name           └── description
+├── position    ├── departmentId ├── headId?       ├── role
+└── manager?    └── members[]    └── teams[]       └── permissions[]   UserPermission
+                                                                       ├── userId
+AuditLog                                                               ├── permissionId
+├── id                                                                 └── granted
 ├── userId
 ├── userEmail
 ├── action
@@ -200,9 +202,10 @@ AuditLog                                             ├── permissionId
 ```
 
 - **Person** — employees with name, email, position, and optional manager (self-referencing FK)
-- **Team** — teams with a name, optional manager (FK to Person), and members via join table
+- **Team** — teams with a name, optional manager (FK to Person), optional department (FK to Department with SetNull), and members via join table
+- **Department** — organizational unit with name, optional description, optional head (FK to Person with SetNull), and associated teams
 - **User** — authenticated identity from OAuth, with role (superuser/administrator/user/guest)
-- **Permission** — catalog of 16 granular permission keys (e.g. `person:create`, `team:delete`, `admin:manage_users`)
+- **Permission** — catalog of 21 granular permission keys (e.g. `person:create`, `team:delete`, `department:assign_team`, `admin:manage_users`)
 - **UserPermission** — per-user permission overrides (grant/deny) with role-default fallback
 - **AuditLog** — immutable log entries with denormalized user info (no FK), action type, entity reference, and JSON before/after snapshots
 
@@ -210,14 +213,14 @@ AuditLog                                             ├── permissionId
 
 ## RBAC permission system
 
-The app implements a granular Role-Based Access Control system with four roles and 16 permission keys:
+The app implements a granular Role-Based Access Control system with four roles and 21 permission keys:
 
-| Role          | Default permissions                                                                  |
-| ------------- | ------------------------------------------------------------------------------------ |
-| Superuser     | All permissions (immutable — cannot be modified or assigned via UI)                  |
-| Administrator | All person and team operations + audit log access (no data reset, seed, or admin UI) |
-| User          | Read-only (person:read, team:read)                                                   |
-| Guest         | Read-only (same as user, but unauthenticated)                                        |
+| Role          | Default permissions                                                                               |
+| ------------- | ------------------------------------------------------------------------------------------------- |
+| Superuser     | All permissions (immutable — cannot be modified or assigned via UI)                               |
+| Administrator | All person, team, and department operations + audit log access (no data reset, seed, or admin UI) |
+| User          | Read-only (person:read, team:read, department:read)                                               |
+| Guest         | Read-only (same as user, but unauthenticated)                                                     |
 
 **Permission resolution precedence**: superuser (always all) → explicit UserPermission override → role default.
 
@@ -227,23 +230,23 @@ Individual permissions can be overridden per-user through the admin UI — for e
 
 ## Testing
 
-441 tests across 27 test suites, covering every layer of the application:
+533 tests across 34 test suites, covering every layer of the application:
 
-| Layer              | Tests | What's covered                                                                                                                                                                                                                                                                      |
-| ------------------ | ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Zod schemas**    | 60    | PersonSchema, TeamSchema, TeamMemberSchema, UserSchema, PermissionsSchema, AuditLogSchema, AuditLogFilterSchema, AuditActionSchema, AuditEntityTypeSchema — valid data, missing fields, invalid UUIDs, nullable fields, wrong types, enum validation                                |
-| **Prisma queries** | 33    | `getPersons`, `getTeams`, `getUsers`, `getUserById`, `getAllPermissionKeys`, `getAuditLogs`, `getAuditLogUserEmails` against real SQLite — filtering, pagination, ordering, empty state, distinct emails                                                                            |
-| **Server actions** | 78    | All 14 mutations — CRUD for persons/teams/members, admin role updates, permission override grant/deny/reset, mock data seeding, UUID validation, duplicate prevention, cascade deletes, superuser protection, idempotent seed with upserts                                          |
-| **Audit logging**  | 6     | `logAudit` — user info capture, null user (unauthenticated), JSON serialization of before/after, undefined handling, null entityId, transaction client usage                                                                                                                        |
-| **RBAC logic**     | 27    | `resolvePermissions`, `getCurrentUser`, `getUserPermissions`, `hasPermission`, `requirePermission`, `seedPermissions` — superuser immunity, role defaults, grant/deny overrides, session lookup, unauthenticated fallback, permission seeding                                       |
-| **UI components**  | 237   | All 23 components — rendering, user interactions, keyboard accessibility, form validation, permission-based visibility, role chips, selection cards, minimal/full views, empty states, router navigation, admin menu links, audit log filtering, reset/seed dialogs, error handling |
+| Layer              | Tests | What's covered                                                                                                                                                                                                                                                                                                  |
+| ------------------ | ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Zod schemas**    | 71    | PersonSchema, TeamSchema, TeamMemberSchema, DepartmentSchema, DepartmentTeamSchema, UserSchema, PermissionsSchema, AuditLogSchema, AuditLogFilterSchema, AuditActionSchema, AuditEntityTypeSchema — valid data, missing fields, invalid UUIDs, nullable fields, wrong types, enum validation                    |
+| **Prisma queries** | 37    | `getPersons`, `getTeams`, `getDepartments`, `getUsers`, `getUserById`, `getAllPermissionKeys`, `getAuditLogs`, `getAuditLogUserEmails` against real SQLite — filtering, pagination, ordering, empty state, distinct emails, department relations                                                                |
+| **Server actions** | 96    | All 20 mutations — CRUD for persons/teams/members/departments, department head assignment, team-department assignment, admin role updates, permission override grant/deny/reset, mock data seeding, UUID validation, duplicate prevention, cascade deletes, superuser protection, idempotent seed with upserts  |
+| **Audit logging**  | 6     | `logAudit` — user info capture, null user (unauthenticated), JSON serialization of before/after, undefined handling, null entityId, transaction client usage                                                                                                                                                    |
+| **RBAC logic**     | 27    | `resolvePermissions`, `getCurrentUser`, `getUserPermissions`, `hasPermission`, `requirePermission`, `seedPermissions` — superuser immunity, role defaults, grant/deny overrides, session lookup, unauthenticated fallback, permission seeding                                                                   |
+| **UI components**  | 295   | All 30 components — rendering, user interactions, keyboard accessibility, form validation, permission-based visibility, role chips, selection cards, minimal/chip/full views, empty states, router navigation, admin menu links, audit log filtering, reset/seed dialogs, department management, error handling |
 
 ```
 Coverage summary (combined client + server suites)
-  Statements : 93.66%
-  Branches   : 88.63%
-  Functions  : 94.02%
-  Lines      : 94.45%
+  Statements : 93.93%
+  Branches   : 86.93%
+  Functions  : 95.27%
+  Lines      : 94.86%
 ```
 
 Highlights: `auditLog.ts`, `permissions.ts`, `queries.ts`, `schemas.ts`, and `serverActions.ts` at 97–100% line coverage. Server-side tests run against an isolated test database (`prisma/test.db`) — the dev database is never touched.
@@ -252,7 +255,6 @@ Highlights: `auditLog.ts`, `permissions.ts`, `queries.ts`, `schemas.ts`, and `se
 
 ## Roadmap
 
-- Department-level grouping
 - Cloud deployment (AWS Fargate + RDS)
 
 ---

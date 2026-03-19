@@ -31,11 +31,11 @@ This is a **portfolio / showcase project**. The goal is to demonstrate technical
 - **Audit logging** — `auditLog.ts` provides `logAudit()` which records who, what action, which entity, and before/after JSON snapshots. Uses `getCurrentUser()` for actor identity. Accepts optional `tx` param to run inside an existing transaction. No FK to User — logs survive user deletion.
 - Pages are async Server Components that fetch data and pass it as props to Client Components. No `useEffect` data fetching.
 - Forms use React 19's `useActionState` with `action=` prop, not `onSubmit`.
-- Types are derived from Zod schemas in `schemas.ts` via `z.infer` — `Person`, `CombinedTeam`, `AppUser`, `AuditLog`, `Permissions`. Do not create duplicate interfaces in components.
+- Types are derived from Zod schemas in `schemas.ts` via `z.infer` — `Person`, `CombinedTeam`, `Department`, `AppUser`, `AuditLog`, `Permissions`. Do not create duplicate interfaces in components.
 - MUI style tokens and component styles are centralized in `muiStyles.ts`.
 - **Info tooltips**: Use MUI `Tooltip` with `arrow` and `cursor: "help"` on column headers or labels that may not be self-explanatory. Keep tooltip text concise but informative. Apply this consistently across all data tables and editor views.
 - **Auth** is configured in `auth.ts` (NextAuth v5). Protected routes use `auth()` + `redirect("/")` in Server Components. Client components use `useSession` via `SessionProvider` wrapper in layout.
-- **Guest mode**: unauthenticated users see read-only minimal views (MUI Chips) of Persons and Teams on the main page. Manage routes (`/managePersons`, `/manageTeams`) redirect to `/`.
+- **Guest mode**: unauthenticated users see read-only minimal views (MUI Chips) of Persons, Departments, and Teams on the main page. Manage routes (`/managePersons`, `/manageDepartments`, `/manageTeams`) redirect to `/`.
 - **TopBar** — the user avatar dropdown menu contains: User Management, Audit Log (permission-gated), Load Mock Data, Reset All Data (permission-gated), and Sign Out. The `permissions` prop must be passed on every page so all menu items are available everywhere.
 - **Client-heavy rendering**: Keep the server thin — it handles only data fetching, auth, and validation. All rendering logic, UI state, filtering, sorting, and heavy computation belong in Client Components so the server stays lightweight and responsive. Security-sensitive logic (auth checks, input sanitization, access control, database queries) must always remain server-side — never trust the client for authorization or data integrity.
 - **SQLite single-writer constraint** — SQLite cannot handle concurrent write transactions. Never nest `$transaction` calls. In `seedMockData`, separate transactions run sequentially (main data → cleanup → `seedPermissions()` → user creation) to avoid deadlock.
@@ -48,6 +48,7 @@ src/
 │   ├── api/auth/[...nextauth]/  # NextAuth route handler
 │   ├── admin/                   # User management (superuser-protected)
 │   │   └── audit/               # Audit log viewer (permission-protected)
+│   ├── manageDepartments/        # Department management (permission-protected)
 │   ├── managePersons/           # Person management (permission-protected)
 │   └── manageTeams/             # Team management (permission-protected)
 ├── components/       # Reusable MUI client components
@@ -68,10 +69,11 @@ prisma/
 ## Data model
 
 - **Person** — name, email, title, optional manager (FK to Person). Can belong to multiple teams.
-- **Team** — name, manager (FK to Person), members via TeamMember join table.
+- **Team** — name, manager (FK to Person), optional department (FK to Department, SetNull), members via TeamMember join table.
+- **Department** — name, optional description, optional head (FK to Person, SetNull). Teams assigned via Team.departmentId.
 - **TeamMember** — join table between Person and Team, cascade delete on removal.
 - **User** — authenticated identity (email, name, image, role). Linked to NextAuth OAuth.
-- **Permission** — catalog of 16 granular permission keys (e.g. `person:create`, `team:delete`).
+- **Permission** — catalog of 21 granular permission keys (e.g. `person:create`, `team:delete`, `department:assign_team`).
 - **UserPermission** — per-user permission overrides (grant/deny) with role-default fallback.
 - **AuditLog** — immutable log of all mutations: who, what action, which entity, before/after JSON snapshots. No FK to User so logs survive user deletion.
 
@@ -104,5 +106,4 @@ prisma/
 
 ## Roadmap (do not implement unless asked)
 
-- Department-level grouping
 - Cloud deployment (AWS Fargate + RDS)
