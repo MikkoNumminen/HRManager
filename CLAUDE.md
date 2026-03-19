@@ -75,6 +75,7 @@ prisma/
 
 - Do **not** run `git commit` — only provide the commit message as text so the user can commit manually.
 - On large multi-file features, **pause at natural commit boundaries** and provide a commit message before continuing. Don't wait until everything is done — commit early and often at logical checkpoints (e.g. schema + migration, then core logic, then UI, then tests).
+- **STOP after every commit boundary.** Provide the commit message, list the files included, and **wait for the user to confirm** before writing any more code. The user needs to commit and push each change separately and in order. **Never continue to the next commit's work without explicit confirmation.** This is non-negotiable.
 - Changes to `CLAUDE.md` or `README.md` must be committed **separately** from code changes — always provide a dedicated `docs()` commit message for them.
 
 ## Formatting
