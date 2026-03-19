@@ -19,7 +19,7 @@ A full-stack HR management system for managing employees and teams — built wit
 - **People management** — add, update and remove employees with name, email and position
 - **Team management** — create teams, assign managers, add and remove members
 - **Granular RBAC** — four roles (superuser, administrator, user, guest) with 16 permission keys and per-user overrides (grant/deny individual permissions on top of role defaults)
-- **Audit log** — immutable trail of every mutation with who, what, when, and before/after JSON snapshots; filterable admin viewer with pagination
+- **Audit log** — immutable trail of every mutation with who, what, when, and before/after JSON snapshots; filterable admin viewer with pagination, human-readable change descriptions, and user name resolution
 - **Admin UI** — user management panel with role assignment, per-user permission editor with role default / override / effective columns, audit log viewer, and info tooltips
 - **Authentication** — NextAuth v5 with Google and GitHub OAuth; JWT strategy with permission-enriched tokens; automatic superuser bootstrapping on first login
 - **Guest mode** — unauthenticated users see read-only chip views of persons and teams; manage routes redirect to home
@@ -28,7 +28,7 @@ A full-stack HR management system for managing employees and teams — built wit
 - **Dark UI** — MUI dark theme with consistent component styling throughout
 - **Type-safe** — end-to-end TypeScript with Zod schema validation and centralized inferred types
 - **Server-first** — async Server Components for data fetching, Server Actions for mutations inside `$transaction` blocks
-- **Thoroughly tested** — 439 Jest tests across six layers with 94%+ line coverage: Zod schemas, RBAC logic, Prisma queries, server actions, audit logging, and all UI components
+- **Thoroughly tested** — 441 Jest tests across six layers with 94%+ line coverage: Zod schemas, RBAC logic, Prisma queries, server actions, audit logging, and all UI components
 
 ---
 
@@ -234,14 +234,14 @@ Individual permissions can be overridden per-user through the admin UI — for e
 | **Server actions** | 78    | All 14 mutations — CRUD for persons/teams/members, admin role updates, permission override grant/deny/reset, mock data seeding, UUID validation, duplicate prevention, cascade deletes, superuser protection, idempotent seed with upserts                                          |
 | **Audit logging**  | 6     | `logAudit` — user info capture, null user (unauthenticated), JSON serialization of before/after, undefined handling, null entityId, transaction client usage                                                                                                                        |
 | **RBAC logic**     | 27    | `resolvePermissions`, `getCurrentUser`, `getUserPermissions`, `hasPermission`, `requirePermission`, `seedPermissions` — superuser immunity, role defaults, grant/deny overrides, session lookup, unauthenticated fallback, permission seeding                                       |
-| **UI components**  | 235   | All 23 components — rendering, user interactions, keyboard accessibility, form validation, permission-based visibility, role chips, selection cards, minimal/full views, empty states, router navigation, admin menu links, audit log filtering, reset/seed dialogs, error handling |
+| **UI components**  | 237   | All 23 components — rendering, user interactions, keyboard accessibility, form validation, permission-based visibility, role chips, selection cards, minimal/full views, empty states, router navigation, admin menu links, audit log filtering, reset/seed dialogs, error handling |
 
 ```
 Coverage summary (combined client + server suites)
-  Statements : 93.60%
-  Branches   : 88.58%
-  Functions  : 93.98%
-  Lines      : 94.40%
+  Statements : 93.66%
+  Branches   : 88.63%
+  Functions  : 94.02%
+  Lines      : 94.45%
 ```
 
 Highlights: `auditLog.ts`, `permissions.ts`, `queries.ts`, `schemas.ts`, and `serverActions.ts` at 97–100% line coverage. Server-side tests run against an isolated test database (`prisma/test.db`) — the dev database is never touched.
