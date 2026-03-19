@@ -143,6 +143,16 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
                     User Management
                   </MenuItem>
                 )}
+                {session?.user?.permissions?.["admin:view_audit_log"] && (
+                  <MenuItem
+                    component={Link}
+                    href="/admin/audit"
+                    onClick={() => setAnchorEl(null)}
+                    sx={userMenuItemStyles}
+                  >
+                    Audit Log
+                  </MenuItem>
+                )}
                 {canSeed && (
                   <MenuItem
                     disabled={isPending}
