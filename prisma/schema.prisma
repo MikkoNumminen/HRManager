@@ -16,13 +16,27 @@ model Person {
   updatedAt DateTime @updatedAt
   teams TeamMember[]
   managedTeams Team[]
+  headOfDepartments Department[]
+}
+
+model Department {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  headId      String?
+  head        Person?  @relation(fields: [headId], references: [id], onDelete: SetNull)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  teams       Team[]
 }
 
 model Team {
   teamId String @id @default(uuid())
   teamName String @unique
   teamManagerId String?
+  departmentId String?
   manager Person? @relation(fields: [teamManagerId], references: [id], onDelete: SetNull)
+  department Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   members TeamMember[]
