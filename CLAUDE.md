@@ -105,5 +105,4 @@ prisma/
 ## Roadmap (do not implement unless asked)
 
 - Department-level grouping
-- CI/CD pipeline (GitHub Actions)
 - Cloud deployment (AWS Fargate + RDS)

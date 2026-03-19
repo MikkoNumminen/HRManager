@@ -28,6 +28,7 @@ A full-stack HR management system for managing employees and teams — built wit
 - **Dark UI** — MUI dark theme with consistent component styling throughout
 - **Type-safe** — end-to-end TypeScript with Zod schema validation and centralized inferred types
 - **Server-first** — async Server Components for data fetching, Server Actions for mutations inside `$transaction` blocks
+- **CI/CD** — GitHub Actions pipeline runs formatting, linting, full test suite with coverage, and production build on every push and PR
 - **Thoroughly tested** — 441 Jest tests across six layers with 94%+ line coverage: Zod schemas, RBAC logic, Prisma queries, server actions, audit logging, and all UI components
 
 ---
@@ -105,7 +106,7 @@ npm run test:server # query + server action tests (Node, real SQLite)
 npm run test:all    # both suites
 ```
 
-> The project has **439 tests** split into two suites. `npm test` runs the client-side tests — component rendering, user interactions, form validation, Zod schema parsing, and RBAC permission resolution — all in a jsdom environment. `npm run test:server` runs the server-side tests against a real SQLite test database — every Prisma query, every server action mutation (including admin role/permission management), audit log creation, audit log queries, UUID validation, duplicate prevention, and cascade deletes. The test database (`prisma/test.db`) is created automatically the first time you run it and never touches your dev data.
+> The project has **441 tests** split into two suites. `npm test` runs the client-side tests — component rendering, user interactions, form validation, Zod schema parsing, and RBAC permission resolution — all in a jsdom environment. `npm run test:server` runs the server-side tests against a real SQLite test database — every Prisma query, every server action mutation (including admin role/permission management), audit log creation, audit log queries, UUID validation, duplicate prevention, and cascade deletes. The test database (`prisma/test.db`) is created automatically the first time you run it and never touches your dev data.
 
 ---
 
@@ -134,6 +135,7 @@ npm run format
 | Testing           | Jest 30 + React Testing Library              |
 | Linting           | ESLint 9 (flat config)                       |
 | Formatting        | Prettier 3                                   |
+| CI/CD             | GitHub Actions (lint, test, build)           |
 
 ---
 
@@ -225,7 +227,7 @@ Individual permissions can be overridden per-user through the admin UI — for e
 
 ## Testing
 
-439 tests across 27 test suites, covering every layer of the application:
+441 tests across 27 test suites, covering every layer of the application:
 
 | Layer              | Tests | What's covered                                                                                                                                                                                                                                                                      |
 | ------------------ | ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
