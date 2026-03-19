@@ -17,8 +17,9 @@ A full-stack HR management system for managing employees and teams — built wit
 
 - **People management** — add, update and remove employees with name, email and position
 - **Team management** — create teams, assign managers, add and remove members
-- **Granular RBAC** — four roles (superuser, administrator, user, guest) with 15 permission keys and per-user overrides (grant/deny individual permissions on top of role defaults)
-- **Admin UI** — user management panel with role assignment, per-user permission editor with role default / override / effective columns, and info tooltips
+- **Granular RBAC** — four roles (superuser, administrator, user, guest) with 16 permission keys and per-user overrides (grant/deny individual permissions on top of role defaults)
+- **Audit log** — immutable trail of every mutation with who, what, when, and before/after JSON snapshots; filterable admin viewer with pagination
+- **Admin UI** — user management panel with role assignment, per-user permission editor with role default / override / effective columns, audit log viewer, and info tooltips
 - **Authentication** — NextAuth v5 with Google and GitHub OAuth; JWT strategy with permission-enriched tokens; automatic superuser bootstrapping on first login
 - **Guest mode** — unauthenticated users see read-only chip views of persons and teams; manage routes redirect to home
 - **Permission-aware UI** — server-side permission guards on all mutations; client-side conditional rendering hides UI elements the user can't access
@@ -26,7 +27,7 @@ A full-stack HR management system for managing employees and teams — built wit
 - **Dark UI** — MUI dark theme with consistent component styling throughout
 - **Type-safe** — end-to-end TypeScript with Zod schema validation and centralized inferred types
 - **Server-first** — async Server Components for data fetching, Server Actions for mutations inside `$transaction` blocks
-- **Thoroughly tested** — 350 Jest tests across five layers with 93%+ line coverage: Zod schemas, RBAC logic, Prisma queries, server actions, and all UI components
+- **Thoroughly tested** — 382 Jest tests across six layers with 93%+ line coverage: Zod schemas, RBAC logic, Prisma queries, server actions, audit log queries, and all UI components
 
 ---
 
@@ -103,7 +104,7 @@ npm run test:server # query + server action tests (Node, real SQLite)
 npm run test:all    # both suites
 ```
 
-> The project has **308 tests** split into two suites. `npm test` runs the client-side tests — component rendering, user interactions, form validation, Zod schema parsing, and RBAC permission resolution — all in a jsdom environment. `npm run test:server` runs the server-side tests against a real SQLite test database — every Prisma query, every server action mutation (including admin role/permission management), UUID validation, duplicate prevention, and cascade deletes. The test database (`prisma/test.db`) is created automatically the first time you run it and never touches your dev data.
+> The project has **382 tests** split into two suites. `npm test` runs the client-side tests — component rendering, user interactions, form validation, Zod schema parsing, and RBAC permission resolution — all in a jsdom environment. `npm run test:server` runs the server-side tests against a real SQLite test database — every Prisma query, every server action mutation (including admin role/permission management), audit log queries, UUID validation, duplicate prevention, and cascade deletes. The test database (`prisma/test.db`) is created automatically the first time you run it and never touches your dev data.
 
 ---
 
@@ -142,21 +143,24 @@ The app uses Next.js App Router with a clear separation of concerns:
 - **Server Components** fetch data at the page level and pass it as props to client components — no `useEffect` data fetching
 - **Server Actions** (`serverActions.ts`) handle all mutations inside `$transaction` blocks for atomicity
 - **Read queries** (`queries.ts`) are separated from mutations and validated through Zod schemas
-- **Centralized types** (`schemas.ts`) — Zod schemas export inferred `Person`, `CombinedTeam`, `AppUser`, and `Permissions` types used across all components
+- **Centralized types** (`schemas.ts`) — Zod schemas export inferred `Person`, `CombinedTeam`, `AppUser`, `AuditLog`, and `Permissions` types used across all components
 - **Forms** use React 19's `useActionState` for error handling with built-in pending state
 - **Auth** (`auth.ts`) — NextAuth v5 with JWT strategy; protected routes redirect unauthenticated users; guest mode shows read-only chip views
 - **RBAC** (`permissions.ts`) — granular permission system with role defaults, per-user overrides, and server-side guards on every mutation
+- **Audit logging** (`auditLog.ts`) — every mutation is logged with before/after snapshots inside the same transaction for atomicity
 
 ```
 src/
 ├── app/
 │   ├── api/auth/[...nextauth]/  # NextAuth route handler
 │   ├── admin/                   # User management (superuser-protected)
+│   │   └── audit/               # Audit log viewer (permission-protected)
 │   ├── managePersons/           # Person management (permission-protected)
 │   └── manageTeams/             # Team management (permission-protected)
 ├── components/       # Reusable MUI client components
 ├── tests/            # Jest tests (client + server)
 ├── types/            # TypeScript module augmentations (next-auth.d.ts)
+├── auditLog.ts       # Audit logging helper (logAudit)
 ├── auth.ts           # NextAuth v5 configuration + RBAC callbacks
 ├── db.ts             # Prisma singleton
 ├── muiStyles.ts      # Centralised style tokens and component styles
@@ -165,7 +169,7 @@ src/
 ├── schemas.ts        # Zod schemas and exported TypeScript types
 └── serverActions.ts  # Mutation server actions (Prisma $transaction)
 prisma/
-└── schema.prisma     # Data model (Person, Team, User, Permission, UserPermission)
+└── schema.prisma     # Data model (Person, Team, User, Permission, UserPermission, AuditLog)
 ```
 
 ---
@@ -180,28 +184,37 @@ Person          Team             User              Permission
 ├── position    └── members[]    ├── role
 └── manager?                     └── permissions[]   UserPermission
                                                      ├── userId
-                                                     ├── permissionId
-                                                     └── granted
+AuditLog                                             ├── permissionId
+├── id                                               └── granted
+├── userId
+├── userEmail
+├── action
+├── entityType
+├── entityId
+├── before (JSON)
+├── after (JSON)
+└── createdAt
 ```
 
 - **Person** — employees with name, email, position, and optional manager (self-referencing FK)
 - **Team** — teams with a name, optional manager (FK to Person), and members via join table
 - **User** — authenticated identity from OAuth, with role (superuser/administrator/user/guest)
-- **Permission** — catalog of 15 granular permission keys (e.g. `person:create`, `team:delete`, `admin:manage_users`)
+- **Permission** — catalog of 16 granular permission keys (e.g. `person:create`, `team:delete`, `admin:manage_users`)
 - **UserPermission** — per-user permission overrides (grant/deny) with role-default fallback
+- **AuditLog** — immutable log entries with denormalized user info (no FK), action type, entity reference, and JSON before/after snapshots
 
 ---
 
 ## RBAC permission system
 
-The app implements a granular Role-Based Access Control system with four roles and 15 permission keys:
+The app implements a granular Role-Based Access Control system with four roles and 16 permission keys:
 
-| Role          | Default permissions                                                   |
-| ------------- | --------------------------------------------------------------------- |
-| Superuser     | All permissions (immutable — cannot be modified or assigned via UI)   |
-| Administrator | All person and team operations (no data reset, seed, or admin access) |
-| User          | Read-only (person:read, team:read)                                    |
-| Guest         | Read-only (same as user, but unauthenticated)                         |
+| Role          | Default permissions                                                                  |
+| ------------- | ------------------------------------------------------------------------------------ |
+| Superuser     | All permissions (immutable — cannot be modified or assigned via UI)                  |
+| Administrator | All person and team operations + audit log access (no data reset, seed, or admin UI) |
+| User          | Read-only (person:read, team:read)                                                   |
+| Guest         | Read-only (same as user, but unauthenticated)                                        |
 
 **Permission resolution precedence**: superuser (always all) → explicit UserPermission override → role default.
 
@@ -211,25 +224,25 @@ Individual permissions can be overridden per-user through the admin UI — for e
 
 ## Testing
 
-350 tests across 26 test suites, covering every layer of the application:
+382 tests across 26 test suites, covering every layer of the application:
 
-| Layer              | Tests | What's covered                                                                                                                                                                                                                             |
-| ------------------ | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Zod schemas**    | 43    | PersonSchema, TeamSchema, TeamMemberSchema, UserSchema, PermissionsSchema — valid data, missing fields, invalid UUIDs, nullable fields, wrong types, role enum validation                                                                  |
-| **Prisma queries** | 23    | `getPersons`, `getTeams`, `getUsers`, `getUserById`, `getAllPermissionKeys` against real SQLite — empty state, null fields, member shapes, user overrides, permission resolution, ordering                                                 |
-| **Server actions** | 78    | All 14 mutations — CRUD for persons/teams/members, admin role updates, permission override grant/deny/reset, mock data seeding, UUID validation, duplicate prevention, cascade deletes, superuser protection, idempotent seed with upserts |
-| **RBAC logic**     | 24    | `resolvePermissions`, `getCurrentUser`, `getUserPermissions`, `hasPermission`, `requirePermission` — superuser immunity, role defaults, grant/deny overrides, session lookup, unauthenticated fallback                                     |
-| **UI components**  | 182   | All 21 components — rendering, user interactions, keyboard accessibility, form validation, permission-based visibility, role chips, selection cards, minimal/full views, empty states, router navigation, admin menu links                 |
+| Layer              | Tests | What's covered                                                                                                                                                                                                                                       |
+| ------------------ | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Zod schemas**    | 60    | PersonSchema, TeamSchema, TeamMemberSchema, UserSchema, PermissionsSchema, AuditLogSchema, AuditLogFilterSchema, AuditActionSchema, AuditEntityTypeSchema — valid data, missing fields, invalid UUIDs, nullable fields, wrong types, enum validation |
+| **Prisma queries** | 33    | `getPersons`, `getTeams`, `getUsers`, `getUserById`, `getAllPermissionKeys`, `getAuditLogs`, `getAuditLogUserEmails` against real SQLite — filtering, pagination, ordering, empty state, distinct emails                                             |
+| **Server actions** | 78    | All 14 mutations — CRUD for persons/teams/members, admin role updates, permission override grant/deny/reset, mock data seeding, UUID validation, duplicate prevention, cascade deletes, superuser protection, idempotent seed with upserts           |
+| **RBAC logic**     | 24    | `resolvePermissions`, `getCurrentUser`, `getUserPermissions`, `hasPermission`, `requirePermission` — superuser immunity, role defaults, grant/deny overrides, session lookup, unauthenticated fallback                                               |
+| **UI components**  | 187   | All 22 components — rendering, user interactions, keyboard accessibility, form validation, permission-based visibility, role chips, selection cards, minimal/full views, empty states, router navigation, admin menu links, audit log viewer         |
 
 ```
 Coverage summary (combined client + server suites)
-  Statements : 92.51%
-  Branches   : 86.63%
-  Functions  : 92.16%
-  Lines      : 93.46%
+  Statements : 88.53%
+  Branches   : 81.42%
+  Functions  : 83.69%
+  Lines      : 89.02%
 ```
 
-Highlights: `queries.ts`, `schemas.ts`, and `serverActions.ts` at 99–100% line coverage. 19 of 21 components at 96%+ line coverage. Server-side tests run against an isolated test database (`prisma/test.db`) — the dev database is never touched.
+Highlights: `queries.ts`, `schemas.ts`, and `serverActions.ts` at 97–100% line coverage. Server-side tests run against an isolated test database (`prisma/test.db`) — the dev database is never touched.
 
 ---
 

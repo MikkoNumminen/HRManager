@@ -44,11 +44,13 @@ src/
 ├── app/
 │   ├── api/auth/[...nextauth]/  # NextAuth route handler
 │   ├── admin/                   # User management (superuser-protected)
+│   │   └── audit/               # Audit log viewer (permission-protected)
 │   ├── managePersons/           # Person management (permission-protected)
 │   └── manageTeams/             # Team management (permission-protected)
 ├── components/       # Reusable MUI client components
 ├── tests/            # Jest tests
 ├── types/            # TypeScript module augmentations (next-auth.d.ts)
+├── auditLog.ts       # Audit logging helper (logAudit)
 ├── auth.ts           # NextAuth v5 configuration + RBAC callbacks
 ├── db.ts             # Prisma singleton
 ├── muiStyles.ts      # Centralised MUI style tokens
@@ -66,8 +68,9 @@ prisma/
 - **Team** — name, manager (FK to Person), members via TeamMember join table.
 - **TeamMember** — join table between Person and Team, cascade delete on removal.
 - **User** — authenticated identity (email, name, image, role). Linked to NextAuth OAuth.
-- **Permission** — catalog of 15 granular permission keys (e.g. `person:create`, `team:delete`).
+- **Permission** — catalog of 16 granular permission keys (e.g. `person:create`, `team:delete`).
 - **UserPermission** — per-user permission overrides (grant/deny) with role-default fallback.
+- **AuditLog** — immutable log of all mutations: who, what action, which entity, before/after JSON snapshots. No FK to User so logs survive user deletion.
 
 ## Commit style
 
