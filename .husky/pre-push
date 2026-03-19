@@ -1,0 +1,4 @@
+echo "Running full test suite before push..."
+npm run test:all -- --coverage
+
+echo "All tests passed. Pushing..."
