@@ -1,6 +1,7 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import TopBar from "../components/TopBar";
 import { useSession, signIn, signOut } from "next-auth/react";
+import { seedMockData } from "../serverActions";
 
 jest.mock("next/navigation", () => ({
   useRouter: jest.fn(),
@@ -253,5 +254,88 @@ describe("TopBar", () => {
     render(<TopBar title="Home" />);
     fireEvent.click(screen.getByLabelText("User menu"));
     expect(screen.queryByText("Audit Log")).not.toBeInTheDocument();
+  });
+
+  // Clicking "Keep Existing" in the seed dialog calls seedMockData(false)
+  test("calls seedMockData with false when Keep Existing is clicked", async () => {
+    (seedMockData as jest.Mock).mockResolvedValue(undefined);
+    mockUseSession.mockReturnValue({
+      data: { user: { name: "Alice", email: "a@b.com", image: null } },
+      status: "authenticated",
+    });
+    const permissions = { "data:seed": true } as never;
+    render(<TopBar title="Home" permissions={permissions} />);
+    fireEvent.click(screen.getByLabelText("User menu"));
+    fireEvent.click(screen.getByText("Load Mock Data"));
+    fireEvent.click(screen.getByText("Keep Existing"));
+    await waitFor(() => {
+      expect(seedMockData).toHaveBeenCalledWith(false);
+    });
+  });
+
+  // Clicking "Replace All" in the seed dialog calls seedMockData(true)
+  test("calls seedMockData with true when Replace All is clicked", async () => {
+    (seedMockData as jest.Mock).mockResolvedValue(undefined);
+    mockUseSession.mockReturnValue({
+      data: { user: { name: "Alice", email: "a@b.com", image: null } },
+      status: "authenticated",
+    });
+    const permissions = { "data:seed": true } as never;
+    render(<TopBar title="Home" permissions={permissions} />);
+    fireEvent.click(screen.getByLabelText("User menu"));
+    fireEvent.click(screen.getByText("Load Mock Data"));
+    fireEvent.click(screen.getByText("Replace All"));
+    await waitFor(() => {
+      expect(seedMockData).toHaveBeenCalledWith(true);
+    });
+  });
+
+  // Clicking "Cancel" in the seed dialog closes it without calling seedMockData
+  test("closes seed dialog on Cancel without calling seedMockData", async () => {
+    mockUseSession.mockReturnValue({
+      data: { user: { name: "Alice", email: "a@b.com", image: null } },
+      status: "authenticated",
+    });
+    const permissions = { "data:seed": true } as never;
+    render(<TopBar title="Home" permissions={permissions} />);
+    fireEvent.click(screen.getByLabelText("User menu"));
+    fireEvent.click(screen.getByText("Load Mock Data"));
+    fireEvent.click(screen.getByText("Cancel"));
+    await waitFor(() => {
+      expect(
+        screen.queryByText("Do you want to keep your existing data or replace it with mock data?"),
+      ).not.toBeInTheDocument();
+    });
+    expect(seedMockData).not.toHaveBeenCalled();
+  });
+
+  // Shows error message when seedMockData fails
+  test("shows error when seedMockData fails", async () => {
+    (seedMockData as jest.Mock).mockRejectedValue(new Error("Seed failed"));
+    mockUseSession.mockReturnValue({
+      data: { user: { name: "Alice", email: "a@b.com", image: null } },
+      status: "authenticated",
+    });
+    const permissions = { "data:seed": true } as never;
+    render(<TopBar title="Home" permissions={permissions} />);
+    fireEvent.click(screen.getByLabelText("User menu"));
+    fireEvent.click(screen.getByText("Load Mock Data"));
+    fireEvent.click(screen.getByText("Replace All"));
+    await waitFor(() => {
+      expect(screen.getByText("Seed failed")).toBeInTheDocument();
+    });
+  });
+
+  // Shows user avatar image when image URL is provided
+  test("shows user avatar image when provided", () => {
+    mockUseSession.mockReturnValue({
+      data: {
+        user: { name: "Alice", email: "a@b.com", image: "https://example.com/avatar.png" },
+      },
+      status: "authenticated",
+    });
+    render(<TopBar title="Home" />);
+    const avatar = screen.getByAltText("Alice");
+    expect(avatar).toHaveAttribute("src", "https://example.com/avatar.png");
   });
 });

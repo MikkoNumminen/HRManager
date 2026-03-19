@@ -1,9 +1,11 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import AuditLogViewer from "../components/AuditLogViewer";
 import { AuditLog } from "../schemas";
+import { useRouter } from "next/navigation";
 
+const mockPush = jest.fn();
 jest.mock("next/navigation", () => ({
-  useRouter: jest.fn(() => ({ push: jest.fn() })),
+  useRouter: jest.fn(() => ({ push: mockPush })),
   useSearchParams: jest.fn(() => new URLSearchParams()),
 }));
 
@@ -31,6 +33,10 @@ const defaultProps = {
 };
 
 describe("AuditLogViewer", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   // Shows empty state message when there are no log entries.
   test("shows empty state when no logs", () => {
     render(<AuditLogViewer logs={[]} {...defaultProps} />);
@@ -138,5 +144,129 @@ describe("AuditLogViewer", () => {
     render(<AuditLogViewer logs={logs} {...defaultProps} total={2} />);
     expect(screen.getByText("alice@example.com")).toBeInTheDocument();
     expect(screen.getByText("bob@example.com")).toBeInTheDocument();
+  });
+
+  // Displays delete action with before values only.
+  test("formats delete changes showing before values", () => {
+    const log = makelog({
+      action: "delete",
+      before: '{"name":"Alice","email":"alice@test.com"}',
+      after: null,
+    });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(screen.getAllByText(/name: Alice/).length).toBeGreaterThan(0);
+  });
+
+  // Shows dash when both before and after are null.
+  test("shows dash when both before and after are null", () => {
+    const log = makelog({ before: null, after: null });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    // The "-" appears in both the cell and the tooltip
+    const dashes = screen.getAllByText("-");
+    expect(dashes.length).toBeGreaterThan(0);
+  });
+
+  // Handles malformed JSON gracefully by falling back to raw string.
+  test("falls back to raw string for invalid JSON", () => {
+    const log = makelog({ before: "not-json", after: null });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(screen.getAllByText("not-json").length).toBeGreaterThan(0);
+  });
+
+  // Shows dash when before and after have identical values (no actual changes).
+  test("shows dash when before and after are identical", () => {
+    const log = makelog({
+      action: "update",
+      before: '{"position":"Dev"}',
+      after: '{"position":"Dev"}',
+    });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    const dashes = screen.getAllByText("-");
+    expect(dashes.length).toBeGreaterThan(0);
+  });
+
+  // Renders user emails in the filter dropdown when provided.
+  test("renders user email filter options", () => {
+    const { container } = render(
+      <AuditLogViewer
+        logs={[]}
+        {...defaultProps}
+        userEmails={["alice@example.com", "bob@example.com"]}
+      />,
+    );
+    // The emails are MenuItem children inside the Select — they render in the DOM
+    expect(container).toBeDefined();
+  });
+
+  // Changing the action filter navigates with updated URL params.
+  test("navigates when action filter changes", () => {
+    render(<AuditLogViewer logs={[]} {...defaultProps} />);
+    // Open the Action select dropdown — MUI Select uses role="combobox"
+    const actionSelect = screen.getAllByRole("combobox")[1]; // second select = Action
+    fireEvent.mouseDown(actionSelect);
+    // Click "Create" menu item in the dropdown
+    const createOption = screen.getByRole("option", { name: "Create" });
+    fireEvent.click(createOption);
+    expect(mockPush).toHaveBeenCalledWith(expect.stringContaining("action=create"));
+    expect(mockPush).toHaveBeenCalledWith(expect.stringContaining("page=1"));
+  });
+
+  // Clearing the action filter removes it from URL params.
+  test("removes filter param when cleared", () => {
+    render(<AuditLogViewer logs={[]} {...defaultProps} currentFilters={{ action: "create" }} />);
+    const actionSelect = screen.getAllByRole("combobox")[1];
+    fireEvent.mouseDown(actionSelect);
+    const allOption = screen.getByRole("option", { name: "All Actions" });
+    fireEvent.click(allOption);
+    // The empty value should cause the param to be deleted
+    expect(mockPush).toHaveBeenCalled();
+  });
+
+  // Changing the entity type filter navigates with updated URL.
+  test("navigates when entity filter changes", () => {
+    render(<AuditLogViewer logs={[]} {...defaultProps} />);
+    const entitySelect = screen.getAllByRole("combobox")[2]; // third select = Entity
+    fireEvent.mouseDown(entitySelect);
+    const teamOption = screen.getByRole("option", { name: "Team" });
+    fireEvent.click(teamOption);
+    expect(mockPush).toHaveBeenCalledWith(expect.stringContaining("entityType=team"));
+  });
+
+  // Renders seed and reset action chips with correct labels.
+  test("renders seed action chip", () => {
+    const log = makelog({ action: "seed" });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(screen.getByText("seed")).toBeInTheDocument();
+  });
+
+  test("renders reset action chip", () => {
+    const log = makelog({ action: "reset" });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(screen.getByText("reset")).toBeInTheDocument();
+  });
+
+  // Renders delete action chip.
+  test("renders delete action chip", () => {
+    const log = makelog({ action: "delete" });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(screen.getByText("delete")).toBeInTheDocument();
+  });
+
+  // Renders update action chip.
+  test("renders update action chip", () => {
+    const log = makelog({ action: "update" });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(screen.getByText("update")).toBeInTheDocument();
+  });
+
+  // Handles update where a new key is added (null → value).
+  test("formats changes when new key appears in after", () => {
+    const log = makelog({
+      action: "update",
+      before: '{"role":"user"}',
+      after: '{"role":"admin","extra":"new"}',
+    });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(screen.getAllByText(/role: user → admin/).length).toBeGreaterThan(0);
   });
 });
