@@ -4,6 +4,10 @@ import {
   TeamSchema,
   UserSchema,
   PermissionsSchema,
+  AuditLogSchema,
+  AuditLogFilterSchema,
+  AuditActionSchema,
+  AuditEntityTypeSchema,
 } from "@/schemas";
 
 const VALID_UUID = "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11";
@@ -319,5 +323,144 @@ describe("PermissionsSchema", () => {
     const perms = { "data:reset": true, "data:seed": false };
     const result = PermissionsSchema.parse(perms);
     expect(result).toEqual(perms);
+  });
+});
+
+describe("AuditActionSchema", () => {
+  // All five action types should be accepted.
+  test("accepts all valid actions", () => {
+    for (const action of ["create", "update", "delete", "seed", "reset"]) {
+      expect(() => AuditActionSchema.parse(action)).not.toThrow();
+    }
+  });
+
+  // A made-up action should be rejected.
+  test("rejects invalid action", () => {
+    expect(() => AuditActionSchema.parse("bulk_delete")).toThrow();
+  });
+});
+
+describe("AuditEntityTypeSchema", () => {
+  // All five entity types should be accepted.
+  test("accepts all valid entity types", () => {
+    for (const type of ["person", "team", "teamMember", "user", "userPermission"]) {
+      expect(() => AuditEntityTypeSchema.parse(type)).not.toThrow();
+    }
+  });
+
+  // A made-up entity type should be rejected.
+  test("rejects invalid entity type", () => {
+    expect(() => AuditEntityTypeSchema.parse("department")).toThrow();
+  });
+});
+
+describe("AuditLogSchema", () => {
+  const validLog = {
+    id: VALID_UUID,
+    userId: VALID_UUID_2,
+    userEmail: "alice@example.com",
+    action: "create" as const,
+    entityType: "person" as const,
+    entityId: VALID_UUID,
+    before: null,
+    after: '{"name":"Alice"}',
+    createdAt: NOW,
+  };
+
+  // A complete audit log entry with all fields should parse fine.
+  test("accepts a fully valid audit log entry", () => {
+    expect(() => AuditLogSchema.parse(validLog)).not.toThrow();
+  });
+
+  // Audit logs can exist without a user (system actions) — null userId and userEmail are fine.
+  test("accepts null userId, userEmail, entityId, before, and after", () => {
+    const log = {
+      ...validLog,
+      userId: null,
+      userEmail: null,
+      entityId: null,
+      before: null,
+      after: null,
+    };
+    const result = AuditLogSchema.parse(log);
+    expect(result.userId).toBeNull();
+    expect(result.userEmail).toBeNull();
+    expect(result.entityId).toBeNull();
+  });
+
+  // The ID has to be a proper UUID.
+  test("rejects invalid UUID for id", () => {
+    const log = { ...validLog, id: "bad" };
+    expect(() => AuditLogSchema.parse(log)).toThrow();
+  });
+
+  // Only valid action types are allowed.
+  test("rejects invalid action", () => {
+    const log = { ...validLog, action: "explode" };
+    expect(() => AuditLogSchema.parse(log)).toThrow();
+  });
+
+  // Only valid entity types are allowed.
+  test("rejects invalid entityType", () => {
+    const log = { ...validLog, entityType: "widget" };
+    expect(() => AuditLogSchema.parse(log)).toThrow();
+  });
+
+  // createdAt must be a Date, not a string.
+  test("rejects non-date createdAt", () => {
+    const log = { ...validLog, createdAt: "yesterday" };
+    expect(() => AuditLogSchema.parse(log)).toThrow();
+  });
+
+  // What goes in should come back out exactly the same.
+  test("preserves all fields after parsing", () => {
+    const result = AuditLogSchema.parse(validLog);
+    expect(result).toEqual(validLog);
+  });
+});
+
+describe("AuditLogFilterSchema", () => {
+  // An empty object should parse with defaults for page and pageSize.
+  test("provides defaults for page and pageSize", () => {
+    const result = AuditLogFilterSchema.parse({});
+    expect(result.page).toBe(1);
+    expect(result.pageSize).toBe(25);
+  });
+
+  // All optional filter fields should be accepted when provided.
+  test("accepts all optional filter fields", () => {
+    const filters = {
+      userEmail: "alice@example.com",
+      action: "create" as const,
+      entityType: "person" as const,
+      dateFrom: NOW,
+      dateTo: NOW,
+      page: 2,
+      pageSize: 50,
+    };
+    const result = AuditLogFilterSchema.parse(filters);
+    expect(result.page).toBe(2);
+    expect(result.pageSize).toBe(50);
+    expect(result.userEmail).toBe("alice@example.com");
+  });
+
+  // Page must be at least 1 — no zero or negative pages.
+  test("rejects page less than 1", () => {
+    expect(() => AuditLogFilterSchema.parse({ page: 0 })).toThrow();
+  });
+
+  // pageSize can't exceed 100 — that's the maximum.
+  test("rejects pageSize greater than 100", () => {
+    expect(() => AuditLogFilterSchema.parse({ pageSize: 101 })).toThrow();
+  });
+
+  // pageSize must be at least 1.
+  test("rejects pageSize less than 1", () => {
+    expect(() => AuditLogFilterSchema.parse({ pageSize: 0 })).toThrow();
+  });
+
+  // Invalid action in filter should be rejected.
+  test("rejects invalid action filter", () => {
+    expect(() => AuditLogFilterSchema.parse({ action: "nope" })).toThrow();
   });
 });

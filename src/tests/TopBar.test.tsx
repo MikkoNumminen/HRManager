@@ -216,4 +216,42 @@ describe("TopBar", () => {
       ),
     ).toBeInTheDocument();
   });
+
+  // Shows "Audit Log" menu item when user has admin:view_audit_log permission
+  test("shows Audit Log link when user has audit log permission", () => {
+    mockUseSession.mockReturnValue({
+      data: {
+        user: {
+          name: "Alice",
+          email: "a@b.com",
+          image: null,
+          permissions: { "admin:view_audit_log": true },
+        },
+      },
+      status: "authenticated",
+    });
+    render(<TopBar title="Home" />);
+    fireEvent.click(screen.getByLabelText("User menu"));
+    expect(screen.getByText("Audit Log")).toBeInTheDocument();
+    const link = screen.getByText("Audit Log").closest("a");
+    expect(link).toHaveAttribute("href", "/admin/audit");
+  });
+
+  // Hides "Audit Log" menu item when user lacks the permission
+  test("hides Audit Log link when user lacks permission", () => {
+    mockUseSession.mockReturnValue({
+      data: {
+        user: {
+          name: "Alice",
+          email: "a@b.com",
+          image: null,
+          permissions: { "admin:view_audit_log": false },
+        },
+      },
+      status: "authenticated",
+    });
+    render(<TopBar title="Home" />);
+    fireEvent.click(screen.getByLabelText("User menu"));
+    expect(screen.queryByText("Audit Log")).not.toBeInTheDocument();
+  });
 });

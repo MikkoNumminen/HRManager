@@ -11,7 +11,15 @@ jest.mock("@/auth", () => ({
   auth: jest.fn(),
 }));
 
-import { getPersons, getTeams, getUsers, getUserById, getAllPermissionKeys } from "@/queries";
+import {
+  getPersons,
+  getTeams,
+  getUsers,
+  getUserById,
+  getAllPermissionKeys,
+  getAuditLogs,
+  getAuditLogUserEmails,
+} from "@/queries";
 
 describe("getPersons", () => {
   beforeEach(async () => {
@@ -353,5 +361,151 @@ describe("getAllPermissionKeys", () => {
     const keys2 = await getAllPermissionKeys();
     expect(keys1).not.toBe(keys2);
     expect(keys1).toEqual(keys2);
+  });
+});
+
+describe("getAuditLogs", () => {
+  beforeEach(async () => {
+    await cleanDb();
+  });
+
+  // Returns empty result when no audit logs exist.
+  test("returns empty array when no logs exist", async () => {
+    const result = await getAuditLogs();
+    expect(result.logs).toEqual([]);
+    expect(result.total).toBe(0);
+  });
+
+  // Returns logs in descending order by createdAt (newest first).
+  test("returns logs in descending order", async () => {
+    await testPrisma.auditLog.create({
+      data: {
+        action: "create",
+        entityType: "person",
+        userEmail: "alice@example.com",
+        createdAt: new Date("2026-01-01"),
+      },
+    });
+    await testPrisma.auditLog.create({
+      data: {
+        action: "update",
+        entityType: "person",
+        userEmail: "bob@example.com",
+        createdAt: new Date("2026-02-01"),
+      },
+    });
+    const result = await getAuditLogs();
+    expect(result.logs).toHaveLength(2);
+    expect(result.logs[0].action).toBe("update");
+    expect(result.logs[1].action).toBe("create");
+  });
+
+  // Filters logs by userEmail.
+  test("filters by userEmail", async () => {
+    await testPrisma.auditLog.create({
+      data: { action: "create", entityType: "person", userEmail: "alice@example.com" },
+    });
+    await testPrisma.auditLog.create({
+      data: { action: "delete", entityType: "person", userEmail: "bob@example.com" },
+    });
+    const result = await getAuditLogs({ userEmail: "alice" });
+    expect(result.logs).toHaveLength(1);
+    expect(result.logs[0].userEmail).toBe("alice@example.com");
+    expect(result.total).toBe(1);
+  });
+
+  // Filters logs by action type.
+  test("filters by action", async () => {
+    await testPrisma.auditLog.create({
+      data: { action: "create", entityType: "person", userEmail: "a@b.com" },
+    });
+    await testPrisma.auditLog.create({
+      data: { action: "delete", entityType: "person", userEmail: "a@b.com" },
+    });
+    const result = await getAuditLogs({ action: "delete" });
+    expect(result.logs).toHaveLength(1);
+    expect(result.logs[0].action).toBe("delete");
+  });
+
+  // Filters logs by entity type.
+  test("filters by entityType", async () => {
+    await testPrisma.auditLog.create({
+      data: { action: "create", entityType: "person", userEmail: "a@b.com" },
+    });
+    await testPrisma.auditLog.create({
+      data: { action: "create", entityType: "team", userEmail: "a@b.com" },
+    });
+    const result = await getAuditLogs({ entityType: "team" });
+    expect(result.logs).toHaveLength(1);
+    expect(result.logs[0].entityType).toBe("team");
+  });
+
+  // Paginates correctly — page 1 vs page 2 return different results.
+  test("paginates correctly", async () => {
+    for (let i = 0; i < 5; i++) {
+      await testPrisma.auditLog.create({
+        data: { action: "create", entityType: "person", userEmail: `user${i}@example.com` },
+      });
+    }
+    const page1 = await getAuditLogs({ page: 1, pageSize: 2 });
+    const page2 = await getAuditLogs({ page: 2, pageSize: 2 });
+    expect(page1.logs).toHaveLength(2);
+    expect(page2.logs).toHaveLength(2);
+    expect(page1.total).toBe(5);
+    expect(page1.logs[0].id).not.toBe(page2.logs[0].id);
+  });
+
+  // Returns correct total count even when paginated.
+  test("returns correct total with filters and pagination", async () => {
+    for (let i = 0; i < 3; i++) {
+      await testPrisma.auditLog.create({
+        data: { action: "create", entityType: "person", userEmail: "a@b.com" },
+      });
+    }
+    await testPrisma.auditLog.create({
+      data: { action: "delete", entityType: "person", userEmail: "a@b.com" },
+    });
+    const result = await getAuditLogs({ action: "create", page: 1, pageSize: 2 });
+    expect(result.logs).toHaveLength(2);
+    expect(result.total).toBe(3);
+  });
+});
+
+describe("getAuditLogUserEmails", () => {
+  beforeEach(async () => {
+    await cleanDb();
+  });
+
+  // Returns empty array when no logs exist.
+  test("returns empty array when no logs exist", async () => {
+    const result = await getAuditLogUserEmails();
+    expect(result).toEqual([]);
+  });
+
+  // Returns distinct emails only — no duplicates.
+  test("returns distinct emails", async () => {
+    await testPrisma.auditLog.create({
+      data: { action: "create", entityType: "person", userEmail: "alice@example.com" },
+    });
+    await testPrisma.auditLog.create({
+      data: { action: "update", entityType: "person", userEmail: "alice@example.com" },
+    });
+    await testPrisma.auditLog.create({
+      data: { action: "delete", entityType: "person", userEmail: "bob@example.com" },
+    });
+    const result = await getAuditLogUserEmails();
+    expect(result).toEqual(["alice@example.com", "bob@example.com"]);
+  });
+
+  // Excludes null emails (system/anonymous actions).
+  test("excludes null emails", async () => {
+    await testPrisma.auditLog.create({
+      data: { action: "create", entityType: "person", userEmail: null },
+    });
+    await testPrisma.auditLog.create({
+      data: { action: "create", entityType: "person", userEmail: "alice@example.com" },
+    });
+    const result = await getAuditLogUserEmails();
+    expect(result).toEqual(["alice@example.com"]);
   });
 });
