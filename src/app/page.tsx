@@ -102,35 +102,6 @@ export default async function Home() {
       )}
 
       {session ? (
-        canManageDepartments ? (
-          <Link href="/manageDepartments" sx={{ textDecoration: "none" }}>
-            <Tooltip title="Go to Departments Manager" placement="right" arrow>
-              <Box component="div" sx={boxStyles}>
-                <Typography variant="h6" gutterBottom>
-                  Departments
-                </Typography>
-                <DepartmentsTable departments={departments} />
-              </Box>
-            </Tooltip>
-          </Link>
-        ) : (
-          <Box sx={{ ...boxStyles, "&:hover": {}, cursor: "default" }}>
-            <Typography variant="h6" gutterBottom>
-              Departments
-            </Typography>
-            <DepartmentsTable departments={departments} />
-          </Box>
-        )
-      ) : (
-        <Box sx={{ ...boxStyles, "&:hover": {}, cursor: "default" }}>
-          <Typography variant="h6" gutterBottom>
-            Departments
-          </Typography>
-          <DepartmentsTable departments={departments} minimal />
-        </Box>
-      )}
-
-      {session ? (
         canManageTeams ? (
           <Link href="/manageTeams" sx={{ textDecoration: "none" }}>
             <Tooltip title="Go to Teams Manager" placement="right" arrow>
@@ -156,6 +127,35 @@ export default async function Home() {
             Teams
           </Typography>
           <TeamsTable combinedTeams={teamsData} minimal />
+        </Box>
+      )}
+
+      {session ? (
+        canManageDepartments ? (
+          <Link href="/manageDepartments" sx={{ textDecoration: "none" }}>
+            <Tooltip title="Go to Departments Manager" placement="right" arrow>
+              <Box component="div" sx={boxStyles}>
+                <Typography variant="h6" gutterBottom>
+                  Departments
+                </Typography>
+                <DepartmentsTable departments={departments} />
+              </Box>
+            </Tooltip>
+          </Link>
+        ) : (
+          <Box sx={{ ...boxStyles, "&:hover": {}, cursor: "default" }}>
+            <Typography variant="h6" gutterBottom>
+              Departments
+            </Typography>
+            <DepartmentsTable departments={departments} />
+          </Box>
+        )
+      ) : (
+        <Box sx={{ ...boxStyles, "&:hover": {}, cursor: "default" }}>
+          <Typography variant="h6" gutterBottom>
+            Departments
+          </Typography>
+          <DepartmentsTable departments={departments} minimal />
         </Box>
       )}
     </>
