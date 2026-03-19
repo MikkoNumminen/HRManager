@@ -1,0 +1,75 @@
+"use client";
+
+import { updateDepartmentHead } from "@/serverActions";
+import { activeButtonStyles, formStyles, headerStyles, smallButtonStyles } from "@/muiStyles";
+import { Box, Button, Typography } from "@mui/material";
+import { useActionState, useState } from "react";
+import { PersonSelectCard } from "./PersonSelectCard";
+import { Person } from "@/schemas";
+
+type FormState = { error: string | null };
+
+const UpdateDepartmentHeadForm: React.FC<{
+  departmentID: string;
+  persons: Person[];
+  excludeIds?: string[];
+}> = ({ departmentID, persons, excludeIds = [] }) => {
+  const [newHead, setNewHead] = useState<string>("");
+
+  const [state, formAction, isPending] = useActionState(
+    async (_prev: FormState, formData: FormData): Promise<FormState> => {
+      try {
+        await updateDepartmentHead(formData);
+        return { error: null };
+      } catch (error) {
+        return { error: error instanceof Error ? error.message : "An error occurred" };
+      }
+    },
+    { error: null },
+  );
+
+  const filteredPersons = persons.filter((p) => !excludeIds.includes(p.id));
+
+  return (
+    <Box component="form" action={formAction} sx={formStyles}>
+      <Box sx={headerStyles}>
+        <Typography variant="h5">Set Department Head</Typography>
+      </Box>
+      {state.error && <Typography color="error">{state.error}</Typography>}
+
+      <input type="hidden" name="departmentID" value={departmentID} />
+      <input type="hidden" name="personID" value={newHead} />
+
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))",
+          gap: 1,
+          mb: 1,
+        }}
+      >
+        {filteredPersons.map((p) => (
+          <PersonSelectCard
+            key={p.id}
+            person={p}
+            selected={newHead === p.id}
+            onSelect={setNewHead}
+            variant="add"
+          />
+        ))}
+      </Box>
+
+      <Box display="flex" gap={1} justifyContent="flex-end">
+        <Button
+          type="submit"
+          disabled={!newHead || isPending}
+          sx={{ ...smallButtonStyles, ...(newHead && activeButtonStyles) }}
+        >
+          Set Head
+        </Button>
+      </Box>
+    </Box>
+  );
+};
+
+export default UpdateDepartmentHeadForm;
