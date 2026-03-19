@@ -82,22 +82,24 @@ describe("AuditLogViewer", () => {
     expect(screen.getByText("Permission")).toBeInTheDocument();
   });
 
-  // Displays changes with before→after diff format for update actions.
-  test("formats update changes as before → after diff", () => {
+  // Describes a position update in plain language.
+  test("describes position update in Barney style", () => {
     const log = makelog({
       action: "update",
       before: '{"position":"Developer"}',
       after: '{"position":"Senior Developer"}',
     });
     render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
-    expect(screen.getAllByText("position: Developer → Senior Developer").length).toBeGreaterThan(0);
+    expect(
+      screen.getAllByText('Changed position from "Developer" to "Senior Developer"').length,
+    ).toBeGreaterThan(0);
   });
 
-  // Displays create changes showing the created values.
-  test("formats create changes showing after values", () => {
+  // Describes person creation in plain language.
+  test("describes person creation in Barney style", () => {
     const log = makelog({ action: "create", before: null, after: '{"name":"Bob"}' });
     render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
-    expect(screen.getAllByText("name: Bob").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Added a new person: Bob").length).toBeGreaterThan(0);
   });
 
   // Shows pagination component with the correct total count.
@@ -130,24 +132,22 @@ describe("AuditLogViewer", () => {
     expect(screen.getByText("bob@example.com")).toBeInTheDocument();
   });
 
-  // Displays delete action with before values only.
-  test("formats delete changes showing before values", () => {
+  // Describes person deletion in plain language.
+  test("describes person deletion in Barney style", () => {
     const log = makelog({
       action: "delete",
       before: '{"name":"Alice","email":"alice@test.com"}',
       after: null,
     });
     render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
-    expect(screen.getAllByText(/name: Alice/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Removed person: Alice/).length).toBeGreaterThan(0);
   });
 
-  // Shows dash when both before and after are null.
-  test("shows dash when both before and after are null", () => {
+  // Shows a friendly message even when no change data is recorded.
+  test("shows new record message when both before and after are null on create", () => {
     const log = makelog({ before: null, after: null });
     render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
-    // The "-" appears in both the cell and the tooltip
-    const dashes = screen.getAllByText("-");
-    expect(dashes.length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Added a new person: unknown").length).toBeGreaterThan(0);
   });
 
   // Handles malformed JSON gracefully by falling back to raw string.
@@ -157,16 +157,15 @@ describe("AuditLogViewer", () => {
     expect(screen.getAllByText("not-json").length).toBeGreaterThan(0);
   });
 
-  // Shows dash when before and after have identical values (no actual changes).
-  test("shows dash when before and after are identical", () => {
+  // Shows generic message when before and after have identical values (no actual changes).
+  test("shows generic update message when values are identical", () => {
     const log = makelog({
       action: "update",
       before: '{"position":"Dev"}',
       after: '{"position":"Dev"}',
     });
     render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
-    const dashes = screen.getAllByText("-");
-    expect(dashes.length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Updated person details").length).toBeGreaterThan(0);
   });
 
   // Renders user emails in the filter dropdown when provided.
@@ -243,14 +242,82 @@ describe("AuditLogViewer", () => {
     expect(screen.getByText("update")).toBeInTheDocument();
   });
 
-  // Handles update where a new key is added (null → value).
-  test("formats changes when new key appears in after", () => {
+  // Describes a user role change in plain language.
+  test("describes user role change in Barney style", () => {
     const log = makelog({
       action: "update",
+      entityType: "user",
       before: '{"role":"user"}',
-      after: '{"role":"admin","extra":"new"}',
+      after: '{"role":"admin"}',
     });
     render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
-    expect(screen.getAllByText(/role: user → admin/).length).toBeGreaterThan(0);
+    expect(
+      screen.getAllByText('Changed role from "user" to "admin"').length,
+    ).toBeGreaterThan(0);
+  });
+
+  // Describes team creation in plain language.
+  test("describes team creation in Barney style", () => {
+    const log = makelog({
+      action: "create",
+      entityType: "team",
+      after: '{"teamName":"Engineering"}',
+    });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(screen.getAllByText("Created a new team: Engineering").length).toBeGreaterThan(0);
+  });
+
+  // Describes seed action in plain language.
+  test("describes seed action in Barney style", () => {
+    const log = makelog({
+      action: "seed",
+      entityType: "person",
+      before: null,
+      after: '{"clearExisting":true}',
+    });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(
+      screen.getAllByText("Loaded mock data (replaced existing)").length,
+    ).toBeGreaterThan(0);
+  });
+
+  // Describes reset action with counts in plain language.
+  test("describes reset action in Barney style", () => {
+    const log = makelog({
+      action: "reset",
+      entityType: "person",
+      before: '{"personCount":5,"teamCount":2}',
+      after: null,
+    });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(
+      screen.getAllByText("Cleared all data (5 persons, 2 teams removed)").length,
+    ).toBeGreaterThan(0);
+  });
+
+  // Describes permission grant in plain language.
+  test("describes permission grant in Barney style", () => {
+    const log = makelog({
+      action: "update",
+      entityType: "userPermission",
+      after: '{"permissionKey":"person:create","granted":true}',
+    });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(
+      screen.getAllByText("Granted the ability to create new people").length,
+    ).toBeGreaterThan(0);
+  });
+
+  // Describes permission denial in plain language.
+  test("describes permission denial in Barney style", () => {
+    const log = makelog({
+      action: "update",
+      entityType: "userPermission",
+      after: '{"permissionKey":"team:delete","granted":false}',
+    });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(
+      screen.getAllByText("Revoked the ability to delete teams").length,
+    ).toBeGreaterThan(0);
   });
 });
