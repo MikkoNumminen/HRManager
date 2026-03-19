@@ -1,7 +1,6 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import AuditLogViewer from "../components/AuditLogViewer";
 import { AuditLog } from "../schemas";
-import { useRouter } from "next/navigation";
 
 const mockPush = jest.fn();
 jest.mock("next/navigation", () => ({

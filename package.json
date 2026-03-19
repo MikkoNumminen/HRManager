@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "test": "jest --verbose",
     "test:server": "DATABASE_URL=file:./prisma/test.db npx prisma db push --skip-generate --accept-data-loss && jest --config jest.config.server.ts --verbose",
     "test:all": "DATABASE_URL=file:./prisma/test.db npx prisma db push --skip-generate --accept-data-loss && jest --config jest.config.all.ts --runInBand --verbose",
