@@ -2,6 +2,7 @@
 
 A full-stack HR management system for managing employees and teams — built with Next.js 16, React 19, MUI v7, Prisma, and TypeScript. This is a portfolio project intentionally built to production-grade complexity to demonstrate technical depth and breadth.
 
+[![CI](https://github.com/MikkoNumminen/HRManager/actions/workflows/ci.yml/badge.svg)](https://github.com/MikkoNumminen/HRManager/actions/workflows/ci.yml)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)
 ![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat-square&logo=typescript)
