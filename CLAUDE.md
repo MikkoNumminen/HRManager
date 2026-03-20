@@ -102,7 +102,7 @@ prisma/
 - Do not mock core logic — test real functionality.
 - Always add a comment above each test explaining what it does in plain, simple language ("Barney style").
 - **Every new schema, component, or module must have corresponding tests.** Never leave new code untested — if you add it, you test it.
-- **Always aim for maximum coverage.** There is no reason to hold back — add as many tests as needed to cover every branch, edge case, and interaction. This is a portfolio project; comprehensive test coverage is a strength, not over-engineering.
+- **Always aim for 100% coverage.** The project currently has 100% line and function coverage — maintain this. Add tests for every branch, edge case, error fallback, and interaction. If a new line or function is added, it must be covered. This is a portfolio project; comprehensive test coverage is a strength, not over-engineering.
 
 ## Deployment
 
