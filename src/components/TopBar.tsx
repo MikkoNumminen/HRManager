@@ -190,18 +190,32 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
               </Menu>
             </>
           ) : (
-            <Button
-              onClick={() => signIn()}
-              sx={{
-                color: colors.slate300,
-                border: `1px solid ${colors.slate300}`,
-                borderRadius: "4px",
-                px: 2,
-                "&:hover": { backgroundColor: colors.hoverOverlay },
-              }}
-            >
-              Sign in
-            </Button>
+            <Box display="flex" gap={1}>
+              <Button
+                onClick={() => signIn("demo")}
+                sx={{
+                  color: "#fff",
+                  backgroundColor: colors.slate600,
+                  borderRadius: "4px",
+                  px: 2,
+                  "&:hover": { backgroundColor: colors.hoverOverlay },
+                }}
+              >
+                Try Demo
+              </Button>
+              <Button
+                onClick={() => signIn()}
+                sx={{
+                  color: colors.slate300,
+                  border: `1px solid ${colors.slate300}`,
+                  borderRadius: "4px",
+                  px: 2,
+                  "&:hover": { backgroundColor: colors.hoverOverlay },
+                }}
+              >
+                Sign in
+              </Button>
+            </Box>
           )}
         </Toolbar>
       </AppBar>

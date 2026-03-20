@@ -1,11 +1,34 @@
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
 import GitHub from "next-auth/providers/github";
+import Credentials from "next-auth/providers/credentials";
 import { prisma } from "@/db";
 import { resolvePermissions } from "@/permissions";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  providers: [Google, GitHub],
+  providers: [
+    Google,
+    GitHub,
+    Credentials({
+      id: "demo",
+      name: "Demo",
+      credentials: {},
+      async authorize() {
+        const demoEmail = "demo@hrmanager.app";
+        let user = await prisma.user.findUnique({ where: { email: demoEmail } });
+        if (!user) {
+          user = await prisma.user.create({
+            data: {
+              email: demoEmail,
+              name: "Demo User",
+              role: "administrator",
+            },
+          });
+        }
+        return { id: user.id, email: user.email, name: user.name };
+      },
+    }),
+  ],
   session: { strategy: "jwt" },
   callbacks: {
     async signIn({ user }) {
