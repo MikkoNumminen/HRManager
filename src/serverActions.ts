@@ -721,7 +721,7 @@ export async function seedMockData(clearExisting: boolean = true) {
 
   // Seed mock users in a separate transaction — seedPermissions() opens its own
   // transaction internally, so this must run outside the main transaction to avoid
-  // SQLite deadlock (single-writer)
+  // nested transaction deadlock
   const mockUserSeeds = [
     { email: "admin@example.com", name: "Jane Admin", role: "administrator" },
     { email: "user1@example.com", name: "John User", role: "user" },
