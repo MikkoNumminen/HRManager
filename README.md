@@ -28,6 +28,7 @@ A full-stack HR management system for managing employees, teams, and departments
 - **Guest mode** — unauthenticated users see read-only chip views of persons, departments, and teams; manage routes redirect to home
 - **Permission-aware UI** — server-side permission guards on all mutations; client-side conditional rendering hides UI elements the user can't access
 - **Relational integrity** — database constraints enforced at ORM level with cascading rules
+- **Internationalization** — full i18n with next-intl supporting 18 languages (Finnish default, English, Swedish, German, French, Spanish, Portuguese, Polish, Russian, Ukrainian, Arabic with RTL, Hindi, Japanese, Chinese, Korean, Thai, Swahili, Turkish); cookie-based locale persistence, Accept-Language auto-detection, and language switcher in the top bar
 - **Dark UI** — MUI dark theme with consistent component styling throughout
 - **Type-safe** — end-to-end TypeScript with Zod schema validation and centralized inferred types
 - **Server-first** — async Server Components for data fetching, Server Actions for mutations inside `$transaction` blocks
@@ -143,6 +144,7 @@ npm run format
 | ORM               | Prisma 6 (`relationLoadStrategy: 'join'`)             |
 | Database          | PostgreSQL (Vercel Postgres in production)            |
 | Validation        | Zod 4                                                 |
+| i18n              | next-intl (18 languages, cookie-based locale)         |
 | Auth              | NextAuth v5 (JWT, Google + GitHub OAuth + demo login) |
 | Testing           | Jest 30 + React Testing Library                       |
 | Linting           | ESLint 9 (flat config)                                |
@@ -163,6 +165,7 @@ The app uses Next.js App Router with a clear separation of concerns:
 - **Auth** (`auth.ts`) — NextAuth v5 with JWT strategy; Google + GitHub OAuth plus a Credentials-based demo login for portfolio visitors; protected routes redirect unauthenticated users; guest mode shows read-only chip views
 - **RBAC** (`permissions.ts`) — granular permission system with role defaults, per-user overrides, and server-side guards on every mutation
 - **Audit logging** (`auditLog.ts`) — every mutation is logged with before/after snapshots inside the same transaction for atomicity
+- **Internationalization** (`messages/`) — next-intl with 18 language files, cookie-based locale persistence, Accept-Language detection, `useTranslations` in Client Components and `getTranslations` in Server Components
 
 ```
 src/
@@ -184,6 +187,7 @@ src/
 ├── queries.ts        # Read-only data fetching (Prisma + Zod validation)
 ├── schemas.ts        # Zod schemas and exported TypeScript types
 └── serverActions.ts  # Mutation server actions (Prisma $transaction)
+messages/             # i18n translation files (18 languages)
 prisma/
 └── schema.prisma     # Data model (Person, Team, Department, User, Permission, UserPermission, AuditLog)
 ```
