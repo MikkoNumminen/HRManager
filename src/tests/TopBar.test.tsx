@@ -52,10 +52,35 @@ describe("TopBar", () => {
     expect(screen.getByRole("button", { name: /Sign in/i })).toBeInTheDocument();
   });
 
-  test("calls signIn when Sign in button is clicked", () => {
+  // Shows the "Try Demo" button alongside "Sign in" when unauthenticated
+  test("shows Try Demo button when unauthenticated", () => {
+    render(<TopBar title="Home" />);
+    expect(screen.getByRole("button", { name: /Try Demo/i })).toBeInTheDocument();
+  });
+
+  // Clicking "Try Demo" calls signIn with the "demo" provider ID
+  test("calls signIn with 'demo' when Try Demo is clicked", () => {
+    render(<TopBar title="Home" />);
+    fireEvent.click(screen.getByRole("button", { name: /Try Demo/i }));
+    expect(signIn).toHaveBeenCalledWith("demo");
+  });
+
+  // Clicking "Sign in" calls signIn without arguments (default provider selection)
+  test("calls signIn without arguments when Sign in button is clicked", () => {
     render(<TopBar title="Home" />);
     fireEvent.click(screen.getByRole("button", { name: /Sign in/i }));
-    expect(signIn).toHaveBeenCalled();
+    expect(signIn).toHaveBeenCalledWith();
+  });
+
+  // Both buttons are hidden when user is authenticated
+  test("hides Try Demo and Sign in buttons when authenticated", () => {
+    mockUseSession.mockReturnValue({
+      data: { user: { name: "Alice Smith", email: "alice@example.com", image: null } },
+      status: "authenticated",
+    });
+    render(<TopBar title="Home" />);
+    expect(screen.queryByRole("button", { name: /Try Demo/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Sign in/i })).not.toBeInTheDocument();
   });
 
   test("shows user avatar when authenticated", () => {
