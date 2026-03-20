@@ -22,7 +22,7 @@ A full-stack HR management system for managing employees, teams, and departments
 - **Granular RBAC** — four roles (superuser, administrator, user, guest) with 21 permission keys and per-user overrides (grant/deny individual permissions on top of role defaults)
 - **Audit log** — immutable trail of every mutation with who, what, when, and before/after JSON snapshots; filterable admin viewer with pagination, human-readable change descriptions, and user name resolution
 - **Admin UI** — user management panel with role assignment, per-user permission editor with role default / override / effective columns, audit log viewer, and info tooltips
-- **Authentication** — NextAuth v5 with Google and GitHub OAuth; JWT strategy with permission-enriched tokens; automatic superuser bootstrapping on first login
+- **Authentication** — NextAuth v5 with Google and GitHub OAuth plus a one-click demo login; JWT strategy with permission-enriched tokens; automatic superuser bootstrapping on first login
 - **Guest mode** — unauthenticated users see read-only chip views of persons, departments, and teams; manage routes redirect to home
 - **Permission-aware UI** — server-side permission guards on all mutations; client-side conditional rendering hides UI elements the user can't access
 - **Relational integrity** — database constraints enforced at ORM level with cascading rules
@@ -132,20 +132,20 @@ npm run format
 
 ## Tech stack
 
-| Layer             | Technology                                   |
-| ----------------- | -------------------------------------------- |
-| Framework         | Next.js 16 (App Router, Server Components)   |
-| UI library        | React 19 (`useActionState`, `<form action>`) |
-| Component library | MUI v7 (Material UI)                         |
-| Language          | TypeScript 5.9                               |
-| ORM               | Prisma 6 (`relationLoadStrategy: 'join'`)    |
-| Database          | PostgreSQL (Vercel Postgres in production)   |
-| Validation        | Zod 4                                        |
-| Auth              | NextAuth v5 (JWT, Google + GitHub OAuth)     |
-| Testing           | Jest 30 + React Testing Library              |
-| Linting           | ESLint 9 (flat config)                       |
-| Formatting        | Prettier 3                                   |
-| CI/CD             | GitHub Actions (lint, test, build)           |
+| Layer             | Technology                                            |
+| ----------------- | ----------------------------------------------------- |
+| Framework         | Next.js 16 (App Router, Server Components)            |
+| UI library        | React 19 (`useActionState`, `<form action>`)          |
+| Component library | MUI v7 (Material UI)                                  |
+| Language          | TypeScript 5.9                                        |
+| ORM               | Prisma 6 (`relationLoadStrategy: 'join'`)             |
+| Database          | PostgreSQL (Vercel Postgres in production)            |
+| Validation        | Zod 4                                                 |
+| Auth              | NextAuth v5 (JWT, Google + GitHub OAuth + demo login) |
+| Testing           | Jest 30 + React Testing Library                       |
+| Linting           | ESLint 9 (flat config)                                |
+| Formatting        | Prettier 3                                            |
+| CI/CD             | GitHub Actions (lint, test, build)                    |
 
 ---
 
@@ -158,7 +158,7 @@ The app uses Next.js App Router with a clear separation of concerns:
 - **Read queries** (`queries.ts`) are separated from mutations and validated through Zod schemas
 - **Centralized types** (`schemas.ts`) — Zod schemas export inferred `Person`, `CombinedTeam`, `Department`, `AppUser`, `AuditLog`, and `Permissions` types used across all components
 - **Forms** use React 19's `useActionState` for error handling with built-in pending state
-- **Auth** (`auth.ts`) — NextAuth v5 with JWT strategy; protected routes redirect unauthenticated users; guest mode shows read-only chip views
+- **Auth** (`auth.ts`) — NextAuth v5 with JWT strategy; Google + GitHub OAuth plus a Credentials-based demo login for portfolio visitors; protected routes redirect unauthenticated users; guest mode shows read-only chip views
 - **RBAC** (`permissions.ts`) — granular permission system with role defaults, per-user overrides, and server-side guards on every mutation
 - **Audit logging** (`auditLog.ts`) — every mutation is logged with before/after snapshots inside the same transaction for atomicity
 
@@ -262,11 +262,15 @@ Highlights: `auditLog.ts`, `permissions.ts`, `queries.ts`, `schemas.ts`, and `se
 
 ---
 
+## Live demo
+
+The app is deployed at **[hr-manager-pearl.vercel.app](https://hr-manager-pearl.vercel.app)**. Click **Try Demo** to sign in instantly as an administrator — no account required.
+
 ## Deployment
 
 The app is deployed on **Vercel** with **Vercel Postgres** (Neon). The build script runs `prisma generate && prisma migrate deploy && next build` — migrations are applied automatically on every deployment.
 
-The first user to sign in via OAuth is bootstrapped as the superuser.
+The first user to sign in via OAuth is bootstrapped as the superuser. A **demo login** (NextAuth Credentials provider) is available so portfolio visitors can explore the full UI without setting up OAuth — the demo user is created as an administrator with access to all person, team, and department operations.
 
 ---
 
