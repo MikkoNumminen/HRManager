@@ -5,11 +5,14 @@ import { removePerson } from "@/serverActions";
 import { Box, Button, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useActionState, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import ConfirmDialog from "./ConfirmDialog";
 
 type FormState = { error: string | null };
 
 const RemovePersonForm: React.FC<{ personID: string }> = ({ personID }) => {
+  const t = useTranslations("persons");
+  const tc = useTranslations("common");
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -21,7 +24,7 @@ const RemovePersonForm: React.FC<{ personID: string }> = ({ personID }) => {
         router.push("/managePersons");
         return { error: null };
       } catch (error) {
-        return { error: error instanceof Error ? error.message : "An error occurred" };
+        return { error: error instanceof Error ? error.message : tc("error") };
       }
     },
     { error: null },
@@ -29,19 +32,19 @@ const RemovePersonForm: React.FC<{ personID: string }> = ({ personID }) => {
 
   return (
     <Box component="form" action={formAction} ref={formRef} sx={formStyles}>
-      <Typography variant="h5">Remove Person</Typography>
+      <Typography variant="h5">{t("removePerson")}</Typography>
       {state.error && <Typography color="error">{state.error}</Typography>}
       <input type="hidden" name="personID" value={personID} />
       <Box display="flex" gap={1} justifyContent="flex-end">
         <Button disabled={isPending} onClick={() => setDialogOpen(true)} sx={smallButtonStyles}>
-          Remove
+          {tc("remove")}
         </Button>
       </Box>
       <ConfirmDialog
         open={dialogOpen}
-        title="Remove Person"
-        message="Are you sure you want to remove this person? This will also remove them from all teams."
-        confirmLabel="Remove"
+        title={t("removePerson")}
+        message={t("removeConfirm")}
+        confirmLabel={tc("remove")}
         onConfirm={() => {
           setDialogOpen(false);
           formRef.current?.requestSubmit();

@@ -4,6 +4,7 @@ import { addMember } from "@/serverActions";
 import { activeButtonStyles, formStyles, headerStyles, smallButtonStyles } from "@/muiStyles";
 import { Box, Button, Typography } from "@mui/material";
 import { useActionState, useState } from "react";
+import { useTranslations } from "next-intl";
 import { PersonSelectCard } from "./PersonSelectCard";
 import { Person } from "@/schemas";
 
@@ -14,6 +15,8 @@ const AddMemberForm: React.FC<{ teamID: string; persons: Person[]; excludeIds?: 
   persons,
   excludeIds = [],
 }) => {
+  const t = useTranslations("teams");
+  const tc = useTranslations("common");
   const [selectedMember, setSelectedMember] = useState<string>("");
 
   const [state, formAction, isPending] = useActionState(
@@ -22,7 +25,7 @@ const AddMemberForm: React.FC<{ teamID: string; persons: Person[]; excludeIds?: 
         await addMember(formData);
         return { error: null };
       } catch (error) {
-        return { error: error instanceof Error ? error.message : "An error occurred" };
+        return { error: error instanceof Error ? error.message : tc("error") };
       }
     },
     { error: null },
@@ -33,7 +36,7 @@ const AddMemberForm: React.FC<{ teamID: string; persons: Person[]; excludeIds?: 
   return (
     <Box component="form" action={formAction} sx={formStyles}>
       <Box sx={headerStyles}>
-        <Typography variant="h5">Add Member to Team</Typography>
+        <Typography variant="h5">{t("addMember")}</Typography>
       </Box>
       {state.error && <Typography color="error">{state.error}</Typography>}
 
@@ -65,7 +68,7 @@ const AddMemberForm: React.FC<{ teamID: string; persons: Person[]; excludeIds?: 
           disabled={!selectedMember || isPending}
           sx={{ ...smallButtonStyles, ...(selectedMember && activeButtonStyles) }}
         >
-          Add Member
+          {t("addMemberButton")}
         </Button>
       </Box>
     </Box>

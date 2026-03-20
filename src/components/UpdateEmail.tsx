@@ -5,6 +5,7 @@ import { updateEmail } from "@/serverActions";
 import { Box, Button, TextField, Tooltip, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useActionState, useState } from "react";
+import { useTranslations } from "next-intl";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -14,6 +15,8 @@ const UpdateEmailForm: React.FC<{ personID: string; currentEmail?: string }> = (
   personID,
   currentEmail,
 }) => {
+  const t = useTranslations("persons");
+  const tc = useTranslations("common");
   const [newEmail, setNewEmail] = useState(currentEmail ?? "");
   const isChanged = newEmail.trim() !== (currentEmail ?? "");
   const isValid = EMAIL_REGEX.test(newEmail.trim()) && isChanged;
@@ -26,7 +29,7 @@ const UpdateEmailForm: React.FC<{ personID: string; currentEmail?: string }> = (
         router.push("/managePersons");
         return { error: null };
       } catch (error) {
-        return { error: error instanceof Error ? error.message : "An error occurred" };
+        return { error: error instanceof Error ? error.message : tc("error") };
       }
     },
     { error: null },
@@ -34,18 +37,18 @@ const UpdateEmailForm: React.FC<{ personID: string; currentEmail?: string }> = (
 
   return (
     <Box component="form" action={formAction} sx={formStyles}>
-      <Typography variant="h5">Change Email</Typography>
+      <Typography variant="h5">{t("changeEmail")}</Typography>
       {state.error && <Typography color="error">{state.error}</Typography>}
       <input type="hidden" name="personID" value={personID} />
-      <Tooltip title="Required — must be a valid email address" placement="right" arrow>
+      <Tooltip title={tc("requiredEmail")} placement="right" arrow>
         <TextField
-          label="Enter New Email"
+          label={t("enterNewEmail")}
           name="name"
           type="email"
           size="small"
           value={newEmail}
           onChange={(e) => setNewEmail(e.target.value)}
-          helperText={!currentEmail ? "No email set" : undefined}
+          helperText={!currentEmail ? tc("noEmailSet") : undefined}
           sx={textFieldStyles}
         />
       </Tooltip>
@@ -55,7 +58,7 @@ const UpdateEmailForm: React.FC<{ personID: string; currentEmail?: string }> = (
           disabled={!isValid || isPending}
           sx={{ ...smallButtonStyles, ...(isValid && activeButtonStyles) }}
         >
-          Change
+          {tc("change")}
         </Button>
       </Box>
     </Box>

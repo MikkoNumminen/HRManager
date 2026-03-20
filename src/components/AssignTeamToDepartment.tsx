@@ -4,6 +4,7 @@ import { assignTeamToDepartment } from "@/serverActions";
 import { activeButtonStyles, formStyles, smallButtonStyles, textFieldStyles } from "@/muiStyles";
 import { Box, Button, MenuItem, TextField, Typography } from "@mui/material";
 import { useActionState, useState } from "react";
+import { useTranslations } from "next-intl";
 import { CombinedTeam } from "@/schemas";
 
 type FormState = { error: string | null };
@@ -12,6 +13,8 @@ const AssignTeamToDepartmentForm: React.FC<{
   departmentID: string;
   availableTeams: CombinedTeam[];
 }> = ({ departmentID, availableTeams }) => {
+  const t = useTranslations("departments");
+  const tc = useTranslations("common");
   const [selectedTeam, setSelectedTeam] = useState<string>("");
 
   const [state, formAction, isPending] = useActionState(
@@ -20,7 +23,7 @@ const AssignTeamToDepartmentForm: React.FC<{
         await assignTeamToDepartment(formData);
         return { error: null };
       } catch (error) {
-        return { error: error instanceof Error ? error.message : "An error occurred" };
+        return { error: error instanceof Error ? error.message : tc("error") };
       }
     },
     { error: null },
@@ -28,7 +31,7 @@ const AssignTeamToDepartmentForm: React.FC<{
 
   return (
     <Box component="form" action={formAction} sx={formStyles}>
-      <Typography variant="h5">Assign Team</Typography>
+      <Typography variant="h5">{t("assignTeam")}</Typography>
       {state.error && <Typography color="error">{state.error}</Typography>}
 
       <input type="hidden" name="departmentID" value={departmentID} />
@@ -36,7 +39,7 @@ const AssignTeamToDepartmentForm: React.FC<{
 
       <TextField
         select
-        label="Select Team"
+        label={t("selectTeam")}
         size="small"
         value={selectedTeam}
         onChange={(e) => setSelectedTeam(e.target.value)}
@@ -55,7 +58,7 @@ const AssignTeamToDepartmentForm: React.FC<{
           disabled={!selectedTeam || isPending}
           sx={{ ...smallButtonStyles, ...(selectedTeam && activeButtonStyles) }}
         >
-          Assign
+          {tc("assign")}
         </Button>
       </Box>
     </Box>

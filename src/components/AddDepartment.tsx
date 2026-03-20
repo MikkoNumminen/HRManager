@@ -4,10 +4,13 @@ import { activeButtonStyles, formStyles, smallButtonStyles, textFieldStyles } fr
 import { createDepartment } from "@/serverActions";
 import { Box, Button, TextField, Tooltip, Typography } from "@mui/material";
 import { useActionState, useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
 type FormState = { error: string | null; success: boolean };
 
 const AddDepartmentForm: React.FC = () => {
+  const t = useTranslations("departments");
+  const tc = useTranslations("common");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const isValid = name.trim().length > 0;
@@ -19,7 +22,7 @@ const AddDepartmentForm: React.FC = () => {
         return { error: null, success: true };
       } catch (error) {
         return {
-          error: error instanceof Error ? error.message : "An error occurred",
+          error: error instanceof Error ? error.message : tc("error"),
           success: false,
         };
       }
@@ -36,11 +39,11 @@ const AddDepartmentForm: React.FC = () => {
 
   return (
     <Box component="form" action={formAction} sx={formStyles}>
-      <Typography variant="h5">Add Department</Typography>
+      <Typography variant="h5">{t("addDepartment")}</Typography>
       {state.error && <Typography color="error">{state.error}</Typography>}
-      <Tooltip title="Required" placement="right" arrow>
+      <Tooltip title={tc("required")} placement="right" arrow>
         <TextField
-          label="Enter Department Name"
+          label={t("enterName")}
           name="name"
           size="small"
           value={name}
@@ -49,7 +52,7 @@ const AddDepartmentForm: React.FC = () => {
         />
       </Tooltip>
       <TextField
-        label="Description (optional)"
+        label={t("descriptionOptional")}
         name="description"
         size="small"
         value={description}
@@ -62,7 +65,7 @@ const AddDepartmentForm: React.FC = () => {
           disabled={!isValid || isPending}
           sx={{ ...smallButtonStyles, ...(isValid && activeButtonStyles) }}
         >
-          Create
+          {tc("create")}
         </Button>
       </Box>
     </Box>

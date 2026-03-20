@@ -4,6 +4,7 @@ import { removeMember } from "@/serverActions";
 import { activeButtonStyles, formStyles, headerStyles, smallButtonStyles } from "@/muiStyles";
 import { Box, Button, Typography } from "@mui/material";
 import { useActionState, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { PersonSelectCard } from "./PersonSelectCard";
 import { Person } from "@/schemas";
 import ConfirmDialog from "./ConfirmDialog";
@@ -15,6 +16,8 @@ const RemoveMemberForm: React.FC<{
   persons: Person[];
   includeOnlyIds?: string[];
 }> = ({ teamID, persons, includeOnlyIds }) => {
+  const t = useTranslations("teams");
+  const tc = useTranslations("common");
   const [selectedMember, setSelectedMember] = useState<string>("");
   const formRef = useRef<HTMLFormElement>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -25,7 +28,7 @@ const RemoveMemberForm: React.FC<{
         await removeMember(formData);
         return { error: null };
       } catch (error) {
-        return { error: error instanceof Error ? error.message : "An error occurred" };
+        return { error: error instanceof Error ? error.message : tc("error") };
       }
     },
     { error: null },
@@ -37,7 +40,7 @@ const RemoveMemberForm: React.FC<{
   return (
     <Box component="form" action={formAction} ref={formRef} sx={formStyles}>
       <Box sx={headerStyles}>
-        <Typography variant="h5">Remove Member from Team</Typography>
+        <Typography variant="h5">{t("removeMember")}</Typography>
       </Box>
       {state.error && <Typography color="error">{state.error}</Typography>}
 
@@ -69,14 +72,14 @@ const RemoveMemberForm: React.FC<{
           onClick={() => setDialogOpen(true)}
           sx={{ ...smallButtonStyles, ...(selectedMember && activeButtonStyles) }}
         >
-          Remove Member
+          {t("removeMemberButton")}
         </Button>
       </Box>
       <ConfirmDialog
         open={dialogOpen}
-        title="Remove Member"
-        message={`Are you sure you want to remove ${selectedName ?? "this member"} from the team?`}
-        confirmLabel="Remove"
+        title={t("removeMember")}
+        message={t("removeMemberConfirm", { name: selectedName ?? t("removeMemberDefault") })}
+        confirmLabel={tc("remove")}
         onConfirm={() => {
           setDialogOpen(false);
           formRef.current?.requestSubmit();

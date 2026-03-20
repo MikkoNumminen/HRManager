@@ -4,10 +4,13 @@ import { activeButtonStyles, formStyles, smallButtonStyles, textFieldStyles } fr
 import { createTeam } from "@/serverActions";
 import { Box, Button, TextField, Tooltip, Typography } from "@mui/material";
 import { useActionState, useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
 type FormState = { error: string | null; success: boolean };
 
 const AddTeamForm: React.FC = () => {
+  const t = useTranslations("teams");
+  const tc = useTranslations("common");
   const [name, setName] = useState("");
   const isValid = name.trim().length > 0;
 
@@ -18,7 +21,7 @@ const AddTeamForm: React.FC = () => {
         return { error: null, success: true };
       } catch (error) {
         return {
-          error: error instanceof Error ? error.message : "An error occurred",
+          error: error instanceof Error ? error.message : tc("error"),
           success: false,
         };
       }
@@ -34,11 +37,11 @@ const AddTeamForm: React.FC = () => {
 
   return (
     <Box component="form" action={formAction} sx={formStyles}>
-      <Typography variant="h5">Add Team</Typography>
+      <Typography variant="h5">{t("addTeam")}</Typography>
       {state.error && <Typography color="error">{state.error}</Typography>}
-      <Tooltip title="Required" placement="right" arrow>
+      <Tooltip title={tc("required")} placement="right" arrow>
         <TextField
-          label="Enter Team Name"
+          label={t("enterTeamName")}
           name="name"
           size="small"
           value={name}
@@ -52,7 +55,7 @@ const AddTeamForm: React.FC = () => {
           disabled={!isValid || isPending}
           sx={{ ...smallButtonStyles, ...(isValid && activeButtonStyles) }}
         >
-          Create
+          {tc("create")}
         </Button>
       </Box>
     </Box>

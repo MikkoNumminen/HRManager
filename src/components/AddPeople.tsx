@@ -4,10 +4,13 @@ import { activeButtonStyles, formStyles, smallButtonStyles, textFieldStyles } fr
 import { createPerson } from "@/serverActions";
 import { Box, Button, TextField, Tooltip, Typography } from "@mui/material";
 import { useActionState, useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
 type FormState = { error: string | null; success: boolean };
 
 const AddPersonForm: React.FC = () => {
+  const t = useTranslations("persons");
+  const tc = useTranslations("common");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -20,7 +23,7 @@ const AddPersonForm: React.FC = () => {
         return { error: null, success: true };
       } catch (error) {
         return {
-          error: error instanceof Error ? error.message : "An error occurred",
+          error: error instanceof Error ? error.message : tc("error"),
           success: false,
         };
       }
@@ -37,11 +40,11 @@ const AddPersonForm: React.FC = () => {
 
   return (
     <Box component="form" action={formAction} sx={formStyles}>
-      <Typography variant="h5">Add Person</Typography>
+      <Typography variant="h5">{t("addPerson")}</Typography>
       {state.error && <Typography color="error">{state.error}</Typography>}
-      <Tooltip title="Required" placement="right" arrow>
+      <Tooltip title={tc("required")} placement="right" arrow>
         <TextField
-          label="Enter Name"
+          label={t("enterName")}
           name="name"
           size="small"
           value={name}
@@ -49,9 +52,9 @@ const AddPersonForm: React.FC = () => {
           sx={textFieldStyles}
         />
       </Tooltip>
-      <Tooltip title="Required — must be a valid email address" placement="right" arrow>
+      <Tooltip title={tc("requiredEmail")} placement="right" arrow>
         <TextField
-          label="Enter Email"
+          label={t("enterEmail")}
           name="email"
           type="email"
           size="small"
@@ -66,7 +69,7 @@ const AddPersonForm: React.FC = () => {
           disabled={!isValid || isPending}
           sx={{ ...smallButtonStyles, ...(isValid && activeButtonStyles) }}
         >
-          Create
+          {tc("create")}
         </Button>
       </Box>
     </Box>

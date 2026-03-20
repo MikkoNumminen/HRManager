@@ -4,6 +4,7 @@ import { removeTeamFromDepartment } from "@/serverActions";
 import { activeButtonStyles, formStyles, smallButtonStyles, textFieldStyles } from "@/muiStyles";
 import { Box, Button, MenuItem, TextField, Typography } from "@mui/material";
 import { useActionState, useState } from "react";
+import { useTranslations } from "next-intl";
 import { CombinedTeam } from "@/schemas";
 
 type FormState = { error: string | null };
@@ -11,6 +12,8 @@ type FormState = { error: string | null };
 const RemoveTeamFromDepartmentForm: React.FC<{
   currentTeams: CombinedTeam[];
 }> = ({ currentTeams }) => {
+  const t = useTranslations("departments");
+  const tc = useTranslations("common");
   const [selectedTeam, setSelectedTeam] = useState<string>("");
 
   const [state, formAction, isPending] = useActionState(
@@ -19,7 +22,7 @@ const RemoveTeamFromDepartmentForm: React.FC<{
         await removeTeamFromDepartment(formData);
         return { error: null };
       } catch (error) {
-        return { error: error instanceof Error ? error.message : "An error occurred" };
+        return { error: error instanceof Error ? error.message : tc("error") };
       }
     },
     { error: null },
@@ -27,14 +30,14 @@ const RemoveTeamFromDepartmentForm: React.FC<{
 
   return (
     <Box component="form" action={formAction} sx={formStyles}>
-      <Typography variant="h5">Remove Team from Department</Typography>
+      <Typography variant="h5">{t("removeTeam")}</Typography>
       {state.error && <Typography color="error">{state.error}</Typography>}
 
       <input type="hidden" name="teamID" value={selectedTeam} />
 
       <TextField
         select
-        label="Select Team"
+        label={t("selectTeam")}
         size="small"
         value={selectedTeam}
         onChange={(e) => setSelectedTeam(e.target.value)}
@@ -53,7 +56,7 @@ const RemoveTeamFromDepartmentForm: React.FC<{
           disabled={!selectedTeam || isPending}
           sx={{ ...smallButtonStyles, ...(selectedTeam && activeButtonStyles) }}
         >
-          Remove
+          {tc("remove")}
         </Button>
       </Box>
     </Box>

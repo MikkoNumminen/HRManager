@@ -4,6 +4,7 @@ import { updateDepartmentHead } from "@/serverActions";
 import { activeButtonStyles, formStyles, headerStyles, smallButtonStyles } from "@/muiStyles";
 import { Box, Button, Typography } from "@mui/material";
 import { useActionState, useState } from "react";
+import { useTranslations } from "next-intl";
 import { PersonSelectCard } from "./PersonSelectCard";
 import { Person } from "@/schemas";
 
@@ -14,6 +15,8 @@ const UpdateDepartmentHeadForm: React.FC<{
   persons: Person[];
   excludeIds?: string[];
 }> = ({ departmentID, persons, excludeIds = [] }) => {
+  const t = useTranslations("departments");
+  const tc = useTranslations("common");
   const [newHead, setNewHead] = useState<string>("");
 
   const [state, formAction, isPending] = useActionState(
@@ -22,7 +25,7 @@ const UpdateDepartmentHeadForm: React.FC<{
         await updateDepartmentHead(formData);
         return { error: null };
       } catch (error) {
-        return { error: error instanceof Error ? error.message : "An error occurred" };
+        return { error: error instanceof Error ? error.message : tc("error") };
       }
     },
     { error: null },
@@ -33,7 +36,7 @@ const UpdateDepartmentHeadForm: React.FC<{
   return (
     <Box component="form" action={formAction} sx={formStyles}>
       <Box sx={headerStyles}>
-        <Typography variant="h5">Set Department Head</Typography>
+        <Typography variant="h5">{t("setHead")}</Typography>
       </Box>
       {state.error && <Typography color="error">{state.error}</Typography>}
 
@@ -65,7 +68,7 @@ const UpdateDepartmentHeadForm: React.FC<{
           disabled={!newHead || isPending}
           sx={{ ...smallButtonStyles, ...(newHead && activeButtonStyles) }}
         >
-          Set Head
+          {t("setHeadButton")}
         </Button>
       </Box>
     </Box>
