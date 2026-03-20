@@ -658,13 +658,11 @@ describe("AuditLogViewer", () => {
   // Changing rows per page navigates with updated pageSize param and resets to page 1.
   test("navigates when rows per page is changed", () => {
     const logs = [makelog()];
-    const { container } = render(
-      <AuditLogViewer logs={logs} {...defaultProps} total={50} pageSize={10} />,
-    );
-    // MUI v7 TablePagination renders an input with role="combobox" for rows-per-page
-    // It's the last combobox after the filter selects; find it by the pagination wrapper
-    const paginationRoot = container.querySelector(".MuiTablePagination-root");
-    const rowsInput = paginationRoot?.querySelector('[role="combobox"]') as HTMLElement;
+    render(<AuditLogViewer logs={logs} {...defaultProps} total={50} pageSize={10} />);
+    // MUI v7 TablePagination renders an input with role="combobox" for rows-per-page.
+    // Multiple comboboxes exist (filter selects); the rows-per-page one is the last one.
+    const comboboxes = screen.getAllByRole("combobox");
+    const rowsInput = comboboxes[comboboxes.length - 1];
     // MUI Select: open the dropdown, then pick the option
     fireEvent.mouseDown(rowsInput);
     const option50 = screen.getByRole("option", { name: "50" });
