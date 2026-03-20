@@ -222,7 +222,7 @@ describe("auth.ts callbacks", () => {
         where: { email: "demo@hrmanager.app" },
       });
       expect(dbUser).not.toBeNull();
-      expect(dbUser!.role).toBe("administrator");
+      expect(dbUser!.role).toBe("superuser");
     });
 
     // Reuses existing demo user on subsequent authorize calls.
@@ -234,6 +234,19 @@ describe("auth.ts callbacks", () => {
       expect(result.email).toBe("demo@hrmanager.app");
       const count = await testPrisma.user.count({ where: { email: "demo@hrmanager.app" } });
       expect(count).toBe(1);
+    });
+
+    // Upgrades existing demo user to superuser if they have a lower role.
+    test("upgrades existing demo user to superuser on login", async () => {
+      await testPrisma.user.create({
+        data: { email: "demo@hrmanager.app", name: "Demo User", role: "administrator" },
+      });
+      const result = await credentialsProvider.authorize();
+      expect(result.email).toBe("demo@hrmanager.app");
+      const dbUser = await testPrisma.user.findUnique({
+        where: { email: "demo@hrmanager.app" },
+      });
+      expect(dbUser!.role).toBe("superuser");
     });
 
     // Returns id, email, and name in the result.
