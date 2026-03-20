@@ -19,6 +19,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { colors } from "@/muiStyles";
 import { AuditLog } from "@/schemas";
 
@@ -28,39 +29,6 @@ const actionColors: Record<string, string> = {
   delete: "#f87171",
   seed: "#fbbf24",
   reset: "#fbbf24",
-};
-
-const entityTypeLabels: Record<string, string> = {
-  person: "Person",
-  team: "Team",
-  teamMember: "Team Member",
-  department: "Department",
-  user: "User",
-  userPermission: "Permission",
-};
-
-const permissionLabels: Record<string, string> = {
-  "person:create": "create new people",
-  "person:delete": "delete people",
-  "person:update_position": "change people's positions",
-  "person:update_email": "change people's emails",
-  "person:read": "view people",
-  "team:create": "create new teams",
-  "team:delete": "delete teams",
-  "team:update_manager": "change team managers",
-  "team:add_member": "add members to teams",
-  "team:remove_member": "remove members from teams",
-  "team:read": "view teams",
-  "department:create": "create new departments",
-  "department:delete": "delete departments",
-  "department:update": "update departments",
-  "department:assign_team": "assign teams to departments",
-  "department:read": "view departments",
-  "data:reset": "reset all data",
-  "data:seed": "load mock data",
-  "admin:manage_users": "manage users",
-  "admin:assign_permissions": "change user permissions",
-  "admin:view_audit_log": "view the audit log",
 };
 
 const selectStyles = {
@@ -73,109 +41,6 @@ const selectStyles = {
 };
 
 const labelStyles = { color: colors.slate400, "&.Mui-focused": { color: colors.slate100 } };
-
-function describeChanges(
-  action: string,
-  entityType: string,
-  before: string | null,
-  after: string | null,
-  userNames: Record<string, string>,
-): string {
-  try {
-    const b = before ? JSON.parse(before) : null;
-    const a = after ? JSON.parse(after) : null;
-
-    const resolveTarget = (): string => {
-      const email = a?.targetEmail ?? b?.targetEmail;
-      if (!email) return "a user";
-      return userNames[email] ?? email;
-    };
-
-    if (action === "create") {
-      if (entityType === "person") return `Added a new person: ${a?.name ?? "unknown"}`;
-      if (entityType === "team") return `Created a new team: ${a?.teamName ?? "unknown"}`;
-      if (entityType === "teamMember") return "Added a member to a team";
-      if (entityType === "department") return `Created a new department: ${a?.name ?? "unknown"}`;
-      return "New record created";
-    }
-
-    if (action === "delete") {
-      if (entityType === "person")
-        return `Removed person: ${b?.name ?? "unknown"} (${b?.email ?? ""})`;
-      if (entityType === "team") return `Deleted team: ${b?.teamName ?? "unknown"}`;
-      if (entityType === "teamMember") return "Removed a member from a team";
-      if (entityType === "department") return `Deleted department: ${b?.name ?? "unknown"}`;
-      if (entityType === "userPermission") {
-        const key = b?.permissionKey ?? "";
-        const label = permissionLabels[key] ?? key;
-        const target = resolveTarget();
-        return `Reset ${target}'s "${label}" back to role default`;
-      }
-      return "Record deleted";
-    }
-
-    if (action === "update") {
-      if (entityType === "person") {
-        if (a?.position !== undefined && b?.position !== a.position)
-          return `Changed position from "${b?.position}" to "${a?.position}"`;
-        if (a?.email !== undefined && b?.email !== a.email)
-          return `Changed email from "${b?.email}" to "${a?.email}"`;
-        return "Updated person details";
-      }
-      if (entityType === "team") {
-        if (a?.departmentId !== undefined) {
-          if (a.departmentId === null) return "Removed team from department";
-          return "Assigned team to a department";
-        }
-        if (a?.teamManagerId !== undefined) {
-          if (a.teamManagerId === null) return "Removed the team manager";
-          return "Changed the team manager";
-        }
-        return "Updated team details";
-      }
-      if (entityType === "department") {
-        if (a?.headId !== undefined) {
-          if (a.headId === null) return "Removed the department head";
-          return "Changed the department head";
-        }
-        if (a?.name !== undefined && b?.name !== a.name)
-          return `Renamed department from "${b?.name}" to "${a?.name}"`;
-        return "Updated department details";
-      }
-      if (entityType === "user") {
-        const target = resolveTarget();
-        return `Changed ${target}'s role from "${b?.role}" to "${a?.role}"`;
-      }
-      if (entityType === "userPermission") {
-        const granted = a?.granted;
-        const key = a?.permissionKey ?? "";
-        const label = permissionLabels[key] ?? key;
-        const target = resolveTarget();
-        return granted
-          ? `Granted ${target} the ability to ${label}`
-          : `Revoked ${target}'s ability to ${label}`;
-      }
-      return "Record updated";
-    }
-
-    if (action === "seed") {
-      return b?.clearExisting || a?.clearExisting
-        ? "Loaded mock data (replaced existing)"
-        : "Loaded mock data (kept existing)";
-    }
-
-    if (action === "reset") {
-      const persons = b?.personCount ?? b?.persons ?? 0;
-      const teams = b?.teamCount ?? b?.teams ?? 0;
-      const departments = b?.departmentCount ?? b?.departments ?? 0;
-      return `Cleared all data (${persons} persons, ${teams} teams, ${departments} departments removed)`;
-    }
-
-    return "-";
-  } catch {
-    return before ?? after ?? "-";
-  }
-}
 
 interface AuditLogViewerProps {
   logs: AuditLog[];
@@ -200,8 +65,161 @@ export default function AuditLogViewer({
   userNames = {},
   currentFilters,
 }: AuditLogViewerProps) {
+  const t = useTranslations("audit");
+  const tc = useTranslations("common");
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  const entityTypeLabels: Record<string, string> = {
+    person: t("typePerson"),
+    team: t("typeTeam"),
+    teamMember: t("typeTeamMember"),
+    department: t("typeDepartment"),
+    user: t("typeUser"),
+    userPermission: t("typePermission"),
+  };
+
+  const actionLabels: Record<string, string> = {
+    create: t("actionCreate"),
+    update: t("actionUpdate"),
+    delete: t("actionDelete"),
+    seed: t("actionSeed"),
+    reset: t("actionReset"),
+  };
+
+  const permissionLabels: Record<string, string> = {
+    "person:create": t("permCreatePeople"),
+    "person:delete": t("permDeletePeople"),
+    "person:update_position": t("permChangePosition"),
+    "person:update_email": t("permChangeEmail"),
+    "person:read": t("permViewPeople"),
+    "team:create": t("permCreateTeams"),
+    "team:delete": t("permDeleteTeams"),
+    "team:update_manager": t("permChangeManager"),
+    "team:add_member": t("permAddMembers"),
+    "team:remove_member": t("permRemoveMembers"),
+    "team:read": t("permViewTeams"),
+    "department:create": t("permCreateDepartments"),
+    "department:delete": t("permDeleteDepartments"),
+    "department:update": t("permUpdateDepartments"),
+    "department:assign_team": t("permAssignTeams"),
+    "department:read": t("permViewDepartments"),
+    "data:reset": t("permResetData"),
+    "data:seed": t("permSeedData"),
+    "admin:manage_users": t("permManageUsers"),
+    "admin:assign_permissions": t("permChangePermissions"),
+    "admin:view_audit_log": t("permViewAuditLog"),
+  };
+
+  const describeChanges = (
+    action: string,
+    entityType: string,
+    before: string | null,
+    after: string | null,
+  ): string => {
+    try {
+      const b = before ? JSON.parse(before) : null;
+      const a = after ? JSON.parse(after) : null;
+      const unknown = tc("unknown");
+
+      const resolveTarget = (): string => {
+        const email = a?.targetEmail ?? b?.targetEmail;
+        if (!email) return unknown;
+        return userNames[email] ?? email;
+      };
+
+      if (action === "create") {
+        if (entityType === "person") return t("addedPerson", { name: a?.name ?? unknown });
+        if (entityType === "team") return t("createdTeam", { name: a?.teamName ?? unknown });
+        if (entityType === "teamMember") return t("addedMember");
+        if (entityType === "department")
+          return t("createdDepartment", { name: a?.name ?? unknown });
+        return t("newRecord");
+      }
+
+      if (action === "delete") {
+        if (entityType === "person")
+          return t("removedPerson", { name: b?.name ?? unknown, email: b?.email ?? "" });
+        if (entityType === "team") return t("deletedTeam", { name: b?.teamName ?? unknown });
+        if (entityType === "teamMember") return t("removedMember");
+        if (entityType === "department")
+          return t("deletedDepartment", { name: b?.name ?? unknown });
+        if (entityType === "userPermission") {
+          const key = b?.permissionKey ?? "";
+          const label = permissionLabels[key] ?? key;
+          const target = resolveTarget();
+          return t("resetPermission", { target, label });
+        }
+        return t("recordDeleted");
+      }
+
+      if (action === "update") {
+        if (entityType === "person") {
+          if (a?.position !== undefined && b?.position !== a.position)
+            return t("changedPosition", {
+              oldValue: b?.position ?? "",
+              newValue: a?.position ?? "",
+            });
+          if (a?.email !== undefined && b?.email !== a.email)
+            return t("changedEmail", { oldValue: b?.email ?? "", newValue: a?.email ?? "" });
+          return t("updatedPerson");
+        }
+        if (entityType === "team") {
+          if (a?.departmentId !== undefined) {
+            if (a.departmentId === null) return t("removedTeamFromDept");
+            return t("assignedTeamToDept");
+          }
+          if (a?.teamManagerId !== undefined) {
+            if (a.teamManagerId === null) return t("removedManager");
+            return t("changedManager");
+          }
+          return t("updatedTeam");
+        }
+        if (entityType === "department") {
+          if (a?.headId !== undefined) {
+            if (a.headId === null) return t("removedHead");
+            return t("changedHead");
+          }
+          if (a?.name !== undefined && b?.name !== a.name)
+            return t("renamedDepartment", { oldValue: b?.name ?? "", newValue: a?.name ?? "" });
+          return t("updatedDepartment");
+        }
+        if (entityType === "user") {
+          const target = resolveTarget();
+          return t("changedRole", { target, oldValue: b?.role ?? "", newValue: a?.role ?? "" });
+        }
+        if (entityType === "userPermission") {
+          const granted = a?.granted;
+          const key = a?.permissionKey ?? "";
+          const label = permissionLabels[key] ?? key;
+          const target = resolveTarget();
+          return granted
+            ? t("grantedPermission", { target, label })
+            : t("revokedPermission", { target, label });
+        }
+        return t("recordUpdated");
+      }
+
+      if (action === "seed") {
+        return b?.clearExisting || a?.clearExisting ? t("seedReplaced") : t("seedKept");
+      }
+
+      if (action === "reset") {
+        const persons = b?.personCount ?? b?.persons ?? 0;
+        const teams = b?.teamCount ?? b?.teams ?? 0;
+        const departments = b?.departmentCount ?? b?.departments ?? 0;
+        return t("clearedData", {
+          persons: String(persons),
+          teams: String(teams),
+          departments: String(departments),
+        });
+      }
+
+      return tc("dash");
+    } catch {
+      return before ?? after ?? tc("dash");
+    }
+  };
 
   const updateFilter = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -231,14 +249,14 @@ export default function AuditLogViewer({
     <>
       <Box display="flex" gap={2} mb={2} flexWrap="wrap">
         <FormControl size="small">
-          <InputLabel sx={labelStyles}>User</InputLabel>
+          <InputLabel sx={labelStyles}>{t("filterUser")}</InputLabel>
           <Select
             value={currentFilters.userEmail ?? ""}
             onChange={(e) => updateFilter("userEmail", e.target.value)}
-            label="User"
+            label={t("filterUser")}
             sx={selectStyles}
           >
-            <MenuItem value="">All Users</MenuItem>
+            <MenuItem value="">{t("allUsers")}</MenuItem>
             {userEmails.map((email) => (
               <MenuItem key={email} value={email}>
                 {email}
@@ -248,31 +266,31 @@ export default function AuditLogViewer({
         </FormControl>
 
         <FormControl size="small">
-          <InputLabel sx={labelStyles}>Action</InputLabel>
+          <InputLabel sx={labelStyles}>{t("filterAction")}</InputLabel>
           <Select
             value={currentFilters.action ?? ""}
             onChange={(e) => updateFilter("action", e.target.value)}
-            label="Action"
+            label={t("filterAction")}
             sx={selectStyles}
           >
-            <MenuItem value="">All Actions</MenuItem>
-            {["create", "update", "delete", "seed", "reset"].map((a) => (
-              <MenuItem key={a} value={a}>
-                {a.charAt(0).toUpperCase() + a.slice(1)}
+            <MenuItem value="">{t("allActions")}</MenuItem>
+            {Object.entries(actionLabels).map(([key, label]) => (
+              <MenuItem key={key} value={key}>
+                {label}
               </MenuItem>
             ))}
           </Select>
         </FormControl>
 
         <FormControl size="small">
-          <InputLabel sx={labelStyles}>Type</InputLabel>
+          <InputLabel sx={labelStyles}>{t("filterType")}</InputLabel>
           <Select
             value={currentFilters.entityType ?? ""}
             onChange={(e) => updateFilter("entityType", e.target.value)}
-            label="Type"
+            label={t("filterType")}
             sx={selectStyles}
           >
-            <MenuItem value="">All Types</MenuItem>
+            <MenuItem value="">{t("allTypes")}</MenuItem>
             {Object.entries(entityTypeLabels).map(([key, label]) => (
               <MenuItem key={key} value={key}>
                 {label}
@@ -286,36 +304,30 @@ export default function AuditLogViewer({
         <Table sx={{ tableLayout: "fixed", width: "100%" }} aria-label="audit log table">
           <TableHead>
             <TableRow>
-              <Tooltip title="When the action was performed" placement="top" arrow>
+              <Tooltip title={t("tooltipTimestamp")} placement="top" arrow>
                 <TableCell sx={{ color: colors.slate400, cursor: "help", width: "15%" }}>
-                  Timestamp
+                  {t("columnTimestamp")}
                 </TableCell>
               </Tooltip>
-              <Tooltip title="The user who performed the action" placement="top" arrow>
+              <Tooltip title={t("tooltipUser")} placement="top" arrow>
                 <TableCell sx={{ color: colors.slate400, cursor: "help", width: "18%" }}>
-                  User
+                  {t("columnUser")}
                 </TableCell>
               </Tooltip>
-              <Tooltip
-                title="The type of action taken (create, update, delete, etc.)"
-                placement="top"
-                arrow
-              >
+              <Tooltip title={t("tooltipAction")} placement="top" arrow>
                 <TableCell sx={{ color: colors.slate400, cursor: "help", width: "9%" }}>
-                  Action
+                  {t("columnAction")}
                 </TableCell>
               </Tooltip>
-              <Tooltip title="The type of resource that was affected" placement="top" arrow>
+              <Tooltip title={t("tooltipType")} placement="top" arrow>
                 <TableCell sx={{ color: colors.slate400, cursor: "help", width: "10%" }}>
-                  Type
+                  {t("columnType")}
                 </TableCell>
               </Tooltip>
-              <Tooltip
-                title="What changed — shows before and after values for updates"
-                placement="top"
-                arrow
-              >
-                <TableCell sx={{ color: colors.slate400, cursor: "help" }}>Changes</TableCell>
+              <Tooltip title={t("tooltipChanges")} placement="top" arrow>
+                <TableCell sx={{ color: colors.slate400, cursor: "help" }}>
+                  {t("columnChanges")}
+                </TableCell>
               </Tooltip>
             </TableRow>
           </TableHead>
@@ -324,7 +336,7 @@ export default function AuditLogViewer({
               <TableRow>
                 <TableCell colSpan={5}>
                   <Box display="flex" justifyContent="center" alignItems="center" height="100px">
-                    <Typography align="center">No audit log entries found</Typography>
+                    <Typography align="center">{t("noEntries")}</Typography>
                   </Box>
                 </TableCell>
               </TableRow>
@@ -341,7 +353,7 @@ export default function AuditLogViewer({
                       whiteSpace: "nowrap",
                     }}
                   >
-                    <Tooltip title={log.userEmail ?? "System"} placement="top" arrow>
+                    <Tooltip title={log.userEmail ?? t("system")} placement="top" arrow>
                       <Typography
                         variant="body2"
                         sx={{
@@ -351,7 +363,9 @@ export default function AuditLogViewer({
                           whiteSpace: "nowrap",
                         }}
                       >
-                        {(log.userEmail && userNames[log.userEmail]) ?? log.userEmail ?? "System"}
+                        {(log.userEmail && userNames[log.userEmail]) ??
+                          log.userEmail ??
+                          t("system")}
                       </Typography>
                     </Tooltip>
                   </TableCell>
@@ -371,13 +385,7 @@ export default function AuditLogViewer({
                   <TableCell>{entityTypeLabels[log.entityType] ?? log.entityType}</TableCell>
                   <TableCell>
                     <Tooltip
-                      title={describeChanges(
-                        log.action,
-                        log.entityType,
-                        log.before,
-                        log.after,
-                        userNames,
-                      )}
+                      title={describeChanges(log.action, log.entityType, log.before, log.after)}
                       placement="top"
                       arrow
                     >
@@ -392,13 +400,7 @@ export default function AuditLogViewer({
                           wordBreak: "break-word",
                         }}
                       >
-                        {describeChanges(
-                          log.action,
-                          log.entityType,
-                          log.before,
-                          log.after,
-                          userNames,
-                        )}
+                        {describeChanges(log.action, log.entityType, log.before, log.after)}
                       </Typography>
                     </Tooltip>
                   </TableCell>

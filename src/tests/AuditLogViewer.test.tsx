@@ -521,7 +521,7 @@ describe("AuditLogViewer", () => {
     expect(mockPush).toHaveBeenCalledWith(expect.stringContaining("page=1"));
   });
 
-  // Falls back to "a user" when targetEmail is missing from permission reset.
+  // Falls back to "unknown" when targetEmail is missing from permission reset.
   test("falls back to raw key when permission key has no label", () => {
     const log = makelog({
       action: "delete",
@@ -531,11 +531,11 @@ describe("AuditLogViewer", () => {
     });
     render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
     expect(
-      screen.getAllByText('Reset a user\'s "custom:unknown" back to role default').length,
+      screen.getAllByText('Reset unknown\'s "custom:unknown" back to role default').length,
     ).toBeGreaterThan(0);
   });
 
-  // Falls back to "a user" when targetEmail is missing from permission grant.
+  // Falls back to "unknown" when targetEmail is missing from permission grant.
   test("falls back to raw key when granting unknown permission", () => {
     const log = makelog({
       action: "update",
@@ -544,7 +544,7 @@ describe("AuditLogViewer", () => {
     });
     render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
     expect(
-      screen.getAllByText("Granted a user the ability to custom:action").length,
+      screen.getAllByText("Granted unknown the ability to custom:action").length,
     ).toBeGreaterThan(0);
   });
 

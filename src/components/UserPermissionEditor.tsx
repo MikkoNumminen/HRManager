@@ -27,6 +27,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useActionState, useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 
 interface UserData {
   id: string;
@@ -59,11 +60,20 @@ export default function UserPermissionEditor({
   roleDefaults,
   canAssignPermissions,
 }: UserPermissionEditorProps) {
+  const t = useTranslations("admin");
+  const tc = useTranslations("common");
   const [selectedRole, setSelectedRole] = useState(user.role);
   const roleChanged = selectedRole !== user.role;
   const isSuperuser = user.role === "superuser";
   const [isPending, startTransition] = useTransition();
   const [permError, setPermError] = useState<string | null>(null);
+
+  const roleLabels: Record<string, string> = {
+    superuser: t("roleSuperuser"),
+    administrator: t("roleAdministrator"),
+    user: t("roleUser"),
+    guest: t("roleGuest"),
+  };
 
   const [roleState, roleAction, roleIsPending] = useActionState(
     async (_prev: FormState, formData: FormData): Promise<FormState> => {
@@ -71,7 +81,7 @@ export default function UserPermissionEditor({
         await updateUserRole(formData);
         return { error: null };
       } catch (error) {
-        return { error: error instanceof Error ? error.message : "An error occurred" };
+        return { error: error instanceof Error ? error.message : tc("error") };
       }
     },
     { error: null },
@@ -90,7 +100,7 @@ export default function UserPermissionEditor({
         formData.set("action", action);
         await updateUserPermission(formData);
       } catch (e) {
-        setPermError(e instanceof Error ? e.message : "An error occurred");
+        setPermError(e instanceof Error ? e.message : tc("error"));
       }
     });
   };
@@ -114,9 +124,9 @@ export default function UserPermissionEditor({
     <>
       <Box component="form" action={roleAction} sx={formStyles}>
         <Box sx={headerStyles}>
-          <Typography variant="h5">User Role</Typography>
+          <Typography variant="h5">{t("userRole")}</Typography>
           <Chip
-            label={user.role}
+            label={roleLabels[user.role] ?? user.role}
             size="small"
             sx={{
               color: roleColors[user.role] ?? colors.slate300,
@@ -130,23 +140,23 @@ export default function UserPermissionEditor({
         {roleState.error && <Typography color="error">{roleState.error}</Typography>}
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <Typography variant="body2" sx={{ color: colors.slate400 }}>
-            {user.name ?? "Unknown"} ({user.email})
+            {user.name ?? tc("unknown")} ({user.email})
           </Typography>
         </Box>
         <input type="hidden" name="userId" value={user.id} />
         {isSuperuser ? (
           <Typography variant="body2" sx={{ color: colors.slate400 }}>
-            The superuser role cannot be changed.
+            {t("superuserCannotChange")}
           </Typography>
         ) : (
           <>
             <FormControl size="small" sx={{ minWidth: 200 }}>
-              <InputLabel sx={{ color: colors.slate400 }}>Role</InputLabel>
+              <InputLabel sx={{ color: colors.slate400 }}>{t("role")}</InputLabel>
               <Select
                 name="role"
                 value={selectedRole}
                 onChange={(e) => setSelectedRole(e.target.value)}
-                label="Role"
+                label={t("role")}
                 sx={{
                   color: colors.slate300,
                   "& .MuiOutlinedInput-notchedOutline": { borderColor: colors.slate300 },
@@ -154,9 +164,9 @@ export default function UserPermissionEditor({
                   "& .MuiSvgIcon-root": { color: colors.slate300 },
                 }}
               >
-                <MenuItem value="administrator">Administrator</MenuItem>
-                <MenuItem value="user">User</MenuItem>
-                <MenuItem value="guest">Guest</MenuItem>
+                <MenuItem value="administrator">{t("roleAdministrator")}</MenuItem>
+                <MenuItem value="user">{t("roleUser")}</MenuItem>
+                <MenuItem value="guest">{t("roleGuest")}</MenuItem>
               </Select>
             </FormControl>
             <Box display="flex" gap={1} justifyContent="flex-end">
@@ -165,7 +175,7 @@ export default function UserPermissionEditor({
                 disabled={!roleChanged || roleIsPending}
                 sx={{ ...smallButtonStyles, ...(roleChanged && activeButtonStyles) }}
               >
-                Save Role
+                {t("saveRole")}
               </Button>
             </Box>
           </>
@@ -174,16 +184,16 @@ export default function UserPermissionEditor({
 
       <Box sx={formStyles}>
         <Box sx={headerStyles}>
-          <Typography variant="h5">Permissions</Typography>
+          <Typography variant="h5">{t("permissions")}</Typography>
         </Box>
         {permError && <Typography color="error">{permError}</Typography>}
         {isSuperuser ? (
           <Typography variant="body2" sx={{ color: colors.slate400 }}>
-            The superuser has all permissions and cannot be modified.
+            {t("superuserAllPermissions")}
           </Typography>
         ) : !canAssignPermissions ? (
           <Typography variant="body2" sx={{ color: colors.slate400 }}>
-            You do not have permission to modify user permissions.
+            {t("noPermission")}
           </Typography>
         ) : (
           Object.entries(groupedKeys).map(([domain, keys]) => (
@@ -198,41 +208,25 @@ export default function UserPermissionEditor({
                 <Table size="small">
                   <TableHead>
                     <TableRow>
-                      <TableCell sx={{ color: colors.slate400 }}>Permission</TableCell>
-                      <Tooltip
-                        title="The default access level based on the user's role (e.g. administrators can manage data, regular users can only read)"
-                        placement="top"
-                        arrow
-                      >
+                      <TableCell sx={{ color: colors.slate400 }}>{t("permission")}</TableCell>
+                      <Tooltip title={t("roleDefaultTooltip")} placement="top" arrow>
                         <TableCell sx={{ color: colors.slate400, cursor: "help" }}>
-                          Role Default
+                          {t("roleDefault")}
                         </TableCell>
                       </Tooltip>
-                      <Tooltip
-                        title="A per-user override that grants or denies this permission regardless of role defaults"
-                        placement="top"
-                        arrow
-                      >
+                      <Tooltip title={t("overrideTooltip")} placement="top" arrow>
                         <TableCell sx={{ color: colors.slate400, cursor: "help" }}>
-                          Override
+                          {t("override")}
                         </TableCell>
                       </Tooltip>
-                      <Tooltip
-                        title="The actual permission in effect — determined by override if set, otherwise falls back to role default"
-                        placement="top"
-                        arrow
-                      >
+                      <Tooltip title={t("effectiveTooltip")} placement="top" arrow>
                         <TableCell sx={{ color: colors.slate400, cursor: "help" }}>
-                          Effective
+                          {t("effective")}
                         </TableCell>
                       </Tooltip>
-                      <Tooltip
-                        title="Grant or deny an override, or reset to remove it and revert to role default"
-                        placement="top"
-                        arrow
-                      >
+                      <Tooltip title={t("actionsTooltip")} placement="top" arrow>
                         <TableCell sx={{ color: colors.slate400, cursor: "help" }} align="right">
-                          Actions
+                          {t("actions")}
                         </TableCell>
                       </Tooltip>
                     </TableRow>
@@ -249,7 +243,7 @@ export default function UserPermissionEditor({
                           <TableCell sx={{ color: colors.slate300 }}>{formatKey(key)}</TableCell>
                           <TableCell>
                             <Chip
-                              label={isDefault ? "Allowed" : "Denied"}
+                              label={isDefault ? t("allowed") : t("denied")}
                               size="small"
                               sx={{
                                 color: isDefault ? colors.green400 : "#f87171",
@@ -261,7 +255,7 @@ export default function UserPermissionEditor({
                           <TableCell>
                             {hasOverride ? (
                               <Chip
-                                label={override ? "Granted" : "Denied"}
+                                label={override ? t("granted") : t("denied")}
                                 size="small"
                                 sx={{
                                   color: override ? colors.green400 : "#f87171",
@@ -278,7 +272,7 @@ export default function UserPermissionEditor({
                           </TableCell>
                           <TableCell>
                             <Chip
-                              label={effective ? "Allowed" : "Denied"}
+                              label={effective ? t("allowed") : t("denied")}
                               size="small"
                               sx={{
                                 backgroundColor: effective
@@ -303,7 +297,7 @@ export default function UserPermissionEditor({
                                     px: 1,
                                   }}
                                 >
-                                  Reset
+                                  {tc("reset")}
                                 </Button>
                               ) : effective ? (
                                 <Button
@@ -317,7 +311,7 @@ export default function UserPermissionEditor({
                                     px: 1,
                                   }}
                                 >
-                                  Deny
+                                  {t("deny")}
                                 </Button>
                               ) : (
                                 <Button
@@ -331,7 +325,7 @@ export default function UserPermissionEditor({
                                     px: 1,
                                   }}
                                 >
-                                  Grant
+                                  {t("grant")}
                                 </Button>
                               )}
                             </Box>
