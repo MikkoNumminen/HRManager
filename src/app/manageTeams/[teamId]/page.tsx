@@ -8,6 +8,7 @@ import TopBar from "@/components/TopBar";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getUserPermissions } from "@/permissions";
+import { getTranslations } from "next-intl/server";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -16,17 +17,18 @@ export default async function TeamPage({ params }: { params: Promise<{ teamId: s
   if (!session) redirect("/");
 
   const permissions = await getUserPermissions();
+  const t = await getTranslations("teams");
   const { teamId } = await params;
 
   if (!UUID_REGEX.test(teamId)) {
-    return <Typography variant="h4">Team not found</Typography>;
+    return <Typography variant="h4">{t("notFound")}</Typography>;
   }
 
   const [teams, persons] = await Promise.all([getTeams(), getPersons()]);
-  const team = teams.find((t) => t.teamId === teamId);
+  const team = teams.find((tm) => tm.teamId === teamId);
 
   if (!team) {
-    return <Typography variant="h4">Team not found</Typography>;
+    return <Typography variant="h4">{t("notFound")}</Typography>;
   }
 
   const memberIds = team.members.map((m) => m.personId);
@@ -34,7 +36,11 @@ export default async function TeamPage({ params }: { params: Promise<{ teamId: s
 
   return (
     <>
-      <TopBar title={`Manage ${team.teamName}`} backHref="/manageTeams" permissions={permissions} />
+      <TopBar
+        title={t("manageHeading", { name: team.teamName })}
+        backHref="/manageTeams"
+        permissions={permissions}
+      />
       {permissions["team:delete"] && <RemoveTeamForm teamID={teamId} />}
       {permissions["team:update_manager"] && (
         <UpdateManagerForm

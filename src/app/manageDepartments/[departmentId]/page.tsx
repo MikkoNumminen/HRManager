@@ -8,6 +8,7 @@ import TopBar from "@/components/TopBar";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getUserPermissions } from "@/permissions";
+import { getTranslations } from "next-intl/server";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -20,10 +21,11 @@ export default async function DepartmentPage({
   if (!session) redirect("/");
 
   const permissions = await getUserPermissions();
+  const t = await getTranslations("departments");
   const { departmentId } = await params;
 
   if (!UUID_REGEX.test(departmentId)) {
-    return <Typography variant="h4">Department not found</Typography>;
+    return <Typography variant="h4">{t("notFound")}</Typography>;
   }
 
   const [departments, persons, teams] = await Promise.all([
@@ -34,7 +36,7 @@ export default async function DepartmentPage({
   const department = departments.find((d) => d.id === departmentId);
 
   if (!department) {
-    return <Typography variant="h4">Department not found</Typography>;
+    return <Typography variant="h4">{t("notFound")}</Typography>;
   }
 
   const departmentTeamIds = department.teams.map((t) => t.teamId);
@@ -46,7 +48,7 @@ export default async function DepartmentPage({
   return (
     <>
       <TopBar
-        title={`Manage ${department.name}`}
+        title={t("manageHeading", { name: department.name })}
         backHref="/manageDepartments"
         permissions={permissions}
       />

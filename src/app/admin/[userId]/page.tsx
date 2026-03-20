@@ -5,6 +5,7 @@ import { getUserById, getAllPermissionKeys } from "@/queries";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getUserPermissions, ROLE_DEFAULTS } from "@/permissions";
+import { getTranslations } from "next-intl/server";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -19,15 +20,16 @@ export default async function UserPermissionPage({
   const permissions = await getUserPermissions();
   if (!permissions["admin:manage_users"]) redirect("/");
 
+  const t = await getTranslations("admin");
   const { userId } = await params;
 
   if (!UUID_REGEX.test(userId)) {
-    return <Typography variant="h4">User not found</Typography>;
+    return <Typography variant="h4">{t("notFound")}</Typography>;
   }
 
   const user = await getUserById(userId);
   if (!user) {
-    return <Typography variant="h4">User not found</Typography>;
+    return <Typography variant="h4">{t("notFound")}</Typography>;
   }
 
   const allPermissionKeys = await getAllPermissionKeys();
@@ -36,7 +38,7 @@ export default async function UserPermissionPage({
   return (
     <>
       <TopBar
-        title={`Manage ${user.name ?? user.email}`}
+        title={t("manageHeading", { name: user.name ?? user.email })}
         backHref="/admin"
         permissions={permissions}
       />

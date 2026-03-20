@@ -7,6 +7,7 @@ import { getDepartments } from "@/queries";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getUserPermissions } from "@/permissions";
+import { getTranslations } from "next-intl/server";
 
 export default async function ManageDepartmentsPage() {
   const session = await auth();
@@ -21,14 +22,15 @@ export default async function ManageDepartmentsPage() {
   if (!canManageDepartments) redirect("/");
 
   const departments = await getDepartments();
+  const t = await getTranslations("departments");
 
   return (
     <>
-      <TopBar title="Manage Departments" backHref="/" permissions={permissions} />
+      <TopBar title={t("manageTitle")} backHref="/" permissions={permissions} />
       {permissions["department:create"] && <AddDepartmentForm />}
       <Box sx={{ border: `1px solid ${colors.slate300}`, borderRadius: "4px", padding: "20px" }}>
         <Typography variant="h5" mb={1}>
-          Departments
+          {t("heading")}
         </Typography>
         <EditableDepartmentsTable departments={departments} />
       </Box>

@@ -7,6 +7,7 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getUserPermissions } from "@/permissions";
 import { prisma } from "@/db";
+import { getTranslations } from "next-intl/server";
 import { AuditLog, AuditActionSchema, AuditEntityTypeSchema } from "@/schemas";
 
 /**
@@ -112,9 +113,11 @@ export default async function AuditLogPage({
     if (u.name) userNames[u.email] = u.name;
   }
 
+  const t = await getTranslations("admin");
+
   return (
     <>
-      <TopBar title="Audit Log" backHref="/admin" permissions={permissions} />
+      <TopBar title={t("auditTitle")} backHref="/admin" permissions={permissions} />
       <Box
         sx={{
           border: `1px solid ${colors.slate300}`,
@@ -123,7 +126,7 @@ export default async function AuditLogPage({
         }}
       >
         <Typography variant="h5" mb={1}>
-          Activity History
+          {t("auditHeading")}
         </Typography>
         <AuditLogViewer
           logs={logs}

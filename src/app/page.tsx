@@ -40,6 +40,7 @@ import { boxStyles } from "@/muiStyles";
 import { getPersons, getTeams, getDepartments } from "@/queries";
 import { auth } from "@/auth";
 import { getUserPermissions } from "@/permissions";
+import { getTranslations } from "next-intl/server";
 
 export default async function Home() {
   const session = await auth();
@@ -49,6 +50,7 @@ export default async function Home() {
     getDepartments(),
   ]);
   const permissions = await getUserPermissions();
+  const t = await getTranslations("home");
 
   const canManagePersons =
     permissions["person:create"] ||
@@ -71,14 +73,14 @@ export default async function Home() {
 
   return (
     <>
-      <TopBar title="Human Resources Management System" permissions={permissions} />
+      <TopBar title={t("title")} permissions={permissions} />
       {session ? (
         canManagePersons ? (
           <Link href="/managePersons" sx={{ textDecoration: "none" }}>
-            <Tooltip title="Go to Persons Manager" placement="right" arrow>
+            <Tooltip title={t("goToPersons")} placement="right" arrow>
               <Box component="div" sx={boxStyles}>
                 <Typography variant="h6" gutterBottom>
-                  Persons
+                  {t("persons")}
                 </Typography>
                 <PersonTable persons={persons} />
               </Box>
@@ -104,10 +106,10 @@ export default async function Home() {
       {session ? (
         canManageTeams ? (
           <Link href="/manageTeams" sx={{ textDecoration: "none" }}>
-            <Tooltip title="Go to Teams Manager" placement="right" arrow>
+            <Tooltip title={t("goToTeams")} placement="right" arrow>
               <Box component="div" sx={boxStyles}>
                 <Typography variant="h6" gutterBottom>
-                  Teams
+                  {t("teams")}
                 </Typography>
                 <TeamsTable combinedTeams={teamsData} />
               </Box>
@@ -133,10 +135,10 @@ export default async function Home() {
       {session ? (
         canManageDepartments ? (
           <Link href="/manageDepartments" sx={{ textDecoration: "none" }}>
-            <Tooltip title="Go to Departments Manager" placement="right" arrow>
+            <Tooltip title={t("goToDepartments")} placement="right" arrow>
               <Box component="div" sx={boxStyles}>
                 <Typography variant="h6" gutterBottom>
-                  Departments
+                  {t("departments")}
                 </Typography>
                 <DepartmentsTable departments={departments} />
               </Box>

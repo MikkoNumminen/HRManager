@@ -7,6 +7,7 @@ import { getPersons } from "@/queries";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getUserPermissions } from "@/permissions";
+import { getTranslations } from "next-intl/server";
 
 export default async function ManagePersonsPage() {
   const session = await auth();
@@ -21,14 +22,15 @@ export default async function ManagePersonsPage() {
   if (!canManagePersons) redirect("/");
 
   const persons = await getPersons();
+  const t = await getTranslations("persons");
 
   return (
     <>
-      <TopBar title="Manage Persons" backHref="/" permissions={permissions} />
+      <TopBar title={t("manageTitle")} backHref="/" permissions={permissions} />
       {permissions["person:create"] && <AddPersonForm />}
       <Box sx={{ border: `1px solid ${colors.slate300}`, borderRadius: "4px", padding: "20px" }}>
         <Typography variant="h5" mb={1}>
-          Persons
+          {t("heading")}
         </Typography>
         <PersonTable persons={persons} />
       </Box>
