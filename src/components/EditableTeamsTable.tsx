@@ -16,12 +16,15 @@ import {
 import { useRouter } from "next/navigation";
 import { colors } from "@/muiStyles";
 import { CombinedTeam } from "@/schemas";
+import { useTranslations } from "next-intl";
 
 interface CombinedTeamProps {
   combinedTeams: CombinedTeam[];
 }
 
 const EditableTeamsTable: React.FC<CombinedTeamProps> = ({ combinedTeams }) => {
+  const t = useTranslations("teams");
+  const tc = useTranslations("common");
   const router = useRouter();
 
   const handleRowClick = (teamId: string) => {
@@ -33,11 +36,11 @@ const EditableTeamsTable: React.FC<CombinedTeamProps> = ({ combinedTeams }) => {
       <Table sx={{ minWidth: 650, maxWidth: 1020 }} aria-label="teams table">
         <TableHead>
           <TableRow>
-            <TableCell>Team Name</TableCell>
-            <TableCell>Team Manager</TableCell>
-            <TableCell>Team Members</TableCell>
-            <TableCell>Created At</TableCell>
-            <TableCell>Updated At</TableCell>
+            <TableCell>{t("teamName")}</TableCell>
+            <TableCell>{t("teamManager")}</TableCell>
+            <TableCell>{t("teamMembers")}</TableCell>
+            <TableCell>{tc("createdAt")}</TableCell>
+            <TableCell>{tc("updatedAt")}</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -45,7 +48,7 @@ const EditableTeamsTable: React.FC<CombinedTeamProps> = ({ combinedTeams }) => {
             <TableRow>
               <TableCell colSpan={5}>
                 <Box display="flex" justifyContent="center" alignItems="center" height="100px">
-                  <Typography align="center">No Teams Available</Typography>
+                  <Typography align="center">{t("noTeams")}</Typography>
                 </Box>
               </TableCell>
             </TableRow>
@@ -53,7 +56,7 @@ const EditableTeamsTable: React.FC<CombinedTeamProps> = ({ combinedTeams }) => {
             combinedTeams.map((team) => (
               <Tooltip
                 key={team.teamId}
-                title={`Click to manage ${team.teamName}`}
+                title={t("clickToManage", { name: team.teamName })}
                 placement="right"
                 arrow
               >
@@ -68,13 +71,13 @@ const EditableTeamsTable: React.FC<CombinedTeamProps> = ({ combinedTeams }) => {
                   }}
                 >
                   <TableCell>{team.teamName}</TableCell>
-                  <TableCell>{team.managerName || "No Manager Assigned"}</TableCell>
+                  <TableCell>{team.managerName || t("noManager")}</TableCell>
                   <TableCell>
                     <Box>
                       {team.members && team.members.length > 0
                         ? team.members.map((member) => (
                             <Typography key={member.personId} variant="body2">
-                              {member?.name || "Unknown Name"}
+                              {member?.name || tc("unknown")}
                             </Typography>
                           ))
                         : null}

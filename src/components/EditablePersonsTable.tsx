@@ -15,12 +15,15 @@ import {
 import { useRouter } from "next/navigation";
 import { colors } from "@/muiStyles";
 import { Person } from "@/schemas";
+import { useTranslations } from "next-intl";
 
 interface PersonTableProps {
   persons: Person[];
 }
 
 const PersonTable: React.FC<PersonTableProps> = ({ persons }) => {
+  const t = useTranslations("persons");
+  const tc = useTranslations("common");
   const router = useRouter();
 
   const handleRowClick = (personId: string) => {
@@ -32,11 +35,11 @@ const PersonTable: React.FC<PersonTableProps> = ({ persons }) => {
       <Table sx={{ minWidth: 650, maxWidth: 1020 }} aria-label="person table">
         <TableHead>
           <TableRow>
-            <TableCell>Name</TableCell>
-            <TableCell>Position</TableCell>
-            <TableCell>Email</TableCell>
-            <TableCell>Created At</TableCell>
-            <TableCell>Updated At</TableCell>
+            <TableCell>{tc("name")}</TableCell>
+            <TableCell>{t("position")}</TableCell>
+            <TableCell>{tc("email")}</TableCell>
+            <TableCell>{tc("createdAt")}</TableCell>
+            <TableCell>{tc("updatedAt")}</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -44,7 +47,7 @@ const PersonTable: React.FC<PersonTableProps> = ({ persons }) => {
             <TableRow>
               <TableCell colSpan={5}>
                 <Box display="flex" justifyContent="center" alignItems="center" height="100px">
-                  <Typography align="center">No Persons Available</Typography>
+                  <Typography align="center">{t("noPersons")}</Typography>
                 </Box>
               </TableCell>
             </TableRow>
@@ -52,7 +55,7 @@ const PersonTable: React.FC<PersonTableProps> = ({ persons }) => {
             persons.map((person) => (
               <Tooltip
                 key={person.id}
-                title={`Click to manage ${person.name}`}
+                title={t("clickToManage", { name: person.name })}
                 placement="right"
                 arrow
               >

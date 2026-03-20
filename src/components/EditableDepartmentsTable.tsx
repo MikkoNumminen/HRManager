@@ -16,12 +16,15 @@ import {
 import { useRouter } from "next/navigation";
 import { colors } from "@/muiStyles";
 import { Department } from "@/schemas";
+import { useTranslations } from "next-intl";
 
 interface EditableDepartmentsTableProps {
   departments: Department[];
 }
 
 const EditableDepartmentsTable: React.FC<EditableDepartmentsTableProps> = ({ departments }) => {
+  const t = useTranslations("departments");
+  const tc = useTranslations("common");
   const router = useRouter();
 
   const handleRowClick = (departmentId: string) => {
@@ -33,12 +36,12 @@ const EditableDepartmentsTable: React.FC<EditableDepartmentsTableProps> = ({ dep
       <Table sx={{ minWidth: 650, maxWidth: 1020 }} aria-label="departments table">
         <TableHead>
           <TableRow>
-            <TableCell>Name</TableCell>
-            <TableCell>Description</TableCell>
-            <TableCell>Head</TableCell>
-            <TableCell>Teams</TableCell>
-            <TableCell>Created At</TableCell>
-            <TableCell>Updated At</TableCell>
+            <TableCell>{tc("name")}</TableCell>
+            <TableCell>{t("description")}</TableCell>
+            <TableCell>{t("head")}</TableCell>
+            <TableCell>{t("teamsHeader")}</TableCell>
+            <TableCell>{tc("createdAt")}</TableCell>
+            <TableCell>{tc("updatedAt")}</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -46,13 +49,18 @@ const EditableDepartmentsTable: React.FC<EditableDepartmentsTableProps> = ({ dep
             <TableRow>
               <TableCell colSpan={6}>
                 <Box display="flex" justifyContent="center" alignItems="center" height="100px">
-                  <Typography align="center">No Departments Available</Typography>
+                  <Typography align="center">{t("noDepartments")}</Typography>
                 </Box>
               </TableCell>
             </TableRow>
           ) : (
             departments.map((dept) => (
-              <Tooltip key={dept.id} title={`Click to manage ${dept.name}`} placement="right" arrow>
+              <Tooltip
+                key={dept.id}
+                title={t("clickToManage", { name: dept.name })}
+                placement="right"
+                arrow
+              >
                 <TableRow
                   hover
                   onClick={() => handleRowClick(dept.id)}
@@ -64,14 +72,14 @@ const EditableDepartmentsTable: React.FC<EditableDepartmentsTableProps> = ({ dep
                   }}
                 >
                   <TableCell>{dept.name}</TableCell>
-                  <TableCell>{dept.description || "-"}</TableCell>
-                  <TableCell>{dept.headName || "No Head Assigned"}</TableCell>
+                  <TableCell>{dept.description || tc("dash")}</TableCell>
+                  <TableCell>{dept.headName || t("noHead")}</TableCell>
                   <TableCell>
                     <Box>
                       {dept.teams.length > 0
-                        ? dept.teams.map((t) => (
-                            <Typography key={t.teamId} variant="body2">
-                              {t.teamName}
+                        ? dept.teams.map((team) => (
+                            <Typography key={team.teamId} variant="body2">
+                              {team.teamName}
                             </Typography>
                           ))
                         : null}

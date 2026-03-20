@@ -17,6 +17,7 @@ import {
 } from "@mui/material";
 import { Department } from "@/schemas";
 import { colors } from "@/muiStyles";
+import { useTranslations } from "next-intl";
 
 interface DepartmentsTableProps {
   departments: Department[];
@@ -24,10 +25,12 @@ interface DepartmentsTableProps {
 }
 
 const DepartmentsTable: React.FC<DepartmentsTableProps> = ({ departments, minimal = false }) => {
+  const t = useTranslations("departments");
+  const tc = useTranslations("common");
   if (minimal) {
     return departments.length === 0 ? (
       <Typography sx={{ color: colors.slate400, textAlign: "center", py: 2 }}>
-        No Departments Available
+        {t("noDepartments")}
       </Typography>
     ) : (
       <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
@@ -71,18 +74,18 @@ const DepartmentsTable: React.FC<DepartmentsTableProps> = ({ departments, minima
       <Table sx={{ minWidth: 650, maxWidth: 1020 }} aria-label="departments table">
         <TableHead>
           <TableRow>
-            <TableCell>Name</TableCell>
-            <Tooltip title="A short summary of the department's purpose" placement="top" arrow>
-              <TableCell sx={{ cursor: "help" }}>Description</TableCell>
+            <TableCell>{tc("name")}</TableCell>
+            <Tooltip title={t("descriptionTooltip")} placement="top" arrow>
+              <TableCell sx={{ cursor: "help" }}>{t("description")}</TableCell>
             </Tooltip>
-            <Tooltip title="The person leading this department" placement="top" arrow>
-              <TableCell sx={{ cursor: "help" }}>Head</TableCell>
+            <Tooltip title={t("headTooltip")} placement="top" arrow>
+              <TableCell sx={{ cursor: "help" }}>{t("head")}</TableCell>
             </Tooltip>
-            <Tooltip title="Teams that belong to this department" placement="top" arrow>
-              <TableCell sx={{ cursor: "help" }}>Teams</TableCell>
+            <Tooltip title={t("teamsTooltip")} placement="top" arrow>
+              <TableCell sx={{ cursor: "help" }}>{t("teamsHeader")}</TableCell>
             </Tooltip>
-            <TableCell>Created At</TableCell>
-            <TableCell>Updated At</TableCell>
+            <TableCell>{tc("createdAt")}</TableCell>
+            <TableCell>{tc("updatedAt")}</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -90,7 +93,7 @@ const DepartmentsTable: React.FC<DepartmentsTableProps> = ({ departments, minima
             <TableRow>
               <TableCell colSpan={6}>
                 <Box display="flex" justifyContent="center" alignItems="center" height="100px">
-                  <Typography align="center">No Departments Available</Typography>
+                  <Typography align="center">{t("noDepartments")}</Typography>
                 </Box>
               </TableCell>
             </TableRow>
@@ -98,17 +101,17 @@ const DepartmentsTable: React.FC<DepartmentsTableProps> = ({ departments, minima
             departments.map((dept) => (
               <TableRow key={dept.id}>
                 <TableCell>{dept.name}</TableCell>
-                <TableCell>{dept.description || "-"}</TableCell>
-                <TableCell>{dept.headName || "No Head Assigned"}</TableCell>
+                <TableCell>{dept.description || tc("dash")}</TableCell>
+                <TableCell>{dept.headName || t("noHead")}</TableCell>
                 <TableCell>
                   <Box>
                     {dept.teams.length > 0
-                      ? dept.teams.map((t) => (
-                          <Typography key={t.teamId} variant="body2">
-                            {t.teamName}
+                      ? dept.teams.map((team) => (
+                          <Typography key={team.teamId} variant="body2">
+                            {team.teamName}
                           </Typography>
                         ))
-                      : "-"}
+                      : tc("dash")}
                   </Box>
                 </TableCell>
                 <TableCell>{new Date(dept.createdAt).toLocaleString()}</TableCell>

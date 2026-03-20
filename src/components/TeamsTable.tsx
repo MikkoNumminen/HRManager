@@ -16,6 +16,7 @@ import {
 } from "@mui/material";
 import { CombinedTeam } from "@/schemas";
 import { colors } from "@/muiStyles";
+import { useTranslations } from "next-intl";
 
 interface CombinedTeamProps {
   combinedTeams: CombinedTeam[];
@@ -23,10 +24,12 @@ interface CombinedTeamProps {
 }
 
 const TeamsTable: React.FC<CombinedTeamProps> = ({ combinedTeams, minimal = false }) => {
+  const t = useTranslations("teams");
+  const tc = useTranslations("common");
   if (minimal) {
     return combinedTeams.length === 0 ? (
       <Typography sx={{ color: colors.slate400, textAlign: "center", py: 2 }}>
-        No Teams Available
+        {t("noTeams")}
       </Typography>
     ) : (
       <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
@@ -70,11 +73,11 @@ const TeamsTable: React.FC<CombinedTeamProps> = ({ combinedTeams, minimal = fals
       <Table sx={{ minWidth: 650, maxWidth: 1020 }} aria-label="teams table">
         <TableHead>
           <TableRow>
-            <TableCell>Team Name</TableCell>
-            <TableCell>Team Manager</TableCell>
-            <TableCell>Team Members</TableCell>
-            <TableCell>Created At</TableCell>
-            <TableCell>Updated At</TableCell>
+            <TableCell>{t("teamName")}</TableCell>
+            <TableCell>{t("teamManager")}</TableCell>
+            <TableCell>{t("teamMembers")}</TableCell>
+            <TableCell>{tc("createdAt")}</TableCell>
+            <TableCell>{tc("updatedAt")}</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -82,7 +85,7 @@ const TeamsTable: React.FC<CombinedTeamProps> = ({ combinedTeams, minimal = fals
             <TableRow>
               <TableCell colSpan={5}>
                 <Box display="flex" justifyContent="center" alignItems="center" height="100px">
-                  <Typography align="center">No Teams Available</Typography>
+                  <Typography align="center">{t("noTeams")}</Typography>
                 </Box>
               </TableCell>
             </TableRow>
@@ -90,7 +93,7 @@ const TeamsTable: React.FC<CombinedTeamProps> = ({ combinedTeams, minimal = fals
             combinedTeams.map((team) => (
               <TableRow key={team.teamId}>
                 <TableCell>{team.teamName}</TableCell>
-                <TableCell>{team.managerName || "No Manager Assigned"}</TableCell>
+                <TableCell>{team.managerName || t("noManager")}</TableCell>
                 <TableCell>
                   <Box>
                     {team.members.map((member) => (

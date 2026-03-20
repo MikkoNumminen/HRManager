@@ -16,6 +16,7 @@ import {
 import { useRouter } from "next/navigation";
 import { colors } from "@/muiStyles";
 import { AppUser } from "@/schemas";
+import { useTranslations } from "next-intl";
 
 const roleColors: Record<string, string> = {
   superuser: "#f59e0b",
@@ -29,6 +30,8 @@ interface UserManagementTableProps {
 }
 
 const UserManagementTable: React.FC<UserManagementTableProps> = ({ users }) => {
+  const t = useTranslations("admin");
+  const tc = useTranslations("common");
   const router = useRouter();
 
   return (
@@ -36,10 +39,10 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({ users }) => {
       <Table sx={{ minWidth: 650, maxWidth: 1020 }} aria-label="user management table">
         <TableHead>
           <TableRow>
-            <TableCell>Name</TableCell>
-            <TableCell>Email</TableCell>
-            <TableCell>Role</TableCell>
-            <TableCell>Created At</TableCell>
+            <TableCell>{tc("name")}</TableCell>
+            <TableCell>{tc("email")}</TableCell>
+            <TableCell>{t("role")}</TableCell>
+            <TableCell>{tc("createdAt")}</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -47,7 +50,7 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({ users }) => {
             <TableRow>
               <TableCell colSpan={4}>
                 <Box display="flex" justifyContent="center" alignItems="center" height="100px">
-                  <Typography align="center">No Users Found</Typography>
+                  <Typography align="center">{t("noUsers")}</Typography>
                 </Box>
               </TableCell>
             </TableRow>
@@ -55,7 +58,7 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({ users }) => {
             users.map((user) => (
               <Tooltip
                 key={user.id}
-                title={`Click to manage permissions for ${user.name ?? user.email}`}
+                title={t("clickToManage", { name: user.name ?? user.email })}
                 placement="right"
                 arrow
               >
@@ -69,7 +72,7 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({ users }) => {
                     },
                   }}
                 >
-                  <TableCell>{user.name ?? "-"}</TableCell>
+                  <TableCell>{user.name ?? tc("dash")}</TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>
                     <Chip

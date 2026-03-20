@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import { Person } from "@/schemas";
 import { colors } from "@/muiStyles";
+import { useTranslations } from "next-intl";
 
 interface PersonTableProps {
   persons: Person[];
@@ -22,10 +23,12 @@ interface PersonTableProps {
 }
 
 const PersonTable: React.FC<PersonTableProps> = ({ persons, minimal = false }) => {
+  const t = useTranslations("persons");
+  const tc = useTranslations("common");
   if (minimal) {
     return persons.length === 0 ? (
       <Typography sx={{ color: colors.slate400, textAlign: "center", py: 2 }}>
-        No Persons Available
+        {t("noPersons")}
       </Typography>
     ) : (
       <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
@@ -69,11 +72,11 @@ const PersonTable: React.FC<PersonTableProps> = ({ persons, minimal = false }) =
       <Table sx={{ minWidth: 650, maxWidth: 1020 }} aria-label="person table">
         <TableHead>
           <TableRow>
-            <TableCell>Name</TableCell>
-            <TableCell>Position</TableCell>
-            <TableCell>Email</TableCell>
-            <TableCell>Created At</TableCell>
-            <TableCell>Updated At</TableCell>
+            <TableCell>{tc("name")}</TableCell>
+            <TableCell>{t("position")}</TableCell>
+            <TableCell>{tc("email")}</TableCell>
+            <TableCell>{tc("createdAt")}</TableCell>
+            <TableCell>{tc("updatedAt")}</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -81,7 +84,7 @@ const PersonTable: React.FC<PersonTableProps> = ({ persons, minimal = false }) =
             <TableRow>
               <TableCell colSpan={5}>
                 <Box display="flex" justifyContent="center" alignItems="center" height="100px">
-                  <Typography align="center">No Persons Available</Typography>
+                  <Typography align="center">{t("noPersons")}</Typography>
                 </Box>
               </TableCell>
             </TableRow>
