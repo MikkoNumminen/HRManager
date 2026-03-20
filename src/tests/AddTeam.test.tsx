@@ -51,6 +51,21 @@ describe("AddTeam Component", () => {
     });
   });
 
+  // Shows generic error message when createTeam throws a non-Error value.
+  test("shows generic error when createTeam throws non-Error", async () => {
+    (createTeam as jest.MockedFunction<typeof createTeam>).mockRejectedValue("string error");
+    render(<AddTeamForm />);
+
+    fireEvent.change(screen.getByLabelText(/Enter Team Name/i), {
+      target: { value: "Engineering" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /Create/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText("An error occurred")).toBeInTheDocument();
+    });
+  });
+
   test("shows error message when createTeam fails", async () => {
     (createTeam as jest.MockedFunction<typeof createTeam>).mockRejectedValue(
       new Error("Team already exists"),

@@ -360,6 +360,61 @@ describe("UserPermissionEditor", () => {
     });
   });
 
+  // Shows generic error message when updateUserRole throws a non-Error value.
+  test("shows generic error when role update throws non-Error", async () => {
+    (updateUserRole as jest.Mock).mockRejectedValue("string error");
+    render(
+      <UserPermissionEditor
+        user={baseUser}
+        allPermissionKeys={allKeys}
+        roleDefaults={roleDefaults}
+        canAssignPermissions={true}
+      />,
+    );
+
+    fireEvent.mouseDown(screen.getByRole("combobox"));
+    fireEvent.click(screen.getByRole("option", { name: /User/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Save Role/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText("An error occurred")).toBeInTheDocument();
+    });
+  });
+
+  // Shows generic error when permission update throws a non-Error value.
+  test("shows generic error when permission update throws non-Error", async () => {
+    (updateUserPermission as jest.Mock).mockRejectedValue("string error");
+    render(
+      <UserPermissionEditor
+        user={baseUser}
+        allPermissionKeys={allKeys}
+        roleDefaults={roleDefaults}
+        canAssignPermissions={true}
+      />,
+    );
+
+    const grantButtons = screen.getAllByRole("button", { name: /Grant/i });
+    fireEvent.click(grantButtons[grantButtons.length - 1]);
+
+    await waitFor(() => {
+      expect(screen.getByText("An error occurred")).toBeInTheDocument();
+    });
+  });
+
+  // Uses fallback color for unknown role values in the role chip.
+  test("renders fallback color for unknown role", () => {
+    const unknownRoleUser = { ...baseUser, role: "custom_role" };
+    render(
+      <UserPermissionEditor
+        user={unknownRoleUser}
+        allPermissionKeys={allKeys}
+        roleDefaults={roleDefaults}
+        canAssignPermissions={true}
+      />,
+    );
+    expect(screen.getByText("custom_role")).toBeInTheDocument();
+  });
+
   // Shows "Unknown" when user name is null
   test("shows Unknown when user name is null", () => {
     const nullNameUser = { ...baseUser, name: null as string | null };

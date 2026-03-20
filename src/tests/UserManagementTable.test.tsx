@@ -77,6 +77,21 @@ describe("UserManagementTable", () => {
     expect(screen.getByText("Created At")).toBeInTheDocument();
   });
 
+  // Uses fallback color for unknown role values in the role chip.
+  test("renders fallback color for unknown role", () => {
+    const unknownRoleUser: AppUser = {
+      id: "ddd-444",
+      email: "dave@example.com",
+      name: "Dave",
+      image: null,
+      role: "custom_role",
+      createdAt: new Date("2026-04-01"),
+      updatedAt: new Date("2026-04-01"),
+    };
+    render(<UserManagementTable users={[unknownRoleUser]} />);
+    expect(screen.getByText("custom_role")).toBeInTheDocument();
+  });
+
   // Clicking a user row should navigate to their admin detail page
   test("navigates to admin page when row is clicked", () => {
     mockPush.mockClear();

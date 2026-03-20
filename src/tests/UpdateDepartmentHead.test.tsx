@@ -108,6 +108,19 @@ describe("UpdateDepartmentHead Component", () => {
     });
   });
 
+  // Shows generic error message when updateDepartmentHead throws a non-Error value.
+  test("shows generic error when updateDepartmentHead throws non-Error", async () => {
+    (updateDepartmentHead as jest.Mock).mockRejectedValue("string error");
+    render(<UpdateDepartmentHeadForm departmentID={departmentID} persons={mockPersons} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Alice" }));
+    fireEvent.click(screen.getByRole("button", { name: /Set Head/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText("An error occurred")).toBeInTheDocument();
+    });
+  });
+
   // Hidden inputs contain the department ID and selected person ID.
   test("includes departmentID and personID as hidden inputs", () => {
     render(<UpdateDepartmentHeadForm departmentID={departmentID} persons={mockPersons} />);

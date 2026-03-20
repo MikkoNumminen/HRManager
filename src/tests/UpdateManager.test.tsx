@@ -69,6 +69,19 @@ describe("UpdateManager Component", () => {
     });
   });
 
+  // Shows generic error message when addManager throws a non-Error value.
+  test("shows generic error when addManager throws non-Error", async () => {
+    (addManager as jest.Mock).mockRejectedValue("string error");
+    render(<UpdateManagerForm teamID={teamID} persons={mockPersons} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Alice" }));
+    fireEvent.click(screen.getByRole("button", { name: /Add Manager/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText("An error occurred")).toBeInTheDocument();
+    });
+  });
+
   test("shows error message when addManager fails", async () => {
     (addManager as jest.Mock).mockRejectedValue(new Error("Manager assignment failed"));
     render(<UpdateManagerForm teamID={teamID} persons={mockPersons} />);

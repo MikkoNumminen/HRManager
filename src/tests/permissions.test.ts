@@ -99,6 +99,16 @@ describe("Permission Resolution", () => {
     expect(result["person:create"]).toBe(false);
   });
 
+  // Overrides with unknown keys are silently ignored (guard clause).
+  test("ignores overrides with keys not in PERMISSION_KEYS", async () => {
+    const overrides = [{ key: "fake:nonexistent", granted: true }];
+    const result = await resolvePermissions("user", overrides);
+
+    expect(result["person:read"]).toBe(true);
+    expect(result["person:create"]).toBe(false);
+    expect("fake:nonexistent" in result).toBe(false);
+  });
+
   // Unknown roles fall back to guest permissions
   test("unknown role falls back to guest defaults", async () => {
     const result = await resolvePermissions("nonexistent", []);

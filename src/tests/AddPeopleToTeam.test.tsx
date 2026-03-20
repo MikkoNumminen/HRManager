@@ -79,6 +79,19 @@ describe("AddPeopleToTeam Component", () => {
     });
   });
 
+  // Shows generic error message when addMember throws a non-Error value.
+  test("shows generic error when addMember throws non-Error", async () => {
+    (addMember as jest.Mock).mockRejectedValue("string error");
+    render(<AddPeopleToTeam teamID={teamID} persons={mockPersons} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Alice" }));
+    fireEvent.click(screen.getByRole("button", { name: /Add Member/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText("An error occurred")).toBeInTheDocument();
+    });
+  });
+
   test("shows error message when addMember fails", async () => {
     (addMember as jest.Mock).mockRejectedValue(new Error("Person is already a member"));
     render(<AddPeopleToTeam teamID={teamID} persons={mockPersons} />);

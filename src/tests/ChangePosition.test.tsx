@@ -59,6 +59,23 @@ describe("UpdatePosition Component", () => {
     expect(mockPush).toHaveBeenCalledWith("/managePersons");
   });
 
+  // Shows generic error message when updatePosition throws a non-Error value.
+  test("shows generic error when updatePosition throws non-Error", async () => {
+    (updatePosition as jest.MockedFunction<typeof updatePosition>).mockRejectedValue(
+      "string error",
+    );
+    render(<UpdatePositionForm personID={personID} />);
+
+    fireEvent.change(screen.getByLabelText(/Enter New Position/i), {
+      target: { value: "Senior Developer" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /Change/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText("An error occurred")).toBeInTheDocument();
+    });
+  });
+
   test("shows error message when updatePosition fails", async () => {
     (updatePosition as jest.MockedFunction<typeof updatePosition>).mockRejectedValue(
       new Error("Update failed"),

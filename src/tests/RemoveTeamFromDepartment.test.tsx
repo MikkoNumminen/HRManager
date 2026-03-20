@@ -83,6 +83,20 @@ describe("RemoveTeamFromDepartment Component", () => {
     });
   });
 
+  // Shows generic error message when removeTeamFromDepartment throws a non-Error value.
+  test("shows generic error when removeTeamFromDepartment throws non-Error", async () => {
+    (removeTeamFromDepartment as jest.Mock).mockRejectedValue("string error");
+    render(<RemoveTeamFromDepartmentForm currentTeams={mockTeams} />);
+
+    fireEvent.mouseDown(screen.getByLabelText(/Select Team/i));
+    fireEvent.click(screen.getByText("Frontend"));
+    fireEvent.click(screen.getByRole("button", { name: /Remove/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText("An error occurred")).toBeInTheDocument();
+    });
+  });
+
   // Hidden input for teamID exists.
   test("includes teamID as hidden input", () => {
     render(<RemoveTeamFromDepartmentForm currentTeams={mockTeams} />);

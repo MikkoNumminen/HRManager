@@ -86,6 +86,20 @@ describe("AssignTeamToDepartment Component", () => {
     });
   });
 
+  // Shows generic error message when assignTeamToDepartment throws a non-Error value.
+  test("shows generic error when assignTeamToDepartment throws non-Error", async () => {
+    (assignTeamToDepartment as jest.Mock).mockRejectedValue("string error");
+    render(<AssignTeamToDepartmentForm departmentID={departmentID} availableTeams={mockTeams} />);
+
+    fireEvent.mouseDown(screen.getByLabelText(/Select Team/i));
+    fireEvent.click(screen.getByText("Frontend"));
+    fireEvent.click(screen.getByRole("button", { name: /Assign/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText("An error occurred")).toBeInTheDocument();
+    });
+  });
+
   // Hidden inputs contain the department ID and selected team ID.
   test("includes departmentID as hidden input", () => {
     render(<AssignTeamToDepartmentForm departmentID={departmentID} availableTeams={mockTeams} />);

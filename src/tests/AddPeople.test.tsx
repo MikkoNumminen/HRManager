@@ -79,6 +79,24 @@ describe("AddPerson Component", () => {
     expect((emailInput as HTMLInputElement).value).toBe("");
   });
 
+  // Shows generic error message when createPerson throws a non-Error value.
+  test("shows generic error when createPerson throws non-Error", async () => {
+    (createPerson as jest.MockedFunction<typeof createPerson>).mockRejectedValue("string error");
+    render(<AddPersonForm />);
+
+    fireEvent.change(screen.getByLabelText(/Enter Name/i), {
+      target: { value: "John Doe" },
+    });
+    fireEvent.change(screen.getByLabelText(/Enter Email/i), {
+      target: { value: "john@example.com" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /Create/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText("An error occurred")).toBeInTheDocument();
+    });
+  });
+
   test("shows error message when createPerson fails", async () => {
     (createPerson as jest.MockedFunction<typeof createPerson>).mockRejectedValue(
       new Error("A person with this email already exists"),

@@ -70,6 +70,19 @@ describe("RemoveDepartment Component", () => {
     });
   });
 
+  // Shows generic error message when removeDepartment throws a non-Error value.
+  test("shows generic error when removeDepartment throws non-Error", async () => {
+    (removeDepartment as jest.Mock).mockRejectedValue("string error");
+    render(<RemoveDepartmentForm departmentID={departmentID} />);
+
+    fireEvent.click(screen.getByRole("button", { name: /^Remove$/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^Remove$/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText("An error occurred")).toBeInTheDocument();
+    });
+  });
+
   // The hidden input contains the department ID.
   test("includes departmentID as hidden input", () => {
     render(<RemoveDepartmentForm departmentID={departmentID} />);

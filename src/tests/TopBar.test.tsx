@@ -488,6 +488,37 @@ describe("TopBar", () => {
     expect(() => fireEvent.click(screen.getByText("User Management"))).not.toThrow();
   });
 
+  // Clicking the backdrop triggers the Menu onClose callback without error.
+  test("menu onClose callback runs without error", () => {
+    mockUseSession.mockReturnValue({
+      data: { user: { name: "Alice", email: "a@b.com", image: null } },
+      status: "authenticated",
+    });
+    const { baseElement } = render(<TopBar title="Home" />);
+    fireEvent.click(screen.getByLabelText("User menu"));
+    expect(screen.getByText("Sign out")).toBeInTheDocument();
+    // MUI Menu renders a backdrop — clicking it triggers the onClose handler
+    const backdrop = baseElement.querySelector(".MuiBackdrop-root") as HTMLElement;
+    expect(() => fireEvent.click(backdrop)).not.toThrow();
+  });
+
+  // Clicking the backdrop triggers the seed Dialog onClose callback without error.
+  test("seed dialog onClose callback runs without error", () => {
+    mockUseSession.mockReturnValue({
+      data: { user: { name: "Alice", email: "a@b.com", image: null } },
+      status: "authenticated",
+    });
+    const permissions = { "data:seed": true } as never;
+    const { baseElement } = render(<TopBar title="Home" permissions={permissions} />);
+    fireEvent.click(screen.getByLabelText("User menu"));
+    fireEvent.click(screen.getByText("Load Mock Data"));
+    expect(screen.getByText("Keep Existing")).toBeInTheDocument();
+    // MUI Dialog renders a backdrop — clicking it triggers the onClose handler
+    const backdrops = baseElement.querySelectorAll(".MuiBackdrop-root");
+    const dialogBackdrop = backdrops[backdrops.length - 1] as HTMLElement;
+    expect(() => fireEvent.click(dialogBackdrop)).not.toThrow();
+  });
+
   // Audit Log menu item click handler runs without error.
   test("Audit Log click handler runs without error", () => {
     mockUseSession.mockReturnValue({

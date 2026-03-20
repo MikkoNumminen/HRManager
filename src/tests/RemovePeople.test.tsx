@@ -58,6 +58,19 @@ describe("Remove People", () => {
     expect(mockPush).toHaveBeenCalledWith("/managePersons");
   });
 
+  // Shows generic error message when removePerson throws a non-Error value.
+  test("shows generic error when removePerson throws non-Error", async () => {
+    (removePerson as jest.MockedFunction<typeof removePerson>).mockRejectedValue("string error");
+    render(<RemovePersonForm personID={personID} />);
+
+    fireEvent.click(screen.getByRole("button", { name: /^Remove$/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^Remove$/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText("An error occurred")).toBeInTheDocument();
+    });
+  });
+
   test("shows error message when removePerson fails", async () => {
     (removePerson as jest.MockedFunction<typeof removePerson>).mockRejectedValue(
       new Error("Removal failed"),

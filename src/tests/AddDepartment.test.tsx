@@ -77,6 +77,21 @@ describe("AddDepartment Component", () => {
     });
   });
 
+  // Shows generic error message when createDepartment throws a non-Error value.
+  test("shows generic error when createDepartment throws non-Error", async () => {
+    (createDepartment as jest.Mock).mockRejectedValue("string error");
+    render(<AddDepartmentForm />);
+
+    fireEvent.change(screen.getByLabelText(/Enter Department Name/i), {
+      target: { value: "Engineering" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /Create/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText("An error occurred")).toBeInTheDocument();
+    });
+  });
+
   // Clears form fields after successful submission.
   test("clears fields after successful submission", async () => {
     (createDepartment as jest.Mock).mockResolvedValue(undefined);
