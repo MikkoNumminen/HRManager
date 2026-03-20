@@ -27,6 +27,7 @@ jobs:
 
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/hrmanager_test
+      DIRECT_URL: postgresql://postgres:postgres@localhost:5432/hrmanager_test
 
     steps:
       - name: Checkout code
