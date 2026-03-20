@@ -12,6 +12,8 @@ A full-stack HR management system for managing employees, teams, and departments
 ![Jest](https://img.shields.io/badge/Tested_with-Jest_30-C21325?style=flat-square&logo=jest)
 ![Prettier](https://img.shields.io/badge/Formatted_with-Prettier-F7B93E?style=flat-square&logo=prettier)
 
+### **[Try the live demo](https://hr-manager-pearl.vercel.app)** — click "Try Demo" to sign in instantly as an administrator, no account required.
+
 ---
 
 ## Features
@@ -261,10 +263,6 @@ Coverage summary (combined client + server suites)
 Highlights: `auditLog.ts`, `permissions.ts`, `queries.ts`, `schemas.ts`, and `serverActions.ts` at 97–100% line coverage. Server-side tests run against an isolated PostgreSQL test database (`hrmanager_test`) — the dev database is never touched.
 
 ---
-
-## Live demo
-
-The app is deployed at **[hr-manager-pearl.vercel.app](https://hr-manager-pearl.vercel.app)**. Click **Try Demo** to sign in instantly as an administrator — no account required.
 
 ## Deployment
 
