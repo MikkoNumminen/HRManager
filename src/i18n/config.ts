@@ -1,0 +1,66 @@
+export const locales = [
+  "en",
+  "fi",
+  "sv",
+  "de",
+  "fr",
+  "es",
+  "pt",
+  "pl",
+  "ru",
+  "uk",
+  "ar",
+  "hi",
+  "ja",
+  "zh",
+  "ko",
+  "th",
+  "sw",
+  "tr",
+] as const;
+
+export type Locale = (typeof locales)[number];
+
+export const defaultLocale: Locale = "fi";
+
+export const localeNames: Record<Locale, string> = {
+  en: "English",
+  fi: "Suomi",
+  sv: "Svenska",
+  de: "Deutsch",
+  fr: "Fran\u00e7ais",
+  es: "Espa\u00f1ol",
+  pt: "Portugu\u00eas",
+  pl: "Polski",
+  ru: "\u0420\u0443\u0441\u0441\u043a\u0438\u0439",
+  uk: "\u0423\u043a\u0440\u0430\u0457\u043d\u0441\u044c\u043a\u0430",
+  ar: "\u0627\u0644\u0639\u0631\u0628\u064a\u0629",
+  hi: "\u0939\u093f\u0928\u094d\u0926\u0940",
+  ja: "\u65e5\u672c\u8a9e",
+  zh: "\u4e2d\u6587",
+  ko: "\ud55c\uad6d\uc5b4",
+  th: "\u0e44\u0e17\u0e22",
+  sw: "Kiswahili",
+  tr: "T\u00fcrk\u00e7e",
+};
+
+export const localeFlags: Record<Locale, string> = {
+  en: "\ud83c\uddec\ud83c\udde7",
+  fi: "\ud83c\uddeb\ud83c\uddee",
+  sv: "\ud83c\uddf8\ud83c\uddea",
+  de: "\ud83c\udde9\ud83c\uddea",
+  fr: "\ud83c\uddeb\ud83c\uddf7",
+  es: "\ud83c\uddea\ud83c\uddf8",
+  pt: "\ud83c\udde7\ud83c\uddf7",
+  pl: "\ud83c\uddf5\ud83c\uddf1",
+  ru: "\ud83c\uddf7\ud83c\uddfa",
+  uk: "\ud83c\uddfa\ud83c\udde6",
+  ar: "\ud83c\uddf8\ud83c\udde6",
+  hi: "\ud83c\uddee\ud83c\uddf3",
+  ja: "\ud83c\uddef\ud83c\uddf5",
+  zh: "\ud83c\udde8\ud83c\uddf3",
+  ko: "\ud83c\uddf0\ud83c\uddf7",
+  th: "\ud83c\uddf9\ud83c\udded",
+  sw: "\ud83c\uddf9\ud83c\uddff",
+  tr: "\ud83c\uddf9\ud83c\uddf7",
+};

@@ -24,7 +24,9 @@ import { useSession, signIn, signOut } from "next-auth/react";
 import { useRef, useState, useTransition } from "react";
 import { resetAll, seedMockData } from "@/serverActions";
 import ConfirmDialog from "./ConfirmDialog";
+import LanguageSwitcher from "./LanguageSwitcher";
 import { Permissions } from "@/schemas";
+import { useTranslations } from "next-intl";
 
 interface TopBarProps {
   title: string;
@@ -33,6 +35,8 @@ interface TopBarProps {
 }
 
 export default function TopBar({ title, backHref, permissions }: TopBarProps) {
+  const t = useTranslations("topBar");
+  const tc = useTranslations("common");
   const { data: session } = useSession();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
@@ -62,7 +66,7 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
       try {
         await seedMockData(clearExisting);
       } catch (e) {
-        setError(e instanceof Error ? e.message : "An error occurred");
+        setError(e instanceof Error ? e.message : tc("error"));
       }
     });
   };
@@ -90,7 +94,7 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
             <IconButton
               component={Link}
               href={backHref}
-              aria-label="Go back"
+              aria-label={tc("goBack")}
               sx={{
                 position: "absolute",
                 left: 4,
@@ -109,9 +113,10 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
               {error}
             </Typography>
           )}
+          <LanguageSwitcher />
           {user ? (
             <>
-              <IconButton onClick={(e) => setAnchorEl(e.currentTarget)} aria-label="User menu">
+              <IconButton onClick={(e) => setAnchorEl(e.currentTarget)} aria-label={t("userMenu")}>
                 <Avatar src={user.image ?? undefined} alt={user.name ?? "User"} sx={avatarStyles}>
                   {!user.image && initials}
                 </Avatar>
@@ -140,7 +145,7 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
                     onClick={() => setAnchorEl(null)}
                     sx={userMenuItemStyles}
                   >
-                    User Management
+                    {t("userManagement")}
                   </MenuItem>
                 )}
                 {session?.user?.permissions?.["admin:view_audit_log"] && (
@@ -150,7 +155,7 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
                     onClick={() => setAnchorEl(null)}
                     sx={userMenuItemStyles}
                   >
-                    Audit Log
+                    {t("auditLog")}
                   </MenuItem>
                 )}
                 {canSeed && (
@@ -162,7 +167,7 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
                     }}
                     sx={userMenuItemStyles}
                   >
-                    Load Mock Data
+                    {t("loadMockData")}
                   </MenuItem>
                 )}
                 {canReset && (
@@ -174,7 +179,7 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
                     }}
                     sx={{ ...userMenuItemStyles, color: "#f87171" }}
                   >
-                    Reset All Data
+                    {t("resetAllData")}
                   </MenuItem>
                 )}
                 <Divider sx={{ borderColor: colors.slate300 }} />
@@ -185,7 +190,7 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
                   }}
                   sx={userMenuItemStyles}
                 >
-                  Sign out
+                  {t("signOut")}
                 </MenuItem>
               </Menu>
             </>
@@ -201,7 +206,7 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
                   "&:hover": { backgroundColor: colors.hoverOverlay },
                 }}
               >
-                Try Demo
+                {t("tryDemo")}
               </Button>
               <Button
                 onClick={() => signIn()}
@@ -213,7 +218,7 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
                   "&:hover": { backgroundColor: colors.hoverOverlay },
                 }}
               >
-                Sign in
+                {t("signIn")}
               </Button>
             </Box>
           )}
@@ -228,7 +233,7 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
             await resetAll();
             setError(null);
           } catch (e) {
-            setError(e instanceof Error ? e.message : "An error occurred");
+            setError(e instanceof Error ? e.message : tc("error"));
           }
         }}
         ref={formRef}
@@ -237,9 +242,9 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
 
       <ConfirmDialog
         open={resetDialogOpen}
-        title="Reset All Data"
-        message="Are you sure you want to delete all persons and teams? This action cannot be undone."
-        confirmLabel="Reset All"
+        title={t("resetTitle")}
+        message={t("resetMessage")}
+        confirmLabel={t("resetConfirm")}
         onConfirm={() => {
           setResetDialogOpen(false);
           formRef.current?.requestSubmit();
@@ -260,15 +265,13 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
           },
         }}
       >
-        <DialogTitle sx={{ color: colors.slate100 }}>Load Mock Data</DialogTitle>
+        <DialogTitle sx={{ color: colors.slate100 }}>{t("seedTitle")}</DialogTitle>
         <DialogContent>
-          <DialogContentText sx={{ color: colors.slate400 }}>
-            Do you want to keep your existing data or replace it with mock data?
-          </DialogContentText>
+          <DialogContentText sx={{ color: colors.slate400 }}>{t("seedMessage")}</DialogContentText>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
           <Button onClick={() => setSeedDialogOpen(false)} sx={{ color: colors.slate300 }}>
-            Cancel
+            {tc("cancel")}
           </Button>
           <Button
             onClick={() => handleSeed(false)}
@@ -277,7 +280,7 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
               "&:hover": { backgroundColor: colors.hoverOverlay },
             }}
           >
-            Keep Existing
+            {t("keepExisting")}
           </Button>
           <Button
             onClick={() => handleSeed(true)}
@@ -286,7 +289,7 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
               "&:hover": { backgroundColor: "rgba(248, 113, 113, 0.1)" },
             }}
           >
-            Replace All
+            {t("replaceAll")}
           </Button>
         </DialogActions>
       </Dialog>

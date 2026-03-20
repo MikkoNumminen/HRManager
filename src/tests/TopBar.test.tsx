@@ -3,6 +3,26 @@ import TopBar from "../components/TopBar";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { seedMockData } from "../serverActions";
 
+// Mock next-intl to return English translations (avoids ESM import error)
+jest.mock("next-intl", () => {
+  const en = require("../../messages/en.json");
+  return {
+    useTranslations: (namespace: string) => {
+      const messages = (en as Record<string, Record<string, string>>)[namespace] || {};
+      return (key: string, params?: Record<string, string>) => {
+        let msg = messages[key] || key;
+        if (params) {
+          Object.entries(params).forEach(([k, v]) => {
+            msg = msg.replace(`{${k}}`, v);
+          });
+        }
+        return msg;
+      };
+    },
+    useLocale: () => "en",
+  };
+});
+
 jest.mock("next/navigation", () => ({
   useRouter: jest.fn(),
 }));
