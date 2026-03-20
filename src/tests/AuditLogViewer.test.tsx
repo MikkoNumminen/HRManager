@@ -547,4 +547,129 @@ describe("AuditLogViewer", () => {
       screen.getAllByText("Granted a user the ability to custom:action").length,
     ).toBeGreaterThan(0);
   });
+
+  // Describes removing a team from a department (departmentId set to null).
+  test("describes removing team from department", () => {
+    const log = makelog({
+      action: "update",
+      entityType: "team",
+      before: '{"departmentId":"dept-123"}',
+      after: '{"departmentId":null}',
+    });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(screen.getAllByText("Removed team from department").length).toBeGreaterThan(0);
+  });
+
+  // Describes assigning a team to a department (departmentId set to a value).
+  test("describes assigning team to department", () => {
+    const log = makelog({
+      action: "update",
+      entityType: "team",
+      before: '{"departmentId":null}',
+      after: '{"departmentId":"dept-456"}',
+    });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(screen.getAllByText("Assigned team to a department").length).toBeGreaterThan(0);
+  });
+
+  // Describes removing the department head (headId set to null).
+  test("describes removing department head", () => {
+    const log = makelog({
+      action: "update",
+      entityType: "department",
+      before: '{"headId":"person-123"}',
+      after: '{"headId":null}',
+    });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(screen.getAllByText("Removed the department head").length).toBeGreaterThan(0);
+  });
+
+  // Describes changing the department head (headId set to a new value).
+  test("describes changing department head", () => {
+    const log = makelog({
+      action: "update",
+      entityType: "department",
+      before: '{"headId":"person-123"}',
+      after: '{"headId":"person-456"}',
+    });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(screen.getAllByText("Changed the department head").length).toBeGreaterThan(0);
+  });
+
+  // Describes renaming a department.
+  test("describes renaming a department", () => {
+    const log = makelog({
+      action: "update",
+      entityType: "department",
+      before: '{"name":"Old Name"}',
+      after: '{"name":"New Name"}',
+    });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(
+      screen.getAllByText('Renamed department from "Old Name" to "New Name"').length,
+    ).toBeGreaterThan(0);
+  });
+
+  // Shows generic department update message when name is unchanged.
+  test("describes generic department update", () => {
+    const log = makelog({
+      action: "update",
+      entityType: "department",
+      before: '{"description":"old"}',
+      after: '{"description":"new"}',
+    });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(screen.getAllByText("Updated department details").length).toBeGreaterThan(0);
+  });
+
+  // Describes department creation in plain language.
+  test("describes department creation", () => {
+    const log = makelog({
+      action: "create",
+      entityType: "department",
+      after: '{"name":"Finance"}',
+    });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(screen.getAllByText("Created a new department: Finance").length).toBeGreaterThan(0);
+  });
+
+  // Describes department deletion in plain language.
+  test("describes department deletion", () => {
+    const log = makelog({
+      action: "delete",
+      entityType: "department",
+      before: '{"name":"Marketing"}',
+      after: null,
+    });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(screen.getAllByText("Deleted department: Marketing").length).toBeGreaterThan(0);
+  });
+
+  // Changing page via pagination navigates with updated page param.
+  test("navigates when page is changed via pagination", () => {
+    const logs = [makelog()];
+    render(<AuditLogViewer logs={logs} {...defaultProps} total={50} />);
+    // MUI TablePagination renders next page button
+    const nextPageButton = screen.getByLabelText("Go to next page");
+    fireEvent.click(nextPageButton);
+    expect(mockPush).toHaveBeenCalledWith(expect.stringContaining("page=2"));
+  });
+
+  // Changing rows per page navigates with updated pageSize param and resets to page 1.
+  test("navigates when rows per page is changed", () => {
+    const logs = [makelog()];
+    const { container } = render(
+      <AuditLogViewer logs={logs} {...defaultProps} total={50} pageSize={10} />,
+    );
+    // MUI v7 TablePagination renders an input with role="combobox" for rows-per-page
+    // It's the last combobox after the filter selects; find it by the pagination wrapper
+    const paginationRoot = container.querySelector(".MuiTablePagination-root");
+    const rowsInput = paginationRoot?.querySelector('[role="combobox"]') as HTMLElement;
+    // MUI Select: open the dropdown, then pick the option
+    fireEvent.mouseDown(rowsInput);
+    const option50 = screen.getByRole("option", { name: "50" });
+    fireEvent.click(option50);
+    expect(mockPush).toHaveBeenCalledWith(expect.stringContaining("pageSize=50"));
+    expect(mockPush).toHaveBeenCalledWith(expect.stringContaining("page=1"));
+  });
 });
