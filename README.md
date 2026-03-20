@@ -60,7 +60,7 @@ Required variables:
 
 | Variable             | Description                  |
 | -------------------- | ---------------------------- |
-| `DATABASE_URL`       | Prisma database URL          |
+| `DATABASE_URL`       | PostgreSQL connection string |
 | `AUTH_SECRET`        | NextAuth secret (random key) |
 | `AUTH_GOOGLE_ID`     | Google OAuth client ID       |
 | `AUTH_GOOGLE_SECRET` | Google OAuth client secret   |
@@ -79,11 +79,20 @@ npx auth secret
 
 ### 3. Set up the database
 
+Install PostgreSQL locally, then create the dev and test databases:
+
 ```bash
-npx prisma migrate dev --name init
+createdb hrmanager_dev
+createdb hrmanager_test
 ```
 
-> This creates the SQLite database file (`prisma/dev.db`) and builds all the tables according to the schema in `prisma/schema.prisma`. It also generates the Prisma client — the type-safe query builder the app uses to talk to the database. You only need to run this once on a fresh clone, or again whenever the schema changes.
+Apply the schema migrations:
+
+```bash
+npx prisma migrate dev
+```
+
+> This connects to the PostgreSQL database specified in `DATABASE_URL` and applies all migrations from `prisma/migrations/`. It also generates the Prisma client — the type-safe query builder the app uses to talk to the database. You only need to run this once on a fresh clone, or again whenever the schema changes.
 
 ---
 
@@ -103,11 +112,11 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ```bash
 npm test            # UI + schema tests (jsdom)
-npm run test:server # query + server action tests (Node, real SQLite)
+npm run test:server # query + server action tests (Node, real PostgreSQL)
 npm run test:all    # both suites
 ```
 
-> The project has **533 tests** split into two suites. `npm test` runs the client-side tests — component rendering, user interactions, form validation, Zod schema parsing, and RBAC permission resolution — all in a jsdom environment. `npm run test:server` runs the server-side tests against a real SQLite test database — every Prisma query, every server action mutation (including admin role/permission management and department operations), audit log creation, audit log queries, UUID validation, duplicate prevention, and cascade deletes. The test database (`prisma/test.db`) is created automatically the first time you run it and never touches your dev data.
+> The project has **533 tests** split into two suites. `npm test` runs the client-side tests — component rendering, user interactions, form validation, Zod schema parsing, and RBAC permission resolution — all in a jsdom environment. `npm run test:server` runs the server-side tests against a real PostgreSQL test database — every Prisma query, every server action mutation (including admin role/permission management and department operations), audit log creation, audit log queries, UUID validation, duplicate prevention, and cascade deletes. The test database (`hrmanager_test`) is separate from the dev database and never touches your dev data. Configure its connection string in `.env.test`.
 
 ---
 
@@ -130,7 +139,7 @@ npm run format
 | Component library | MUI v7 (Material UI)                         |
 | Language          | TypeScript 5.9                               |
 | ORM               | Prisma 6 (`relationLoadStrategy: 'join'`)    |
-| Database          | SQLite (dev)                                 |
+| Database          | PostgreSQL (Vercel Postgres in production)   |
 | Validation        | Zod 4                                        |
 | Auth              | NextAuth v5 (JWT, Google + GitHub OAuth)     |
 | Testing           | Jest 30 + React Testing Library              |
@@ -235,7 +244,7 @@ Individual permissions can be overridden per-user through the admin UI — for e
 | Layer              | Tests | What's covered                                                                                                                                                                                                                                                                                                  |
 | ------------------ | ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Zod schemas**    | 71    | PersonSchema, TeamSchema, TeamMemberSchema, DepartmentSchema, DepartmentTeamSchema, UserSchema, PermissionsSchema, AuditLogSchema, AuditLogFilterSchema, AuditActionSchema, AuditEntityTypeSchema — valid data, missing fields, invalid UUIDs, nullable fields, wrong types, enum validation                    |
-| **Prisma queries** | 37    | `getPersons`, `getTeams`, `getDepartments`, `getUsers`, `getUserById`, `getAllPermissionKeys`, `getAuditLogs`, `getAuditLogUserEmails` against real SQLite — filtering, pagination, ordering, empty state, distinct emails, department relations                                                                |
+| **Prisma queries** | 37    | `getPersons`, `getTeams`, `getDepartments`, `getUsers`, `getUserById`, `getAllPermissionKeys`, `getAuditLogs`, `getAuditLogUserEmails` against real PostgreSQL — filtering, pagination, ordering, empty state, distinct emails, department relations                                                            |
 | **Server actions** | 96    | All 20 mutations — CRUD for persons/teams/members/departments, department head assignment, team-department assignment, admin role updates, permission override grant/deny/reset, mock data seeding, UUID validation, duplicate prevention, cascade deletes, superuser protection, idempotent seed with upserts  |
 | **Audit logging**  | 6     | `logAudit` — user info capture, null user (unauthenticated), JSON serialization of before/after, undefined handling, null entityId, transaction client usage                                                                                                                                                    |
 | **RBAC logic**     | 27    | `resolvePermissions`, `getCurrentUser`, `getUserPermissions`, `hasPermission`, `requirePermission`, `seedPermissions` — superuser immunity, role defaults, grant/deny overrides, session lookup, unauthenticated fallback, permission seeding                                                                   |
@@ -249,13 +258,15 @@ Coverage summary (combined client + server suites)
   Lines      : 94.86%
 ```
 
-Highlights: `auditLog.ts`, `permissions.ts`, `queries.ts`, `schemas.ts`, and `serverActions.ts` at 97–100% line coverage. Server-side tests run against an isolated test database (`prisma/test.db`) — the dev database is never touched.
+Highlights: `auditLog.ts`, `permissions.ts`, `queries.ts`, `schemas.ts`, and `serverActions.ts` at 97–100% line coverage. Server-side tests run against an isolated PostgreSQL test database (`hrmanager_test`) — the dev database is never touched.
 
 ---
 
-## Roadmap
+## Deployment
 
-- Cloud deployment (AWS Fargate + RDS)
+The app is deployed on **Vercel** with **Vercel Postgres** (Neon). The build script runs `prisma generate && prisma migrate deploy && next build` — migrations are applied automatically on every deployment.
+
+The first user to sign in via OAuth is bootstrapped as the superuser.
 
 ---
 

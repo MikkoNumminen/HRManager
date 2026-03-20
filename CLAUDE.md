@@ -17,7 +17,7 @@ This is a **portfolio / showcase project**. The goal is to demonstrate technical
 | UI         | React 19 + MUI v7 — dark theme throughout, no Tailwind         |
 | Language   | TypeScript 5.9                                                 |
 | ORM        | Prisma 6 (`relationLoadStrategy: 'join'`)                      |
-| Database   | SQLite (dev), `prisma/dev.db` (not committed)                  |
+| Database   | PostgreSQL (local dev + Vercel Postgres in production)         |
 | Validation | Zod 4                                                          |
 | Auth       | NextAuth v5 (JWT strategy, Google + GitHub OAuth)              |
 | Testing    | Jest 30 + React Testing Library                                |
@@ -38,7 +38,7 @@ This is a **portfolio / showcase project**. The goal is to demonstrate technical
 - **Guest mode**: unauthenticated users see read-only minimal views (MUI Chips) of Persons, Departments, and Teams on the main page. Manage routes (`/managePersons`, `/manageDepartments`, `/manageTeams`) redirect to `/`.
 - **TopBar** — the user avatar dropdown menu contains: User Management, Audit Log (permission-gated), Load Mock Data, Reset All Data (permission-gated), and Sign Out. The `permissions` prop must be passed on every page so all menu items are available everywhere.
 - **Client-heavy rendering**: Keep the server thin — it handles only data fetching, auth, and validation. All rendering logic, UI state, filtering, sorting, and heavy computation belong in Client Components so the server stays lightweight and responsive. Security-sensitive logic (auth checks, input sanitization, access control, database queries) must always remain server-side — never trust the client for authorization or data integrity.
-- **SQLite single-writer constraint** — SQLite cannot handle concurrent write transactions. Never nest `$transaction` calls. In `seedMockData`, separate transactions run sequentially (main data → cleanup → `seedPermissions()` → user creation) to avoid deadlock.
+- **Transaction nesting** — never nest `$transaction` calls. In `seedMockData`, separate transactions run sequentially (main data → cleanup → `seedPermissions()` → user creation) to avoid deadlock.
 
 ## File structure
 
@@ -104,6 +104,6 @@ prisma/
 - **Every new schema, component, or module must have corresponding tests.** Never leave new code untested — if you add it, you test it.
 - **Always aim for maximum coverage.** There is no reason to hold back — add as many tests as needed to cover every branch, edge case, and interaction. This is a portfolio project; comprehensive test coverage is a strength, not over-engineering.
 
-## Roadmap (do not implement unless asked)
+## Deployment
 
-- Cloud deployment (AWS Fargate + RDS)
+Deployed on **Vercel** with **Vercel Postgres** (Neon). Build script: `prisma generate && prisma migrate deploy && next build`.
