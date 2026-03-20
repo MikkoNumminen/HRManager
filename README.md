@@ -32,7 +32,7 @@ A full-stack HR management system for managing employees, teams, and departments
 - **Type-safe** — end-to-end TypeScript with Zod schema validation and centralized inferred types
 - **Server-first** — async Server Components for data fetching, Server Actions for mutations inside `$transaction` blocks
 - **CI/CD** — GitHub Actions pipeline runs formatting, linting, full test suite with coverage, and production build on every push and PR
-- **Thoroughly tested** — 572 Jest tests across seven layers with 99%+ line coverage: Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, audit logging, and all UI components
+- **Thoroughly tested** — 593 Jest tests across seven layers with 100% line and function coverage: Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, audit logging, and all UI components
 
 ---
 
@@ -118,7 +118,7 @@ npm run test:server # query + server action tests (Node, real PostgreSQL)
 npm run test:all    # both suites
 ```
 
-> The project has **536 tests** split into two suites. `npm test` runs the client-side tests — component rendering, user interactions, form validation, Zod schema parsing, and RBAC permission resolution — all in a jsdom environment. `npm run test:server` runs the server-side tests against a real PostgreSQL test database — every Prisma query, every server action mutation (including admin role/permission management and department operations), audit log creation, audit log queries, UUID validation, duplicate prevention, and cascade deletes. The test database (`hrmanager_test`) is separate from the dev database and never touches your dev data. Configure its connection string in `.env.test`.
+> The project has **593 tests** split into two suites. `npm test` runs the client-side tests — component rendering, user interactions, form validation, Zod schema parsing, and RBAC permission resolution — all in a jsdom environment. `npm run test:server` runs the server-side tests against a real PostgreSQL test database — every Prisma query, every server action mutation (including admin role/permission management and department operations), audit log creation, audit log queries, UUID validation, duplicate prevention, and cascade deletes. The test database (`hrmanager_test`) is separate from the dev database and never touches your dev data. Configure its connection string in `.env.test`.
 
 ---
 
@@ -241,27 +241,27 @@ Individual permissions can be overridden per-user through the admin UI — for e
 
 ## Testing
 
-572 tests across 37 test suites, covering every layer of the application:
+593 tests across 37 test suites, covering every layer of the application:
 
-| Layer              | Tests | What's covered                                                                                                                                                                                                                                                                                                                                    |
-| ------------------ | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Zod schemas**    | 71    | PersonSchema, TeamSchema, TeamMemberSchema, DepartmentSchema, DepartmentTeamSchema, UserSchema, PermissionsSchema, AuditLogSchema, AuditLogFilterSchema, AuditActionSchema, AuditEntityTypeSchema — valid data, missing fields, invalid UUIDs, nullable fields, wrong types, enum validation                                                      |
-| **Prisma queries** | 38    | `getPersons`, `getTeams`, `getDepartments`, `getUsers`, `getUserById`, `getAllPermissionKeys`, `getAuditLogs`, `getAuditLogUserEmails` against real PostgreSQL — filtering, pagination, ordering, date range filtering, empty state, distinct emails, department relations                                                                        |
-| **Server actions** | 98    | All 20 mutations — CRUD for persons/teams/members/departments, department head assignment, team-department assignment, admin role updates, permission override grant/deny/reset, mock data seeding with permission overrides, UUID validation, duplicate prevention, cascade deletes, superuser protection, idempotent seed                       |
-| **Auth callbacks** | 19    | NextAuth signIn/jwt/session callbacks and demo Credentials provider — user creation on first sign-in, superuser bootstrapping, duplicate prevention, JWT enrichment with role and permissions, permission overrides, session hydration, demo user creation and reuse                                                                              |
-| **Audit logging**  | 6     | `logAudit` — user info capture, null user (unauthenticated), JSON serialization of before/after, undefined handling, null entityId, transaction client usage                                                                                                                                                                                      |
-| **RBAC logic**     | 27    | `resolvePermissions`, `getCurrentUser`, `getUserPermissions`, `hasPermission`, `requirePermission`, `seedPermissions` — superuser immunity, role defaults, grant/deny overrides, session lookup, unauthenticated fallback, permission seeding                                                                                                     |
-| **UI components**  | 312   | All 32 components — rendering, user interactions, keyboard accessibility, form validation, permission-based visibility, role chips, selection cards, minimal/chip/full views, empty states, router navigation, admin menu links, audit log filtering and pagination, reset/seed dialogs, department management, demo login button, error handling |
+| Layer              | Tests | What's covered                                                                                                                                                                                                                                                                                                                                                                                     |
+| ------------------ | ----- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Zod schemas**    | 71    | PersonSchema, TeamSchema, TeamMemberSchema, DepartmentSchema, DepartmentTeamSchema, UserSchema, PermissionsSchema, AuditLogSchema, AuditLogFilterSchema, AuditActionSchema, AuditEntityTypeSchema — valid data, missing fields, invalid UUIDs, nullable fields, wrong types, enum validation                                                                                                       |
+| **Prisma queries** | 38    | `getPersons`, `getTeams`, `getDepartments`, `getUsers`, `getUserById`, `getAllPermissionKeys`, `getAuditLogs`, `getAuditLogUserEmails` against real PostgreSQL — filtering, pagination, ordering, date range filtering, empty state, distinct emails, department relations                                                                                                                         |
+| **Server actions** | 98    | All 20 mutations — CRUD for persons/teams/members/departments, department head assignment, team-department assignment, admin role updates, permission override grant/deny/reset, mock data seeding with permission overrides, UUID validation, duplicate prevention, cascade deletes, superuser protection, idempotent seed                                                                        |
+| **Auth callbacks** | 19    | NextAuth signIn/jwt/session callbacks and demo Credentials provider — user creation on first sign-in, superuser bootstrapping, duplicate prevention, JWT enrichment with role and permissions, permission overrides, session hydration, demo user creation and reuse                                                                                                                               |
+| **Audit logging**  | 6     | `logAudit` — user info capture, null user (unauthenticated), JSON serialization of before/after, undefined handling, null entityId, transaction client usage                                                                                                                                                                                                                                       |
+| **RBAC logic**     | 28    | `resolvePermissions`, `getCurrentUser`, `getUserPermissions`, `hasPermission`, `requirePermission`, `seedPermissions` — superuser immunity, role defaults, grant/deny overrides, invalid override key guard, session lookup, unauthenticated fallback, permission seeding                                                                                                                          |
+| **UI components**  | 333   | All 32 components — rendering, user interactions, keyboard accessibility, form validation, permission-based visibility, role chips, unknown role fallbacks, selection cards, minimal/chip/full views, empty states, router navigation, admin menu links, audit log filtering and pagination, reset/seed dialogs, department management, demo login button, error handling with non-Error fallbacks |
 
 ```
 Coverage summary (combined client + server suites)
-  Statements : 99.22%
-  Branches   : 94.26%
-  Functions  : 99.14%
-  Lines      : 99.81%
+  Statements : 99.39%
+  Branches   : 97.67%
+  Functions  : 100%
+  Lines      : 100%
 ```
 
-Highlights: `auditLog.ts`, `auth.ts`, `permissions.ts`, `queries.ts`, `schemas.ts`, and `serverActions.ts` all at 100% line coverage. Every component at 96–100% line coverage. Server-side tests run against an isolated PostgreSQL test database (`hrmanager_test`) — the dev database is never touched.
+Highlights: every source file at 100% line and function coverage — `auditLog.ts`, `auth.ts`, `permissions.ts`, `queries.ts`, `schemas.ts`, `serverActions.ts`, and all 33 components. The remaining branch gaps are defensive optional chaining operators where the fallback path cannot be triggered at runtime (e.g. Prisma always returns arrays, never null). Server-side tests run against an isolated PostgreSQL test database (`hrmanager_test`) — the dev database is never touched.
 
 ---
 
