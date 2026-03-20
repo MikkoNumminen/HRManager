@@ -1040,6 +1040,49 @@ describe("seedMockData", () => {
     expect(persons).toHaveLength(10); // 9 seeded + 1 pre-existing
     expect(persons.some((p) => p.email === "existing@test.com")).toBe(true);
   });
+
+  // Grants data:seed permission override to admin@example.com when permission rows exist.
+  test("creates permission override for admin user", async () => {
+    // Create the required permission rows so the upsert branch is reached
+    await testPrisma.permission.createMany({
+      data: [
+        { key: "data:seed", description: "Load mock data" },
+        { key: "person:create", description: "Create person" },
+      ],
+    });
+
+    await seedMockData();
+
+    const adminUser = await testPrisma.user.findUnique({ where: { email: "admin@example.com" } });
+    expect(adminUser).not.toBeNull();
+    const seedPerm = await testPrisma.permission.findUnique({ where: { key: "data:seed" } });
+    const override = await testPrisma.userPermission.findUnique({
+      where: { userId_permissionId: { userId: adminUser!.id, permissionId: seedPerm!.id } },
+    });
+    expect(override).not.toBeNull();
+    expect(override!.granted).toBe(true);
+  });
+
+  // Grants person:create permission override to user1@example.com when permission rows exist.
+  test("creates permission override for regular user", async () => {
+    await testPrisma.permission.createMany({
+      data: [
+        { key: "data:seed", description: "Load mock data" },
+        { key: "person:create", description: "Create person" },
+      ],
+    });
+
+    await seedMockData();
+
+    const user1 = await testPrisma.user.findUnique({ where: { email: "user1@example.com" } });
+    expect(user1).not.toBeNull();
+    const createPerm = await testPrisma.permission.findUnique({ where: { key: "person:create" } });
+    const override = await testPrisma.userPermission.findUnique({
+      where: { userId_permissionId: { userId: user1!.id, permissionId: createPerm!.id } },
+    });
+    expect(override).not.toBeNull();
+    expect(override!.granted).toBe(true);
+  });
 });
 
 describe("initializePermissions", () => {

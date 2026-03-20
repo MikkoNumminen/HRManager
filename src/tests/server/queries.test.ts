@@ -457,6 +457,29 @@ describe("getAuditLogs", () => {
     expect(page1.logs[0].id).not.toBe(page2.logs[0].id);
   });
 
+  // Filters logs by date range when dateFrom and dateTo are provided.
+  test("filters by date range", async () => {
+    const old = new Date("2025-01-01T00:00:00Z");
+    const mid = new Date("2025-06-15T00:00:00Z");
+    const recent = new Date("2025-12-01T00:00:00Z");
+    await testPrisma.auditLog.create({
+      data: { action: "create", entityType: "person", userEmail: "a@b.com", createdAt: old },
+    });
+    await testPrisma.auditLog.create({
+      data: { action: "update", entityType: "person", userEmail: "a@b.com", createdAt: mid },
+    });
+    await testPrisma.auditLog.create({
+      data: { action: "delete", entityType: "person", userEmail: "a@b.com", createdAt: recent },
+    });
+    const result = await getAuditLogs({
+      dateFrom: new Date("2025-03-01"),
+      dateTo: new Date("2025-09-01"),
+    });
+    expect(result.logs).toHaveLength(1);
+    expect(result.logs[0].action).toBe("update");
+    expect(result.total).toBe(1);
+  });
+
   // Returns correct total count even when paginated.
   test("returns correct total with filters and pagination", async () => {
     for (let i = 0; i < 3; i++) {
