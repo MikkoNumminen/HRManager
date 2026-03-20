@@ -55,4 +55,4 @@ jobs:
         run: npm run test:all -- --coverage
 
       - name: Build
-        run: npm run build
+        run: next build
