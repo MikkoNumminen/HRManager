@@ -13,6 +13,8 @@
     "test:watch": "jest --watchAll",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "i18n:audit": "npx tsx scripts/i18n-sync.ts",
+    "i18n:fix": "npx tsx scripts/i18n-sync.ts --fix",
     "prepare": "husky"
   },
   "dependencies": {
