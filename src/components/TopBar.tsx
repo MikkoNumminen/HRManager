@@ -199,8 +199,12 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
                 <MenuItem
                   onClick={() => {
                     setAnchorEl(null);
-                    if (session?.user?.email === DEMO_EMAIL) {
-                      localStorage.removeItem(STORAGE_KEY);
+                    try {
+                      if (session?.user?.email === DEMO_EMAIL) {
+                        localStorage.removeItem(STORAGE_KEY);
+                      }
+                    } catch {
+                      // localStorage unavailable (private browsing)
                     }
                     signOut();
                   }}
