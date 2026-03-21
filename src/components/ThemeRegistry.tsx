@@ -67,33 +67,34 @@ export default function ThemeRegistry({ children }: { children: React.ReactNode 
     }
   }, []);
 
-  const muiTheme = useMemo(
-    () =>
-      createTheme({
-        palette: {
-          mode: getPaletteMode(currentTheme),
-          background: {
-            default: colors.slate700,
-            paper: colors.slate600,
-          },
-          text: {
-            primary: colors.slate100,
-            secondary: colors.slate300,
-          },
+  const muiTheme = useMemo(() => {
+    // MUI's palette must use real color values, not CSS variables,
+    // because MUI internally calls alpha()/darken() on palette colors.
+    const p = THEME_PALETTES[currentTheme];
+    return createTheme({
+      palette: {
+        mode: getPaletteMode(currentTheme),
+        background: {
+          default: p.slate700,
+          paper: p.slate600,
         },
-        components: {
-          MuiCssBaseline: {
-            styleOverrides: {
-              body: {
-                backgroundColor: colors.slate700,
-                color: colors.slate100,
-              },
+        text: {
+          primary: p.slate100,
+          secondary: p.slate300,
+        },
+      },
+      components: {
+        MuiCssBaseline: {
+          styleOverrides: {
+            body: {
+              backgroundColor: colors.slate700,
+              color: colors.slate100,
             },
           },
         },
-      }),
-    [currentTheme],
-  );
+      },
+    });
+  }, [currentTheme]);
 
   const globalStyles = useMemo(
     () => ({ ":root": buildCssVariables(currentTheme) }),
