@@ -115,8 +115,8 @@ describe("UserPermissionEditor", () => {
     ).toBeInTheDocument();
   });
 
-  // Shows override chips when user has permission overrides
-  test("shows override chip when user has an override", () => {
+  // Grant override flips the effective status to Allowed
+  test("grant override shows Allowed effective status", () => {
     const userWithOverride = {
       ...baseUser,
       overrides: [{ key: "admin:manage_users", granted: true }],
@@ -129,24 +129,8 @@ describe("UserPermissionEditor", () => {
         canAssignPermissions={true}
       />,
     );
-    expect(screen.getByText("Granted")).toBeInTheDocument();
-  });
-
-  // Shows a Reset button when there is an override
-  test("shows Reset button for overridden permission", () => {
-    const userWithOverride = {
-      ...baseUser,
-      overrides: [{ key: "admin:manage_users", granted: true }],
-    };
-    render(
-      <UserPermissionEditor
-        user={userWithOverride}
-        allPermissionKeys={allKeys}
-        roleDefaults={roleDefaults}
-        canAssignPermissions={true}
-      />,
-    );
-    expect(screen.getByText("Reset")).toBeInTheDocument();
+    // All 3 permissions now show Allowed (2 from role default + 1 from override)
+    expect(screen.getAllByText("Allowed")).toHaveLength(3);
   });
 
   // Shows the Save Role button as disabled when role hasn't changed
@@ -203,8 +187,8 @@ describe("UserPermissionEditor", () => {
     });
   });
 
-  // Clicking Reset on an overridden permission should call updateUserPermission with reset action
-  test("calls updateUserPermission when Reset is clicked", async () => {
+  // Clicking Role Default on an overridden permission resets it
+  test("calls updateUserPermission when Role Default is clicked to reset", async () => {
     (updateUserPermission as jest.Mock).mockResolvedValue(undefined);
     const userWithOverride = {
       ...baseUser,
@@ -218,7 +202,10 @@ describe("UserPermissionEditor", () => {
         canAssignPermissions={true}
       />,
     );
-    fireEvent.click(screen.getByText("Reset"));
+    // admin:manage_users has a grant override → toggle is on "grant"
+    // Clicking "Role Default" resets it back to the role default
+    const defaultButtons = screen.getAllByText("Role Default");
+    fireEvent.click(defaultButtons[defaultButtons.length - 1]);
 
     await waitFor(() => {
       expect(updateUserPermission).toHaveBeenCalled();
@@ -244,8 +231,8 @@ describe("UserPermissionEditor", () => {
     });
   });
 
-  // Shows "Denied" override chip when a permission is explicitly denied
-  test("shows Denied override chip", () => {
+  // Deny override flips the effective status to Denied
+  test("deny override shows Denied effective status", () => {
     const userWithDenyOverride = {
       ...baseUser,
       overrides: [{ key: "person:create", granted: false }],
@@ -258,13 +245,13 @@ describe("UserPermissionEditor", () => {
         canAssignPermissions={true}
       />,
     );
-    // "Denied" appears in role defaults and effective columns too, so check multiple exist
+    // person:create now denied via override + admin:manage_users denied by default = 2 Denied chips
     const deniedChips = screen.getAllByText("Denied");
-    expect(deniedChips.length).toBeGreaterThanOrEqual(2);
+    expect(deniedChips).toHaveLength(2);
   });
 
-  // Tooltip headers should be present on Role Default, Override, Effective, Actions
-  test("renders column headers with tooltip help cursors", () => {
+  // Each permission row renders a three-state toggle (Deny / Role Default / Grant)
+  test("renders toggle buttons for each permission", () => {
     render(
       <UserPermissionEditor
         user={baseUser}
@@ -273,11 +260,10 @@ describe("UserPermissionEditor", () => {
         canAssignPermissions={true}
       />,
     );
-    // Multiple domain groups create duplicate headers, so use getAllByText
-    expect(screen.getAllByText("Role Default").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("Override").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("Effective").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("Actions").length).toBeGreaterThan(0);
+    // 3 permissions × 1 toggle group each, with Deny/Role Default/Grant buttons
+    expect(screen.getAllByText("Role Default")).toHaveLength(3);
+    expect(screen.getAllByText("Grant")).toHaveLength(3);
+    expect(screen.getAllByText("Deny")).toHaveLength(3);
   });
 
   // Permission groups should show domain headers (capitalized)
@@ -393,7 +379,7 @@ describe("UserPermissionEditor", () => {
       />,
     );
 
-    const grantButtons = screen.getAllByRole("button", { name: /Grant/i });
+    const grantButtons = screen.getAllByText("Grant");
     fireEvent.click(grantButtons[grantButtons.length - 1]);
 
     await waitFor(() => {

@@ -16,13 +16,8 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
+  ToggleButton,
+  ToggleButtonGroup,
   Tooltip,
   Typography,
 } from "@mui/material";
@@ -206,138 +201,109 @@ export default function UserPermissionEditor({
               >
                 {domain}
               </Typography>
-              <TableContainer component={Paper} sx={{ backgroundColor: "transparent" }}>
-                <Table size="small">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell sx={{ color: colors.slate400 }}>{t("permission")}</TableCell>
-                      <Tooltip title={t("roleDefaultTooltip")} placement="top" arrow>
-                        <TableCell sx={{ color: colors.slate400, cursor: "help" }}>
-                          {t("roleDefault")}
-                        </TableCell>
-                      </Tooltip>
-                      <Tooltip title={t("overrideTooltip")} placement="top" arrow>
-                        <TableCell sx={{ color: colors.slate400, cursor: "help" }}>
-                          {t("override")}
-                        </TableCell>
-                      </Tooltip>
-                      <Tooltip title={t("effectiveTooltip")} placement="top" arrow>
-                        <TableCell sx={{ color: colors.slate400, cursor: "help" }}>
-                          {t("effective")}
-                        </TableCell>
-                      </Tooltip>
-                      <Tooltip title={t("actionsTooltip")} placement="top" arrow>
-                        <TableCell sx={{ color: colors.slate400, cursor: "help" }} align="right">
-                          {t("actions")}
-                        </TableCell>
-                      </Tooltip>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {keys.map((key) => {
-                      const isDefault = defaults.includes(key);
-                      const override = overrideMap.get(key);
-                      const hasOverride = override !== undefined;
-                      const effective = hasOverride ? override : isDefault;
+              {keys.map((key) => {
+                const isDefault = defaults.includes(key);
+                const override = overrideMap.get(key);
+                const hasOverride = override !== undefined;
+                const effective = hasOverride ? override : isDefault;
+                const toggleValue = hasOverride ? (override ? "grant" : "deny") : "default";
 
-                      return (
-                        <TableRow key={key}>
-                          <TableCell sx={{ color: colors.slate300 }}>{formatKey(key)}</TableCell>
-                          <TableCell>
-                            <Chip
-                              label={isDefault ? t("allowed") : t("denied")}
-                              size="small"
-                              sx={{
-                                color: isDefault ? colors.green400 : colors.error,
-                                borderColor: isDefault ? colors.green400 : colors.error,
-                              }}
-                              variant="outlined"
-                            />
-                          </TableCell>
-                          <TableCell>
-                            {hasOverride ? (
-                              <Chip
-                                label={override ? t("granted") : t("denied")}
-                                size="small"
-                                sx={{
-                                  color: override ? colors.green400 : colors.error,
-                                  borderColor: override ? colors.green400 : colors.error,
-                                  fontWeight: 600,
-                                }}
-                                variant="outlined"
-                              />
-                            ) : (
-                              <Typography variant="body2" sx={{ color: colors.slate400 }}>
-                                —
-                              </Typography>
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            <Chip
-                              label={effective ? t("allowed") : t("denied")}
-                              size="small"
-                              sx={{
-                                backgroundColor: effective
-                                  ? "rgba(74, 222, 128, 0.15)"
-                                  : colors.errorBg,
-                                color: effective ? colors.green400 : colors.error,
-                                fontWeight: 600,
-                              }}
-                            />
-                          </TableCell>
-                          <TableCell align="right">
-                            <Box display="flex" gap={0.5} justifyContent="flex-end">
-                              {hasOverride ? (
-                                <Button
-                                  size="small"
-                                  disabled={isPending}
-                                  onClick={() => handlePermissionAction(key, "reset")}
-                                  sx={{
-                                    color: colors.slate400,
-                                    fontSize: "0.7rem",
-                                    minWidth: "auto",
-                                    px: 1,
-                                  }}
-                                >
-                                  {tc("reset")}
-                                </Button>
-                              ) : effective ? (
-                                <Button
-                                  size="small"
-                                  disabled={isPending}
-                                  onClick={() => handlePermissionAction(key, "deny")}
-                                  sx={{
-                                    color: colors.error,
-                                    fontSize: "0.7rem",
-                                    minWidth: "auto",
-                                    px: 1,
-                                  }}
-                                >
-                                  {t("deny")}
-                                </Button>
-                              ) : (
-                                <Button
-                                  size="small"
-                                  disabled={isPending}
-                                  onClick={() => handlePermissionAction(key, "grant")}
-                                  sx={{
-                                    color: colors.green400,
-                                    fontSize: "0.7rem",
-                                    minWidth: "auto",
-                                    px: 1,
-                                  }}
-                                >
-                                  {t("grant")}
-                                </Button>
-                              )}
-                            </Box>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
-              </TableContainer>
+                return (
+                  <Box
+                    key={key}
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      flexWrap: "wrap",
+                      gap: 1,
+                      py: 1,
+                      borderBottom: `1px solid ${colors.slate600}`,
+                    }}
+                  >
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1, minWidth: 0 }}>
+                      <Typography
+                        variant="body2"
+                        sx={{ color: colors.slate300, fontFamily: "monospace", fontSize: "0.8rem" }}
+                      >
+                        {formatKey(key)}
+                      </Typography>
+                      <Chip
+                        label={effective ? t("allowed") : t("denied")}
+                        size="small"
+                        sx={{
+                          backgroundColor: effective ? "rgba(74, 222, 128, 0.15)" : colors.errorBg,
+                          color: effective ? colors.green400 : colors.error,
+                          fontWeight: 600,
+                          height: 20,
+                          fontSize: "0.7rem",
+                        }}
+                      />
+                    </Box>
+                    <ToggleButtonGroup
+                      value={toggleValue}
+                      exclusive
+                      size="small"
+                      disabled={isPending}
+                      onChange={(_e, newValue) => {
+                        if (!newValue) return;
+                        if (newValue === "grant") handlePermissionAction(key, "grant");
+                        else if (newValue === "deny") handlePermissionAction(key, "deny");
+                        else handlePermissionAction(key, "reset");
+                      }}
+                      sx={{
+                        "& .MuiToggleButton-root": {
+                          color: colors.slate400,
+                          borderColor: colors.slate500,
+                          fontSize: "0.7rem",
+                          py: 0.25,
+                          px: 1.5,
+                          textTransform: "none",
+                        },
+                        "& .Mui-selected": {
+                          fontWeight: 600,
+                        },
+                      }}
+                    >
+                      <ToggleButton
+                        value="deny"
+                        sx={{
+                          "&.Mui-selected, &.Mui-selected:hover": {
+                            backgroundColor: colors.errorBg,
+                            color: colors.error,
+                          },
+                        }}
+                      >
+                        {t("deny")}
+                      </ToggleButton>
+                      <Tooltip title={t("roleDefaultTooltip")} placement="top" arrow>
+                        <ToggleButton
+                          value="default"
+                          sx={{
+                            "&.Mui-selected, &.Mui-selected:hover": {
+                              backgroundColor: "rgba(148, 163, 184, 0.15)",
+                              color: colors.slate200,
+                            },
+                          }}
+                        >
+                          {t("roleDefault")}
+                        </ToggleButton>
+                      </Tooltip>
+                      <ToggleButton
+                        value="grant"
+                        sx={{
+                          "&.Mui-selected, &.Mui-selected:hover": {
+                            backgroundColor: "rgba(74, 222, 128, 0.15)",
+                            color: colors.green400,
+                          },
+                        }}
+                      >
+                        {t("grant")}
+                      </ToggleButton>
+                    </ToggleButtonGroup>
+                  </Box>
+                );
+              })}
             </Box>
           ))
         )}
