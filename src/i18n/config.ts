@@ -43,24 +43,3 @@ export const localeNames: Record<Locale, string> = {
   sw: "Kiswahili",
   tr: "T\u00fcrk\u00e7e",
 };
-
-export const localeFlags: Record<Locale, string> = {
-  en: "\ud83c\uddec\ud83c\udde7",
-  fi: "\ud83c\uddeb\ud83c\uddee",
-  sv: "\ud83c\uddf8\ud83c\uddea",
-  de: "\ud83c\udde9\ud83c\uddea",
-  fr: "\ud83c\uddeb\ud83c\uddf7",
-  es: "\ud83c\uddea\ud83c\uddf8",
-  pt: "\ud83c\udde7\ud83c\uddf7",
-  pl: "\ud83c\uddf5\ud83c\uddf1",
-  ru: "\ud83c\uddf7\ud83c\uddfa",
-  uk: "\ud83c\uddfa\ud83c\udde6",
-  ar: "\ud83c\uddf8\ud83c\udde6",
-  hi: "\ud83c\uddee\ud83c\uddf3",
-  ja: "\ud83c\uddef\ud83c\uddf5",
-  zh: "\ud83c\udde8\ud83c\uddf3",
-  ko: "\ud83c\uddf0\ud83c\uddf7",
-  th: "\ud83c\uddf9\ud83c\udded",
-  sw: "\ud83c\uddf9\ud83c\uddff",
-  tr: "\ud83c\uddf9\ud83c\uddf7",
-};

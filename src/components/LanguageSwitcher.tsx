@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { IconButton, Menu, MenuItem, Typography, Box } from "@mui/material";
+import { IconButton, Menu, MenuItem, Typography } from "@mui/material";
 import LanguageIcon from "@mui/icons-material/Language";
 import { useLocale, useTranslations } from "next-intl";
-import { locales, localeNames, localeFlags, Locale } from "@/i18n/config";
+import { locales, localeNames, Locale } from "@/i18n/config";
 import { setLocale } from "@/i18n/actions";
 import { colors, userMenuStyles, userMenuItemStyles } from "@/muiStyles";
 
@@ -59,14 +59,9 @@ export default function LanguageSwitcher() {
               }),
             }}
           >
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-              <Typography sx={{ fontSize: "1.25rem", lineHeight: 1 }}>
-                {localeFlags[locale]}
-              </Typography>
-              <Typography variant="body2" sx={{ color: colors.slate100 }}>
-                {localeNames[locale]}
-              </Typography>
-            </Box>
+            <Typography variant="body2" sx={{ color: colors.slate100 }}>
+              {localeNames[locale]}
+            </Typography>
           </MenuItem>
         ))}
       </Menu>
