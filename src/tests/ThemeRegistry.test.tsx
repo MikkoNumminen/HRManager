@@ -1,6 +1,6 @@
 import { render, screen, act } from "@testing-library/react";
 import ThemeRegistry, { useTheme } from "../components/ThemeRegistry";
-import { THEME_STORAGE_KEY, THEME_PALETTES, DEFAULT_THEME } from "../themeConfig";
+import { THEME_STORAGE_KEY, DEFAULT_THEME } from "../themeConfig";
 
 jest.mock("next/navigation", () => ({
   useRouter: jest.fn(),
