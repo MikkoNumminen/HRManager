@@ -1,3 +1,31 @@
+echo "Running i18n audit..."
+AUDIT_OUTPUT=$(npx tsx scripts/i18n-sync.ts 2>&1)
+MISSING=$(echo "$AUDIT_OUTPUT" | grep -c "^      + " || true)
+SUMMARY=$(echo "$AUDIT_OUTPUT" | grep "^Summary:")
+
+if [ "$MISSING" -gt 0 ]; then
+  echo ""
+  echo "Found $MISSING missing i18n keys. Auto-fixing with English fallback..."
+  npm run i18n:fix
+  echo ""
+  echo "PUSH BLOCKED: New keys added with English fallback text."
+  echo "Ask Claude Code to translate them, then commit and push again."
+  echo ""
+  exit 1
+fi
+
+# Check for untranslated keys (excluding known false positives ~20)
+UNTRANSLATED=$(echo "$SUMMARY" | sed 's/.*\([0-9]*\) untranslated.*/\1/')
+if [ "$UNTRANSLATED" -gt 25 ]; then
+  echo ""
+  echo "PUSH BLOCKED: $UNTRANSLATED untranslated keys detected (threshold: 25)."
+  echo "Ask Claude Code to translate them, then commit and push again."
+  echo ""
+  exit 1
+fi
+
+echo "i18n OK. $SUMMARY"
+echo ""
 echo "Running full test suite before push..."
 npm run test:all -- --coverage
 
