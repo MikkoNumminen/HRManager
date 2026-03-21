@@ -1,6 +1,6 @@
 # HRManager
 
-A production-grade HR management system with granular RBAC, audit logging, AI-powered i18n across 18 languages, and 738 tests at 99.7% line coverage.
+A production-grade HR management system with granular RBAC, audit logging, AI-powered i18n across 18 languages, and 750 tests at 99.7% line coverage.
 
 [![CI](https://github.com/MikkoNumminen/HRManager/actions/workflows/ci.yml/badge.svg)](https://github.com/MikkoNumminen/HRManager/actions/workflows/ci.yml)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)
@@ -26,11 +26,12 @@ A production-grade HR management system with granular RBAC, audit logging, AI-po
 
 ## Highlights
 
-- **738 tests, 99.7% line coverage** — Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, audit logging, and all 38 UI components tested against real PostgreSQL
+- **750 tests, 99.7% line coverage** — Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, audit logging, and all 39 UI components tested against real PostgreSQL
 - **Granular RBAC** — 4 roles, 21 permission keys, per-user grant/deny overrides with three-state toggles (deny / role default / grant)
 - **Immutable audit trail** — every mutation logged with before/after JSON snapshots inside the same `$transaction` for atomicity
 - **18 languages** — next-intl with cookie persistence, Accept-Language detection, and an AI-powered translation pipeline using parallel Claude Code agents
 - **Gamified demo tour** — 8-step tutorial with DOM-aware navigation hints, spotlight overlays, confetti celebrations, and auto-detection of task completion
+- **Snackbar notifications** — global success/error toasts via React context + MUI Snackbar; consistent feedback across all 15 form actions
 - **6 visual themes** — CSS custom properties with FOUC-preventing inline script; instant switching without re-render
 
 ---
@@ -64,7 +65,7 @@ Server Actions ($transaction)     → Prisma → PostgreSQL
 - **Types** in `schemas.ts` — Zod schemas with `z.infer` exports, used everywhere
 - **Auth** in `auth.ts` — JWT strategy with permission-enriched tokens; automatic superuser bootstrapping
 - **RBAC** in `permissions.ts` — resolution: superuser (all) → user override → role default
-- **Forms** — React 19 `useActionState` with `action=` prop, no `onSubmit`
+- **Forms** — React 19 `useActionState` with `action=` prop, no `onSubmit`; success/error feedback via global snackbar
 - **Themes** — CSS custom properties injected before hydration; 6 palettes switchable at runtime
 - **i18n** — 18 locale files synced against `en.json` via custom audit tooling
 
@@ -93,15 +94,15 @@ Individual permissions can be overridden per-user — e.g. granting `person:crea
 | Auth callbacks | 20      |
 | Audit logging  | 6       |
 | RBAC logic     | 28      |
-| UI components  | 476     |
-| **Total**      | **738** |
+| UI components  | 488     |
+| **Total**      | **750** |
 
 ```
 Statements : 99.09%    Branches : 95.64%
 Functions  : 99.68%    Lines    : 99.73%
 ```
 
-Server-side tests run against a real PostgreSQL test database. Client-side tests cover all 38 components including permission toggles, audit log filtering, tutorial system, theme switching, and language selection.
+Server-side tests run against a real PostgreSQL test database. Client-side tests cover all 39 components including permission toggles, audit log filtering, tutorial system, snackbar notifications, theme switching, and language selection.
 
 ---
 
