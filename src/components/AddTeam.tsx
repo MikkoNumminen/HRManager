@@ -5,6 +5,7 @@ import { createTeam } from "@/serverActions";
 import { Box, Button, TextField, Tooltip, Typography } from "@mui/material";
 import { useActionState, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
+import { emitTutorialEvent } from "@/tutorialConfig";
 
 type FormState = { error: string | null; success: boolean };
 
@@ -18,6 +19,7 @@ const AddTeamForm: React.FC = () => {
     async (_prev: FormState, formData: FormData): Promise<FormState> => {
       try {
         await createTeam(formData);
+        emitTutorialEvent("tutorial:team_created");
         return { error: null, success: true };
       } catch (error) {
         return {
@@ -36,7 +38,7 @@ const AddTeamForm: React.FC = () => {
   }, [state]);
 
   return (
-    <Box component="form" action={formAction} sx={formStyles}>
+    <Box component="form" action={formAction} sx={formStyles} data-tutorial="add-team-form">
       <Typography variant="h5">{t("addTeam")}</Typography>
       {state.error && <Typography color="error">{state.error}</Typography>}
       <Tooltip title={tc("required")} placement="right" arrow>

@@ -5,6 +5,7 @@ import { activeButtonStyles, formStyles, smallButtonStyles, textFieldStyles } fr
 import { Box, Button, MenuItem, TextField, Typography } from "@mui/material";
 import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
+import { emitTutorialEvent } from "@/tutorialConfig";
 import { CombinedTeam } from "@/schemas";
 
 type FormState = { error: string | null };
@@ -21,6 +22,7 @@ const AssignTeamToDepartmentForm: React.FC<{
     async (_prev: FormState, formData: FormData): Promise<FormState> => {
       try {
         await assignTeamToDepartment(formData);
+        emitTutorialEvent("tutorial:team_assigned");
         return { error: null };
       } catch (error) {
         return { error: error instanceof Error ? error.message : tc("error") };
@@ -30,7 +32,7 @@ const AssignTeamToDepartmentForm: React.FC<{
   );
 
   return (
-    <Box component="form" action={formAction} sx={formStyles}>
+    <Box component="form" action={formAction} sx={formStyles} data-tutorial="assign-team-form">
       <Typography variant="h5">{t("assignTeam")}</Typography>
       {state.error && <Typography color="error">{state.error}</Typography>}
 

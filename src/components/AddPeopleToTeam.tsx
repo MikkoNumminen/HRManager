@@ -5,6 +5,7 @@ import { activeButtonStyles, formStyles, headerStyles, smallButtonStyles } from 
 import { Box, Button, Typography } from "@mui/material";
 import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
+import { emitTutorialEvent } from "@/tutorialConfig";
 import { PersonSelectCard } from "./PersonSelectCard";
 import { Person } from "@/schemas";
 
@@ -23,6 +24,7 @@ const AddMemberForm: React.FC<{ teamID: string; persons: Person[]; excludeIds?: 
     async (_prev: FormState, formData: FormData): Promise<FormState> => {
       try {
         await addMember(formData);
+        emitTutorialEvent("tutorial:member_added");
         return { error: null };
       } catch (error) {
         return { error: error instanceof Error ? error.message : tc("error") };
@@ -34,7 +36,7 @@ const AddMemberForm: React.FC<{ teamID: string; persons: Person[]; excludeIds?: 
   const filteredPersons = persons.filter((p) => !excludeIds.includes(p.id));
 
   return (
-    <Box component="form" action={formAction} sx={formStyles}>
+    <Box component="form" action={formAction} sx={formStyles} data-tutorial="add-member-form">
       <Box sx={headerStyles}>
         <Typography variant="h5">{t("addMember")}</Typography>
       </Box>

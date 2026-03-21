@@ -78,7 +78,7 @@ export default async function Home() {
         canManagePersons ? (
           <Link href="/managePersons" sx={{ textDecoration: "none" }}>
             <Tooltip title={t("goToPersons")} placement="right" arrow>
-              <Box component="div" sx={boxStyles}>
+              <Box component="div" sx={boxStyles} data-tutorial="persons-section">
                 <Typography variant="h6" gutterBottom>
                   {t("persons")}
                 </Typography>

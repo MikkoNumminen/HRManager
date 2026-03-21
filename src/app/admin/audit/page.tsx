@@ -119,6 +119,7 @@ export default async function AuditLogPage({
     <>
       <TopBar title={t("auditTitle")} backHref="/admin" permissions={permissions} />
       <Box
+        data-tutorial="audit-log"
         sx={{
           border: `1px solid ${colors.slate300}`,
           borderRadius: "4px",

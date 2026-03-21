@@ -5,6 +5,7 @@ import { createPerson } from "@/serverActions";
 import { Box, Button, TextField, Tooltip, Typography } from "@mui/material";
 import { useActionState, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
+import { emitTutorialEvent } from "@/tutorialConfig";
 
 type FormState = { error: string | null; success: boolean };
 
@@ -20,6 +21,7 @@ const AddPersonForm: React.FC = () => {
     async (_prev: FormState, formData: FormData): Promise<FormState> => {
       try {
         await createPerson(formData);
+        emitTutorialEvent("tutorial:person_created");
         return { error: null, success: true };
       } catch (error) {
         return {
@@ -39,7 +41,7 @@ const AddPersonForm: React.FC = () => {
   }, [state]);
 
   return (
-    <Box component="form" action={formAction} sx={formStyles}>
+    <Box component="form" action={formAction} sx={formStyles} data-tutorial="add-person-form">
       <Typography variant="h5">{t("addPerson")}</Typography>
       {state.error && <Typography color="error">{state.error}</Typography>}
       <Tooltip title={tc("required")} placement="right" arrow>
