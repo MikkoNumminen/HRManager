@@ -36,7 +36,8 @@
     "seedMessage": "Do you want to keep your existing data or replace it with mock data?",
     "keepExisting": "Keep Existing",
     "replaceAll": "Replace All",
-    "language": "Language"
+    "language": "Language",
+    "theme": "Theme"
   },
   "home": {
     "title": "Human Resources Management System",

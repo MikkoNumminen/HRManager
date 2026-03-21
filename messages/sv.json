@@ -36,7 +36,8 @@
     "seedMessage": "Vill du behålla befintlig data eller ersätta den med testdata?",
     "keepExisting": "Behåll befintlig",
     "replaceAll": "Ersätt allt",
-    "language": "Språk"
+    "language": "Språk",
+    "theme": "Tema"
   },
   "home": {
     "title": "Personalhanteringssystem",

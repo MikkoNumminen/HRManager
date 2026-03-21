@@ -36,7 +36,8 @@
     "seedMessage": "Haluatko säilyttää nykyiset tiedot vai korvata ne esimerkkitiedoilla?",
     "keepExisting": "Säilytä nykyiset",
     "replaceAll": "Korvaa kaikki",
-    "language": "Kieli"
+    "language": "Kieli",
+    "theme": "Teema"
   },
   "home": {
     "title": "Henkilöstöhallintajärjestelmä",

@@ -36,7 +36,8 @@
     "seedMessage": "既存のデータを保持しますか、それともサンプルデータに置き換えますか？",
     "keepExisting": "既存を保持",
     "replaceAll": "すべて置換",
-    "language": "言語"
+    "language": "言語",
+    "theme": "テーマ"
   },
   "home": {
     "title": "人事管理システム",

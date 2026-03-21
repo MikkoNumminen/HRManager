@@ -1,13 +1,18 @@
 export const colors = {
-  slate100: "rgb(241 245 249)",
-  slate300: "rgb(203 213 225)",
-  slate400: "rgb(148 163 184)",
-  slate600: "rgb(71 85 105)",
-  slate700: "rgb(51 65 85)",
-  green400: "rgb(74 222 128)",
-  green900: "rgb(20 83 45)",
-  rowHover: "#f0f0f0",
-  hoverOverlay: "rgba(255, 255, 255, 0.04)",
+  slate100: "var(--hrm-slate100)",
+  slate300: "var(--hrm-slate300)",
+  slate400: "var(--hrm-slate400)",
+  slate600: "var(--hrm-slate600)",
+  slate700: "var(--hrm-slate700)",
+  green400: "var(--hrm-green400)",
+  green900: "var(--hrm-green900)",
+  rowHover: "var(--hrm-rowHover)",
+  hoverOverlay: "var(--hrm-hoverOverlay)",
+  error: "var(--hrm-error)",
+  errorBg: "var(--hrm-errorBg)",
+  warning: "var(--hrm-warning)",
+  info: "var(--hrm-info)",
+  success: "var(--hrm-success)",
 };
 
 export const formStyles = {

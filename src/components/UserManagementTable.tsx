@@ -19,8 +19,8 @@ import { AppUser } from "@/schemas";
 import { useTranslations } from "next-intl";
 
 const roleColors: Record<string, string> = {
-  superuser: "#f59e0b",
-  administrator: "#3b82f6",
+  superuser: colors.warning,
+  administrator: colors.info,
   user: colors.slate300,
   guest: colors.slate400,
 };

@@ -36,7 +36,8 @@
     "seedMessage": "Voulez-vous conserver les données existantes ou les remplacer par des données de test ?",
     "keepExisting": "Conserver",
     "replaceAll": "Tout remplacer",
-    "language": "Langue"
+    "language": "Langue",
+    "theme": "Thème"
   },
   "home": {
     "title": "Système de gestion des ressources humaines",

@@ -36,7 +36,8 @@
     "seedMessage": "Möchten Sie vorhandene Daten behalten oder durch Testdaten ersetzen?",
     "keepExisting": "Vorhandene behalten",
     "replaceAll": "Alles ersetzen",
-    "language": "Sprache"
+    "language": "Sprache",
+    "theme": "Thema"
   },
   "home": {
     "title": "Personalverwaltungssystem",

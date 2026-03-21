@@ -36,7 +36,8 @@
     "seedMessage": "Czy chcesz zachować istniejące dane, czy zastąpić je danymi testowymi?",
     "keepExisting": "Zachowaj istniejące",
     "replaceAll": "Zastąp wszystko",
-    "language": "Język"
+    "language": "Język",
+    "theme": "Motyw"
   },
   "home": {
     "title": "System Zarządzania Zasobami Ludzkimi",

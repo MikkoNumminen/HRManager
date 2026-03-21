@@ -160,7 +160,7 @@ export default function TutorialCelebration() {
                 <EmojiEventsIcon
                   sx={{
                     fontSize: 80,
-                    color: "#fbbf24",
+                    color: colors.warning,
                     animation: "tutorial-trophy-bounce 1s ease-in-out infinite",
                     filter: "drop-shadow(0 0 20px rgba(251, 191, 36, 0.5))",
                   }}

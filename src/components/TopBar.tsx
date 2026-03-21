@@ -25,6 +25,7 @@ import { useRef, useState, useTransition } from "react";
 import { resetAll, seedMockData } from "@/serverActions";
 import ConfirmDialog from "./ConfirmDialog";
 import LanguageSwitcher from "./LanguageSwitcher";
+import ThemeSwitcher from "./ThemeSwitcher";
 import { Permissions } from "@/schemas";
 import { useTranslations } from "next-intl";
 import { DEMO_EMAIL, STORAGE_KEY } from "@/tutorialConfig";
@@ -126,10 +127,11 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
             </Typography>
           </Box>
           {error && (
-            <Typography variant="caption" sx={{ color: "#f87171", mr: 2 }}>
+            <Typography variant="caption" sx={{ color: colors.error, mr: 2 }}>
               {error}
             </Typography>
           )}
+          <ThemeSwitcher />
           <LanguageSwitcher />
           {user ? (
             <>
@@ -200,7 +202,7 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
                       setAnchorEl(null);
                       setResetDialogOpen(true);
                     }}
-                    sx={{ ...userMenuItemStyles, color: "#f87171" }}
+                    sx={{ ...userMenuItemStyles, color: colors.error }}
                   >
                     {t("resetAllData")}
                   </MenuItem>
@@ -311,8 +313,8 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
           <Button
             onClick={() => handleSeed(true)}
             sx={{
-              color: "#f87171",
-              "&:hover": { backgroundColor: "rgba(248, 113, 113, 0.1)" },
+              color: colors.error,
+              "&:hover": { backgroundColor: colors.errorBg },
             }}
           >
             {t("replaceAll")}

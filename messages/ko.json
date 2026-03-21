@@ -36,7 +36,8 @@
     "seedMessage": "기존 데이터를 유지하시겠습니까, 샘플 데이터로 교체하시겠습니까?",
     "keepExisting": "기존 유지",
     "replaceAll": "전체 교체",
-    "language": "언어"
+    "language": "언어",
+    "theme": "테마"
   },
   "home": {
     "title": "인사 관리 시스템",

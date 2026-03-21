@@ -24,11 +24,11 @@ import { colors } from "@/muiStyles";
 import { AuditLog } from "@/schemas";
 
 const actionColors: Record<string, string> = {
-  create: "#4ade80",
-  update: "#60a5fa",
-  delete: "#f87171",
-  seed: "#fbbf24",
-  reset: "#fbbf24",
+  create: colors.success,
+  update: colors.info,
+  delete: colors.error,
+  seed: colors.warning,
+  reset: colors.warning,
 };
 
 const selectStyles = {

@@ -49,8 +49,8 @@ interface UserPermissionEditorProps {
 type FormState = { error: string | null };
 
 const roleColors: Record<string, string> = {
-  superuser: "#f59e0b",
-  administrator: "#3b82f6",
+  superuser: colors.warning,
+  administrator: colors.info,
   user: colors.slate300,
   guest: colors.slate400,
 };
@@ -248,8 +248,8 @@ export default function UserPermissionEditor({
                               label={isDefault ? t("allowed") : t("denied")}
                               size="small"
                               sx={{
-                                color: isDefault ? colors.green400 : "#f87171",
-                                borderColor: isDefault ? colors.green400 : "#f87171",
+                                color: isDefault ? colors.green400 : colors.error,
+                                borderColor: isDefault ? colors.green400 : colors.error,
                               }}
                               variant="outlined"
                             />
@@ -260,8 +260,8 @@ export default function UserPermissionEditor({
                                 label={override ? t("granted") : t("denied")}
                                 size="small"
                                 sx={{
-                                  color: override ? colors.green400 : "#f87171",
-                                  borderColor: override ? colors.green400 : "#f87171",
+                                  color: override ? colors.green400 : colors.error,
+                                  borderColor: override ? colors.green400 : colors.error,
                                   fontWeight: 600,
                                 }}
                                 variant="outlined"
@@ -279,8 +279,8 @@ export default function UserPermissionEditor({
                               sx={{
                                 backgroundColor: effective
                                   ? "rgba(74, 222, 128, 0.15)"
-                                  : "rgba(248, 113, 113, 0.15)",
-                                color: effective ? colors.green400 : "#f87171",
+                                  : colors.errorBg,
+                                color: effective ? colors.green400 : colors.error,
                                 fontWeight: 600,
                               }}
                             />
@@ -307,7 +307,7 @@ export default function UserPermissionEditor({
                                   disabled={isPending}
                                   onClick={() => handlePermissionAction(key, "deny")}
                                   sx={{
-                                    color: "#f87171",
+                                    color: colors.error,
                                     fontSize: "0.7rem",
                                     minWidth: "auto",
                                     px: 1,

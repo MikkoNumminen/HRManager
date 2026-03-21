@@ -36,7 +36,8 @@
     "seedMessage": "Unataka kuhifadhi data iliyopo au kuibadilisha na data ya majaribio?",
     "keepExisting": "Hifadhi iliyopo",
     "replaceAll": "Badilisha yote",
-    "language": "Lugha"
+    "language": "Lugha",
+    "theme": "Mandhari"
   },
   "home": {
     "title": "Mfumo wa Usimamizi wa Rasilimali Watu",

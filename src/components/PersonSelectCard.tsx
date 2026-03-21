@@ -21,8 +21,8 @@ export function PersonSelectCard({ person, selected, onSelect, variant = "add" }
     .slice(0, 2);
 
   const isRemove = variant === "remove";
-  const accentColor = isRemove ? "#f87171" : colors.green400;
-  const accentBg = isRemove ? "rgba(248, 113, 113, 0.1)" : "rgba(74, 222, 128, 0.08)";
+  const accentColor = isRemove ? colors.error : colors.green400;
+  const accentBg = isRemove ? colors.errorBg : "rgba(74, 222, 128, 0.08)";
   const accentDark = isRemove ? "#7f1d1d" : colors.green900;
 
   return (

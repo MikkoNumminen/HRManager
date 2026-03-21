@@ -10,6 +10,7 @@ import TutorialCelebration from "@/components/TutorialCelebration";
 import TutorialChecklist from "@/components/TutorialChecklist";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
+import { THEME_PALETTES, THEME_NAMES, THEME_STORAGE_KEY, DEFAULT_THEME } from "@/themeConfig";
 
 const inter = Inter({ subsets: ["latin", "latin-ext", "cyrillic", "greek", "vietnamese"] });
 
@@ -25,8 +26,13 @@ export default async function RootLayout({
   const locale = await getLocale();
   const messages = await getMessages();
 
+  const foucScript = `(function(){try{var t=localStorage.getItem("${THEME_STORAGE_KEY}");var v=${JSON.stringify(Object.fromEntries(THEME_NAMES.map((name) => [name, Object.entries(THEME_PALETTES[name]).map(([k, v]) => ["--hrm-" + k, v])])))};var p=v[t]||v["${DEFAULT_THEME}"];var s=document.documentElement.style;for(var i=0;i<p.length;i++)s.setProperty(p[i][0],p[i][1])}catch(e){}})()`;
+
   return (
     <html lang={locale} dir={locale === "ar" ? "rtl" : "ltr"}>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: foucScript }} />
+      </head>
       <body style={{ fontFamily: inter.style.fontFamily }}>
         <SessionProvider>
           <AppRouterCacheProvider>

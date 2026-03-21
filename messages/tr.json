@@ -36,7 +36,8 @@
     "seedMessage": "Mevcut verileri korumak mı yoksa test verileriyle değiştirmek mi istiyorsunuz?",
     "keepExisting": "Mevcutı koru",
     "replaceAll": "Tümünü değiştir",
-    "language": "Dil"
+    "language": "Dil",
+    "theme": "Tema"
   },
   "home": {
     "title": "İnsan Kaynakları Yönetim Sistemi",

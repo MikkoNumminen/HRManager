@@ -52,8 +52,8 @@ export default function ConfirmDialog({
         <Button
           onClick={onConfirm}
           sx={{
-            color: "#f87171",
-            "&:hover": { backgroundColor: "rgba(248, 113, 113, 0.1)" },
+            color: colors.error,
+            "&:hover": { backgroundColor: colors.errorBg },
           }}
         >
           {confirmLabel}

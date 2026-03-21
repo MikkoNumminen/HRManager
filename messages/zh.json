@@ -36,7 +36,8 @@
     "seedMessage": "您想保留现有数据还是用示例数据替换？",
     "keepExisting": "保留现有",
     "replaceAll": "全部替换",
-    "language": "语言"
+    "language": "语言",
+    "theme": "主题"
   },
   "home": {
     "title": "人力资源管理系统",
