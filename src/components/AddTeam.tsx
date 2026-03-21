@@ -43,8 +43,12 @@ const AddTeamForm: React.FC = () => {
 
   return (
     <Box component="form" action={formAction} sx={formStyles} data-tutorial="add-team-form">
-      <Typography variant="h6">{t("addTeam")}</Typography>
-      {state.error && <Typography color="error">{state.error}</Typography>}
+      <Typography variant="h5">{t("addTeam")}</Typography>
+      {state.error && (
+        <Typography color="error" role="alert">
+          {state.error}
+        </Typography>
+      )}
       <Tooltip title={tc("required")} placement="right" arrow>
         <TextField
           label={t("enterTeamName")}

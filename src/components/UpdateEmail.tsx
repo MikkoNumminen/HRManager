@@ -41,8 +41,12 @@ const UpdateEmailForm: React.FC<{ personID: string; currentEmail?: string }> = (
 
   return (
     <Box component="form" action={formAction} sx={formStyles}>
-      <Typography variant="h6">{t("changeEmail")}</Typography>
-      {state.error && <Typography color="error">{state.error}</Typography>}
+      <Typography variant="h5">{t("changeEmail")}</Typography>
+      {state.error && (
+        <Typography color="error" role="alert">
+          {state.error}
+        </Typography>
+      )}
       <input type="hidden" name="personID" value={personID} />
       <Tooltip title={tc("requiredEmail")} placement="right" arrow>
         <TextField

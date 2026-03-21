@@ -72,11 +72,11 @@ const PersonTable: React.FC<PersonTableProps> = ({ persons, minimal = false }) =
       <Table sx={{ minWidth: { xs: 500, sm: 650 } }} aria-label="person table">
         <TableHead>
           <TableRow>
-            <TableCell>{tc("name")}</TableCell>
-            <TableCell>{t("position")}</TableCell>
-            <TableCell>{tc("email")}</TableCell>
-            <TableCell>{tc("createdAt")}</TableCell>
-            <TableCell>{tc("updatedAt")}</TableCell>
+            <TableCell scope="col">{tc("name")}</TableCell>
+            <TableCell scope="col">{t("position")}</TableCell>
+            <TableCell scope="col">{tc("email")}</TableCell>
+            <TableCell scope="col">{tc("createdAt")}</TableCell>
+            <TableCell scope="col">{tc("updatedAt")}</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>

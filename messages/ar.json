@@ -256,6 +256,8 @@
     "checklistTitle": "جولة تعريفية",
     "checklistProgress": "{completed} من {total} مكتمل",
     "restartTutorial": "إعادة الجولة",
+    "collapse": "طي القائمة",
+    "expand": "توسيع القائمة",
     "taskComplete": "أحسنت!",
     "finaleTitle": "اكتملت الجولة!",
     "finaleMessage": "لقد استكشفت جميع الميزات الرئيسية. عمل رائع!",

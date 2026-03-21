@@ -256,6 +256,8 @@
     "checklistTitle": "ทัวร์สาธิต",
     "checklistProgress": "เสร็จสิ้น {completed} จาก {total}",
     "restartTutorial": "เริ่มทัวร์ใหม่",
+    "collapse": "ย่อรายการ",
+    "expand": "ขยายรายการ",
     "taskComplete": "ทำได้ดีมาก!",
     "finaleTitle": "ทัวร์เสร็จสมบูรณ์!",
     "finaleMessage": "คุณได้สำรวจฟีเจอร์หลักทั้งหมดแล้ว ยอดเยี่ยมมาก!",

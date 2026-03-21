@@ -256,6 +256,8 @@
     "checklistTitle": "Demo Tour",
     "checklistProgress": "{completed} of {total} complete",
     "restartTutorial": "Restart Tour",
+    "collapse": "Collapse checklist",
+    "expand": "Expand checklist",
     "taskComplete": "Nice work!",
     "finaleTitle": "Tour Complete!",
     "finaleMessage": "You've explored all the key features. Great job!",

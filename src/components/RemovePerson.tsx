@@ -36,8 +36,12 @@ const RemovePersonForm: React.FC<{ personID: string }> = ({ personID }) => {
 
   return (
     <Box component="form" action={formAction} ref={formRef} sx={formStyles}>
-      <Typography variant="h6">{t("removePerson")}</Typography>
-      {state.error && <Typography color="error">{state.error}</Typography>}
+      <Typography variant="h5">{t("removePerson")}</Typography>
+      {state.error && (
+        <Typography color="error" role="alert">
+          {state.error}
+        </Typography>
+      )}
       <input type="hidden" name="personID" value={personID} />
       <Box display="flex" gap={1} justifyContent="flex-end">
         <Button disabled={isPending} onClick={() => setDialogOpen(true)} sx={smallButtonStyles}>

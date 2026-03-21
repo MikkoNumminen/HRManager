@@ -44,7 +44,11 @@ const AddMemberForm: React.FC<{ teamID: string; persons: Person[]; excludeIds?: 
       <Box sx={headerStyles}>
         <Typography variant="h6">{t("addMember")}</Typography>
       </Box>
-      {state.error && <Typography color="error">{state.error}</Typography>}
+      {state.error && (
+        <Typography color="error" role="alert">
+          {state.error}
+        </Typography>
+      )}
 
       <input type="hidden" name="teamID" value={teamID} />
       <input type="hidden" name="personID" value={selectedMember} />

@@ -256,6 +256,8 @@
     "checklistTitle": "डेमो टूर",
     "checklistProgress": "{completed} में से {total} पूर्ण",
     "restartTutorial": "टूर पुनः आरंभ करें",
+    "collapse": "सूची छोटी करें",
+    "expand": "सूची बड़ी करें",
     "taskComplete": "बहुत बढ़िया!",
     "finaleTitle": "टूर पूर्ण!",
     "finaleMessage": "आपने सभी प्रमुख सुविधाओं को देख लिया है। शानदार काम!",

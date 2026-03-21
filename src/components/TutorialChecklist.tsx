@@ -86,7 +86,11 @@ export default function TutorialChecklist() {
               {t("checklistProgress", { completed: completedCount, total: totalSteps })}
             </Typography>
           </Box>
-          <IconButton size="small" sx={{ color: colors.slate300 }}>
+          <IconButton
+            size="small"
+            aria-label={expanded ? t("collapse") : t("expand")}
+            sx={{ color: colors.slate300 }}
+          >
             {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
           </IconButton>
         </Box>

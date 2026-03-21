@@ -305,27 +305,36 @@ export default function AuditLogViewer({
           <TableHead>
             <TableRow>
               <Tooltip title={t("tooltipTimestamp")} placement="top" arrow>
-                <TableCell sx={{ color: colors.slate400, cursor: "help", width: "15%" }}>
+                <TableCell
+                  scope="col"
+                  sx={{ color: colors.slate400, cursor: "help", width: "15%" }}
+                >
                   {t("columnTimestamp")}
                 </TableCell>
               </Tooltip>
               <Tooltip title={t("tooltipUser")} placement="top" arrow>
-                <TableCell sx={{ color: colors.slate400, cursor: "help", width: "18%" }}>
+                <TableCell
+                  scope="col"
+                  sx={{ color: colors.slate400, cursor: "help", width: "18%" }}
+                >
                   {t("columnUser")}
                 </TableCell>
               </Tooltip>
               <Tooltip title={t("tooltipAction")} placement="top" arrow>
-                <TableCell sx={{ color: colors.slate400, cursor: "help", width: "9%" }}>
+                <TableCell scope="col" sx={{ color: colors.slate400, cursor: "help", width: "9%" }}>
                   {t("columnAction")}
                 </TableCell>
               </Tooltip>
               <Tooltip title={t("tooltipType")} placement="top" arrow>
-                <TableCell sx={{ color: colors.slate400, cursor: "help", width: "10%" }}>
+                <TableCell
+                  scope="col"
+                  sx={{ color: colors.slate400, cursor: "help", width: "10%" }}
+                >
                   {t("columnType")}
                 </TableCell>
               </Tooltip>
               <Tooltip title={t("tooltipChanges")} placement="top" arrow>
-                <TableCell sx={{ color: colors.slate400, cursor: "help" }}>
+                <TableCell scope="col" sx={{ color: colors.slate400, cursor: "help" }}>
                   {t("columnChanges")}
                 </TableCell>
               </Tooltip>

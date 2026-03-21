@@ -256,6 +256,8 @@
     "checklistTitle": "デモツアー",
     "checklistProgress": "{total}件中{completed}件完了",
     "restartTutorial": "ツアーを再開",
+    "collapse": "チェックリストを折りたたむ",
+    "expand": "チェックリストを展開",
     "taskComplete": "よくできました!",
     "finaleTitle": "ツアー完了!",
     "finaleMessage": "すべての主要機能を確認しました。お疲れさまでした!",

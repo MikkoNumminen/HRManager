@@ -36,12 +36,12 @@ const EditableDepartmentsTable: React.FC<EditableDepartmentsTableProps> = ({ dep
       <Table sx={{ minWidth: { xs: 500, sm: 650 } }} aria-label="departments table">
         <TableHead>
           <TableRow>
-            <TableCell>{tc("name")}</TableCell>
-            <TableCell>{t("description")}</TableCell>
-            <TableCell>{t("head")}</TableCell>
-            <TableCell>{t("teamsHeader")}</TableCell>
-            <TableCell>{tc("createdAt")}</TableCell>
-            <TableCell>{tc("updatedAt")}</TableCell>
+            <TableCell scope="col">{tc("name")}</TableCell>
+            <TableCell scope="col">{t("description")}</TableCell>
+            <TableCell scope="col">{t("head")}</TableCell>
+            <TableCell scope="col">{t("teamsHeader")}</TableCell>
+            <TableCell scope="col">{tc("createdAt")}</TableCell>
+            <TableCell scope="col">{tc("updatedAt")}</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -63,9 +63,16 @@ const EditableDepartmentsTable: React.FC<EditableDepartmentsTableProps> = ({ dep
               >
                 <TableRow
                   hover
+                  tabIndex={0}
                   onClick={() => handleRowClick(dept.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      handleRowClick(dept.id);
+                    }
+                  }}
                   sx={{
-                    "&:hover": {
+                    "&:hover, &:focus-visible": {
                       cursor: "pointer",
                       backgroundColor: colors.rowHover,
                     },

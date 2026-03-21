@@ -129,7 +129,7 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
             </Typography>
           </Box>
           {error && (
-            <Typography variant="caption" sx={{ color: colors.error, mr: 2 }}>
+            <Typography variant="caption" role="alert" sx={{ color: colors.error, mr: 2 }}>
               {error}
             </Typography>
           )}
@@ -292,6 +292,8 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
         onClose={() => setSeedDialogOpen(false)}
         fullWidth
         maxWidth="xs"
+        aria-labelledby="seed-dialog-title"
+        aria-describedby="seed-dialog-description"
         slotProps={{
           paper: {
             sx: {
@@ -302,9 +304,13 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
           },
         }}
       >
-        <DialogTitle sx={{ color: colors.slate100 }}>{t("seedTitle")}</DialogTitle>
+        <DialogTitle id="seed-dialog-title" sx={{ color: colors.slate100 }}>
+          {t("seedTitle")}
+        </DialogTitle>
         <DialogContent>
-          <DialogContentText sx={{ color: colors.slate400 }}>{t("seedMessage")}</DialogContentText>
+          <DialogContentText id="seed-dialog-description" sx={{ color: colors.slate400 }}>
+            {t("seedMessage")}
+          </DialogContentText>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
           <Button onClick={() => setSeedDialogOpen(false)} sx={{ color: colors.slate300 }}>

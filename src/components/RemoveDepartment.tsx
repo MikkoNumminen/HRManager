@@ -33,8 +33,12 @@ const RemoveDepartmentForm: React.FC<{ departmentID: string }> = ({ departmentID
 
   return (
     <Box component="form" action={formAction} ref={formRef} sx={formStyles}>
-      <Typography variant="h6">{t("removeDepartment")}</Typography>
-      {state.error && <Typography color="error">{state.error}</Typography>}
+      <Typography variant="h5">{t("removeDepartment")}</Typography>
+      {state.error && (
+        <Typography color="error" role="alert">
+          {state.error}
+        </Typography>
+      )}
       <input type="hidden" name="departmentID" value={departmentID} />
       <Box display="flex" gap={1} justifyContent="flex-end">
         <Button disabled={isPending} onClick={() => setDialogOpen(true)} sx={smallButtonStyles}>

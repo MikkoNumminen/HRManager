@@ -37,8 +37,12 @@ const AssignTeamToDepartmentForm: React.FC<{
 
   return (
     <Box component="form" action={formAction} sx={formStyles} data-tutorial="assign-team-form">
-      <Typography variant="h6">{t("assignTeam")}</Typography>
-      {state.error && <Typography color="error">{state.error}</Typography>}
+      <Typography variant="h5">{t("assignTeam")}</Typography>
+      {state.error && (
+        <Typography color="error" role="alert">
+          {state.error}
+        </Typography>
+      )}
 
       <input type="hidden" name="departmentID" value={departmentID} />
       <input type="hidden" name="teamID" value={selectedTeam} />

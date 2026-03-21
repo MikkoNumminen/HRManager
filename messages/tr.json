@@ -256,6 +256,8 @@
     "checklistTitle": "Demo Turu",
     "checklistProgress": "{completed} / {total} tamamlandı",
     "restartTutorial": "Turu yeniden başlat",
+    "collapse": "Listeyi daralt",
+    "expand": "Listeyi genişlet",
     "taskComplete": "Harika!",
     "finaleTitle": "Tur tamamlandı!",
     "finaleMessage": "Tüm temel özellikleri keşfettiniz. Tebrikler!",

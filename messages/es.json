@@ -256,6 +256,8 @@
     "checklistTitle": "Visita guiada",
     "checklistProgress": "{completed} de {total} completado(s)",
     "restartTutorial": "Reiniciar visita",
+    "collapse": "Contraer lista",
+    "expand": "Expandir lista",
     "taskComplete": "Buen trabajo!",
     "finaleTitle": "Visita completada!",
     "finaleMessage": "Ha explorado todas las funcionalidades clave. Excelente trabajo!",

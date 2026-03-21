@@ -42,7 +42,11 @@ const UpdateDepartmentHeadForm: React.FC<{
       <Box sx={headerStyles}>
         <Typography variant="h6">{t("setHead")}</Typography>
       </Box>
-      {state.error && <Typography color="error">{state.error}</Typography>}
+      {state.error && (
+        <Typography color="error" role="alert">
+          {state.error}
+        </Typography>
+      )}
 
       <input type="hidden" name="departmentID" value={departmentID} />
       <input type="hidden" name="personID" value={newHead} />

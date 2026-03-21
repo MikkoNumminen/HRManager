@@ -139,7 +139,11 @@ export default function UserPermissionEditor({
             variant="outlined"
           />
         </Box>
-        {roleState.error && <Typography color="error">{roleState.error}</Typography>}
+        {roleState.error && (
+          <Typography color="error" role="alert">
+            {roleState.error}
+          </Typography>
+        )}
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <Typography variant="body2" sx={{ color: colors.slate400 }}>
             {user.name ?? tc("unknown")} ({user.email})
@@ -188,7 +192,11 @@ export default function UserPermissionEditor({
         <Box sx={headerStyles}>
           <Typography variant="h6">{t("permissions")}</Typography>
         </Box>
-        {permError && <Typography color="error">{permError}</Typography>}
+        {permError && (
+          <Typography color="error" role="alert">
+            {permError}
+          </Typography>
+        )}
         {isSuperuser ? (
           <Typography variant="body2" sx={{ color: colors.slate400 }}>
             {t("superuserAllPermissions")}

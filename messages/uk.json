@@ -256,6 +256,8 @@
     "checklistTitle": "Огляд демо",
     "checklistProgress": "{completed} з {total} виконано",
     "restartTutorial": "Почати спочатку",
+    "collapse": "Згорнути список",
+    "expand": "Розгорнути список",
     "taskComplete": "Чудова робота!",
     "finaleTitle": "Огляд завершено!",
     "finaleMessage": "Ви ознайомилися з усіма основними функціями. Відмінно!",

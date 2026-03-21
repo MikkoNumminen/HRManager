@@ -256,6 +256,8 @@
     "checklistTitle": "데모 투어",
     "checklistProgress": "{total}개 중 {completed}개 완료",
     "restartTutorial": "투어 다시 시작",
+    "collapse": "체크리스트 접기",
+    "expand": "체크리스트 펼치기",
     "taskComplete": "잘하셨습니다!",
     "finaleTitle": "투어 완료!",
     "finaleMessage": "모든 주요 기능을 살펴보셨습니다. 훌륭합니다!",

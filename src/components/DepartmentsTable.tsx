@@ -74,18 +74,24 @@ const DepartmentsTable: React.FC<DepartmentsTableProps> = ({ departments, minima
       <Table sx={{ minWidth: { xs: 500, sm: 650 } }} aria-label="departments table">
         <TableHead>
           <TableRow>
-            <TableCell>{tc("name")}</TableCell>
+            <TableCell scope="col">{tc("name")}</TableCell>
             <Tooltip title={t("descriptionTooltip")} placement="top" arrow>
-              <TableCell sx={{ cursor: "help" }}>{t("description")}</TableCell>
+              <TableCell scope="col" sx={{ cursor: "help" }}>
+                {t("description")}
+              </TableCell>
             </Tooltip>
             <Tooltip title={t("headTooltip")} placement="top" arrow>
-              <TableCell sx={{ cursor: "help" }}>{t("head")}</TableCell>
+              <TableCell scope="col" sx={{ cursor: "help" }}>
+                {t("head")}
+              </TableCell>
             </Tooltip>
             <Tooltip title={t("teamsTooltip")} placement="top" arrow>
-              <TableCell sx={{ cursor: "help" }}>{t("teamsHeader")}</TableCell>
+              <TableCell scope="col" sx={{ cursor: "help" }}>
+                {t("teamsHeader")}
+              </TableCell>
             </Tooltip>
-            <TableCell>{tc("createdAt")}</TableCell>
-            <TableCell>{tc("updatedAt")}</TableCell>
+            <TableCell scope="col">{tc("createdAt")}</TableCell>
+            <TableCell scope="col">{tc("updatedAt")}</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>

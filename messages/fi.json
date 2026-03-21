@@ -256,6 +256,8 @@
     "checklistTitle": "Demokierros",
     "checklistProgress": "{completed} / {total} suoritettu",
     "restartTutorial": "Aloita kierros alusta",
+    "collapse": "Pienennä tarkistuslista",
+    "expand": "Laajenna tarkistuslista",
     "taskComplete": "Hienosti tehty!",
     "finaleTitle": "Kierros suoritettu!",
     "finaleMessage": "Olet tutustunut kaikkiin keskeisiin ominaisuuksiin. Hienoa!",

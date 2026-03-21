@@ -46,7 +46,11 @@ const RemoveMemberForm: React.FC<{
       <Box sx={headerStyles}>
         <Typography variant="h6">{t("removeMember")}</Typography>
       </Box>
-      {state.error && <Typography color="error">{state.error}</Typography>}
+      {state.error && (
+        <Typography color="error" role="alert">
+          {state.error}
+        </Typography>
+      )}
 
       <input type="hidden" name="teamID" value={teamID} />
       <input type="hidden" name="personID" value={selectedMember} />

@@ -39,10 +39,10 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({ users }) => {
       <Table sx={{ minWidth: { xs: 500, sm: 650 } }} aria-label="user management table">
         <TableHead>
           <TableRow>
-            <TableCell>{tc("name")}</TableCell>
-            <TableCell>{tc("email")}</TableCell>
-            <TableCell>{t("role")}</TableCell>
-            <TableCell>{tc("createdAt")}</TableCell>
+            <TableCell scope="col">{tc("name")}</TableCell>
+            <TableCell scope="col">{tc("email")}</TableCell>
+            <TableCell scope="col">{t("role")}</TableCell>
+            <TableCell scope="col">{tc("createdAt")}</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -64,9 +64,16 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({ users }) => {
               >
                 <TableRow
                   hover
+                  tabIndex={0}
                   onClick={() => router.push(`/admin/${user.id}`)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      router.push(`/admin/${user.id}`);
+                    }
+                  }}
                   sx={{
-                    "&:hover": {
+                    "&:hover, &:focus-visible": {
                       cursor: "pointer",
                       backgroundColor: colors.rowHover,
                     },

@@ -33,6 +33,8 @@ export default function ConfirmDialog({
       onClose={onCancel}
       fullWidth
       maxWidth="xs"
+      aria-labelledby="confirm-dialog-title"
+      aria-describedby="confirm-dialog-description"
       slotProps={{
         paper: {
           sx: {
@@ -43,9 +45,13 @@ export default function ConfirmDialog({
         },
       }}
     >
-      <DialogTitle sx={{ color: colors.slate100 }}>{title}</DialogTitle>
+      <DialogTitle id="confirm-dialog-title" sx={{ color: colors.slate100 }}>
+        {title}
+      </DialogTitle>
       <DialogContent>
-        <DialogContentText sx={{ color: colors.slate400 }}>{message}</DialogContentText>
+        <DialogContentText id="confirm-dialog-description" sx={{ color: colors.slate400 }}>
+          {message}
+        </DialogContentText>
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2 }}>
         <Button onClick={onCancel} sx={{ color: colors.slate300 }}>

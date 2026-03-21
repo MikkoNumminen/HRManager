@@ -256,6 +256,8 @@
     "checklistTitle": "Demo-Rundgang",
     "checklistProgress": "{completed} von {total} abgeschlossen",
     "restartTutorial": "Rundgang neu starten",
+    "collapse": "Checkliste einklappen",
+    "expand": "Checkliste ausklappen",
     "taskComplete": "Gut gemacht!",
     "finaleTitle": "Rundgang abgeschlossen!",
     "finaleMessage": "Sie haben alle wichtigen Funktionen erkundet. Hervorragend!",

@@ -256,6 +256,8 @@
     "checklistTitle": "Przewodnik demo",
     "checklistProgress": "{completed} z {total} ukończono",
     "restartTutorial": "Uruchom ponownie",
+    "collapse": "Zwiń listę",
+    "expand": "Rozwiń listę",
     "taskComplete": "Świetna robota!",
     "finaleTitle": "Przewodnik ukończony!",
     "finaleMessage": "Poznałeś wszystkie kluczowe funkcje. Doskonale!",

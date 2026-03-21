@@ -256,6 +256,8 @@
     "checklistTitle": "Demoguide",
     "checklistProgress": "{completed} av {total} slutförda",
     "restartTutorial": "Starta om guiden",
+    "collapse": "Minimera checklista",
+    "expand": "Expandera checklista",
     "taskComplete": "Bra gjort!",
     "finaleTitle": "Guiden slutförd!",
     "finaleMessage": "Du har utforskat alla viktiga funktioner. Snyggt jobbat!",

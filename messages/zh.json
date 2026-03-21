@@ -256,6 +256,8 @@
     "checklistTitle": "演示导览",
     "checklistProgress": "已完成 {completed}/{total}",
     "restartTutorial": "重新开始导览",
+    "collapse": "折叠清单",
+    "expand": "展开清单",
     "taskComplete": "做得好！",
     "finaleTitle": "导览完成！",
     "finaleMessage": "您已探索了所有主要功能。做得很棒！",

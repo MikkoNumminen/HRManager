@@ -256,6 +256,8 @@
     "checklistTitle": "Ziara ya Demo",
     "checklistProgress": "{completed} kati ya {total} zimekamilika",
     "restartTutorial": "Anza upya ziara",
+    "collapse": "Punguza orodha",
+    "expand": "Panua orodha",
     "taskComplete": "Umefanya vizuri!",
     "finaleTitle": "Ziara imekamilika!",
     "finaleMessage": "Umechunguza vipengele vyote muhimu. Hongera!",

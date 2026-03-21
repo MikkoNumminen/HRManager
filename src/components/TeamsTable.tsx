@@ -73,11 +73,11 @@ const TeamsTable: React.FC<CombinedTeamProps> = ({ combinedTeams, minimal = fals
       <Table sx={{ minWidth: { xs: 500, sm: 650 } }} aria-label="teams table">
         <TableHead>
           <TableRow>
-            <TableCell>{t("teamName")}</TableCell>
-            <TableCell>{t("teamManager")}</TableCell>
-            <TableCell>{t("teamMembers")}</TableCell>
-            <TableCell>{tc("createdAt")}</TableCell>
-            <TableCell>{tc("updatedAt")}</TableCell>
+            <TableCell scope="col">{t("teamName")}</TableCell>
+            <TableCell scope="col">{t("teamManager")}</TableCell>
+            <TableCell scope="col">{t("teamMembers")}</TableCell>
+            <TableCell scope="col">{tc("createdAt")}</TableCell>
+            <TableCell scope="col">{tc("updatedAt")}</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>

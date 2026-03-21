@@ -35,6 +35,25 @@ export default async function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: foucScript }} />
       </head>
       <body style={{ fontFamily: inter.style.fontFamily }}>
+        <Box
+          component="a"
+          href="#main-content"
+          sx={{
+            position: "absolute",
+            top: -40,
+            left: 0,
+            px: 2,
+            py: 1,
+            zIndex: 1500,
+            backgroundColor: "var(--hrm-green400)",
+            color: "var(--hrm-slate700)",
+            fontWeight: 600,
+            textDecoration: "none",
+            "&:focus": { top: 0 },
+          }}
+        >
+          Skip to main content
+        </Box>
         <SessionProvider>
           <AppRouterCacheProvider>
             <NextIntlClientProvider locale={locale} messages={messages}>
@@ -42,6 +61,8 @@ export default async function RootLayout({
                 <SnackbarProvider>
                   <TutorialProvider>
                     <Box
+                      component="main"
+                      id="main-content"
                       sx={{
                         maxWidth: "1280px",
                         mx: "auto",
