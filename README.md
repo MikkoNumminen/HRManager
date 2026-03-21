@@ -1,6 +1,6 @@
 # HRManager
 
-A production-grade HR management system with granular RBAC, audit logging, AI-powered i18n across 18 languages, and 750 tests at 99.7% line coverage.
+A production-grade HR management system with granular RBAC, audit logging, AI-powered i18n across 18 languages, and 763 tests at 99.7% line coverage.
 
 [![CI](https://github.com/MikkoNumminen/HRManager/actions/workflows/ci.yml/badge.svg)](https://github.com/MikkoNumminen/HRManager/actions/workflows/ci.yml)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)
@@ -26,7 +26,7 @@ A production-grade HR management system with granular RBAC, audit logging, AI-po
 
 ## Highlights
 
-- **750 tests, 99.7% line coverage** — Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, audit logging, and all 39 UI components tested against real PostgreSQL
+- **763 tests, 99.7% line coverage** — Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, audit logging, and all 39 UI components tested against real PostgreSQL
 - **Granular RBAC** — 4 roles, 21 permission keys, per-user grant/deny overrides with three-state toggles (deny / role default / grant)
 - **Immutable audit trail** — every mutation logged with before/after JSON snapshots inside the same `$transaction` for atomicity
 - **18 languages** — next-intl with cookie persistence, Accept-Language detection, and an AI-powered translation pipeline using parallel Claude Code agents
@@ -95,8 +95,8 @@ Individual permissions can be overridden per-user — e.g. granting `person:crea
 | Auth callbacks | 20      |
 | Audit logging  | 6       |
 | RBAC logic     | 28      |
-| UI components  | 488     |
-| **Total**      | **750** |
+| UI components  | 501     |
+| **Total**      | **763** |
 
 ```
 Statements : 99.09%    Branches : 95.64%
