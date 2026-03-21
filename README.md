@@ -1,6 +1,6 @@
 # HRManager
 
-A full-stack HR management system for managing employees, teams, and departments — built with Next.js 16, React 19, MUI v7, Prisma, and TypeScript. This is a portfolio project intentionally built to production-grade complexity to demonstrate technical depth and breadth.
+A production-grade HR management system with granular RBAC, audit logging, AI-powered i18n across 18 languages, and 738 tests at 99.7% line coverage.
 
 [![CI](https://github.com/MikkoNumminen/HRManager/actions/workflows/ci.yml/badge.svg)](https://github.com/MikkoNumminen/HRManager/actions/workflows/ci.yml)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)
@@ -12,298 +12,139 @@ A full-stack HR management system for managing employees, teams, and departments
 ![Jest](https://img.shields.io/badge/Tested_with-Jest_30-C21325?style=flat-square&logo=jest)
 ![Prettier](https://img.shields.io/badge/Formatted_with-Prettier-F7B93E?style=flat-square&logo=prettier)
 
-### **[Try the live demo](https://hr-manager-pearl.vercel.app)** — click "Try Demo" to sign in instantly as an administrator, no account required.
+### **[Try the live demo](https://hr-manager-pearl.vercel.app)** — click "Try Demo" to sign in instantly, no account required.
+
+<p align="center">
+  <img src="docs/screenshots/overview.png" alt="Dashboard overview" width="100%">
+</p>
+<p align="center">
+  <img src="docs/screenshots/permissions.png" alt="Permission editor" width="49%">
+  <img src="docs/screenshots/audit-log.png" alt="Audit log" width="49%">
+</p>
 
 ---
 
-## Features
+## Highlights
 
-- **People management** — add, update and remove employees with name, email and position
-- **Team management** — create teams, assign managers, add and remove members
-- **Department management** — create departments with optional head and description, assign/remove teams, department detail pages with permission-gated actions
-- **Granular RBAC** — four roles (superuser, administrator, user, guest) with 21 permission keys and per-user overrides (grant/deny individual permissions on top of role defaults)
-- **Audit log** — immutable trail of every mutation with who, what, when, and before/after JSON snapshots; filterable admin viewer with pagination, human-readable change descriptions, and user name resolution
-- **Admin UI** — user management panel with role assignment, per-user permission editor with three-state toggles (deny/default/grant), audit log viewer, and info tooltips
-- **Authentication** — NextAuth v5 with Google and GitHub OAuth plus a one-click demo login; JWT strategy with permission-enriched tokens; automatic superuser bootstrapping on first login
-- **Guest mode** — unauthenticated users see read-only chip views of persons, departments, and teams; manage routes redirect to home
-- **Permission-aware UI** — server-side permission guards on all mutations; client-side conditional rendering hides UI elements the user can't access
-- **Relational integrity** — database constraints enforced at ORM level with cascading rules
-- **Internationalization** — full i18n with next-intl supporting 18 languages (Finnish default, English, Swedish, German, French, Spanish, Portuguese, Polish, Russian, Ukrainian, Arabic with RTL, Hindi, Japanese, Chinese, Korean, Thai, Swahili, Turkish); cookie-based locale persistence, Accept-Language auto-detection, and language switcher in the top bar
-- **AI-powered translation pipeline** — custom i18n sync agent (`scripts/i18n-sync.ts`) that audits all 17 locale files against `en.json` for missing, extra, and untranslated keys; auto-fills structural drift with `--fix`; translates via parallel Claude Code subagents (6 concurrent agents translating 17 locales in ~80s) or via Claude Haiku API for headless CI use; integrated into `npm run validate` pre-commit pipeline
-- **Gamified demo tour** — 8-step interactive tutorial for demo users with auto-detection of task completion via custom DOM events and route matching; pulsing spotlight hints on target elements; DOM-aware navigation guidance highlighting every click needed between pages (back buttons, section links, table rows, dropdown menu items with automatic fallback when menus open/close); confetti celebrations on each step with a trophy finale; floating progress checklist; localStorage persistence; automatic reset on demo logout
-- **Responsive design** — MUI responsive breakpoints for mobile, tablet, and desktop; horizontally scrollable tables, adaptive padding, and overflow-safe TopBar across all screen resolutions
-- **6 visual themes** — Dark (default), Light, Cyberpunk, Retro Terminal, Bubblegum, and Ocean; CSS custom properties architecture allows instant theme switching without component refactoring; FOUC-preventing inline script; localStorage persistence; palette icon switcher in the top bar
-- **Type-safe** — end-to-end TypeScript with Zod schema validation and centralized inferred types
-- **Server-first** — async Server Components for data fetching, Server Actions for mutations inside `$transaction` blocks
-- **CI/CD** — GitHub Actions pipeline runs formatting, linting, full test suite with coverage, and production build on every push and PR
-- **Thoroughly tested** — 738 Jest tests across 47 suites with 99.7% line coverage: Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, audit logging, i18n, and all UI components
-
----
-
-## Getting started
-
-### 1. Install dependencies
-
-```bash
-npm install
-```
-
-> This downloads all the packages the project needs to run. Think of it like going to the store and buying all the ingredients before you can cook. Node.js reads the `package.json` shopping list and grabs everything from the internet into a `node_modules` folder.
-
----
-
-### 2. Configure environment
-
-Copy the example and fill in your values:
-
-```bash
-cp .env.example .env
-```
-
-> The app needs some secret keys and settings to work — things like database location and login credentials. These are kept in a `.env` file that is never committed to git (so your secrets stay yours). The `.env.example` file is a blank template with all the right variable names already in it. You copy it, then fill in the real values.
-
-Required variables:
-
-| Variable             | Description                  |
-| -------------------- | ---------------------------- |
-| `DATABASE_URL`       | PostgreSQL connection string |
-| `AUTH_SECRET`        | NextAuth secret (random key) |
-| `AUTH_GOOGLE_ID`     | Google OAuth client ID       |
-| `AUTH_GOOGLE_SECRET` | Google OAuth client secret   |
-| `AUTH_GITHUB_ID`     | GitHub OAuth client ID       |
-| `AUTH_GITHUB_SECRET` | GitHub OAuth client secret   |
-
-Generate an auth secret:
-
-```bash
-npx auth secret
-```
-
-> `AUTH_SECRET` is a random string that NextAuth uses to sign and encrypt login session tokens. It has to be secret and unpredictable — you never write this yourself. The command above generates a cryptographically secure value and prints it so you can paste it into your `.env`. For Google and GitHub credentials, you register an OAuth app in each provider's developer console and copy the client ID and secret they give you.
-
----
-
-### 3. Set up the database
-
-Install PostgreSQL locally, then create the dev and test databases:
-
-```bash
-createdb hrmanager_dev
-createdb hrmanager_test
-```
-
-Apply the schema migrations:
-
-```bash
-npx prisma migrate dev
-```
-
-> This connects to the PostgreSQL database specified in `DATABASE_URL` and applies all migrations from `prisma/migrations/`. It also generates the Prisma client — the type-safe query builder the app uses to talk to the database. You only need to run this once on a fresh clone, or again whenever the schema changes.
-
----
-
-### 4. Start the dev server
-
-```bash
-npm run dev
-```
-
-> This starts the Next.js development server with hot reload. Any file you save will automatically update in the browser without a full restart. The app will be available at the address below.
-
-Open [http://localhost:3000](http://localhost:3000).
-
----
-
-### Run tests
-
-```bash
-npm test            # UI + schema tests (jsdom)
-npm run test:server # query + server action tests (Node, real PostgreSQL)
-npm run test:all    # both suites
-```
-
-> The project has **676 tests** split into two suites. `npm test` runs the client-side tests — component rendering, user interactions, form validation, Zod schema parsing, and RBAC permission resolution — all in a jsdom environment. `npm run test:server` runs the server-side tests against a real PostgreSQL test database — every Prisma query, every server action mutation (including admin role/permission management and department operations), audit log creation, audit log queries, UUID validation, duplicate prevention, and cascade deletes. The test database (`hrmanager_test`) is separate from the dev database and never touches your dev data. Configure its connection string in `.env.test`.
-
----
-
-### Format code
-
-```bash
-npm run format
-```
-
-> Runs Prettier across all source files and rewrites them to match the project's code style. This is the source of truth for formatting — consistent indentation, quote style, trailing commas, and line width. Run `npm run format:check` if you want to verify formatting without changing any files.
-
----
-
-### Translation sync & validation
-
-```bash
-npm run i18n:audit      # report missing, extra, and untranslated keys across all locales
-npm run i18n:fix        # auto-fill missing keys with English fallback and remove extras
-npm run i18n:translate  # fix + auto-translate via Claude Haiku API (requires ANTHROPIC_API_KEY)
-npm run validate        # pre-commit pipeline: Prettier + ESLint + i18n audit + full test suite
-```
-
-> **i18n sync agent** (`scripts/i18n-sync.ts`) — compares all 17 locale files against `en.json` as the source of truth. Detects missing keys, extra keys, and untranslated values. Fix mode auto-fills missing keys with English fallback and removes extras.
->
-> **AI translation pipeline** — two paths to translate untranslated keys:
->
-> 1. **Claude Code agents** (primary) — parallel subagents translate all 17 locales simultaneously (~80s for full coverage). Zero marginal cost under a Claude Max subscription. Used during active development sessions.
-> 2. **Claude Haiku API** (alternative) — headless `--translate` mode for CI or standalone use. Requires `ANTHROPIC_API_KEY`. The SDK (`@anthropic-ai/sdk`) is a dev dependency and is not included in the production bundle.
->
-> **Pre-commit validation** (`npm run validate`) — runs Prettier, ESLint, i18n audit, and the full 738-test suite in sequence, failing fast on the first error. This is the quality gate before every commit.
+- **738 tests, 99.7% line coverage** — Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, audit logging, and all 38 UI components tested against real PostgreSQL
+- **Granular RBAC** — 4 roles, 21 permission keys, per-user grant/deny overrides with three-state toggles (deny / role default / grant)
+- **Immutable audit trail** — every mutation logged with before/after JSON snapshots inside the same `$transaction` for atomicity
+- **18 languages** — next-intl with cookie persistence, Accept-Language detection, and an AI-powered translation pipeline using parallel Claude Code agents
+- **Gamified demo tour** — 8-step tutorial with DOM-aware navigation hints, spotlight overlays, confetti celebrations, and auto-detection of task completion
+- **6 visual themes** — CSS custom properties with FOUC-preventing inline script; instant switching without re-render
 
 ---
 
 ## Tech stack
 
-| Layer             | Technology                                            |
-| ----------------- | ----------------------------------------------------- |
-| Framework         | Next.js 16 (App Router, Server Components)            |
-| UI library        | React 19 (`useActionState`, `<form action>`)          |
-| Component library | MUI v7 (Material UI)                                  |
-| Language          | TypeScript 5.9                                        |
-| ORM               | Prisma 6 (`relationLoadStrategy: 'join'`)             |
-| Database          | PostgreSQL (Vercel Postgres in production)            |
-| Validation        | Zod 4                                                 |
-| i18n              | next-intl (18 languages, cookie-based locale)         |
-| Auth              | NextAuth v5 (JWT, Google + GitHub OAuth + demo login) |
-| Testing           | Jest 30 + React Testing Library                       |
-| Linting           | ESLint 9 (flat config)                                |
-| Formatting        | Prettier 3                                            |
-| CI/CD             | GitHub Actions (lint, test, build)                    |
+| Layer      | Technology                                            |
+| ---------- | ----------------------------------------------------- |
+| Framework  | Next.js 16 (App Router, Server Components)            |
+| UI         | React 19 + MUI v7                                     |
+| Language   | TypeScript 5.9                                        |
+| ORM        | Prisma 6 (`relationLoadStrategy: 'join'`)             |
+| Database   | PostgreSQL (Vercel Postgres in production)            |
+| Validation | Zod 4                                                 |
+| Auth       | NextAuth v5 (JWT, Google + GitHub OAuth + demo login) |
+| Testing    | Jest 30 + React Testing Library                       |
+| CI/CD      | GitHub Actions (lint, test, build on every push)      |
 
 ---
 
 ## Architecture
 
-The app uses Next.js App Router with a clear separation of concerns:
-
-- **Server Components** fetch data at the page level and pass it as props to client components — no `useEffect` data fetching
-- **Server Actions** (`serverActions.ts`) handle all mutations inside `$transaction` blocks for atomicity
-- **Read queries** (`queries.ts`) are separated from mutations and validated through Zod schemas
-- **Centralized types** (`schemas.ts`) — Zod schemas export inferred `Person`, `CombinedTeam`, `Department`, `AppUser`, `AuditLog`, and `Permissions` types used across all components
-- **Forms** use React 19's `useActionState` for error handling with built-in pending state
-- **Auth** (`auth.ts`) — NextAuth v5 with JWT strategy; Google + GitHub OAuth plus a Credentials-based demo login for portfolio visitors; protected routes redirect unauthenticated users; guest mode shows read-only chip views
-- **RBAC** (`permissions.ts`) — granular permission system with role defaults, per-user overrides, and server-side guards on every mutation
-- **Audit logging** (`auditLog.ts`) — every mutation is logged with before/after snapshots inside the same transaction for atomicity
-- **Internationalization** (`messages/`) — next-intl with 18 language files, cookie-based locale persistence, Accept-Language detection, `useTranslations` in Client Components and `getTranslations` in Server Components
-- **Tutorial system** (`tutorialConfig.ts`) — 8-step guided tour for demo users with auto-detection via custom DOM events, route-based completion, navigation hints between pages, spotlight overlays, confetti celebrations, and localStorage persistence with logout reset
-- **Theme system** (`themeConfig.ts`) — 6 visual themes with CSS custom properties; FOUC-preventing inline script injects variables before React hydrates; ThemeRegistry provides context and GlobalStyles injection; ThemeSwitcher dropdown in the top bar
-
 ```
-src/
-├── app/
-│   ├── api/auth/[...nextauth]/  # NextAuth route handler
-│   ├── admin/                   # User management (superuser-protected)
-│   │   └── audit/               # Audit log viewer (permission-protected)
-│   ├── manageDepartments/        # Department management (permission-protected)
-│   ├── managePersons/           # Person management (permission-protected)
-│   └── manageTeams/             # Team management (permission-protected)
-├── components/       # Reusable MUI client components
-├── tests/            # Jest tests (client + server)
-├── types/            # TypeScript module augmentations (next-auth.d.ts)
-├── auditLog.ts       # Audit logging helper (logAudit)
-├── auth.ts           # NextAuth v5 configuration + RBAC callbacks
-├── db.ts             # Prisma singleton
-├── muiStyles.ts      # Centralised style tokens and component styles
-├── permissions.ts    # RBAC: role defaults, permission resolution, guards
-├── queries.ts        # Read-only data fetching (Prisma + Zod validation)
-├── schemas.ts        # Zod schemas and exported TypeScript types
-├── serverActions.ts  # Mutation server actions (Prisma $transaction)
-├── themeConfig.ts    # Theme palettes, constants, CSS variable generation
-└── tutorialConfig.ts # Tutorial step definitions, route matching, event helpers
-messages/             # i18n translation files (18 languages)
-scripts/
-└── i18n-sync.ts      # Translation sync agent (audit, fix, auto-translate via Claude API)
-prisma/
-└── schema.prisma     # Data model (Person, Team, Department, User, Permission, UserPermission, AuditLog)
+Server Components (data fetching) → Client Components (rendering, UI state)
+Server Actions ($transaction)     → Prisma → PostgreSQL
+                                  → logAudit() (same transaction)
 ```
+
+- **Reads** in `queries.ts` — Zod-validated, no `"use server"`
+- **Mutations** in `serverActions.ts` — always inside `$transaction`, always audit-logged
+- **Types** in `schemas.ts` — Zod schemas with `z.infer` exports, used everywhere
+- **Auth** in `auth.ts` — JWT strategy with permission-enriched tokens; automatic superuser bootstrapping
+- **RBAC** in `permissions.ts` — resolution: superuser (all) → user override → role default
+- **Forms** — React 19 `useActionState` with `action=` prop, no `onSubmit`
+- **Themes** — CSS custom properties injected before hydration; 6 palettes switchable at runtime
+- **i18n** — 18 locale files synced against `en.json` via custom audit tooling
 
 ---
 
-## Data model
+## RBAC
 
-```
-Person          Team             Department        User              Permission
-├── id          ├── teamId       ├── id            ├── id             ├── id
-├── name        ├── teamName     ├── name          ├── email          ├── key
-├── email       ├── managerId    ├── description?  ├── name           └── description
-├── position    ├── departmentId ├── headId?       ├── role
-└── manager?    └── members[]    └── teams[]       └── permissions[]   UserPermission
-                                                                       ├── userId
-AuditLog                                                               ├── permissionId
-├── id                                                                 └── granted
-├── userId
-├── userEmail
-├── action
-├── entityType
-├── entityId
-├── before (JSON)
-├── after (JSON)
-└── createdAt
-```
+| Role          | Access                                           |
+| ------------- | ------------------------------------------------ |
+| Superuser     | All permissions (immutable)                      |
+| Administrator | All CRUD + audit log (no admin UI or data reset) |
+| User          | Read-only                                        |
+| Guest         | Read-only (unauthenticated)                      |
 
-- **Person** — employees with name, email, position, and optional manager (self-referencing FK)
-- **Team** — teams with a name, optional manager (FK to Person), optional department (FK to Department with SetNull), and members via join table
-- **Department** — organizational unit with name, optional description, optional head (FK to Person with SetNull), and associated teams
-- **User** — authenticated identity from OAuth, with role (superuser/administrator/user/guest)
-- **Permission** — catalog of 21 granular permission keys (e.g. `person:create`, `team:delete`, `department:assign_team`, `admin:manage_users`)
-- **UserPermission** — per-user permission overrides (grant/deny) with role-default fallback
-- **AuditLog** — immutable log entries with denormalized user info (no FK), action type, entity reference, and JSON before/after snapshots
-
----
-
-## RBAC permission system
-
-The app implements a granular Role-Based Access Control system with four roles and 21 permission keys:
-
-| Role          | Default permissions                                                                               |
-| ------------- | ------------------------------------------------------------------------------------------------- |
-| Superuser     | All permissions (immutable — cannot be modified or assigned via UI)                               |
-| Administrator | All person, team, and department operations + audit log access (no data reset, seed, or admin UI) |
-| User          | Read-only (person:read, team:read, department:read)                                               |
-| Guest         | Read-only (same as user, but unauthenticated)                                                     |
-
-**Permission resolution precedence**: superuser (always all) → explicit UserPermission override → role default.
-
-Individual permissions can be overridden per-user through the admin UI — for example, granting `person:create` to a regular user, or denying `team:delete` from an administrator. The first user to log in via OAuth is automatically bootstrapped as the superuser.
+Individual permissions can be overridden per-user — e.g. granting `person:create` to a user, or denying `team:delete` from an administrator.
 
 ---
 
 ## Testing
 
-738 tests across 47 test suites, covering every layer of the application:
-
-| Layer              | Tests | What's covered                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| ------------------ | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Zod schemas**    | 71    | PersonSchema, TeamSchema, TeamMemberSchema, DepartmentSchema, DepartmentTeamSchema, UserSchema, PermissionsSchema, AuditLogSchema, AuditLogFilterSchema, AuditActionSchema, AuditEntityTypeSchema — valid data, missing fields, invalid UUIDs, nullable fields, wrong types, enum validation                                                                                                                                                                                                                                                                                                                                                                           |
-| **Prisma queries** | 38    | `getPersons`, `getTeams`, `getDepartments`, `getUsers`, `getUserById`, `getAllPermissionKeys`, `getAuditLogs`, `getAuditLogUserEmails` against real PostgreSQL — filtering, pagination, ordering, date range filtering, empty state, distinct emails, department relations                                                                                                                                                                                                                                                                                                                                                                                             |
-| **Server actions** | 98    | All 20 mutations — CRUD for persons/teams/members/departments, department head assignment, team-department assignment, admin role updates, permission override grant/deny/reset, mock data seeding with permission overrides, UUID validation, duplicate prevention, cascade deletes, superuser protection, idempotent seed                                                                                                                                                                                                                                                                                                                                            |
-| **Auth callbacks** | 20    | NextAuth signIn/jwt/session callbacks and demo Credentials provider — user creation on first sign-in, superuser bootstrapping, duplicate prevention, JWT enrichment with role and permissions, permission overrides, session hydration, demo user creation and reuse                                                                                                                                                                                                                                                                                                                                                                                                   |
-| **Audit logging**  | 6     | `logAudit` — user info capture, null user (unauthenticated), JSON serialization of before/after, undefined handling, null entityId, transaction client usage                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-| **RBAC logic**     | 28    | `resolvePermissions`, `getCurrentUser`, `getUserPermissions`, `hasPermission`, `requirePermission`, `seedPermissions` — superuser immunity, role defaults, grant/deny overrides, invalid override key guard, session lookup, unauthenticated fallback, permission seeding                                                                                                                                                                                                                                                                                                                                                                                              |
-| **UI components**  | 476   | All 38 components + i18n — rendering, user interactions, keyboard accessibility, form validation, three-state permission toggles (deny/default/grant), role chips, unknown role fallbacks, selection cards, minimal/chip/full views, empty states, router navigation, admin menu links, audit log filtering and pagination, reset/seed dialogs, department management, demo login button, error handling, tutorial config/provider/spotlight/celebration/checklist with DOM-aware navigation hints, theme config/registry/switcher with 6 palettes and localStorage persistence, language switcher with 18 locales, i18n locale detection and cookie/header resolution |
+| Layer          | Tests   |
+| -------------- | ------- |
+| Zod schemas    | 71      |
+| Prisma queries | 38      |
+| Server actions | 98      |
+| Auth callbacks | 20      |
+| Audit logging  | 6       |
+| RBAC logic     | 28      |
+| UI components  | 476     |
+| **Total**      | **738** |
 
 ```
-Coverage summary (combined client + server suites)
-  Statements : 99.09%
-  Branches   : 95.64%
-  Functions  : 99.68%
-  Lines      : 99.73%
+Statements : 99.09%    Branches : 95.64%
+Functions  : 99.68%    Lines    : 99.73%
 ```
 
-Nearly every source file at 100% line and function coverage — `auditLog.ts`, `auth.ts`, `permissions.ts`, `queries.ts`, `schemas.ts`, `serverActions.ts`, `themeConfig.ts`, `tutorialConfig.ts`, i18n modules, and all 38 components. The remaining gaps are SSR-only code paths untestable in JSDOM (`typeof window === "undefined"` branches) and defensive optional chaining where the fallback cannot be triggered at runtime. Server-side tests run against an isolated PostgreSQL test database (`hrmanager_test`) — the dev database is never touched.
+Server-side tests run against a real PostgreSQL test database. Client-side tests cover all 38 components including permission toggles, audit log filtering, tutorial system, theme switching, and language selection.
+
+---
+
+## Developer tooling
+
+```bash
+npm run validate        # pre-commit gate: Prettier + ESLint + i18n audit + full test suite
+npm run i18n:audit      # report missing, extra, and untranslated keys across all locales
+npm run i18n:fix        # auto-fill missing keys with English fallback, remove extras
+npm run i18n:translate  # auto-translate via Claude Haiku API (requires ANTHROPIC_API_KEY)
+```
+
+**AI translation pipeline** — the i18n sync agent (`scripts/i18n-sync.ts`) audits 17 locale files against `en.json`. Two translation paths: parallel Claude Code subagents during development (6 agents, 17 locales, ~80s) or headless Claude Haiku API for CI.
+
+---
+
+## Getting started
+
+```bash
+npm install                   # install dependencies
+cp .env.example .env          # configure environment variables
+npx auth secret               # generate AUTH_SECRET
+createdb hrmanager_dev        # create PostgreSQL databases
+createdb hrmanager_test
+npx prisma migrate dev        # apply schema migrations
+npm run dev                   # start dev server at localhost:3000
+```
+
+| Variable             | Description                  |
+| -------------------- | ---------------------------- |
+| `DATABASE_URL`       | PostgreSQL connection string |
+| `AUTH_SECRET`        | NextAuth secret              |
+| `AUTH_GOOGLE_ID`     | Google OAuth client ID       |
+| `AUTH_GOOGLE_SECRET` | Google OAuth client secret   |
+| `AUTH_GITHUB_ID`     | GitHub OAuth client ID       |
+| `AUTH_GITHUB_SECRET` | GitHub OAuth client secret   |
 
 ---
 
 ## Deployment
 
-The app is deployed on **Vercel** with **Vercel Postgres** (Neon). The build script runs `prisma generate && prisma migrate deploy && next build` — migrations are applied automatically on every deployment.
-
-The first user to sign in via OAuth is bootstrapped as the superuser. A **demo login** (NextAuth Credentials provider) is available so portfolio visitors can explore the full UI without setting up OAuth — the demo user is created as a superuser with full access to all features including user management, data reset/seed, and audit log.
+Deployed on **Vercel** with **Vercel Postgres** (Neon). Build: `prisma generate && prisma migrate deploy && next build`. The first OAuth user is bootstrapped as superuser. A demo login lets visitors explore without setting up OAuth.
 
 ---
 
-### Commit style: [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
+Commit style: [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
