@@ -403,6 +403,8 @@ describe("UserPermissionEditor", () => {
 
   // Uses fallback color for unknown role values in the role chip.
   test("renders fallback color for unknown role", () => {
+    // MUI warns about out-of-range Select value — expected for unknown role test
+    const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
     const unknownRoleUser = { ...baseUser, role: "custom_role" };
     render(
       <UserPermissionEditor
@@ -413,6 +415,7 @@ describe("UserPermissionEditor", () => {
       />,
     );
     expect(screen.getByText("custom_role")).toBeInTheDocument();
+    warnSpy.mockRestore();
   });
 
   // Shows "Unknown" when user name is null

@@ -6,7 +6,9 @@ jest.mock("next/navigation", () => ({
   useRouter: jest.fn(),
 }));
 
-const mockSetLocale = jest.fn().mockResolvedValue(undefined);
+// Return a never-resolving promise so window.location.reload() is never reached
+// (JSDOM doesn't implement navigation and would emit a console.error)
+const mockSetLocale = jest.fn().mockReturnValue(new Promise(() => {}));
 jest.mock("../i18n/actions", () => ({
   setLocale: (...args: unknown[]) => mockSetLocale(...args),
 }));

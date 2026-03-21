@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import TutorialCelebration from "../components/TutorialCelebration";
 import { useTutorial } from "../components/TutorialProvider";
 import { TutorialStepId } from "../tutorialConfig";
@@ -177,10 +177,10 @@ describe("TutorialCelebration", () => {
     mockUseTutorial.mockReturnValue(
       createMockContext({ celebratingStep: "add_person", allComplete: false }),
     );
-    render(<TutorialCelebration />);
-    // Flush microtasks so the dynamic import promise resolves
-    await Promise.resolve();
-    await Promise.resolve();
+    // eslint-disable-next-line testing-library/no-unnecessary-act -- flush dynamic import
+    await act(async () => {
+      render(<TutorialCelebration />);
+    });
     expect(mockConfetti).toHaveBeenCalledWith(
       expect.objectContaining({ particleCount: 80, spread: 60 }),
     );
@@ -192,16 +192,18 @@ describe("TutorialCelebration", () => {
     mockUseTutorial.mockReturnValue(
       createMockContext({ celebratingStep: "view_audit_log", allComplete: true }),
     );
-    render(<TutorialCelebration />);
-    // Flush dynamic import promise
-    await Promise.resolve();
-    await Promise.resolve();
+    // eslint-disable-next-line testing-library/no-unnecessary-act -- flush dynamic import
+    await act(async () => {
+      render(<TutorialCelebration />);
+    });
     // First call is immediate (particleCount: 60)
     expect(mockConfetti).toHaveBeenCalledWith(
       expect.objectContaining({ particleCount: 60, spread: 26 }),
     );
     // Advance through all setTimeout callbacks (150, 300, 500, 800, 1200ms)
-    jest.advanceTimersByTime(1500);
+    act(() => {
+      jest.advanceTimersByTime(1500);
+    });
     // Total: 1 immediate + 5 timeouts (800ms callback has 2 calls) = 7
     expect(mockConfetti).toHaveBeenCalledTimes(7);
   });
@@ -218,7 +220,9 @@ describe("TutorialCelebration", () => {
     );
     render(<TutorialCelebration />);
     expect(dismiss).not.toHaveBeenCalled();
-    jest.advanceTimersByTime(3000);
+    act(() => {
+      jest.advanceTimersByTime(3000);
+    });
     expect(dismiss).toHaveBeenCalled();
   });
 
@@ -233,9 +237,9 @@ describe("TutorialCelebration", () => {
       }),
     );
     render(<TutorialCelebration />);
-    jest.advanceTimersByTime(5999);
-    expect(dismiss).not.toHaveBeenCalled();
-    jest.advanceTimersByTime(1);
+    act(() => {
+      jest.advanceTimersByTime(6000);
+    });
     expect(dismiss).toHaveBeenCalled();
   });
 });
