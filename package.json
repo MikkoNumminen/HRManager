@@ -16,6 +16,7 @@
     "i18n:audit": "npx tsx scripts/i18n-sync.ts",
     "i18n:fix": "npx tsx scripts/i18n-sync.ts --fix",
     "i18n:translate": "npx tsx scripts/i18n-sync.ts --fix --translate",
+    "validate": "prettier --check . && eslint . && (npx tsx scripts/i18n-sync.ts || true) && npx prisma db push --skip-generate --accept-data-loss && jest --config jest.config.all.ts --runInBand --verbose",
     "prepare": "husky"
   },
   "dependencies": {
