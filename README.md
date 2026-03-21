@@ -29,13 +29,13 @@ A full-stack HR management system for managing employees, teams, and departments
 - **Permission-aware UI** — server-side permission guards on all mutations; client-side conditional rendering hides UI elements the user can't access
 - **Relational integrity** — database constraints enforced at ORM level with cascading rules
 - **Internationalization** — full i18n with next-intl supporting 18 languages (Finnish default, English, Swedish, German, French, Spanish, Portuguese, Polish, Russian, Ukrainian, Arabic with RTL, Hindi, Japanese, Chinese, Korean, Thai, Swahili, Turkish); cookie-based locale persistence, Accept-Language auto-detection, and language switcher in the top bar
-- **Gamified demo tour** — 8-step interactive tutorial for demo users with auto-detection of task completion via custom DOM events and route matching; pulsing spotlight hints on target elements; navigation guidance highlighting every click needed between pages (back buttons, section links, table rows, menus); confetti celebrations on each step with a trophy finale; floating progress checklist; localStorage persistence; automatic reset on demo logout
+- **Gamified demo tour** — 8-step interactive tutorial for demo users with auto-detection of task completion via custom DOM events and route matching; pulsing spotlight hints on target elements; DOM-aware navigation guidance highlighting every click needed between pages (back buttons, section links, table rows, dropdown menu items with automatic fallback when menus open/close); confetti celebrations on each step with a trophy finale; floating progress checklist; localStorage persistence; automatic reset on demo logout
 - **Responsive design** — MUI responsive breakpoints for mobile, tablet, and desktop; horizontally scrollable tables, adaptive padding, and overflow-safe TopBar across all screen resolutions
 - **Dark UI** — MUI dark theme with consistent component styling throughout
 - **Type-safe** — end-to-end TypeScript with Zod schema validation and centralized inferred types
 - **Server-first** — async Server Components for data fetching, Server Actions for mutations inside `$transaction` blocks
 - **CI/CD** — GitHub Actions pipeline runs formatting, linting, full test suite with coverage, and production build on every push and PR
-- **Thoroughly tested** — 675 Jest tests across seven layers with 100% line and function coverage: Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, audit logging, and all UI components
+- **Thoroughly tested** — 680 Jest tests across seven layers with 100% line and function coverage: Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, audit logging, and all UI components
 
 ---
 
@@ -249,7 +249,7 @@ Individual permissions can be overridden per-user through the admin UI — for e
 
 ## Testing
 
-676 tests across 42 test suites, covering every layer of the application:
+680 tests across 42 test suites, covering every layer of the application:
 
 | Layer              | Tests | What's covered                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | ------------------ | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -259,7 +259,7 @@ Individual permissions can be overridden per-user through the admin UI — for e
 | **Auth callbacks** | 19    | NextAuth signIn/jwt/session callbacks and demo Credentials provider — user creation on first sign-in, superuser bootstrapping, duplicate prevention, JWT enrichment with role and permissions, permission overrides, session hydration, demo user creation and reuse                                                                                                                                                                                                            |
 | **Audit logging**  | 6     | `logAudit` — user info capture, null user (unauthenticated), JSON serialization of before/after, undefined handling, null entityId, transaction client usage                                                                                                                                                                                                                                                                                                                    |
 | **RBAC logic**     | 28    | `resolvePermissions`, `getCurrentUser`, `getUserPermissions`, `hasPermission`, `requirePermission`, `seedPermissions` — superuser immunity, role defaults, grant/deny overrides, invalid override key guard, session lookup, unauthenticated fallback, permission seeding                                                                                                                                                                                                       |
-| **UI components**  | 415   | All 36 components — rendering, user interactions, keyboard accessibility, form validation, permission-based visibility, role chips, unknown role fallbacks, selection cards, minimal/chip/full views, empty states, router navigation, admin menu links, audit log filtering and pagination, reset/seed dialogs, department management, demo login button, error handling, tutorial config/provider/spotlight/celebration/checklist with navigation hints and demo logout reset |
+| **UI components**  | 420   | All 36 components — rendering, user interactions, keyboard accessibility, form validation, permission-based visibility, role chips, unknown role fallbacks, selection cards, minimal/chip/full views, empty states, router navigation, admin menu links, audit log filtering and pagination, reset/seed dialogs, department management, demo login button, error handling, tutorial config/provider/spotlight/celebration/checklist with DOM-aware navigation hints, menu item highlighting, and demo logout reset |
 
 ```
 Coverage summary (combined client + server suites)
