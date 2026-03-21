@@ -89,7 +89,7 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
         }}
         elevation={0}
       >
-        <Toolbar sx={backHref ? { pl: { xs: "4px", sm: "16px" } } : undefined}>
+        <Toolbar sx={{ position: "relative" }}>
           {backHref && (
             <IconButton
               component={Link}
@@ -97,6 +97,8 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
               aria-label={tc("goBack")}
               data-tutorial="back-button"
               sx={{
+                position: "absolute",
+                left: { xs: -36, sm: -44 },
                 color: colors.slate100,
                 "&:hover": { backgroundColor: colors.hoverOverlay },
               }}
