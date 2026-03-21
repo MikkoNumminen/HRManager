@@ -109,6 +109,17 @@ export default function TutorialProvider({ children }: { children: React.ReactNo
     setCelebratingStep(null);
   }, []);
 
+  // Re-sync from localStorage on navigation — picks up steps saved by
+  // completeTutorialStep before a server action redirect
+  useEffect(() => {
+    if (!isDemo || !initialized) return;
+    const stored = loadProgress();
+    if (stored.size > completedStepsRef.current.size) {
+      completedStepsRef.current = stored;
+      setCompletedSteps(stored);
+    }
+  }, [pathname, isDemo, initialized]);
+
   useEffect(() => {
     if (!isDemo || !initialized) return;
     TUTORIAL_STEPS.forEach((step) => {

@@ -19,8 +19,8 @@ const AddDepartmentForm: React.FC = () => {
   const [state, formAction, isPending] = useActionState(
     async (_prev: FormState, formData: FormData): Promise<FormState> => {
       try {
-        await createDepartment(formData);
         completeTutorialStep("create_department");
+        await createDepartment(formData);
         return { error: null, success: true };
       } catch (error) {
         return {

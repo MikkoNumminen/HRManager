@@ -23,8 +23,8 @@ const AddMemberForm: React.FC<{ teamID: string; persons: Person[]; excludeIds?: 
   const [state, formAction, isPending] = useActionState(
     async (_prev: FormState, formData: FormData): Promise<FormState> => {
       try {
-        await addMember(formData);
         completeTutorialStep("add_member");
+        await addMember(formData);
         return { error: null };
       } catch (error) {
         return { error: error instanceof Error ? error.message : tc("error") };

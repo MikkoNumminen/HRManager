@@ -21,8 +21,8 @@ const AssignTeamToDepartmentForm: React.FC<{
   const [state, formAction, isPending] = useActionState(
     async (_prev: FormState, formData: FormData): Promise<FormState> => {
       try {
-        await assignTeamToDepartment(formData);
         completeTutorialStep("assign_team_to_department");
+        await assignTeamToDepartment(formData);
         return { error: null };
       } catch (error) {
         return { error: error instanceof Error ? error.message : tc("error") };

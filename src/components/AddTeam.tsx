@@ -18,8 +18,8 @@ const AddTeamForm: React.FC = () => {
   const [state, formAction, isPending] = useActionState(
     async (_prev: FormState, formData: FormData): Promise<FormState> => {
       try {
-        await createTeam(formData);
         completeTutorialStep("create_team");
+        await createTeam(formData);
         return { error: null, success: true };
       } catch (error) {
         return {
