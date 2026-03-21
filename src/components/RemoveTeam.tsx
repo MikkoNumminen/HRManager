@@ -33,7 +33,7 @@ const RemoveTeamForm: React.FC<{ teamID: string }> = ({ teamID }) => {
 
   return (
     <Box component="form" action={formAction} ref={formRef} sx={formStyles}>
-      <Typography variant="h5">{t("removeTeam")}</Typography>
+      <Typography variant="h6">{t("removeTeam")}</Typography>
       {state.error && <Typography color="error">{state.error}</Typography>}
       <input type="hidden" name="teamID" value={teamID} />
       <Box display="flex" gap={1} justifyContent="flex-end">

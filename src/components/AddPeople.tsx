@@ -46,7 +46,7 @@ const AddPersonForm: React.FC = () => {
 
   return (
     <Box component="form" action={formAction} sx={formStyles} data-tutorial="add-person-form">
-      <Typography variant="h5">{t("addPerson")}</Typography>
+      <Typography variant="h6">{t("addPerson")}</Typography>
       {state.error && <Typography color="error">{state.error}</Typography>}
       <Tooltip title={tc("required")} placement="right" arrow>
         <TextField

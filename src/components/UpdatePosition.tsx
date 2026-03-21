@@ -39,7 +39,7 @@ const UpdatePositionForm: React.FC<{ personID: string; currentPosition?: string 
 
   return (
     <Box component="form" action={formAction} sx={formStyles}>
-      <Typography variant="h5">{t("changePosition")}</Typography>
+      <Typography variant="h6">{t("changePosition")}</Typography>
       {state.error && <Typography color="error">{state.error}</Typography>}
       <input type="hidden" name="personID" value={personID} />
       <Tooltip title={tc("required")} placement="right" arrow>

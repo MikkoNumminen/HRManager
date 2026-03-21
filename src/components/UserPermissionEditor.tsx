@@ -126,7 +126,7 @@ export default function UserPermissionEditor({
     <Box data-tutorial="permission-editor">
       <Box component="form" action={roleAction} sx={formStyles}>
         <Box sx={headerStyles}>
-          <Typography variant="h5">{t("userRole")}</Typography>
+          <Typography variant="h6">{t("userRole")}</Typography>
           <Chip
             label={roleLabels[user.role] ?? user.role}
             size="small"
@@ -186,7 +186,7 @@ export default function UserPermissionEditor({
 
       <Box sx={formStyles}>
         <Box sx={headerStyles}>
-          <Typography variant="h5">{t("permissions")}</Typography>
+          <Typography variant="h6">{t("permissions")}</Typography>
         </Box>
         {permError && <Typography color="error">{permError}</Typography>}
         {isSuperuser ? (

@@ -126,7 +126,7 @@ export default async function AuditLogPage({
           padding: { xs: "12px", sm: "20px" },
         }}
       >
-        <Typography variant="h5" mb={1}>
+        <Typography variant="h6" mb={1}>
           {t("auditHeading")}
         </Typography>
         <AuditLogViewer

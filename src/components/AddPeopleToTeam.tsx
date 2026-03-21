@@ -42,7 +42,7 @@ const AddMemberForm: React.FC<{ teamID: string; persons: Person[]; excludeIds?: 
   return (
     <Box component="form" action={formAction} sx={formStyles} data-tutorial="add-member-form">
       <Box sx={headerStyles}>
-        <Typography variant="h5">{t("addMember")}</Typography>
+        <Typography variant="h6">{t("addMember")}</Typography>
       </Box>
       {state.error && <Typography color="error">{state.error}</Typography>}
 

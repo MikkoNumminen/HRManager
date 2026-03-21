@@ -40,7 +40,7 @@ const UpdateManagerForm: React.FC<{ teamID: string; persons: Person[]; excludeId
   return (
     <Box component="form" action={formAction} sx={formStyles}>
       <Box sx={headerStyles}>
-        <Typography variant="h5">{t("addManager")}</Typography>
+        <Typography variant="h6">{t("addManager")}</Typography>
       </Box>
       {state.error && <Typography color="error">{state.error}</Typography>}
 

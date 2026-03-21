@@ -34,7 +34,7 @@ const RemoveTeamFromDepartmentForm: React.FC<{
 
   return (
     <Box component="form" action={formAction} sx={formStyles}>
-      <Typography variant="h5">{t("removeTeam")}</Typography>
+      <Typography variant="h6">{t("removeTeam")}</Typography>
       {state.error && <Typography color="error">{state.error}</Typography>}
 
       <input type="hidden" name="teamID" value={selectedTeam} />

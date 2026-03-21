@@ -40,7 +40,7 @@ const UpdateDepartmentHeadForm: React.FC<{
   return (
     <Box component="form" action={formAction} sx={formStyles}>
       <Box sx={headerStyles}>
-        <Typography variant="h5">{t("setHead")}</Typography>
+        <Typography variant="h6">{t("setHead")}</Typography>
       </Box>
       {state.error && <Typography color="error">{state.error}</Typography>}
 

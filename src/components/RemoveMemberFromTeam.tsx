@@ -44,7 +44,7 @@ const RemoveMemberForm: React.FC<{
   return (
     <Box component="form" action={formAction} ref={formRef} sx={formStyles}>
       <Box sx={headerStyles}>
-        <Typography variant="h5">{t("removeMember")}</Typography>
+        <Typography variant="h6">{t("removeMember")}</Typography>
       </Box>
       {state.error && <Typography color="error">{state.error}</Typography>}
 

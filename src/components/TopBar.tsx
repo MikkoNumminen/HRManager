@@ -117,9 +117,9 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
           )}
           <Box sx={{ flexGrow: 1, minWidth: 0 }}>
             <Typography
-              variant="h6"
+              variant="h5"
               sx={{
-                fontSize: { xs: "0.95rem", sm: "1.25rem" },
+                fontSize: { xs: "1.1rem", sm: "1.5rem" },
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 whiteSpace: "nowrap",
