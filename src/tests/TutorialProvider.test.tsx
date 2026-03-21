@@ -346,38 +346,6 @@ describe("TutorialProvider", () => {
     expect(screen.getByTestId("completedCount")).toHaveTextContent("1");
   });
 
-  // Resets tutorial progress when demo user logs out
-  test("resets progress when demo user logs out", async () => {
-    mockUseSession.mockReturnValue({
-      data: { user: { email: "demo@hrmanager.app" } },
-      status: "authenticated",
-    });
-
-    const { rerender } = render(
-      <TutorialProvider>
-        <TutorialConsumer />
-      </TutorialProvider>,
-    );
-
-    // Demo user has progress (view_employees auto-completed)
-    expect(screen.getByTestId("completedCount")).toHaveTextContent("1");
-    expect(localStorage.getItem(STORAGE_KEY)).not.toBeNull();
-
-    // Simulate demo user logging out
-    mockUseSession.mockReturnValue({ data: null, status: "unauthenticated" });
-
-    rerender(
-      <TutorialProvider>
-        <TutorialConsumer />
-      </TutorialProvider>,
-    );
-
-    // Progress should be cleared
-    expect(screen.getByTestId("completedCount")).toHaveTextContent("0");
-    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-    expect(stored).toHaveLength(0);
-  });
-
   // useTutorialMaybe returns context when provider is present
   test("useTutorialMaybe returns context when provider is present", () => {
     mockUseSession.mockReturnValue({ data: null, status: "unauthenticated" });

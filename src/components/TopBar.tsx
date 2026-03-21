@@ -27,6 +27,7 @@ import ConfirmDialog from "./ConfirmDialog";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { Permissions } from "@/schemas";
 import { useTranslations } from "next-intl";
+import { DEMO_EMAIL, STORAGE_KEY } from "@/tutorialConfig";
 
 interface TopBarProps {
   title: string;
@@ -206,6 +207,9 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
                 <MenuItem
                   onClick={() => {
                     setAnchorEl(null);
+                    if (session?.user?.email === DEMO_EMAIL) {
+                      localStorage.removeItem(STORAGE_KEY);
+                    }
                     signOut();
                   }}
                   sx={userMenuItemStyles}

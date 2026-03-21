@@ -80,17 +80,6 @@ export default function TutorialProvider({ children }: { children: React.ReactNo
     completedStepsRef.current = completedSteps;
   }, [completedSteps]);
 
-  // Reset tutorial when demo user logs out (isDemo goes true → false)
-  const wasDemoRef = useRef(isDemo);
-  useEffect(() => {
-    if (wasDemoRef.current && !isDemo) {
-      setCompletedSteps(new Set());
-      setCelebratingStep(null);
-      saveProgress(new Set());
-    }
-    wasDemoRef.current = isDemo;
-  }, [isDemo]);
-
   useEffect(() => {
     if (isDemo) {
       setCompletedSteps(loadProgress());

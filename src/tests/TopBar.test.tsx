@@ -2,6 +2,7 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import TopBar from "../components/TopBar";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { seedMockData } from "../serverActions";
+import { STORAGE_KEY } from "../tutorialConfig";
 
 jest.mock("next/navigation", () => ({
   useRouter: jest.fn(),
@@ -535,5 +536,33 @@ describe("TopBar", () => {
     render(<TopBar title="Home" />);
     fireEvent.click(screen.getByLabelText("User menu"));
     expect(() => fireEvent.click(screen.getByText("Audit Log"))).not.toThrow();
+  });
+
+  // Clears tutorial localStorage when demo user signs out
+  test("clears tutorial progress on demo logout", () => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(["view_employees", "add_person"]));
+    mockUseSession.mockReturnValue({
+      data: { user: { name: "Demo", email: "demo@hrmanager.app", image: null } },
+      status: "authenticated",
+    });
+    render(<TopBar title="Home" />);
+    fireEvent.click(screen.getByLabelText("User menu"));
+    fireEvent.click(screen.getByText("Sign out"));
+    expect(signOut).toHaveBeenCalled();
+    expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
+  });
+
+  // Does not clear tutorial localStorage when non-demo user signs out
+  test("does not clear tutorial progress on non-demo logout", () => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(["view_employees"]));
+    mockUseSession.mockReturnValue({
+      data: { user: { name: "Alice", email: "alice@example.com", image: null } },
+      status: "authenticated",
+    });
+    render(<TopBar title="Home" />);
+    fireEvent.click(screen.getByLabelText("User menu"));
+    fireEvent.click(screen.getByText("Sign out"));
+    expect(signOut).toHaveBeenCalled();
+    expect(localStorage.getItem(STORAGE_KEY)).not.toBeNull();
   });
 });
