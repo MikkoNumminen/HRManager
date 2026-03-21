@@ -28,7 +28,7 @@ import {
 } from "@mui/material";
 import { useActionState, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import { emitTutorialEvent } from "@/tutorialConfig";
+import { completeTutorialStep } from "@/tutorialConfig";
 
 interface UserData {
   id: string;
@@ -100,7 +100,7 @@ export default function UserPermissionEditor({
         formData.set("permissionKey", permissionKey);
         formData.set("action", action);
         await updateUserPermission(formData);
-        emitTutorialEvent("tutorial:permission_updated");
+        completeTutorialStep("manage_permissions");
       } catch (e) {
         setPermError(e instanceof Error ? e.message : tc("error"));
       }

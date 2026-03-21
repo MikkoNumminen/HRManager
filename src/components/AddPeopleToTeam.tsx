@@ -5,7 +5,7 @@ import { activeButtonStyles, formStyles, headerStyles, smallButtonStyles } from 
 import { Box, Button, Typography } from "@mui/material";
 import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
-import { emitTutorialEvent } from "@/tutorialConfig";
+import { completeTutorialStep } from "@/tutorialConfig";
 import { PersonSelectCard } from "./PersonSelectCard";
 import { Person } from "@/schemas";
 
@@ -24,7 +24,7 @@ const AddMemberForm: React.FC<{ teamID: string; persons: Person[]; excludeIds?: 
     async (_prev: FormState, formData: FormData): Promise<FormState> => {
       try {
         await addMember(formData);
-        emitTutorialEvent("tutorial:member_added");
+        completeTutorialStep("add_member");
         return { error: null };
       } catch (error) {
         return { error: error instanceof Error ? error.message : tc("error") };

@@ -5,7 +5,7 @@ import { createTeam } from "@/serverActions";
 import { Box, Button, TextField, Tooltip, Typography } from "@mui/material";
 import { useActionState, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { emitTutorialEvent } from "@/tutorialConfig";
+import { completeTutorialStep } from "@/tutorialConfig";
 
 type FormState = { error: string | null; success: boolean };
 
@@ -19,7 +19,7 @@ const AddTeamForm: React.FC = () => {
     async (_prev: FormState, formData: FormData): Promise<FormState> => {
       try {
         await createTeam(formData);
-        emitTutorialEvent("tutorial:team_created");
+        completeTutorialStep("create_team");
         return { error: null, success: true };
       } catch (error) {
         return {

@@ -176,6 +176,30 @@ export function emitTutorialEvent(eventName: string): void {
   }
 }
 
+/**
+ * Save a tutorial step completion directly to localStorage AND emit the event.
+ * Server actions that call redirect() navigate the page before React can
+ * process event-based state updates — this persists progress synchronously
+ * so it survives the navigation.
+ */
+export function completeTutorialStep(stepId: TutorialStepId): void {
+  if (typeof window === "undefined") return;
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    const progress: string[] = stored ? JSON.parse(stored) : [];
+    if (!progress.includes(stepId)) {
+      progress.push(stepId);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+    }
+  } catch {
+    /* empty */
+  }
+  const step = TUTORIAL_STEPS.find((s) => s.id === stepId);
+  if (step?.event) {
+    emitTutorialEvent(step.event);
+  }
+}
+
 export function findNavigationHint(step: TutorialStep, pathname: string): NavigationHint | null {
   if (!step.navigationHints) return null;
   return step.navigationHints.find((hint) => matchRoute(hint.fromRoute, pathname)) ?? null;

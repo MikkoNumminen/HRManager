@@ -88,14 +88,15 @@ export default function TutorialProvider({ children }: { children: React.ReactNo
   }, [isDemo]);
 
   const completeStep = useCallback((stepId: TutorialStepId) => {
-    setCompletedSteps((prev) => {
-      if (prev.has(stepId)) return prev;
-      const next = new Set(prev);
-      next.add(stepId);
-      saveProgress(next);
-      setCelebratingStep(stepId);
-      return next;
-    });
+    if (completedStepsRef.current.has(stepId)) return;
+    const next = new Set(completedStepsRef.current);
+    next.add(stepId);
+    completedStepsRef.current = next;
+    // Save to localStorage synchronously so progress survives
+    // server action redirects that navigate before React re-renders
+    saveProgress(next);
+    setCompletedSteps(next);
+    setCelebratingStep(stepId);
   }, []);
 
   const resetTutorial = useCallback(() => {

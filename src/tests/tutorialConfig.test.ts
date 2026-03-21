@@ -1,6 +1,7 @@
 import {
   matchRoute,
   emitTutorialEvent,
+  completeTutorialStep,
   findNavigationHint,
   TUTORIAL_STEPS,
   DEMO_EMAIL,
@@ -156,5 +157,32 @@ describe("tutorialConfig", () => {
     for (const hint of backHints) {
       expect(hint.targetSelector).toBe("[data-tutorial='back-button']");
     }
+  });
+
+  // completeTutorialStep saves step to localStorage and emits the event
+  test("completeTutorialStep saves to localStorage", () => {
+    localStorage.clear();
+    completeTutorialStep("add_person");
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    expect(stored).toContain("add_person");
+  });
+
+  // completeTutorialStep is idempotent — does not duplicate entries
+  test("completeTutorialStep is idempotent", () => {
+    localStorage.clear();
+    completeTutorialStep("add_person");
+    completeTutorialStep("add_person");
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    expect(stored.filter((s: string) => s === "add_person")).toHaveLength(1);
+  });
+
+  // completeTutorialStep emits the correct event for the step
+  test("completeTutorialStep emits the step event", () => {
+    localStorage.clear();
+    const handler = jest.fn();
+    window.addEventListener("tutorial:person_created", handler);
+    completeTutorialStep("add_person");
+    expect(handler).toHaveBeenCalledTimes(1);
+    window.removeEventListener("tutorial:person_created", handler);
   });
 });

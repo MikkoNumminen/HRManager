@@ -5,7 +5,7 @@ import { createDepartment } from "@/serverActions";
 import { Box, Button, TextField, Tooltip, Typography } from "@mui/material";
 import { useActionState, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { emitTutorialEvent } from "@/tutorialConfig";
+import { completeTutorialStep } from "@/tutorialConfig";
 
 type FormState = { error: string | null; success: boolean };
 
@@ -20,7 +20,7 @@ const AddDepartmentForm: React.FC = () => {
     async (_prev: FormState, formData: FormData): Promise<FormState> => {
       try {
         await createDepartment(formData);
-        emitTutorialEvent("tutorial:department_created");
+        completeTutorialStep("create_department");
         return { error: null, success: true };
       } catch (error) {
         return {

@@ -5,7 +5,7 @@ import { createPerson } from "@/serverActions";
 import { Box, Button, TextField, Tooltip, Typography } from "@mui/material";
 import { useActionState, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { emitTutorialEvent } from "@/tutorialConfig";
+import { completeTutorialStep } from "@/tutorialConfig";
 
 type FormState = { error: string | null; success: boolean };
 
@@ -21,7 +21,7 @@ const AddPersonForm: React.FC = () => {
     async (_prev: FormState, formData: FormData): Promise<FormState> => {
       try {
         await createPerson(formData);
-        emitTutorialEvent("tutorial:person_created");
+        completeTutorialStep("add_person");
         return { error: null, success: true };
       } catch (error) {
         return {
