@@ -7,7 +7,7 @@ const customJestConfig: Config = {
   displayName: "client",
   setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
   testEnvironment: "jsdom",
-  testPathIgnorePatterns: ["<rootDir>/src/tests/server/"],
+  testPathIgnorePatterns: ["<rootDir>/src/tests/server/", "<rootDir>/.claude/"],
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
     "^next/image$": "<rootDir>/__mocks__/next/image.js",
