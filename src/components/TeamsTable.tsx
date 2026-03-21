@@ -70,7 +70,7 @@ const TeamsTable: React.FC<CombinedTeamProps> = ({ combinedTeams, minimal = fals
 
   return (
     <TableContainer component={Paper} sx={{ marginBottom: "20px" }}>
-      <Table sx={{ minWidth: 650, maxWidth: 1020 }} aria-label="teams table">
+      <Table sx={{ minWidth: 650 }} aria-label="teams table">
         <TableHead>
           <TableRow>
             <TableCell>{t("teamName")}</TableCell>

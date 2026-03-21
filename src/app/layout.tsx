@@ -28,7 +28,9 @@ export default async function RootLayout({
           <AppRouterCacheProvider>
             <NextIntlClientProvider locale={locale} messages={messages}>
               <ThemeRegistry>
-                <Box sx={{ maxWidth: "1280px", mx: "auto", pl: 2, pt: 2, pb: 2, pr: 18 }}>
+                <Box
+                  sx={{ maxWidth: "1280px", mx: "auto", px: { xs: 1, sm: 2, md: 3 }, pt: 2, pb: 2 }}
+                >
                   {children}
                 </Box>
               </ThemeRegistry>

@@ -71,7 +71,7 @@ const DepartmentsTable: React.FC<DepartmentsTableProps> = ({ departments, minima
 
   return (
     <TableContainer component={Paper} sx={{ marginBottom: "20px" }}>
-      <Table sx={{ minWidth: 650, maxWidth: 1020 }} aria-label="departments table">
+      <Table sx={{ minWidth: 650 }} aria-label="departments table">
         <TableHead>
           <TableRow>
             <TableCell>{tc("name")}</TableCell>

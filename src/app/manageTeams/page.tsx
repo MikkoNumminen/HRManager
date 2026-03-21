@@ -29,7 +29,13 @@ export default async function ManageTeamsPage() {
     <>
       <TopBar title={t("manageTitle")} backHref="/" permissions={permissions} />
       {permissions["team:create"] && <AddTeamForm />}
-      <Box sx={{ border: `1px solid ${colors.slate300}`, borderRadius: "4px", padding: "20px" }}>
+      <Box
+        sx={{
+          border: `1px solid ${colors.slate300}`,
+          borderRadius: "4px",
+          padding: { xs: "12px", sm: "20px" },
+        }}
+      >
         <Typography variant="h5" mb={1}>
           {t("heading")}
         </Typography>

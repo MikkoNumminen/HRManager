@@ -80,14 +80,19 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
           backgroundColor: colors.slate600,
           borderRadius: "4px",
           border: `1px solid ${colors.slate300}`,
-          ...(backHref && { ml: "-48px", width: "calc(100% + 48px)" }),
+          ...(backHref && {
+            ml: { xs: "-40px", sm: "-48px" },
+            width: { xs: "calc(100% + 40px)", sm: "calc(100% + 48px)" },
+          }),
         }}
         elevation={0}
       >
         <Toolbar
           sx={{
             position: "relative",
-            ...(backHref && { paddingLeft: "64px !important" }),
+            ...(backHref && {
+              paddingLeft: { xs: "48px !important", sm: "64px !important" },
+            }),
           }}
         >
           {backHref && (
@@ -105,8 +110,18 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
               <ArrowBackIcon />
             </IconButton>
           )}
-          <Box sx={{ flexGrow: 1 }}>
-            <Typography variant="h6">{title}</Typography>
+          <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+            <Typography
+              variant="h6"
+              sx={{
+                fontSize: { xs: "0.95rem", sm: "1.25rem" },
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {title}
+            </Typography>
           </Box>
           {error && (
             <Typography variant="caption" sx={{ color: "#f87171", mr: 2 }}>
@@ -195,7 +210,7 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
               </Menu>
             </>
           ) : (
-            <Box display="flex" gap={1}>
+            <Box display="flex" gap={1} flexWrap="wrap" justifyContent="flex-end">
               <Button
                 onClick={() => signIn("demo")}
                 sx={{

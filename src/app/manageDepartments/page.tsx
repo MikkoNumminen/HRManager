@@ -28,7 +28,13 @@ export default async function ManageDepartmentsPage() {
     <>
       <TopBar title={t("manageTitle")} backHref="/" permissions={permissions} />
       {permissions["department:create"] && <AddDepartmentForm />}
-      <Box sx={{ border: `1px solid ${colors.slate300}`, borderRadius: "4px", padding: "20px" }}>
+      <Box
+        sx={{
+          border: `1px solid ${colors.slate300}`,
+          borderRadius: "4px",
+          padding: { xs: "12px", sm: "20px" },
+        }}
+      >
         <Typography variant="h5" mb={1}>
           {t("heading")}
         </Typography>

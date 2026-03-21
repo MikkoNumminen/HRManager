@@ -36,7 +36,7 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({ users }) => {
 
   return (
     <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 650, maxWidth: 1020 }} aria-label="user management table">
+      <Table sx={{ minWidth: 650 }} aria-label="user management table">
         <TableHead>
           <TableRow>
             <TableCell>{tc("name")}</TableCell>

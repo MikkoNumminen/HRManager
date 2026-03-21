@@ -37,7 +37,7 @@ const selectStyles = {
   "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: colors.slate100 },
   "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: colors.slate100 },
   "& .MuiSvgIcon-root": { color: colors.slate400 },
-  minWidth: 150,
+  minWidth: { xs: 120, sm: 150 },
 };
 
 const labelStyles = { color: colors.slate400, "&.Mui-focused": { color: colors.slate100 } };

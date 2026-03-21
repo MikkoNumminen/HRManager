@@ -69,7 +69,7 @@ const PersonTable: React.FC<PersonTableProps> = ({ persons, minimal = false }) =
 
   return (
     <TableContainer component={Paper} sx={{ marginBottom: "20px" }}>
-      <Table sx={{ minWidth: 650, maxWidth: 1020 }} aria-label="person table">
+      <Table sx={{ minWidth: 650 }} aria-label="person table">
         <TableHead>
           <TableRow>
             <TableCell>{tc("name")}</TableCell>

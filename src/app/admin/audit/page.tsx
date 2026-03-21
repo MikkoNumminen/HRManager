@@ -122,7 +122,7 @@ export default async function AuditLogPage({
         sx={{
           border: `1px solid ${colors.slate300}`,
           borderRadius: "4px",
-          padding: "20px",
+          padding: { xs: "12px", sm: "20px" },
         }}
       >
         <Typography variant="h5" mb={1}>

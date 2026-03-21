@@ -16,7 +16,7 @@ export const formStyles = {
   gap: 2,
   border: `1px solid ${colors.slate300}`,
   borderRadius: "4px",
-  p: 2,
+  p: { xs: 1.5, sm: 2 },
   mb: 1.5,
 };
 
@@ -121,9 +121,14 @@ export const userMenuItemStyles = {
   },
 };
 
+export const tableStyles = {
+  minWidth: 650,
+  width: "100%",
+};
+
 export const boxStyles = {
   flex: "1",
-  padding: "20px",
+  padding: { xs: "12px", sm: "20px" },
   border: `1px solid ${colors.slate300}`,
   borderRadius: "4px",
   mb: 1.5,
