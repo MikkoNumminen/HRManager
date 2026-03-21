@@ -232,6 +232,26 @@
     "permChangePermissions": "ユーザー権限の変更",
     "permViewAuditLog": "監査ログの閲覧"
   },
+  "notifications": {
+    "personCreated": "担当者を作成しました",
+    "personRemoved": "担当者を削除しました",
+    "positionUpdated": "役職を更新しました",
+    "emailUpdated": "メールアドレスを更新しました",
+    "teamCreated": "チームを作成しました",
+    "teamRemoved": "チームを削除しました",
+    "managerUpdated": "チームマネージャーを更新しました",
+    "memberAdded": "メンバーをチームに追加しました",
+    "memberRemoved": "メンバーをチームから削除しました",
+    "departmentCreated": "部署を作成しました",
+    "departmentRemoved": "部署を削除しました",
+    "departmentHeadUpdated": "部署長を更新しました",
+    "teamAssigned": "チームを部署に割り当てました",
+    "teamRemovedFromDepartment": "チームを部署から削除しました",
+    "roleUpdated": "ユーザーロールを更新しました",
+    "permissionUpdated": "権限を更新しました",
+    "mockDataLoaded": "テストデータを読み込みました",
+    "dataReset": "すべてのデータをリセットしました"
+  },
   "tutorial": {
     "checklistTitle": "デモツアー",
     "checklistProgress": "{total}件中{completed}件完了",

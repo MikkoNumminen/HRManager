@@ -5,6 +5,7 @@ import { activeButtonStyles, formStyles, headerStyles, smallButtonStyles } from 
 import { Box, Button, Typography } from "@mui/material";
 import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
+import { useSnackbar } from "./SnackbarProvider";
 import { PersonSelectCard } from "./PersonSelectCard";
 import { Person } from "@/schemas";
 
@@ -17,12 +18,15 @@ const UpdateDepartmentHeadForm: React.FC<{
 }> = ({ departmentID, persons, excludeIds = [] }) => {
   const t = useTranslations("departments");
   const tc = useTranslations("common");
+  const tn = useTranslations("notifications");
+  const { showSnackbar } = useSnackbar();
   const [newHead, setNewHead] = useState<string>("");
 
   const [state, formAction, isPending] = useActionState(
     async (_prev: FormState, formData: FormData): Promise<FormState> => {
       try {
         await updateDepartmentHead(formData);
+        showSnackbar(tn("departmentHeadUpdated"));
         return { error: null };
       } catch (error) {
         return { error: error instanceof Error ? error.message : tc("error") };

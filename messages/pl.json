@@ -232,6 +232,26 @@
     "permChangePermissions": "zmieniać uprawnienia użytkowników",
     "permViewAuditLog": "przeglądać dziennik audytu"
   },
+  "notifications": {
+    "personCreated": "Osoba utworzona pomyślnie",
+    "personRemoved": "Osoba usunięta pomyślnie",
+    "positionUpdated": "Stanowisko zaktualizowane pomyślnie",
+    "emailUpdated": "E-mail zaktualizowany pomyślnie",
+    "teamCreated": "Zespół utworzony pomyślnie",
+    "teamRemoved": "Zespół usunięty pomyślnie",
+    "managerUpdated": "Kierownik zespołu zaktualizowany pomyślnie",
+    "memberAdded": "Członek dodany do zespołu pomyślnie",
+    "memberRemoved": "Członek usunięty z zespołu pomyślnie",
+    "departmentCreated": "Dział utworzony pomyślnie",
+    "departmentRemoved": "Dział usunięty pomyślnie",
+    "departmentHeadUpdated": "Kierownik działu zaktualizowany pomyślnie",
+    "teamAssigned": "Zespół przypisany do działu pomyślnie",
+    "teamRemovedFromDepartment": "Zespół usunięty z działu pomyślnie",
+    "roleUpdated": "Rola użytkownika zaktualizowana pomyślnie",
+    "permissionUpdated": "Uprawnienie zaktualizowane pomyślnie",
+    "mockDataLoaded": "Dane testowe załadowane pomyślnie",
+    "dataReset": "Wszystkie dane zresetowane pomyślnie"
+  },
   "tutorial": {
     "checklistTitle": "Przewodnik demo",
     "checklistProgress": "{completed} z {total} ukończono",

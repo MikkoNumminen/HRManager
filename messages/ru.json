@@ -232,6 +232,26 @@
     "permChangePermissions": "изменять права пользователей",
     "permViewAuditLog": "просматривать журнал аудита"
   },
+  "notifications": {
+    "personCreated": "Сотрудник успешно создан",
+    "personRemoved": "Сотрудник успешно удалён",
+    "positionUpdated": "Должность успешно обновлена",
+    "emailUpdated": "Электронная почта успешно обновлена",
+    "teamCreated": "Команда успешно создана",
+    "teamRemoved": "Команда успешно удалена",
+    "managerUpdated": "Руководитель команды успешно обновлён",
+    "memberAdded": "Участник успешно добавлен в команду",
+    "memberRemoved": "Участник успешно удалён из команды",
+    "departmentCreated": "Отдел успешно создан",
+    "departmentRemoved": "Отдел успешно удалён",
+    "departmentHeadUpdated": "Руководитель отдела успешно обновлён",
+    "teamAssigned": "Команда успешно назначена в отдел",
+    "teamRemovedFromDepartment": "Команда успешно удалена из отдела",
+    "roleUpdated": "Роль пользователя успешно обновлена",
+    "permissionUpdated": "Разрешение успешно обновлено",
+    "mockDataLoaded": "Тестовые данные успешно загружены",
+    "dataReset": "Все данные успешно сброшены"
+  },
   "tutorial": {
     "checklistTitle": "Обзор демо",
     "checklistProgress": "{completed} из {total} выполнено",

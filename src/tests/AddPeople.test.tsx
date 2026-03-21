@@ -97,6 +97,26 @@ describe("AddPerson Component", () => {
     });
   });
 
+  // Shows success snackbar after creating a person
+  test("shows success snackbar after creating a person", async () => {
+    const showSnackbar = (globalThis as Record<string, unknown>).mockShowSnackbar as jest.Mock;
+    showSnackbar.mockClear();
+    (createPerson as jest.MockedFunction<typeof createPerson>).mockResolvedValue(undefined);
+    render(<AddPersonForm />);
+
+    fireEvent.change(screen.getByLabelText(/Enter Name/i), {
+      target: { value: "John Doe" },
+    });
+    fireEvent.change(screen.getByLabelText(/Enter Email/i), {
+      target: { value: "john@example.com" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /Create/i }));
+
+    await waitFor(() => {
+      expect(showSnackbar).toHaveBeenCalledWith("Person created successfully");
+    });
+  });
+
   test("shows error message when createPerson fails", async () => {
     (createPerson as jest.MockedFunction<typeof createPerson>).mockRejectedValue(
       new Error("A person with this email already exists"),

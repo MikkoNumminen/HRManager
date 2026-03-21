@@ -6,6 +6,7 @@ import { Box, Button, TextField, Tooltip, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
+import { useSnackbar } from "./SnackbarProvider";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -17,6 +18,8 @@ const UpdateEmailForm: React.FC<{ personID: string; currentEmail?: string }> = (
 }) => {
   const t = useTranslations("persons");
   const tc = useTranslations("common");
+  const tn = useTranslations("notifications");
+  const { showSnackbar } = useSnackbar();
   const [newEmail, setNewEmail] = useState(currentEmail ?? "");
   const isChanged = newEmail.trim() !== (currentEmail ?? "");
   const isValid = EMAIL_REGEX.test(newEmail.trim()) && isChanged;
@@ -26,6 +29,7 @@ const UpdateEmailForm: React.FC<{ personID: string; currentEmail?: string }> = (
     async (_prev: FormState, formData: FormData): Promise<FormState> => {
       try {
         await updateEmail(formData);
+        showSnackbar(tn("emailUpdated"));
         router.push("/managePersons");
         return { error: null };
       } catch (error) {

@@ -232,6 +232,26 @@
     "permChangePermissions": "ändra användarbehörigheter",
     "permViewAuditLog": "visa händelseloggen"
   },
+  "notifications": {
+    "personCreated": "Person skapad",
+    "personRemoved": "Person borttagen",
+    "positionUpdated": "Befattning uppdaterad",
+    "emailUpdated": "E-post uppdaterad",
+    "teamCreated": "Team skapat",
+    "teamRemoved": "Team borttaget",
+    "managerUpdated": "Teamchef uppdaterad",
+    "memberAdded": "Medlem tillagd i teamet",
+    "memberRemoved": "Medlem borttagen från teamet",
+    "departmentCreated": "Avdelning skapad",
+    "departmentRemoved": "Avdelning borttagen",
+    "departmentHeadUpdated": "Avdelningschef uppdaterad",
+    "teamAssigned": "Team tilldelat avdelningen",
+    "teamRemovedFromDepartment": "Team borttaget från avdelningen",
+    "roleUpdated": "Användarroll uppdaterad",
+    "permissionUpdated": "Behörighet uppdaterad",
+    "mockDataLoaded": "Testdata laddad",
+    "dataReset": "All data återställd"
+  },
   "tutorial": {
     "checklistTitle": "Demoguide",
     "checklistProgress": "{completed} av {total} slutförda",

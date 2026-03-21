@@ -6,6 +6,7 @@ import { Box, Button, MenuItem, TextField, Typography } from "@mui/material";
 import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
 import { completeTutorialStep } from "@/tutorialConfig";
+import { useSnackbar } from "./SnackbarProvider";
 import { CombinedTeam } from "@/schemas";
 
 type FormState = { error: string | null };
@@ -16,6 +17,8 @@ const AssignTeamToDepartmentForm: React.FC<{
 }> = ({ departmentID, availableTeams }) => {
   const t = useTranslations("departments");
   const tc = useTranslations("common");
+  const tn = useTranslations("notifications");
+  const { showSnackbar } = useSnackbar();
   const [selectedTeam, setSelectedTeam] = useState<string>("");
 
   const [state, formAction, isPending] = useActionState(
@@ -23,6 +26,7 @@ const AssignTeamToDepartmentForm: React.FC<{
       try {
         completeTutorialStep("assign_team_to_department");
         await assignTeamToDepartment(formData);
+        showSnackbar(tn("teamAssigned"));
         return { error: null };
       } catch (error) {
         return { error: error instanceof Error ? error.message : tc("error") };

@@ -232,6 +232,26 @@
     "permChangePermissions": "змінювати дозволи користувачів",
     "permViewAuditLog": "переглядати журнал аудиту"
   },
+  "notifications": {
+    "personCreated": "Особу успішно створено",
+    "personRemoved": "Особу успішно видалено",
+    "positionUpdated": "Посаду успішно оновлено",
+    "emailUpdated": "Електронну пошту успішно оновлено",
+    "teamCreated": "Команду успішно створено",
+    "teamRemoved": "Команду успішно видалено",
+    "managerUpdated": "Керівника команди успішно оновлено",
+    "memberAdded": "Учасника успішно додано до команди",
+    "memberRemoved": "Учасника успішно видалено з команди",
+    "departmentCreated": "Відділ успішно створено",
+    "departmentRemoved": "Відділ успішно видалено",
+    "departmentHeadUpdated": "Керівника відділу успішно оновлено",
+    "teamAssigned": "Команду успішно призначено до відділу",
+    "teamRemovedFromDepartment": "Команду успішно видалено з відділу",
+    "roleUpdated": "Роль користувача успішно оновлено",
+    "permissionUpdated": "Дозвіл успішно оновлено",
+    "mockDataLoaded": "Тестові дані успішно завантажено",
+    "dataReset": "Усі дані успішно скинуто"
+  },
   "tutorial": {
     "checklistTitle": "Огляд демо",
     "checklistProgress": "{completed} з {total} виконано",

@@ -232,6 +232,26 @@
     "permChangePermissions": "更改用户权限",
     "permViewAuditLog": "查看审计日志"
   },
+  "notifications": {
+    "personCreated": "人员创建成功",
+    "personRemoved": "人员删除成功",
+    "positionUpdated": "职位更新成功",
+    "emailUpdated": "邮箱更新成功",
+    "teamCreated": "团队创建成功",
+    "teamRemoved": "团队删除成功",
+    "managerUpdated": "团队经理更新成功",
+    "memberAdded": "成员已成功添加到团队",
+    "memberRemoved": "成员已成功从团队移除",
+    "departmentCreated": "部门创建成功",
+    "departmentRemoved": "部门删除成功",
+    "departmentHeadUpdated": "部门主管更新成功",
+    "teamAssigned": "团队已成功分配到部门",
+    "teamRemovedFromDepartment": "团队已成功从部门移除",
+    "roleUpdated": "用户角色更新成功",
+    "permissionUpdated": "权限更新成功",
+    "mockDataLoaded": "测试数据加载成功",
+    "dataReset": "所有数据重置成功"
+  },
   "tutorial": {
     "checklistTitle": "演示导览",
     "checklistProgress": "已完成 {completed}/{total}",

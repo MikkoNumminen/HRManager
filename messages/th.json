@@ -232,6 +232,26 @@
     "permChangePermissions": "เปลี่ยนสิทธิ์ผู้ใช้",
     "permViewAuditLog": "ดูบันทึกการตรวจสอบ"
   },
+  "notifications": {
+    "personCreated": "สร้างบุคคลสำเร็จ",
+    "personRemoved": "ลบบุคคลสำเร็จ",
+    "positionUpdated": "อัปเดตตำแหน่งสำเร็จ",
+    "emailUpdated": "อัปเดตอีเมลสำเร็จ",
+    "teamCreated": "สร้างทีมสำเร็จ",
+    "teamRemoved": "ลบทีมสำเร็จ",
+    "managerUpdated": "อัปเดตผู้จัดการทีมสำเร็จ",
+    "memberAdded": "เพิ่มสมาชิกในทีมสำเร็จ",
+    "memberRemoved": "ลบสมาชิกจากทีมสำเร็จ",
+    "departmentCreated": "สร้างแผนกสำเร็จ",
+    "departmentRemoved": "ลบแผนกสำเร็จ",
+    "departmentHeadUpdated": "อัปเดตหัวหน้าแผนกสำเร็จ",
+    "teamAssigned": "มอบหมายทีมให้แผนกสำเร็จ",
+    "teamRemovedFromDepartment": "ลบทีมจากแผนกสำเร็จ",
+    "roleUpdated": "อัปเดตบทบาทผู้ใช้สำเร็จ",
+    "permissionUpdated": "อัปเดตสิทธิ์สำเร็จ",
+    "mockDataLoaded": "โหลดข้อมูลทดสอบสำเร็จ",
+    "dataReset": "รีเซ็ตข้อมูลทั้งหมดสำเร็จ"
+  },
   "tutorial": {
     "checklistTitle": "ทัวร์สาธิต",
     "checklistProgress": "เสร็จสิ้น {completed} จาก {total}",

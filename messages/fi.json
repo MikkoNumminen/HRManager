@@ -232,6 +232,26 @@
     "permChangePermissions": "muokata käyttöoikeuksia",
     "permViewAuditLog": "nähdä tapahtumaloki"
   },
+  "notifications": {
+    "personCreated": "Henkilö luotu onnistuneesti",
+    "personRemoved": "Henkilö poistettu onnistuneesti",
+    "positionUpdated": "Tehtävänimike päivitetty onnistuneesti",
+    "emailUpdated": "Sähköposti päivitetty onnistuneesti",
+    "teamCreated": "Tiimi luotu onnistuneesti",
+    "teamRemoved": "Tiimi poistettu onnistuneesti",
+    "managerUpdated": "Tiimin esimies päivitetty onnistuneesti",
+    "memberAdded": "Jäsen lisätty tiimiin onnistuneesti",
+    "memberRemoved": "Jäsen poistettu tiimistä onnistuneesti",
+    "departmentCreated": "Osasto luotu onnistuneesti",
+    "departmentRemoved": "Osasto poistettu onnistuneesti",
+    "departmentHeadUpdated": "Osaston johtaja päivitetty onnistuneesti",
+    "teamAssigned": "Tiimi liitetty osastoon onnistuneesti",
+    "teamRemovedFromDepartment": "Tiimi poistettu osastolta onnistuneesti",
+    "roleUpdated": "Käyttäjärooli päivitetty onnistuneesti",
+    "permissionUpdated": "Käyttöoikeus päivitetty onnistuneesti",
+    "mockDataLoaded": "Testidatan lataus onnistui",
+    "dataReset": "Kaikki tiedot nollattu onnistuneesti"
+  },
   "tutorial": {
     "checklistTitle": "Demokierros",
     "checklistProgress": "{completed} / {total} suoritettu",

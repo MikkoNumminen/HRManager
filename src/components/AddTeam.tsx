@@ -6,12 +6,15 @@ import { Box, Button, TextField, Tooltip, Typography } from "@mui/material";
 import { useActionState, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { completeTutorialStep } from "@/tutorialConfig";
+import { useSnackbar } from "./SnackbarProvider";
 
 type FormState = { error: string | null; success: boolean };
 
 const AddTeamForm: React.FC = () => {
   const t = useTranslations("teams");
   const tc = useTranslations("common");
+  const tn = useTranslations("notifications");
+  const { showSnackbar } = useSnackbar();
   const [name, setName] = useState("");
   const isValid = name.trim().length > 0;
 
@@ -20,6 +23,7 @@ const AddTeamForm: React.FC = () => {
       try {
         completeTutorialStep("create_team");
         await createTeam(formData);
+        showSnackbar(tn("teamCreated"));
         return { error: null, success: true };
       } catch (error) {
         return {

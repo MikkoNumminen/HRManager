@@ -232,6 +232,26 @@
     "permChangePermissions": "उपयोगकर्ता अनुमतियाँ बदलना",
     "permViewAuditLog": "ऑडिट लॉग देखना"
   },
+  "notifications": {
+    "personCreated": "व्यक्ति सफलतापूर्वक बनाया गया",
+    "personRemoved": "व्यक्ति सफलतापूर्वक हटाया गया",
+    "positionUpdated": "पद सफलतापूर्वक अपडेट किया गया",
+    "emailUpdated": "ईमेल सफलतापूर्वक अपडेट किया गया",
+    "teamCreated": "टीम सफलतापूर्वक बनाई गई",
+    "teamRemoved": "टीम सफलतापूर्वक हटाई गई",
+    "managerUpdated": "टीम प्रबंधक सफलतापूर्वक अपडेट किया गया",
+    "memberAdded": "सदस्य सफलतापूर्वक टीम में जोड़ा गया",
+    "memberRemoved": "सदस्य सफलतापूर्वक टीम से हटाया गया",
+    "departmentCreated": "विभाग सफलतापूर्वक बनाया गया",
+    "departmentRemoved": "विभाग सफलतापूर्वक हटाया गया",
+    "departmentHeadUpdated": "विभाग प्रमुख सफलतापूर्वक अपडेट किया गया",
+    "teamAssigned": "टीम सफलतापूर्वक विभाग को सौंपी गई",
+    "teamRemovedFromDepartment": "टीम सफलतापूर्वक विभाग से हटाई गई",
+    "roleUpdated": "उपयोगकर्ता भूमिका सफलतापूर्वक अपडेट की गई",
+    "permissionUpdated": "अनुमति सफलतापूर्वक अपडेट की गई",
+    "mockDataLoaded": "परीक्षण डेटा सफलतापूर्वक लोड किया गया",
+    "dataReset": "सभी डेटा सफलतापूर्वक रीसेट किया गया"
+  },
   "tutorial": {
     "checklistTitle": "डेमो टूर",
     "checklistProgress": "{completed} में से {total} पूर्ण",

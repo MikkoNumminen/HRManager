@@ -7,12 +7,15 @@ import { useRouter } from "next/navigation";
 import { useActionState, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import ConfirmDialog from "./ConfirmDialog";
+import { useSnackbar } from "./SnackbarProvider";
 
 type FormState = { error: string | null };
 
 const RemovePersonForm: React.FC<{ personID: string }> = ({ personID }) => {
   const t = useTranslations("persons");
   const tc = useTranslations("common");
+  const tn = useTranslations("notifications");
+  const { showSnackbar } = useSnackbar();
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -21,6 +24,7 @@ const RemovePersonForm: React.FC<{ personID: string }> = ({ personID }) => {
     async (_prev: FormState, formData: FormData): Promise<FormState> => {
       try {
         await removePerson(formData);
+        showSnackbar(tn("personRemoved"));
         router.push("/managePersons");
         return { error: null };
       } catch (error) {

@@ -6,12 +6,15 @@ import { Box, Button, TextField, Tooltip, Typography } from "@mui/material";
 import { useActionState, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { completeTutorialStep } from "@/tutorialConfig";
+import { useSnackbar } from "./SnackbarProvider";
 
 type FormState = { error: string | null; success: boolean };
 
 const AddDepartmentForm: React.FC = () => {
   const t = useTranslations("departments");
   const tc = useTranslations("common");
+  const tn = useTranslations("notifications");
+  const { showSnackbar } = useSnackbar();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const isValid = name.trim().length > 0;
@@ -21,6 +24,7 @@ const AddDepartmentForm: React.FC = () => {
       try {
         completeTutorialStep("create_department");
         await createDepartment(formData);
+        showSnackbar(tn("departmentCreated"));
         return { error: null, success: true };
       } catch (error) {
         return {

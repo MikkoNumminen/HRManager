@@ -5,6 +5,7 @@ import { activeButtonStyles, formStyles, headerStyles, smallButtonStyles } from 
 import { Box, Button, Typography } from "@mui/material";
 import { useActionState, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
+import { useSnackbar } from "./SnackbarProvider";
 import { PersonSelectCard } from "./PersonSelectCard";
 import { Person } from "@/schemas";
 import ConfirmDialog from "./ConfirmDialog";
@@ -18,6 +19,8 @@ const RemoveMemberForm: React.FC<{
 }> = ({ teamID, persons, includeOnlyIds }) => {
   const t = useTranslations("teams");
   const tc = useTranslations("common");
+  const tn = useTranslations("notifications");
+  const { showSnackbar } = useSnackbar();
   const [selectedMember, setSelectedMember] = useState<string>("");
   const formRef = useRef<HTMLFormElement>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -26,6 +29,7 @@ const RemoveMemberForm: React.FC<{
     async (_prev: FormState, formData: FormData): Promise<FormState> => {
       try {
         await removeMember(formData);
+        showSnackbar(tn("memberRemoved"));
         return { error: null };
       } catch (error) {
         return { error: error instanceof Error ? error.message : tc("error") };

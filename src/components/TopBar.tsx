@@ -24,6 +24,7 @@ import { useSession, signIn, signOut } from "next-auth/react";
 import { useRef, useState, useTransition } from "react";
 import { resetAll, seedMockData } from "@/serverActions";
 import ConfirmDialog from "./ConfirmDialog";
+import { useSnackbar } from "./SnackbarProvider";
 import LanguageSwitcher from "./LanguageSwitcher";
 import ThemeSwitcher from "./ThemeSwitcher";
 import { Permissions } from "@/schemas";
@@ -39,6 +40,8 @@ interface TopBarProps {
 export default function TopBar({ title, backHref, permissions }: TopBarProps) {
   const t = useTranslations("topBar");
   const tc = useTranslations("common");
+  const tn = useTranslations("notifications");
+  const { showSnackbar } = useSnackbar();
   const { data: session } = useSession();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
@@ -67,6 +70,7 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
     startTransition(async () => {
       try {
         await seedMockData(clearExisting);
+        showSnackbar(tn("mockDataLoaded"));
       } catch (e) {
         setError(e instanceof Error ? e.message : tc("error"));
       }
@@ -262,6 +266,7 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
           try {
             await resetAll();
             setError(null);
+            showSnackbar(tn("dataReset"));
           } catch (e) {
             setError(e instanceof Error ? e.message : tc("error"));
           }

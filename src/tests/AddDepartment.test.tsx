@@ -92,6 +92,23 @@ describe("AddDepartment Component", () => {
     });
   });
 
+  // Shows success snackbar after creating a department
+  test("shows success snackbar after creating a department", async () => {
+    const showSnackbar = (globalThis as Record<string, unknown>).mockShowSnackbar as jest.Mock;
+    showSnackbar.mockClear();
+    (createDepartment as jest.Mock).mockResolvedValue(undefined);
+    render(<AddDepartmentForm />);
+
+    fireEvent.change(screen.getByLabelText(/Enter Department Name/i), {
+      target: { value: "Engineering" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /Create/i }));
+
+    await waitFor(() => {
+      expect(showSnackbar).toHaveBeenCalledWith("Department created successfully");
+    });
+  });
+
   // Clears form fields after successful submission.
   test("clears fields after successful submission", async () => {
     (createDepartment as jest.Mock).mockResolvedValue(undefined);

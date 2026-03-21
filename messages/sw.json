@@ -232,6 +232,26 @@
     "permChangePermissions": "kubadilisha ruhusa za watumiaji",
     "permViewAuditLog": "kuona kumbukumbu ya ukaguzi"
   },
+  "notifications": {
+    "personCreated": "Mtu ameundwa kwa mafanikio",
+    "personRemoved": "Mtu ameondolewa kwa mafanikio",
+    "positionUpdated": "Nafasi imesasishwa kwa mafanikio",
+    "emailUpdated": "Barua pepe imesasishwa kwa mafanikio",
+    "teamCreated": "Timu imeundwa kwa mafanikio",
+    "teamRemoved": "Timu imeondolewa kwa mafanikio",
+    "managerUpdated": "Meneja wa timu amesasishwa kwa mafanikio",
+    "memberAdded": "Mwanachama ameongezwa kwenye timu kwa mafanikio",
+    "memberRemoved": "Mwanachama ameondolewa kwenye timu kwa mafanikio",
+    "departmentCreated": "Idara imeundwa kwa mafanikio",
+    "departmentRemoved": "Idara imeondolewa kwa mafanikio",
+    "departmentHeadUpdated": "Mkuu wa idara amesasishwa kwa mafanikio",
+    "teamAssigned": "Timu imepewa idara kwa mafanikio",
+    "teamRemovedFromDepartment": "Timu imeondolewa kwenye idara kwa mafanikio",
+    "roleUpdated": "Jukumu la mtumiaji limesasishwa kwa mafanikio",
+    "permissionUpdated": "Ruhusa imesasishwa kwa mafanikio",
+    "mockDataLoaded": "Data ya majaribio imepakiwa kwa mafanikio",
+    "dataReset": "Data yote imewekwa upya kwa mafanikio"
+  },
   "tutorial": {
     "checklistTitle": "Ziara ya Demo",
     "checklistProgress": "{completed} kati ya {total} zimekamilika",

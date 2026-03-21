@@ -6,6 +6,7 @@ import { Box, Button, Typography } from "@mui/material";
 import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
 import { completeTutorialStep } from "@/tutorialConfig";
+import { useSnackbar } from "./SnackbarProvider";
 import { PersonSelectCard } from "./PersonSelectCard";
 import { Person } from "@/schemas";
 
@@ -18,6 +19,8 @@ const AddMemberForm: React.FC<{ teamID: string; persons: Person[]; excludeIds?: 
 }) => {
   const t = useTranslations("teams");
   const tc = useTranslations("common");
+  const tn = useTranslations("notifications");
+  const { showSnackbar } = useSnackbar();
   const [selectedMember, setSelectedMember] = useState<string>("");
 
   const [state, formAction, isPending] = useActionState(
@@ -25,6 +28,7 @@ const AddMemberForm: React.FC<{ teamID: string; persons: Person[]; excludeIds?: 
       try {
         completeTutorialStep("add_member");
         await addMember(formData);
+        showSnackbar(tn("memberAdded"));
         return { error: null };
       } catch (error) {
         return { error: error instanceof Error ? error.message : tc("error") };

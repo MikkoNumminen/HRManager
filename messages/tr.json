@@ -232,6 +232,26 @@
     "permChangePermissions": "kullanıcı izinlerini değiştirmek",
     "permViewAuditLog": "denetim günlüğünü görüntülemek"
   },
+  "notifications": {
+    "personCreated": "Kişi başarıyla oluşturuldu",
+    "personRemoved": "Kişi başarıyla silindi",
+    "positionUpdated": "Pozisyon başarıyla güncellendi",
+    "emailUpdated": "E-posta başarıyla güncellendi",
+    "teamCreated": "Takım başarıyla oluşturuldu",
+    "teamRemoved": "Takım başarıyla silindi",
+    "managerUpdated": "Takım yöneticisi başarıyla güncellendi",
+    "memberAdded": "Üye takıma başarıyla eklendi",
+    "memberRemoved": "Üye takımdan başarıyla çıkarıldı",
+    "departmentCreated": "Departman başarıyla oluşturuldu",
+    "departmentRemoved": "Departman başarıyla silindi",
+    "departmentHeadUpdated": "Departman başkanı başarıyla güncellendi",
+    "teamAssigned": "Takım departmana başarıyla atandı",
+    "teamRemovedFromDepartment": "Takım departmandan başarıyla çıkarıldı",
+    "roleUpdated": "Kullanıcı rolü başarıyla güncellendi",
+    "permissionUpdated": "İzin başarıyla güncellendi",
+    "mockDataLoaded": "Test verileri başarıyla yüklendi",
+    "dataReset": "Tüm veriler başarıyla sıfırlandı"
+  },
   "tutorial": {
     "checklistTitle": "Demo Turu",
     "checklistProgress": "{completed} / {total} tamamlandı",

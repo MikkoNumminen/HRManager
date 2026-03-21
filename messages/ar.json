@@ -232,6 +232,26 @@
     "permChangePermissions": "تغيير صلاحيات المستخدمين",
     "permViewAuditLog": "عرض سجل التدقيق"
   },
+  "notifications": {
+    "personCreated": "تم إنشاء الشخص بنجاح",
+    "personRemoved": "تم حذف الشخص بنجاح",
+    "positionUpdated": "تم تحديث المنصب بنجاح",
+    "emailUpdated": "تم تحديث البريد الإلكتروني بنجاح",
+    "teamCreated": "تم إنشاء الفريق بنجاح",
+    "teamRemoved": "تم حذف الفريق بنجاح",
+    "managerUpdated": "تم تحديث مدير الفريق بنجاح",
+    "memberAdded": "تمت إضافة العضو إلى الفريق بنجاح",
+    "memberRemoved": "تمت إزالة العضو من الفريق بنجاح",
+    "departmentCreated": "تم إنشاء القسم بنجاح",
+    "departmentRemoved": "تم حذف القسم بنجاح",
+    "departmentHeadUpdated": "تم تحديث رئيس القسم بنجاح",
+    "teamAssigned": "تم تعيين الفريق للقسم بنجاح",
+    "teamRemovedFromDepartment": "تمت إزالة الفريق من القسم بنجاح",
+    "roleUpdated": "تم تحديث دور المستخدم بنجاح",
+    "permissionUpdated": "تم تحديث الإذن بنجاح",
+    "mockDataLoaded": "تم تحميل البيانات التجريبية بنجاح",
+    "dataReset": "تم إعادة تعيين جميع البيانات بنجاح"
+  },
   "tutorial": {
     "checklistTitle": "جولة تعريفية",
     "checklistProgress": "{completed} من {total} مكتمل",

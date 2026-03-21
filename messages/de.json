@@ -232,6 +232,26 @@
     "permChangePermissions": "Benutzerberechtigungen ändern",
     "permViewAuditLog": "Protokoll anzeigen"
   },
+  "notifications": {
+    "personCreated": "Person erfolgreich erstellt",
+    "personRemoved": "Person erfolgreich entfernt",
+    "positionUpdated": "Position erfolgreich aktualisiert",
+    "emailUpdated": "E-Mail erfolgreich aktualisiert",
+    "teamCreated": "Team erfolgreich erstellt",
+    "teamRemoved": "Team erfolgreich entfernt",
+    "managerUpdated": "Teammanager erfolgreich aktualisiert",
+    "memberAdded": "Mitglied erfolgreich zum Team hinzugefügt",
+    "memberRemoved": "Mitglied erfolgreich aus Team entfernt",
+    "departmentCreated": "Abteilung erfolgreich erstellt",
+    "departmentRemoved": "Abteilung erfolgreich entfernt",
+    "departmentHeadUpdated": "Abteilungsleiter erfolgreich aktualisiert",
+    "teamAssigned": "Team erfolgreich der Abteilung zugewiesen",
+    "teamRemovedFromDepartment": "Team erfolgreich von Abteilung entfernt",
+    "roleUpdated": "Benutzerrolle erfolgreich aktualisiert",
+    "permissionUpdated": "Berechtigung erfolgreich aktualisiert",
+    "mockDataLoaded": "Testdaten erfolgreich geladen",
+    "dataReset": "Alle Daten erfolgreich zurückgesetzt"
+  },
   "tutorial": {
     "checklistTitle": "Demo-Rundgang",
     "checklistProgress": "{completed} von {total} abgeschlossen",

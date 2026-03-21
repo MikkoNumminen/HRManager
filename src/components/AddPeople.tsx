@@ -6,12 +6,15 @@ import { Box, Button, TextField, Tooltip, Typography } from "@mui/material";
 import { useActionState, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { completeTutorialStep } from "@/tutorialConfig";
+import { useSnackbar } from "./SnackbarProvider";
 
 type FormState = { error: string | null; success: boolean };
 
 const AddPersonForm: React.FC = () => {
   const t = useTranslations("persons");
   const tc = useTranslations("common");
+  const tn = useTranslations("notifications");
+  const { showSnackbar } = useSnackbar();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -22,6 +25,7 @@ const AddPersonForm: React.FC = () => {
       try {
         await createPerson(formData);
         completeTutorialStep("add_person");
+        showSnackbar(tn("personCreated"));
         return { error: null, success: true };
       } catch (error) {
         return {

@@ -24,6 +24,7 @@ import {
 import { useActionState, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { completeTutorialStep } from "@/tutorialConfig";
+import { useSnackbar } from "./SnackbarProvider";
 
 interface UserData {
   id: string;
@@ -58,6 +59,8 @@ export default function UserPermissionEditor({
 }: UserPermissionEditorProps) {
   const t = useTranslations("admin");
   const tc = useTranslations("common");
+  const tn = useTranslations("notifications");
+  const { showSnackbar } = useSnackbar();
   const [selectedRole, setSelectedRole] = useState(user.role);
   const roleChanged = selectedRole !== user.role;
   const isSuperuser = user.role === "superuser";
@@ -75,6 +78,7 @@ export default function UserPermissionEditor({
     async (_prev: FormState, formData: FormData): Promise<FormState> => {
       try {
         await updateUserRole(formData);
+        showSnackbar(tn("roleUpdated"));
         return { error: null };
       } catch (error) {
         return { error: error instanceof Error ? error.message : tc("error") };
@@ -96,6 +100,7 @@ export default function UserPermissionEditor({
         formData.set("action", action);
         await updateUserPermission(formData);
         completeTutorialStep("manage_permissions");
+        showSnackbar(tn("permissionUpdated"));
       } catch (e) {
         setPermError(e instanceof Error ? e.message : tc("error"));
       }

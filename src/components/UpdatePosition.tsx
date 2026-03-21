@@ -6,6 +6,7 @@ import { Box, Button, TextField, Tooltip, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
+import { useSnackbar } from "./SnackbarProvider";
 
 type FormState = { error: string | null };
 
@@ -15,6 +16,8 @@ const UpdatePositionForm: React.FC<{ personID: string; currentPosition?: string 
 }) => {
   const t = useTranslations("persons");
   const tc = useTranslations("common");
+  const tn = useTranslations("notifications");
+  const { showSnackbar } = useSnackbar();
   const [newPosition, setNewPosition] = useState(currentPosition ?? "");
   const isChanged = newPosition.trim() !== (currentPosition ?? "");
   const isValid = newPosition.trim().length > 0 && isChanged;
@@ -24,6 +27,7 @@ const UpdatePositionForm: React.FC<{ personID: string; currentPosition?: string 
     async (_prev: FormState, formData: FormData): Promise<FormState> => {
       try {
         await updatePosition(formData);
+        showSnackbar(tn("positionUpdated"));
         router.push("/managePersons");
         return { error: null };
       } catch (error) {

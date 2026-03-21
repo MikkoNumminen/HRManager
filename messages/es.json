@@ -232,6 +232,26 @@
     "permChangePermissions": "cambiar permisos de usuario",
     "permViewAuditLog": "ver el registro de auditoría"
   },
+  "notifications": {
+    "personCreated": "Persona creada correctamente",
+    "personRemoved": "Persona eliminada correctamente",
+    "positionUpdated": "Puesto actualizado correctamente",
+    "emailUpdated": "Correo electrónico actualizado correctamente",
+    "teamCreated": "Equipo creado correctamente",
+    "teamRemoved": "Equipo eliminado correctamente",
+    "managerUpdated": "Gerente de equipo actualizado correctamente",
+    "memberAdded": "Miembro agregado al equipo correctamente",
+    "memberRemoved": "Miembro eliminado del equipo correctamente",
+    "departmentCreated": "Departamento creado correctamente",
+    "departmentRemoved": "Departamento eliminado correctamente",
+    "departmentHeadUpdated": "Jefe de departamento actualizado correctamente",
+    "teamAssigned": "Equipo asignado al departamento correctamente",
+    "teamRemovedFromDepartment": "Equipo eliminado del departamento correctamente",
+    "roleUpdated": "Rol de usuario actualizado correctamente",
+    "permissionUpdated": "Permiso actualizado correctamente",
+    "mockDataLoaded": "Datos de prueba cargados correctamente",
+    "dataReset": "Todos los datos restablecidos correctamente"
+  },
   "tutorial": {
     "checklistTitle": "Visita guiada",
     "checklistProgress": "{completed} de {total} completado(s)",

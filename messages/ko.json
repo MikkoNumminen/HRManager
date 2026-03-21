@@ -232,6 +232,26 @@
     "permChangePermissions": "사용자 권한 변경",
     "permViewAuditLog": "감사 로그 조회"
   },
+  "notifications": {
+    "personCreated": "직원이 생성되었습니다",
+    "personRemoved": "직원이 삭제되었습니다",
+    "positionUpdated": "직위가 업데이트되었습니다",
+    "emailUpdated": "이메일이 업데이트되었습니다",
+    "teamCreated": "팀이 생성되었습니다",
+    "teamRemoved": "팀이 삭제되었습니다",
+    "managerUpdated": "팀 매니저가 업데이트되었습니다",
+    "memberAdded": "팀에 멤버가 추가되었습니다",
+    "memberRemoved": "팀에서 멤버가 제거되었습니다",
+    "departmentCreated": "부서가 생성되었습니다",
+    "departmentRemoved": "부서가 삭제되었습니다",
+    "departmentHeadUpdated": "부서장이 업데이트되었습니다",
+    "teamAssigned": "팀이 부서에 배정되었습니다",
+    "teamRemovedFromDepartment": "팀이 부서에서 제거되었습니다",
+    "roleUpdated": "사용자 역할이 업데이트되었습니다",
+    "permissionUpdated": "권한이 업데이트되었습니다",
+    "mockDataLoaded": "테스트 데이터가 로드되었습니다",
+    "dataReset": "모든 데이터가 초기화되었습니다"
+  },
   "tutorial": {
     "checklistTitle": "데모 투어",
     "checklistProgress": "{total}개 중 {completed}개 완료",
