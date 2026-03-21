@@ -92,6 +92,33 @@ describe("UserManagementTable", () => {
     expect(screen.getByText("custom_role")).toBeInTheDocument();
   });
 
+  // Pressing Enter on a row navigates to the admin detail page
+  test("navigates to admin page on Enter key", () => {
+    mockPush.mockClear();
+    render(<UserManagementTable users={mockUsers} />);
+    const row = screen.getByText("Alice").closest("tr")!;
+    fireEvent.keyDown(row, { key: "Enter" });
+    expect(mockPush).toHaveBeenCalledWith("/admin/aaa-111");
+  });
+
+  // Pressing Space on a row navigates to the admin detail page
+  test("navigates to admin page on Space key", () => {
+    mockPush.mockClear();
+    render(<UserManagementTable users={mockUsers} />);
+    const row = screen.getByText("Bob").closest("tr")!;
+    fireEvent.keyDown(row, { key: " " });
+    expect(mockPush).toHaveBeenCalledWith("/admin/bbb-222");
+  });
+
+  // Pressing a non-trigger key does not navigate
+  test("does not navigate on non-trigger key", () => {
+    mockPush.mockClear();
+    render(<UserManagementTable users={mockUsers} />);
+    const row = screen.getByText("Alice").closest("tr")!;
+    fireEvent.keyDown(row, { key: "Tab" });
+    expect(mockPush).not.toHaveBeenCalled();
+  });
+
   // Clicking a user row should navigate to their admin detail page
   test("navigates to admin page when row is clicked", () => {
     mockPush.mockClear();

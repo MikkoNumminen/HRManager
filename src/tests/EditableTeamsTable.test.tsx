@@ -88,6 +88,49 @@ describe("EditableTeamsTable Component", () => {
     expect(mockPush).toHaveBeenCalledWith("/manageTeams/1");
   });
 
+  // Pressing Enter on a row navigates to the team page
+  test("should navigate to team page on Enter key", () => {
+    render(<EditableTeamsTable combinedTeams={mockCombinedTeams} />);
+
+    const row = screen.getByText("Development").closest("tr")!;
+    fireEvent.keyDown(row, { key: "Enter" });
+
+    expect(mockPush).toHaveBeenCalledWith("/manageTeams/1");
+  });
+
+  // Pressing Space on a row navigates to the team page
+  test("should navigate to team page on Space key", () => {
+    render(<EditableTeamsTable combinedTeams={mockCombinedTeams} />);
+
+    const row = screen.getByText("Design").closest("tr")!;
+    fireEvent.keyDown(row, { key: " " });
+
+    expect(mockPush).toHaveBeenCalledWith("/manageTeams/2");
+  });
+
+  // Pressing a non-trigger key does not navigate
+  test("should not navigate on non-trigger key", () => {
+    render(<EditableTeamsTable combinedTeams={mockCombinedTeams} />);
+
+    const row = screen.getByText("Development").closest("tr")!;
+    fireEvent.keyDown(row, { key: "Tab" });
+
+    expect(mockPush).not.toHaveBeenCalled();
+  });
+
+  // Shows "Unknown" fallback when a team member has no name
+  test("should show unknown fallback for member without name", () => {
+    const teamsWithNullMember = [
+      {
+        ...mockCombinedTeams[0],
+        members: [{ personId: "person-x", name: null, email: "x@example.com" }],
+      },
+    ];
+    render(<EditableTeamsTable combinedTeams={teamsWithNullMember} />);
+
+    expect(screen.getByText("unknown")).toBeInTheDocument();
+  });
+
   test('should render "No Teams Available" when there are no teams', () => {
     render(<EditableTeamsTable combinedTeams={[]} />);
 

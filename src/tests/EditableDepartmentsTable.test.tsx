@@ -83,6 +83,36 @@ describe("EditableDepartmentsTable Component", () => {
     expect(mockPush).toHaveBeenCalledWith("/manageDepartments/dept-2");
   });
 
+  // Pressing Enter on a row navigates to the department page
+  test("navigates to department page on Enter key", () => {
+    render(<EditableDepartmentsTable departments={mockDepartments} />);
+
+    const row = screen.getByText("Engineering").closest("tr")!;
+    fireEvent.keyDown(row, { key: "Enter" });
+
+    expect(mockPush).toHaveBeenCalledWith("/manageDepartments/dept-1");
+  });
+
+  // Pressing Space on a row navigates to the department page
+  test("navigates to department page on Space key", () => {
+    render(<EditableDepartmentsTable departments={mockDepartments} />);
+
+    const row = screen.getByText("Product").closest("tr")!;
+    fireEvent.keyDown(row, { key: " " });
+
+    expect(mockPush).toHaveBeenCalledWith("/manageDepartments/dept-2");
+  });
+
+  // Pressing a non-trigger key does not navigate
+  test("does not navigate on non-trigger key", () => {
+    render(<EditableDepartmentsTable departments={mockDepartments} />);
+
+    const row = screen.getByText("Engineering").closest("tr")!;
+    fireEvent.keyDown(row, { key: "Tab" });
+
+    expect(mockPush).not.toHaveBeenCalled();
+  });
+
   // A department with no head shows the fallback text.
   test("shows fallback for null headName", () => {
     render(<EditableDepartmentsTable departments={mockDepartments} />);

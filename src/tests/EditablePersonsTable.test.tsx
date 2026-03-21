@@ -81,6 +81,36 @@ describe("EditablePersonsTable Component", () => {
     expect(cells[1].textContent).toBe("");
   });
 
+  // Pressing Enter on a row navigates to the person page
+  test("should navigate to person page on Enter key", () => {
+    render(<EditablePersonsTable persons={mockPersons} />);
+
+    const row = screen.getByText("John Doe").closest("tr")!;
+    fireEvent.keyDown(row, { key: "Enter" });
+
+    expect(mockPush).toHaveBeenCalledWith("/managePersons/1");
+  });
+
+  // Pressing Space on a row navigates to the person page
+  test("should navigate to person page on Space key", () => {
+    render(<EditablePersonsTable persons={mockPersons} />);
+
+    const row = screen.getByText("Jane Smith").closest("tr")!;
+    fireEvent.keyDown(row, { key: " " });
+
+    expect(mockPush).toHaveBeenCalledWith("/managePersons/2");
+  });
+
+  // Pressing a non-trigger key does not navigate
+  test("should not navigate on non-trigger key", () => {
+    render(<EditablePersonsTable persons={mockPersons} />);
+
+    const row = screen.getByText("John Doe").closest("tr")!;
+    fireEvent.keyDown(row, { key: "Tab" });
+
+    expect(mockPush).not.toHaveBeenCalled();
+  });
+
   test("should render email as empty when value is null", () => {
     const personsWithNull: Person[] = [{ ...mockPersons[0], email: null }];
     render(<EditablePersonsTable persons={personsWithNull} />);
