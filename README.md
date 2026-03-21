@@ -28,7 +28,8 @@ A full-stack HR management system for managing employees, teams, and departments
 - **Guest mode** — unauthenticated users see read-only chip views of persons, departments, and teams; manage routes redirect to home
 - **Permission-aware UI** — server-side permission guards on all mutations; client-side conditional rendering hides UI elements the user can't access
 - **Relational integrity** — database constraints enforced at ORM level with cascading rules
-- **Internationalization** — full i18n with next-intl supporting 18 languages (Finnish default, English, Swedish, German, French, Spanish, Portuguese, Polish, Russian, Ukrainian, Arabic with RTL, Hindi, Japanese, Chinese, Korean, Thai, Swahili, Turkish); cookie-based locale persistence, Accept-Language auto-detection, language switcher in the top bar, and an i18n sync agent (`scripts/i18n-sync.ts`) that audits locale files for missing/extra/untranslated keys and can auto-translate via Claude Haiku API
+- **Internationalization** — full i18n with next-intl supporting 18 languages (Finnish default, English, Swedish, German, French, Spanish, Portuguese, Polish, Russian, Ukrainian, Arabic with RTL, Hindi, Japanese, Chinese, Korean, Thai, Swahili, Turkish); cookie-based locale persistence, Accept-Language auto-detection, and language switcher in the top bar
+- **AI-powered translation pipeline** — custom i18n sync agent (`scripts/i18n-sync.ts`) that audits all 17 locale files against `en.json` for missing, extra, and untranslated keys; auto-fills structural drift with `--fix`; translates via parallel Claude Code subagents (6 concurrent agents translating 17 locales in ~80s) or via Claude Haiku API for headless CI use; integrated into `npm run validate` pre-commit pipeline
 - **Gamified demo tour** — 8-step interactive tutorial for demo users with auto-detection of task completion via custom DOM events and route matching; pulsing spotlight hints on target elements; DOM-aware navigation guidance highlighting every click needed between pages (back buttons, section links, table rows, dropdown menu items with automatic fallback when menus open/close); confetti celebrations on each step with a trophy finale; floating progress checklist; localStorage persistence; automatic reset on demo logout
 - **Responsive design** — MUI responsive breakpoints for mobile, tablet, and desktop; horizontally scrollable tables, adaptive padding, and overflow-safe TopBar across all screen resolutions
 - **6 visual themes** — Dark (default), Light, Cyberpunk, Retro Terminal, Bubblegum, and Ocean; CSS custom properties architecture allows instant theme switching without component refactoring; FOUC-preventing inline script; localStorage persistence; palette icon switcher in the top bar
@@ -135,17 +136,23 @@ npm run format
 
 ---
 
-### Translation sync
+### Translation sync & validation
 
 ```bash
 npm run i18n:audit      # report missing, extra, and untranslated keys across all locales
 npm run i18n:fix        # auto-fill missing keys with English fallback and remove extras
-npm run i18n:translate  # fix + auto-translate untranslated keys via Claude Haiku API (requires ANTHROPIC_API_KEY)
+npm run i18n:translate  # fix + auto-translate via Claude Haiku API (requires ANTHROPIC_API_KEY)
+npm run validate        # pre-commit pipeline: Prettier + ESLint + i18n audit + full test suite
 ```
 
-> The i18n sync agent (`scripts/i18n-sync.ts`) compares all 17 locale files against `en.json` as the source of truth. Audit mode reports issues without modifying files. Fix mode adds missing keys (with English fallback text) and removes keys that don't exist in the source.
+> **i18n sync agent** (`scripts/i18n-sync.ts`) — compares all 17 locale files against `en.json` as the source of truth. Detects missing keys, extra keys, and untranslated values. Fix mode auto-fills missing keys with English fallback and removes extras.
 >
-> **Translation workflow:** New UI strings are added to `en.json` first, then `npm run i18n:fix` propagates the keys to all locales with English fallback text. Translations are then produced by Claude Code agents — parallel subagents translate all 17 locales simultaneously at zero marginal cost under a Claude Max subscription. The `--translate` flag provides an alternative path via the Claude Haiku API for CI or standalone use (requires `ANTHROPIC_API_KEY`). The SDK (`@anthropic-ai/sdk`) is a dev dependency and is not included in the production bundle.
+> **AI translation pipeline** — two paths to translate untranslated keys:
+>
+> 1. **Claude Code agents** (primary) — parallel subagents translate all 17 locales simultaneously (~80s for full coverage). Zero marginal cost under a Claude Max subscription. Used during active development sessions.
+> 2. **Claude Haiku API** (alternative) — headless `--translate` mode for CI or standalone use. Requires `ANTHROPIC_API_KEY`. The SDK (`@anthropic-ai/sdk`) is a dev dependency and is not included in the production bundle.
+>
+> **Pre-commit validation** (`npm run validate`) — runs Prettier, ESLint, i18n audit, and the full 738-test suite in sequence, failing fast on the first error. This is the quality gate before every commit.
 
 ---
 
