@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, act } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import LanguageSwitcher from "../components/LanguageSwitcher";
 import { locales, localeNames } from "../i18n/config";
 
@@ -47,27 +47,19 @@ describe("LanguageSwitcher", () => {
   });
 
   // Selecting a language calls setLocale with the correct locale code
-  test("selecting a language calls setLocale", async () => {
+  test("selecting a language calls setLocale", () => {
     render(<LanguageSwitcher />);
     fireEvent.click(screen.getByLabelText("Language"));
-    await act(async () => {
-      fireEvent.click(screen.getByText("Deutsch"));
-    });
-    // Flush the startTransition async callback
-    await act(async () => {
-      await new Promise((r) => setTimeout(r, 0));
-    });
+    fireEvent.click(screen.getByText("Deutsch"));
     expect(mockSetLocale).toHaveBeenCalledWith("de");
   });
 
   // Selecting a language closes the menu
-  test("selecting a language closes the menu", async () => {
+  test("selecting a language closes the menu", () => {
     render(<LanguageSwitcher />);
     fireEvent.click(screen.getByLabelText("Language"));
     expect(screen.getByText("Suomi")).toBeInTheDocument();
-    await act(async () => {
-      fireEvent.click(screen.getByText("Suomi"));
-    });
+    fireEvent.click(screen.getByText("Suomi"));
     expect(mockSetLocale).toHaveBeenCalledWith("fi");
   });
 

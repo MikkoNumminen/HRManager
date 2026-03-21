@@ -1,6 +1,6 @@
 // Mock getRequestConfig to just pass through the callback function
 jest.mock("next-intl/server", () => ({
-  getRequestConfig: (fn: Function) => fn,
+  getRequestConfig: (fn: (...args: unknown[]) => unknown) => fn,
 }));
 
 const mockCookieGet = jest.fn();
