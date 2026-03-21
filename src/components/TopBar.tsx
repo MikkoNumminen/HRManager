@@ -96,7 +96,7 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
         <Toolbar
           sx={{
             position: "relative",
-            ...(backHref && { pl: { xs: "56px", sm: "72px" } }),
+            ...(backHref && { pl: { xs: "52px", sm: "64px" } }),
           }}
         >
           {backHref && (
