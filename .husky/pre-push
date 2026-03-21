@@ -15,8 +15,8 @@ if [ "$MISSING" -gt 0 ]; then
 fi
 
 # Check for untranslated keys (excluding known false positives ~20)
-UNTRANSLATED=$(echo "$SUMMARY" | sed 's/.*\([0-9]*\) untranslated.*/\1/')
-if [ "$UNTRANSLATED" -gt 25 ]; then
+UNTRANSLATED=$(echo "$SUMMARY" | sed -E 's/.*,[[:space:]]*([0-9]+) untranslated.*/\1/')
+if [ -n "$UNTRANSLATED" ] && [ "$UNTRANSLATED" -gt 25 ]; then
   echo ""
   echo "PUSH BLOCKED: $UNTRANSLATED untranslated keys detected (threshold: 25)."
   echo "Ask Claude Code to translate them, then commit and push again."
