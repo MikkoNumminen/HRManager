@@ -140,10 +140,12 @@ npm run format
 ```bash
 npm run i18n:audit      # report missing, extra, and untranslated keys across all locales
 npm run i18n:fix        # auto-fill missing keys with English fallback and remove extras
-npm run i18n:translate  # fix + auto-translate untranslated keys via Claude Haiku API
+npm run i18n:translate  # fix + auto-translate untranslated keys via Claude Haiku API (requires ANTHROPIC_API_KEY)
 ```
 
-> The i18n sync agent (`scripts/i18n-sync.ts`) compares all 17 locale files against `en.json` as the source of truth. Audit mode reports issues without modifying files. Fix mode adds missing keys (with English fallback text) and removes keys that don't exist in the source. Translate mode uses the Claude Haiku API to translate untranslated UI strings into each target language — requires `ANTHROPIC_API_KEY` environment variable. The SDK (`@anthropic-ai/sdk`) is a dev dependency and is not included in the production bundle.
+> The i18n sync agent (`scripts/i18n-sync.ts`) compares all 17 locale files against `en.json` as the source of truth. Audit mode reports issues without modifying files. Fix mode adds missing keys (with English fallback text) and removes keys that don't exist in the source.
+>
+> **Translation workflow:** New UI strings are added to `en.json` first, then `npm run i18n:fix` propagates the keys to all locales with English fallback text. Translations are then produced by Claude Code agents — parallel subagents translate all 17 locales simultaneously at zero marginal cost under a Claude Max subscription. The `--translate` flag provides an alternative path via the Claude Haiku API for CI or standalone use (requires `ANTHROPIC_API_KEY`). The SDK (`@anthropic-ai/sdk`) is a dev dependency and is not included in the production bundle.
 
 ---
 
