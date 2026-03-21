@@ -1,25 +1,123 @@
-import { render, screen } from "@testing-library/react";
-import ThemeRegistry from "../components/ThemeRegistry";
+import { render, screen, act } from "@testing-library/react";
+import ThemeRegistry, { useTheme } from "../components/ThemeRegistry";
+import { THEME_STORAGE_KEY, THEME_PALETTES, DEFAULT_THEME } from "../themeConfig";
+
+jest.mock("next/navigation", () => ({
+  useRouter: jest.fn(),
+}));
+
+// Helper component to expose theme context values
+function ThemeConsumer() {
+  const { currentTheme, setTheme } = useTheme();
+  return (
+    <div>
+      <span data-testid="current-theme">{currentTheme}</span>
+      <button onClick={() => setTheme("cyberpunk")}>Switch to cyberpunk</button>
+      <button onClick={() => setTheme("light")}>Switch to light</button>
+    </div>
+  );
+}
 
 describe("ThemeRegistry", () => {
-  // Renders children inside the MUI ThemeProvider with dark theme.
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  // Renders children inside the provider
   test("renders children", () => {
     render(
       <ThemeRegistry>
-        <span>Themed Content</span>
+        <div>Hello</div>
       </ThemeRegistry>,
     );
-    expect(screen.getByText("Themed Content")).toBeInTheDocument();
+    expect(screen.getByText("Hello")).toBeInTheDocument();
   });
 
-  // Applies the dark theme background color to the document body via CssBaseline.
-  test("applies dark theme styles", () => {
+  // Defaults to dark theme when localStorage is empty
+  test("defaults to dark theme", () => {
     render(
       <ThemeRegistry>
-        <div>Test</div>
+        <ThemeConsumer />
       </ThemeRegistry>,
     );
-    // CssBaseline injects global styles — verify component renders without error
-    expect(screen.getByText("Test")).toBeInTheDocument();
+    expect(screen.getByTestId("current-theme")).toHaveTextContent("dark");
+  });
+
+  // Loads theme from localStorage on mount
+  test("loads theme from localStorage", async () => {
+    localStorage.setItem(THEME_STORAGE_KEY, "ocean");
+    render(
+      <ThemeRegistry>
+        <ThemeConsumer />
+      </ThemeRegistry>,
+    );
+    await screen.findByText("ocean");
+    expect(screen.getByTestId("current-theme")).toHaveTextContent("ocean");
+  });
+
+  // Falls back to dark for invalid localStorage values
+  test("falls back to dark for invalid stored theme", () => {
+    localStorage.setItem(THEME_STORAGE_KEY, "nonexistent-theme");
+    render(
+      <ThemeRegistry>
+        <ThemeConsumer />
+      </ThemeRegistry>,
+    );
+    expect(screen.getByTestId("current-theme")).toHaveTextContent("dark");
+  });
+
+  // setTheme updates the current theme
+  test("setTheme updates current theme", async () => {
+    render(
+      <ThemeRegistry>
+        <ThemeConsumer />
+      </ThemeRegistry>,
+    );
+    await act(async () => {
+      screen.getByText("Switch to cyberpunk").click();
+    });
+    expect(screen.getByTestId("current-theme")).toHaveTextContent("cyberpunk");
+  });
+
+  // setTheme persists to localStorage
+  test("setTheme saves to localStorage", async () => {
+    render(
+      <ThemeRegistry>
+        <ThemeConsumer />
+      </ThemeRegistry>,
+    );
+    await act(async () => {
+      screen.getByText("Switch to light").click();
+    });
+    expect(localStorage.getItem(THEME_STORAGE_KEY)).toBe("light");
+  });
+
+  // Multiple theme switches update correctly
+  test("multiple theme switches work correctly", async () => {
+    render(
+      <ThemeRegistry>
+        <ThemeConsumer />
+      </ThemeRegistry>,
+    );
+    await act(async () => {
+      screen.getByText("Switch to cyberpunk").click();
+    });
+    expect(screen.getByTestId("current-theme")).toHaveTextContent("cyberpunk");
+
+    await act(async () => {
+      screen.getByText("Switch to light").click();
+    });
+    expect(screen.getByTestId("current-theme")).toHaveTextContent("light");
+    expect(localStorage.getItem(THEME_STORAGE_KEY)).toBe("light");
+  });
+
+  // useTheme returns default values outside provider
+  test("useTheme returns defaults outside provider", () => {
+    function Standalone() {
+      const { currentTheme } = useTheme();
+      return <span>{currentTheme}</span>;
+    }
+    render(<Standalone />);
+    expect(screen.getByText(DEFAULT_THEME)).toBeInTheDocument();
   });
 });
