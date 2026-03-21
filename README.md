@@ -28,7 +28,7 @@ A full-stack HR management system for managing employees, teams, and departments
 - **Guest mode** — unauthenticated users see read-only chip views of persons, departments, and teams; manage routes redirect to home
 - **Permission-aware UI** — server-side permission guards on all mutations; client-side conditional rendering hides UI elements the user can't access
 - **Relational integrity** — database constraints enforced at ORM level with cascading rules
-- **Internationalization** — full i18n with next-intl supporting 18 languages (Finnish default, English, Swedish, German, French, Spanish, Portuguese, Polish, Russian, Ukrainian, Arabic with RTL, Hindi, Japanese, Chinese, Korean, Thai, Swahili, Turkish); cookie-based locale persistence, Accept-Language auto-detection, and language switcher in the top bar
+- **Internationalization** — full i18n with next-intl supporting 18 languages (Finnish default, English, Swedish, German, French, Spanish, Portuguese, Polish, Russian, Ukrainian, Arabic with RTL, Hindi, Japanese, Chinese, Korean, Thai, Swahili, Turkish); cookie-based locale persistence, Accept-Language auto-detection, language switcher in the top bar, and an i18n sync agent (`scripts/i18n-sync.ts`) that audits locale files for missing/extra/untranslated keys and can auto-translate via Claude Haiku API
 - **Gamified demo tour** — 8-step interactive tutorial for demo users with auto-detection of task completion via custom DOM events and route matching; pulsing spotlight hints on target elements; DOM-aware navigation guidance highlighting every click needed between pages (back buttons, section links, table rows, dropdown menu items with automatic fallback when menus open/close); confetti celebrations on each step with a trophy finale; floating progress checklist; localStorage persistence; automatic reset on demo logout
 - **Responsive design** — MUI responsive breakpoints for mobile, tablet, and desktop; horizontally scrollable tables, adaptive padding, and overflow-safe TopBar across all screen resolutions
 - **6 visual themes** — Dark (default), Light, Cyberpunk, Retro Terminal, Bubblegum, and Ocean; CSS custom properties architecture allows instant theme switching without component refactoring; FOUC-preventing inline script; localStorage persistence; palette icon switcher in the top bar
@@ -135,6 +135,18 @@ npm run format
 
 ---
 
+### Translation sync
+
+```bash
+npm run i18n:audit      # report missing, extra, and untranslated keys across all locales
+npm run i18n:fix        # auto-fill missing keys with English fallback and remove extras
+npm run i18n:translate  # fix + auto-translate untranslated keys via Claude Haiku API
+```
+
+> The i18n sync agent (`scripts/i18n-sync.ts`) compares all 17 locale files against `en.json` as the source of truth. Audit mode reports issues without modifying files. Fix mode adds missing keys (with English fallback text) and removes keys that don't exist in the source. Translate mode uses the Claude Haiku API to translate untranslated UI strings into each target language — requires `ANTHROPIC_API_KEY` environment variable. The SDK (`@anthropic-ai/sdk`) is a dev dependency and is not included in the production bundle.
+
+---
+
 ## Tech stack
 
 | Layer             | Technology                                            |
@@ -194,6 +206,8 @@ src/
 ├── themeConfig.ts    # Theme palettes, constants, CSS variable generation
 └── tutorialConfig.ts # Tutorial step definitions, route matching, event helpers
 messages/             # i18n translation files (18 languages)
+scripts/
+└── i18n-sync.ts      # Translation sync agent (audit, fix, auto-translate via Claude API)
 prisma/
 └── schema.prisma     # Data model (Person, Team, Department, User, Permission, UserPermission, AuditLog)
 ```
