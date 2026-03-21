@@ -48,7 +48,7 @@ describe("TutorialChecklist", () => {
   test("renders nothing when not active", () => {
     mockUseTutorial.mockReturnValue(createMockContext({ isActive: false }));
     const { container } = render(<TutorialChecklist />);
-    expect(container.innerHTML).toBe("");
+    expect(container).toBeEmptyDOMElement();
   });
 
   // Renders the checklist title

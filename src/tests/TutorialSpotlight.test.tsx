@@ -52,14 +52,14 @@ describe("TutorialSpotlight", () => {
   test("renders nothing when not active", () => {
     mockUseTutorial.mockReturnValue(createMockContext({ isActive: false }));
     const { container } = render(<TutorialSpotlight />);
-    expect(container.innerHTML).toBe("");
+    expect(container).toBeEmptyDOMElement();
   });
 
   // Renders nothing when no current step
   test("renders nothing when no current step", () => {
     mockUseTutorial.mockReturnValue(createMockContext({ currentStep: null }));
     const { container } = render(<TutorialSpotlight />);
-    expect(container.innerHTML).toBe("");
+    expect(container).toBeEmptyDOMElement();
   });
 
   // Renders nothing when on a different route than the current step
@@ -68,7 +68,7 @@ describe("TutorialSpotlight", () => {
     usePathname.mockReturnValue("/manageTeams");
     mockUseTutorial.mockReturnValue(createMockContext());
     const { container } = render(<TutorialSpotlight />);
-    expect(container.innerHTML).toBe("");
+    expect(container).toBeEmptyDOMElement();
   });
 
   // Renders nothing when target element does not exist in DOM
@@ -78,7 +78,7 @@ describe("TutorialSpotlight", () => {
     mockUseTutorial.mockReturnValue(createMockContext());
     const { container } = render(<TutorialSpotlight />);
     // No element with data-tutorial='add-person-form' in the DOM
-    expect(container.querySelector(".MuiPopper-root")).toBeNull();
+    expect(container).toBeEmptyDOMElement();
   });
 
   // Renders spotlight when all conditions are met (active, route match, target exists)
@@ -95,7 +95,7 @@ describe("TutorialSpotlight", () => {
     render(<TutorialSpotlight />);
 
     // Should inject the glow CSS class on the target
-    expect(target.classList.contains("tutorial-spotlight-target")).toBe(true);
+    expect(target).toHaveClass("tutorial-spotlight-target");
   });
 
   // Shows the step title from translations
@@ -159,9 +159,9 @@ describe("TutorialSpotlight", () => {
     mockUseTutorial.mockReturnValue(createMockContext());
     const { unmount } = render(<TutorialSpotlight />);
 
-    expect(target.classList.contains("tutorial-spotlight-target")).toBe(true);
+    expect(target).toHaveClass("tutorial-spotlight-target");
     unmount();
-    expect(target.classList.contains("tutorial-spotlight-target")).toBe(false);
+    expect(target).not.toHaveClass("tutorial-spotlight-target");
   });
 
   // Handles RegExp route matching for dynamic routes
@@ -185,7 +185,7 @@ describe("TutorialSpotlight", () => {
     );
     render(<TutorialSpotlight />);
 
-    expect(target.classList.contains("tutorial-spotlight-target")).toBe(true);
+    expect(target).toHaveClass("tutorial-spotlight-target");
   });
 
   // Injects the CSS keyframes style tag
@@ -200,8 +200,102 @@ describe("TutorialSpotlight", () => {
     mockUseTutorial.mockReturnValue(createMockContext());
     const { container } = render(<TutorialSpotlight />);
 
+    // eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
     const style = container.querySelector("style");
     expect(style).not.toBeNull();
     expect(style?.textContent).toContain("tutorial-pulse");
+  });
+
+  // Shows navigation hint when not on the step's route but on a hinted route
+  test("shows navigation hint on a different page", () => {
+    const { usePathname } = require("next/navigation");
+    usePathname.mockReturnValue("/");
+
+    // Create a target matching the nav hint selector for "add_person" step from "/"
+    const target = document.createElement("div");
+    target.setAttribute("data-tutorial", "persons-section");
+    document.body.appendChild(target);
+
+    mockUseTutorial.mockReturnValue(
+      createMockContext({
+        currentStep: {
+          id: "add_person",
+          route: "/managePersons",
+          targetSelector: "[data-tutorial='add-person-form']",
+          event: "tutorial:person_created",
+          navigationHints: [
+            {
+              fromRoute: "/",
+              targetSelector: "[data-tutorial='persons-section']",
+              hintKey: "nav_click_persons",
+            },
+          ],
+        },
+      }),
+    );
+    render(<TutorialSpotlight />);
+
+    expect(target).toHaveClass("tutorial-spotlight-target");
+    expect(screen.getByText("Click the Persons section to manage employees.")).toBeInTheDocument();
+  });
+
+  // Shows back button hint when navigating away from a completed step
+  test("shows back button hint for navigation", () => {
+    const { usePathname } = require("next/navigation");
+    usePathname.mockReturnValue("/managePersons");
+
+    const backBtn = document.createElement("button");
+    backBtn.setAttribute("data-tutorial", "back-button");
+    document.body.appendChild(backBtn);
+
+    mockUseTutorial.mockReturnValue(
+      createMockContext({
+        currentStep: {
+          id: "create_team",
+          route: "/manageTeams",
+          targetSelector: "[data-tutorial='add-team-form']",
+          event: "tutorial:team_created",
+          navigationHints: [
+            {
+              fromRoute: /^\/managePersons/,
+              targetSelector: "[data-tutorial='back-button']",
+              hintKey: "nav_go_back_home",
+            },
+          ],
+        },
+      }),
+    );
+    render(<TutorialSpotlight />);
+
+    expect(backBtn).toHaveClass("tutorial-spotlight-target");
+    expect(
+      screen.getByText("Click the back arrow to return to the home page."),
+    ).toBeInTheDocument();
+  });
+
+  // Renders nothing when not on step route and no matching navigation hint
+  test("renders nothing when no matching navigation hint", () => {
+    const { usePathname } = require("next/navigation");
+    usePathname.mockReturnValue("/some-random-page");
+
+    mockUseTutorial.mockReturnValue(
+      createMockContext({
+        currentStep: {
+          id: "add_person",
+          route: "/managePersons",
+          targetSelector: "[data-tutorial='add-person-form']",
+          event: "tutorial:person_created",
+          navigationHints: [
+            {
+              fromRoute: "/",
+              targetSelector: "[data-tutorial='persons-section']",
+              hintKey: "nav_click_persons",
+            },
+          ],
+        },
+      }),
+    );
+    const { container } = render(<TutorialSpotlight />);
+    expect(container).toBeEmptyDOMElement();
   });
 });

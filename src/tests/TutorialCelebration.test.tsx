@@ -54,7 +54,7 @@ describe("TutorialCelebration", () => {
   test("renders nothing when not celebrating", () => {
     mockUseTutorial.mockReturnValue(createMockContext());
     const { container } = render(<TutorialCelebration />);
-    expect(container.innerHTML).toBe("");
+    expect(container).toBeEmptyDOMElement();
   });
 
   // Shows "Nice work!" text when celebrating a regular step
@@ -146,6 +146,7 @@ describe("TutorialCelebration", () => {
       createMockContext({ celebratingStep: "add_person", allComplete: false }),
     );
     const { container } = render(<TutorialCelebration />);
+    // eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
     const style = container.querySelector("style");
     expect(style?.textContent).toContain("tutorial-celebration-glow");
   });
