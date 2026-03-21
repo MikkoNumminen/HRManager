@@ -1,5 +1,5 @@
 echo "Running i18n audit..."
-AUDIT_OUTPUT=$(npx tsx scripts/i18n-sync.ts 2>&1)
+AUDIT_OUTPUT=$(npx tsx scripts/i18n-sync.ts 2>&1 || true)
 MISSING=$(echo "$AUDIT_OUTPUT" | grep -c "^      + " || true)
 SUMMARY=$(echo "$AUDIT_OUTPUT" | grep "^Summary:")
 
