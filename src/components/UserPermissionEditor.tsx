@@ -282,7 +282,7 @@ export default function UserPermissionEditor({
                           sx={{
                             "&.Mui-selected, &.Mui-selected:hover": {
                               backgroundColor: "rgba(148, 163, 184, 0.15)",
-                              color: colors.slate200,
+                              color: colors.slate100,
                             },
                           }}
                         >
