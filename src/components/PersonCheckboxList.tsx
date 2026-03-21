@@ -46,7 +46,8 @@ export function PersonCheckBoxList({
               textDecoration: isSelected ? "line-through" : "none",
               color: isSelected ? colors.slate400 : colors.slate100,
               cursor: "pointer",
-              fontSize: "0.875rem",
+              fontSize: { xs: "0.8rem", sm: "0.875rem" },
+              wordBreak: "break-word",
             }}
           >
             <strong>Name:</strong> {name} <strong>Position:</strong> {position ?? ""}{" "}

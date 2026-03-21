@@ -275,6 +275,8 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
       <Dialog
         open={seedDialogOpen}
         onClose={() => setSeedDialogOpen(false)}
+        fullWidth
+        maxWidth="xs"
         slotProps={{
           paper: {
             sx: {

@@ -43,6 +43,7 @@ const AssignTeamToDepartmentForm: React.FC<{
         select
         label={t("selectTeam")}
         size="small"
+        fullWidth
         value={selectedTeam}
         onChange={(e) => setSelectedTeam(e.target.value)}
         sx={textFieldStyles}

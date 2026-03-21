@@ -31,6 +31,8 @@ export default function ConfirmDialog({
     <Dialog
       open={open}
       onClose={onCancel}
+      fullWidth
+      maxWidth="xs"
       slotProps={{
         paper: {
           sx: {

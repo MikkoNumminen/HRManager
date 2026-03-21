@@ -32,7 +32,7 @@ const PersonTable: React.FC<PersonTableProps> = ({ persons }) => {
 
   return (
     <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 650 }} aria-label="person table">
+      <Table sx={{ minWidth: { xs: 500, sm: 650 } }} aria-label="person table">
         <TableHead>
           <TableRow>
             <TableCell>{tc("name")}</TableCell>

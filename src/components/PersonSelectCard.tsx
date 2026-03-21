@@ -76,7 +76,7 @@ export function PersonSelectCard({ person, selected, onSelect, variant = "add" }
         <Box>
           <Typography
             sx={{
-              fontSize: "0.8rem",
+              fontSize: { xs: "0.85rem", sm: "0.8rem" },
               fontWeight: selected ? 600 : 400,
               color: selected ? accentColor : colors.slate100,
               lineHeight: 1.3,
@@ -85,7 +85,13 @@ export function PersonSelectCard({ person, selected, onSelect, variant = "add" }
             {name}
           </Typography>
           {position && (
-            <Typography sx={{ fontSize: "0.7rem", color: colors.slate400, lineHeight: 1.2 }}>
+            <Typography
+              sx={{
+                fontSize: { xs: "0.75rem", sm: "0.7rem" },
+                color: colors.slate400,
+                lineHeight: 1.2,
+              }}
+            >
               {position}
             </Typography>
           )}

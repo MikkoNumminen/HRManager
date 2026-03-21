@@ -104,8 +104,8 @@ export const activeButtonStyles = {
 };
 
 export const avatarStyles = {
-  width: 32,
-  height: 32,
+  width: { xs: 36, sm: 32 },
+  height: { xs: 36, sm: 32 },
   border: `1px solid ${colors.slate300}`,
   fontSize: "0.875rem",
 };
@@ -115,7 +115,8 @@ export const userMenuStyles = {
     backgroundColor: colors.slate600,
     border: `1px solid ${colors.slate300}`,
     borderRadius: "4px",
-    minWidth: 200,
+    minWidth: { xs: "70vw", sm: 200 },
+    maxWidth: { xs: "90vw", sm: "none" },
   },
 };
 
@@ -127,13 +128,13 @@ export const userMenuItemStyles = {
 };
 
 export const tableStyles = {
-  minWidth: 650,
+  minWidth: { xs: 500, sm: 650 },
   width: "100%",
 };
 
 export const boxStyles = {
   flex: "1",
-  padding: { xs: "12px", sm: "20px" },
+  padding: { xs: "16px", sm: "20px" },
   border: `1px solid ${colors.slate300}`,
   borderRadius: "4px",
   mb: 1.5,

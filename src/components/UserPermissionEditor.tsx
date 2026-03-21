@@ -224,7 +224,11 @@ export default function UserPermissionEditor({
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1, minWidth: 0 }}>
                       <Typography
                         variant="body2"
-                        sx={{ color: colors.slate300, fontFamily: "monospace", fontSize: "0.8rem" }}
+                        sx={{
+                          color: colors.slate300,
+                          fontFamily: "monospace",
+                          fontSize: { xs: "0.75rem", sm: "0.8rem" },
+                        }}
                       >
                         {formatKey(key)}
                       </Typography>
@@ -236,7 +240,7 @@ export default function UserPermissionEditor({
                           color: effective ? colors.green400 : colors.error,
                           fontWeight: 600,
                           height: 20,
-                          fontSize: "0.7rem",
+                          fontSize: { xs: "0.65rem", sm: "0.7rem" },
                         }}
                       />
                     </Box>

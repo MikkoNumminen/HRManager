@@ -46,8 +46,8 @@ export default function TutorialChecklist() {
     <Box
       sx={{
         position: "fixed",
-        bottom: 16,
-        right: 16,
+        bottom: { xs: 8, sm: 16 },
+        right: { xs: 8, sm: 16 },
         zIndex: 1100,
         pointerEvents: "none",
       }}

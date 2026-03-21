@@ -37,7 +37,7 @@ const selectStyles = {
   "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: colors.slate100 },
   "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: colors.slate100 },
   "& .MuiSvgIcon-root": { color: colors.slate400 },
-  minWidth: { xs: 120, sm: 150 },
+  minWidth: { xs: "100%", sm: 150 },
 };
 
 const labelStyles = { color: colors.slate400, "&.Mui-focused": { color: colors.slate100 } };
@@ -247,7 +247,7 @@ export default function AuditLogViewer({
 
   return (
     <>
-      <Box display="flex" gap={2} mb={2} flexWrap="wrap">
+      <Box display="flex" gap={{ xs: 1, sm: 2 }} mb={2} flexWrap="wrap">
         <FormControl size="small">
           <InputLabel sx={labelStyles}>{t("filterUser")}</InputLabel>
           <Select
@@ -343,7 +343,9 @@ export default function AuditLogViewer({
             ) : (
               logs.map((log) => (
                 <TableRow key={log.id}>
-                  <TableCell sx={{ whiteSpace: "nowrap", fontSize: "0.8rem" }}>
+                  <TableCell
+                    sx={{ whiteSpace: "nowrap", fontSize: { xs: "0.75rem", sm: "0.8rem" } }}
+                  >
                     {new Date(log.createdAt).toLocaleString()}
                   </TableCell>
                   <TableCell
