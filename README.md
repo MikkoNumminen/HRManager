@@ -29,11 +29,12 @@ A full-stack HR management system for managing employees, teams, and departments
 - **Permission-aware UI** — server-side permission guards on all mutations; client-side conditional rendering hides UI elements the user can't access
 - **Relational integrity** — database constraints enforced at ORM level with cascading rules
 - **Internationalization** — full i18n with next-intl supporting 18 languages (Finnish default, English, Swedish, German, French, Spanish, Portuguese, Polish, Russian, Ukrainian, Arabic with RTL, Hindi, Japanese, Chinese, Korean, Thai, Swahili, Turkish); cookie-based locale persistence, Accept-Language auto-detection, and language switcher in the top bar
+- **Responsive design** — MUI responsive breakpoints for mobile, tablet, and desktop; horizontally scrollable tables, adaptive padding, and overflow-safe TopBar across all screen resolutions
 - **Dark UI** — MUI dark theme with consistent component styling throughout
 - **Type-safe** — end-to-end TypeScript with Zod schema validation and centralized inferred types
 - **Server-first** — async Server Components for data fetching, Server Actions for mutations inside `$transaction` blocks
 - **CI/CD** — GitHub Actions pipeline runs formatting, linting, full test suite with coverage, and production build on every push and PR
-- **Thoroughly tested** — 593 Jest tests across seven layers with 100% line and function coverage: Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, audit logging, and all UI components
+- **Thoroughly tested** — 594 Jest tests across seven layers with 100% line and function coverage: Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, audit logging, and all UI components
 
 ---
 
@@ -119,7 +120,7 @@ npm run test:server # query + server action tests (Node, real PostgreSQL)
 npm run test:all    # both suites
 ```
 
-> The project has **593 tests** split into two suites. `npm test` runs the client-side tests — component rendering, user interactions, form validation, Zod schema parsing, and RBAC permission resolution — all in a jsdom environment. `npm run test:server` runs the server-side tests against a real PostgreSQL test database — every Prisma query, every server action mutation (including admin role/permission management and department operations), audit log creation, audit log queries, UUID validation, duplicate prevention, and cascade deletes. The test database (`hrmanager_test`) is separate from the dev database and never touches your dev data. Configure its connection string in `.env.test`.
+> The project has **594 tests** split into two suites. `npm test` runs the client-side tests — component rendering, user interactions, form validation, Zod schema parsing, and RBAC permission resolution — all in a jsdom environment. `npm run test:server` runs the server-side tests against a real PostgreSQL test database — every Prisma query, every server action mutation (including admin role/permission management and department operations), audit log creation, audit log queries, UUID validation, duplicate prevention, and cascade deletes. The test database (`hrmanager_test`) is separate from the dev database and never touches your dev data. Configure its connection string in `.env.test`.
 
 ---
 
@@ -245,7 +246,7 @@ Individual permissions can be overridden per-user through the admin UI — for e
 
 ## Testing
 
-593 tests across 37 test suites, covering every layer of the application:
+594 tests across 37 test suites, covering every layer of the application:
 
 | Layer              | Tests | What's covered                                                                                                                                                                                                                                                                                                                                                                                     |
 | ------------------ | ----- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -273,7 +274,7 @@ Highlights: every source file at 100% line and function coverage — `auditLog.t
 
 The app is deployed on **Vercel** with **Vercel Postgres** (Neon). The build script runs `prisma generate && prisma migrate deploy && next build` — migrations are applied automatically on every deployment.
 
-The first user to sign in via OAuth is bootstrapped as the superuser. A **demo login** (NextAuth Credentials provider) is available so portfolio visitors can explore the full UI without setting up OAuth — the demo user is created as an administrator with access to all person, team, and department operations.
+The first user to sign in via OAuth is bootstrapped as the superuser. A **demo login** (NextAuth Credentials provider) is available so portfolio visitors can explore the full UI without setting up OAuth — the demo user is created as a superuser with full access to all features including user management, data reset/seed, and audit log.
 
 ---
 
