@@ -30,6 +30,7 @@ export default async function ManageTeamsPage() {
       <TopBar title={t("manageTitle")} backHref="/" permissions={permissions} />
       {permissions["team:create"] && <AddTeamForm />}
       <Box
+        data-tutorial="teams-table"
         sx={{
           border: `1px solid ${colors.slate300}`,
           borderRadius: "4px",

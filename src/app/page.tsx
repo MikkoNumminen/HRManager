@@ -107,7 +107,7 @@ export default async function Home() {
         canManageTeams ? (
           <Link href="/manageTeams" sx={{ textDecoration: "none" }}>
             <Tooltip title={t("goToTeams")} placement="right" arrow>
-              <Box component="div" sx={boxStyles}>
+              <Box component="div" sx={boxStyles} data-tutorial="teams-section">
                 <Typography variant="h6" gutterBottom>
                   {t("teams")}
                 </Typography>
@@ -136,7 +136,7 @@ export default async function Home() {
         canManageDepartments ? (
           <Link href="/manageDepartments" sx={{ textDecoration: "none" }}>
             <Tooltip title={t("goToDepartments")} placement="right" arrow>
-              <Box component="div" sx={boxStyles}>
+              <Box component="div" sx={boxStyles} data-tutorial="departments-section">
                 <Typography variant="h6" gutterBottom>
                   {t("departments")}
                 </Typography>

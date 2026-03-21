@@ -29,6 +29,7 @@ export default async function ManageDepartmentsPage() {
       <TopBar title={t("manageTitle")} backHref="/" permissions={permissions} />
       {permissions["department:create"] && <AddDepartmentForm />}
       <Box
+        data-tutorial="departments-table"
         sx={{
           border: `1px solid ${colors.slate300}`,
           borderRadius: "4px",

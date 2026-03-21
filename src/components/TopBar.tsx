@@ -100,6 +100,7 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
               component={Link}
               href={backHref}
               aria-label={tc("goBack")}
+              data-tutorial="back-button"
               sx={{
                 position: "absolute",
                 left: 4,
@@ -131,7 +132,11 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
           <LanguageSwitcher />
           {user ? (
             <>
-              <IconButton onClick={(e) => setAnchorEl(e.currentTarget)} aria-label={t("userMenu")}>
+              <IconButton
+                onClick={(e) => setAnchorEl(e.currentTarget)}
+                aria-label={t("userMenu")}
+                data-tutorial="user-menu-button"
+              >
                 <Avatar src={user.image ?? undefined} alt={user.name ?? "User"} sx={avatarStyles}>
                   {!user.image && initials}
                 </Avatar>

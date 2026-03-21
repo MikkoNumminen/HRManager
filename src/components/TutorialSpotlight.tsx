@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Box, Paper, Popper, Typography } from "@mui/material";
 import { colors } from "@/muiStyles";
 import { useTutorial } from "./TutorialProvider";
-import { matchRoute } from "@/tutorialConfig";
+import { matchRoute, findNavigationHint } from "@/tutorialConfig";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 
@@ -30,9 +30,14 @@ export default function TutorialSpotlight() {
   const observerRef = useRef<MutationObserver | null>(null);
 
   const isOnStepRoute = currentStep && matchRoute(currentStep.route, pathname);
+  const navHint = currentStep && !isOnStepRoute ? findNavigationHint(currentStep, pathname) : null;
+
+  const activeSelector = isOnStepRoute
+    ? currentStep?.targetSelector
+    : (navHint?.targetSelector ?? null);
 
   useEffect(() => {
-    if (!isActive || !currentStep || !isOnStepRoute) {
+    if (!isActive || !currentStep || !activeSelector) {
       if (previousTargetRef.current) {
         previousTargetRef.current.classList.remove("tutorial-spotlight-target");
         previousTargetRef.current = null;
@@ -42,7 +47,7 @@ export default function TutorialSpotlight() {
     }
 
     const findTarget = () => {
-      const el = document.querySelector(currentStep.targetSelector) as HTMLElement | null;
+      const el = document.querySelector(activeSelector) as HTMLElement | null;
 
       if (previousTargetRef.current && previousTargetRef.current !== el) {
         previousTargetRef.current.classList.remove("tutorial-spotlight-target");
@@ -71,12 +76,16 @@ export default function TutorialSpotlight() {
         previousTargetRef.current = null;
       }
     };
-  }, [isActive, currentStep, isOnStepRoute, completedSteps]);
+  }, [isActive, currentStep, activeSelector, completedSteps]);
 
-  if (!isActive || !currentStep || !isOnStepRoute || !anchorEl) return null;
+  if (!isActive || !currentStep || !activeSelector || !anchorEl) return null;
 
   const stepIndex = completedSteps.size + 1;
-  const hintKey = `hint_${currentStep.id}` as Parameters<typeof t>[0];
+
+  const titleKey = `step_${currentStep.id}` as Parameters<typeof t>[0];
+  const hintText = isOnStepRoute
+    ? t(`hint_${currentStep.id}` as Parameters<typeof t>[0])
+    : t(navHint!.hintKey as Parameters<typeof t>[0]);
 
   return (
     <>
@@ -120,11 +129,11 @@ export default function TutorialSpotlight() {
               {stepIndex}
             </Box>
             <Typography variant="subtitle2" sx={{ color: colors.green400, fontWeight: 600 }}>
-              {t(`step_${currentStep.id}` as Parameters<typeof t>[0])}
+              {t(titleKey)}
             </Typography>
           </Box>
           <Typography variant="body2" sx={{ color: colors.slate100, lineHeight: 1.4 }}>
-            {t(hintKey)}
+            {hintText}
           </Typography>
         </Paper>
       </Popper>

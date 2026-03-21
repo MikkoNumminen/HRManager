@@ -1,6 +1,7 @@
 import {
   matchRoute,
   emitTutorialEvent,
+  findNavigationHint,
   TUTORIAL_STEPS,
   DEMO_EMAIL,
   STORAGE_KEY,
@@ -102,6 +103,58 @@ describe("tutorialConfig", () => {
     expect(eventSteps.length).toBeGreaterThan(0);
     for (const step of eventSteps) {
       expect(step.event).toMatch(/^tutorial:/);
+    }
+  });
+
+  // Most steps have navigation hints (all except view_employees which auto-completes)
+  test("action steps have navigation hints", () => {
+    const actionSteps = TUTORIAL_STEPS.filter((s) => !s.autoCompleteOnRoute || s.navigationHints);
+    for (const step of actionSteps) {
+      if (step.id !== "view_employees") {
+        expect(step.navigationHints).toBeDefined();
+        expect(step.navigationHints!.length).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  // findNavigationHint returns matching hint for the current route
+  test("findNavigationHint returns matching hint", () => {
+    const createTeamStep = TUTORIAL_STEPS.find((s) => s.id === "create_team")!;
+    const hint = findNavigationHint(createTeamStep, "/");
+    expect(hint).not.toBeNull();
+    expect(hint!.hintKey).toBe("nav_click_teams");
+  });
+
+  // findNavigationHint returns null when no hint matches the route
+  test("findNavigationHint returns null for non-matching route", () => {
+    const createTeamStep = TUTORIAL_STEPS.find((s) => s.id === "create_team")!;
+    const hint = findNavigationHint(createTeamStep, "/admin/audit");
+    expect(hint).toBeNull();
+  });
+
+  // findNavigationHint returns null for steps without navigation hints
+  test("findNavigationHint returns null for steps without hints", () => {
+    const viewStep = TUTORIAL_STEPS.find((s) => s.id === "view_employees")!;
+    const hint = findNavigationHint(viewStep, "/");
+    expect(hint).toBeNull();
+  });
+
+  // findNavigationHint matches RegExp fromRoute
+  test("findNavigationHint matches RegExp fromRoute", () => {
+    const createTeamStep = TUTORIAL_STEPS.find((s) => s.id === "create_team")!;
+    const hint = findNavigationHint(createTeamStep, "/managePersons");
+    expect(hint).not.toBeNull();
+    expect(hint!.hintKey).toBe("nav_go_back_home");
+  });
+
+  // Navigation hints for back button target the correct selector
+  test("back button hints target data-tutorial=back-button", () => {
+    const backHints = TUTORIAL_STEPS.flatMap((s) => s.navigationHints ?? []).filter((h) =>
+      h.hintKey.includes("go_back"),
+    );
+    expect(backHints.length).toBeGreaterThan(0);
+    for (const hint of backHints) {
+      expect(hint.targetSelector).toBe("[data-tutorial='back-button']");
     }
   });
 });

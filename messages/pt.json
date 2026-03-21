@@ -253,6 +253,16 @@
     "hint_create_department": "Give your department a name and optionally a description.",
     "hint_assign_team_to_department": "Pick a team from the dropdown to assign it to this department.",
     "hint_manage_permissions": "Grant or deny individual permissions for this user.",
-    "hint_view_audit_log": "This log records every action taken in the system."
+    "hint_view_audit_log": "This log records every action taken in the system.",
+    "nav_click_persons": "Click the Persons section to manage employees.",
+    "nav_click_teams": "Click the Teams section to manage teams.",
+    "nav_click_departments": "Click the Departments section to manage departments.",
+    "nav_go_back_home": "Click the back arrow to return to the home page.",
+    "nav_go_back_admin": "Click the back arrow to return to User Management.",
+    "nav_click_a_team": "Click a team to manage its members.",
+    "nav_click_a_department": "Click a department to assign teams to it.",
+    "nav_click_a_user": "Click a user to manage their permissions.",
+    "nav_open_menu": "Open the user menu to access User Management.",
+    "nav_open_menu_audit": "Open the user menu to access the Audit Log."
   }
 }

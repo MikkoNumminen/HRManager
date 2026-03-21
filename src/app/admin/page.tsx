@@ -24,6 +24,7 @@ export default async function AdminPage() {
     <>
       <TopBar title={t("title")} backHref="/" permissions={permissions} />
       <Box
+        data-tutorial="users-table"
         sx={{
           border: `1px solid ${colors.slate300}`,
           borderRadius: "4px",
