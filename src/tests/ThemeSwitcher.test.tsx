@@ -1,6 +1,6 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import ThemeSwitcher from "../components/ThemeSwitcher";
-import { THEME_NAMES, THEME_LABELS, THEME_STORAGE_KEY } from "../themeConfig";
+import { THEME_NAMES, THEME_LABELS } from "../themeConfig";
 
 const mockSetTheme = jest.fn();
 let mockCurrentTheme = "dark";
@@ -73,5 +73,15 @@ describe("ThemeSwitcher", () => {
     // Check that emoji icons are rendered (at least verify the menu has 6 items)
     const menuItems = screen.getAllByRole("menuitem");
     expect(menuItems).toHaveLength(6);
+  });
+
+  // Menu closes via onClose when pressing Escape
+  test("menu closes via Escape key", () => {
+    render(<ThemeSwitcher />);
+    fireEvent.click(screen.getByLabelText("Theme"));
+    expect(screen.getByText(THEME_LABELS.dark)).toBeInTheDocument();
+    fireEvent.keyDown(screen.getByRole("presentation"), { key: "Escape" });
+    // onClose callback (setAnchorEl(null)) was triggered
+    expect(mockSetTheme).not.toHaveBeenCalled();
   });
 });

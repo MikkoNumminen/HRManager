@@ -194,4 +194,28 @@ describe("tutorialConfig", () => {
     expect(handler).toHaveBeenCalledTimes(1);
     window.removeEventListener("tutorial:person_created", handler);
   });
+
+  // completeTutorialStep does not emit event for auto-complete-only steps (no event defined)
+  test("completeTutorialStep does not emit for steps without event", () => {
+    localStorage.clear();
+    const handler = jest.fn();
+    window.addEventListener("tutorial:view_employees", handler);
+    completeTutorialStep("view_employees");
+    // view_employees has no event property, so no custom event should fire
+    expect(handler).not.toHaveBeenCalled();
+    window.removeEventListener("tutorial:view_employees", handler);
+    // But it should still save to localStorage
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    expect(stored).toContain("view_employees");
+  });
+
+  // completeTutorialStep appends to existing localStorage entries
+  test("completeTutorialStep appends to existing progress", () => {
+    localStorage.clear();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(["view_employees"]));
+    completeTutorialStep("add_person");
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    expect(stored).toContain("view_employees");
+    expect(stored).toContain("add_person");
+  });
 });

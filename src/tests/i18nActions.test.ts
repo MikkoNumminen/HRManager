@@ -29,7 +29,26 @@ describe("i18n/actions - setLocale", () => {
 
   // Works with all supported locales
   test("works with all supported locales", async () => {
-    const validLocales = ["en", "fi", "sv", "de", "fr", "es", "pt", "pl", "ru", "uk", "ar", "hi", "ja", "zh", "ko", "th", "sw", "tr"];
+    const validLocales = [
+      "en",
+      "fi",
+      "sv",
+      "de",
+      "fr",
+      "es",
+      "pt",
+      "pl",
+      "ru",
+      "uk",
+      "ar",
+      "hi",
+      "ja",
+      "zh",
+      "ko",
+      "th",
+      "sw",
+      "tr",
+    ];
     for (const locale of validLocales) {
       mockCookieSet.mockClear();
       await setLocale(locale);

@@ -273,6 +273,77 @@ describe("TutorialSpotlight", () => {
     ).toBeInTheDocument();
   });
 
+  // Removes spotlight class from previous target when tutorial becomes inactive
+  test("removes class from previous target when tutorial becomes inactive", () => {
+    const { usePathname } = require("next/navigation");
+    usePathname.mockReturnValue("/managePersons");
+
+    const target = document.createElement("div");
+    target.setAttribute("data-tutorial", "add-person-form");
+    document.body.appendChild(target);
+
+    mockUseTutorial.mockReturnValue(createMockContext());
+    const { rerender } = render(<TutorialSpotlight />);
+    expect(target).toHaveClass("tutorial-spotlight-target");
+
+    // Tutorial becomes inactive
+    mockUseTutorial.mockReturnValue(createMockContext({ isActive: false }));
+    rerender(<TutorialSpotlight />);
+    expect(target).not.toHaveClass("tutorial-spotlight-target");
+  });
+
+  // Removes spotlight class from previous target when current step becomes null
+  test("removes class from previous target when step becomes null", () => {
+    const { usePathname } = require("next/navigation");
+    usePathname.mockReturnValue("/managePersons");
+
+    const target = document.createElement("div");
+    target.setAttribute("data-tutorial", "add-person-form");
+    document.body.appendChild(target);
+
+    mockUseTutorial.mockReturnValue(createMockContext());
+    const { rerender } = render(<TutorialSpotlight />);
+    expect(target).toHaveClass("tutorial-spotlight-target");
+
+    // Step becomes null (all complete)
+    mockUseTutorial.mockReturnValue(createMockContext({ currentStep: null }));
+    rerender(<TutorialSpotlight />);
+    expect(target).not.toHaveClass("tutorial-spotlight-target");
+  });
+
+  // Switches spotlight from old target to new target when step changes
+  test("switches spotlight to new target when step changes", () => {
+    const { usePathname } = require("next/navigation");
+    usePathname.mockReturnValue("/managePersons");
+
+    const target1 = document.createElement("div");
+    target1.setAttribute("data-tutorial", "add-person-form");
+    document.body.appendChild(target1);
+
+    const target2 = document.createElement("div");
+    target2.setAttribute("data-tutorial", "change-position-form");
+    document.body.appendChild(target2);
+
+    mockUseTutorial.mockReturnValue(createMockContext());
+    const { rerender } = render(<TutorialSpotlight />);
+    expect(target1).toHaveClass("tutorial-spotlight-target");
+
+    // Step changes to target a different element
+    mockUseTutorial.mockReturnValue(
+      createMockContext({
+        currentStep: {
+          id: "change_position" as TutorialStepId,
+          route: "/managePersons",
+          targetSelector: "[data-tutorial='change-position-form']",
+          event: "tutorial:position_changed",
+        },
+      }),
+    );
+    rerender(<TutorialSpotlight />);
+    expect(target1).not.toHaveClass("tutorial-spotlight-target");
+    expect(target2).toHaveClass("tutorial-spotlight-target");
+  });
+
   // Renders nothing when not on step route and no matching navigation hint
   test("renders nothing when no matching navigation hint", () => {
     const { usePathname } = require("next/navigation");

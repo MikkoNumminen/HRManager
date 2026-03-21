@@ -162,6 +162,14 @@ describe("PersonCheckBoxList", () => {
     expect(onSelect).toHaveBeenCalledWith("person-1");
   });
 
+  // Clicking an already-selected radio deselects it by calling onSelect with empty string
+  test("clicking selected radio deselects the person", () => {
+    const onSelect = jest.fn();
+    render(<PersonCheckBoxList {...defaultProps} selectedId="person-1" onSelect={onSelect} />);
+    fireEvent.click(screen.getByRole("radio"));
+    expect(onSelect).toHaveBeenCalledWith("");
+  });
+
   // If position is null, just show nothing in that spot — no crash, no "null" text.
   test("renders without crashing when position is null", () => {
     render(<PersonCheckBoxList {...defaultProps} position={null} />);

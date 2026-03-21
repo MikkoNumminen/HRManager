@@ -346,6 +346,41 @@ describe("TutorialProvider", () => {
     expect(screen.getByTestId("completedCount")).toHaveTextContent("1");
   });
 
+  // Re-syncs from localStorage when navigation reveals more progress
+  test("re-syncs from localStorage on navigation", async () => {
+    mockUseSession.mockReturnValue({
+      data: { user: { email: "demo@hrmanager.app" } },
+      status: "authenticated",
+    });
+    mockUsePathname.mockReturnValue("/");
+
+    const { rerender } = render(
+      <TutorialProvider>
+        <TutorialConsumer />
+      </TutorialProvider>,
+    );
+
+    // view_employees auto-completes on /, so completedCount is 1
+    expect(screen.getByTestId("completedCount")).toHaveTextContent("1");
+
+    // Simulate a server action saving more progress to localStorage directly
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(["view_employees", "add_person", "create_team"]),
+    );
+
+    // Navigate to a different page — triggers the re-sync effect
+    mockUsePathname.mockReturnValue("/manageTeams");
+    rerender(
+      <TutorialProvider>
+        <TutorialConsumer />
+      </TutorialProvider>,
+    );
+
+    // Should show 3 completed steps (re-synced from localStorage)
+    expect(screen.getByTestId("completedCount")).toHaveTextContent("3");
+  });
+
   // useTutorialMaybe returns context when provider is present
   test("useTutorialMaybe returns context when provider is present", () => {
     mockUseSession.mockReturnValue({ data: null, status: "unauthenticated" });

@@ -11,7 +11,6 @@ jest.mock("../i18n/actions", () => ({
   setLocale: (...args: unknown[]) => mockSetLocale(...args),
 }));
 
-
 describe("LanguageSwitcher", () => {
   beforeEach(() => {
     jest.clearAllMocks();

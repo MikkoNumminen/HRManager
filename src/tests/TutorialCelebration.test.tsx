@@ -11,8 +11,9 @@ jest.mock("next/navigation", () => ({
   usePathname: jest.fn().mockReturnValue("/"),
 }));
 
-// Mock canvas-confetti to avoid canvas errors in jsdom
-jest.mock("canvas-confetti", () => jest.fn());
+// Mock canvas-confetti — need a trackable reference for the confetti function
+const mockConfetti = jest.fn();
+jest.mock("canvas-confetti", () => ({ __esModule: true, default: mockConfetti }));
 
 jest.mock("../components/TutorialProvider", () => ({
   __esModule: true,
@@ -168,5 +169,73 @@ describe("TutorialCelebration", () => {
     );
     render(<TutorialCelebration />);
     expect(screen.queryByText("Tour Complete!")).not.toBeInTheDocument();
+  });
+
+  // Fires confetti for a regular step completion
+  test("fires confetti for regular step", async () => {
+    mockConfetti.mockClear();
+    mockUseTutorial.mockReturnValue(
+      createMockContext({ celebratingStep: "add_person", allComplete: false }),
+    );
+    render(<TutorialCelebration />);
+    // Flush microtasks so the dynamic import promise resolves
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(mockConfetti).toHaveBeenCalledWith(
+      expect.objectContaining({ particleCount: 80, spread: 60 }),
+    );
+  });
+
+  // Fires the full finale confetti sequence when all steps complete
+  test("fires finale confetti sequence when all complete", async () => {
+    mockConfetti.mockClear();
+    mockUseTutorial.mockReturnValue(
+      createMockContext({ celebratingStep: "view_audit_log", allComplete: true }),
+    );
+    render(<TutorialCelebration />);
+    // Flush dynamic import promise
+    await Promise.resolve();
+    await Promise.resolve();
+    // First call is immediate (particleCount: 60)
+    expect(mockConfetti).toHaveBeenCalledWith(
+      expect.objectContaining({ particleCount: 60, spread: 26 }),
+    );
+    // Advance through all setTimeout callbacks (150, 300, 500, 800, 1200ms)
+    jest.advanceTimersByTime(1500);
+    // Total: 1 immediate + 5 timeouts (800ms callback has 2 calls) = 7
+    expect(mockConfetti).toHaveBeenCalledTimes(7);
+  });
+
+  // Auto-dismisses regular celebration after 3 seconds
+  test("auto-dismisses regular celebration after 3 seconds", () => {
+    const dismiss = jest.fn();
+    mockUseTutorial.mockReturnValue(
+      createMockContext({
+        celebratingStep: "add_person",
+        allComplete: false,
+        dismissCelebration: dismiss,
+      }),
+    );
+    render(<TutorialCelebration />);
+    expect(dismiss).not.toHaveBeenCalled();
+    jest.advanceTimersByTime(3000);
+    expect(dismiss).toHaveBeenCalled();
+  });
+
+  // Auto-dismisses finale after 6 seconds
+  test("auto-dismisses finale after 6 seconds", () => {
+    const dismiss = jest.fn();
+    mockUseTutorial.mockReturnValue(
+      createMockContext({
+        celebratingStep: "view_audit_log",
+        allComplete: true,
+        dismissCelebration: dismiss,
+      }),
+    );
+    render(<TutorialCelebration />);
+    jest.advanceTimersByTime(5999);
+    expect(dismiss).not.toHaveBeenCalled();
+    jest.advanceTimersByTime(1);
+    expect(dismiss).toHaveBeenCalled();
   });
 });
