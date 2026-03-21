@@ -230,5 +230,29 @@
     "permManageUsers": "उपयोगकर्ता प्रबंधित करना",
     "permChangePermissions": "उपयोगकर्ता अनुमतियाँ बदलना",
     "permViewAuditLog": "ऑडिट लॉग देखना"
+  },
+  "tutorial": {
+    "checklistTitle": "Demo Tour",
+    "checklistProgress": "{completed} of {total} complete",
+    "restartTutorial": "Restart Tour",
+    "taskComplete": "Nice work!",
+    "finaleTitle": "Tour Complete!",
+    "finaleMessage": "You've explored all the key features. Great job!",
+    "step_view_employees": "View employees",
+    "step_add_person": "Add a person",
+    "step_create_team": "Create a team",
+    "step_add_member": "Add a team member",
+    "step_create_department": "Create a department",
+    "step_assign_team_to_department": "Assign a team to a department",
+    "step_manage_permissions": "Manage user permissions",
+    "step_view_audit_log": "View the audit log",
+    "hint_view_employees": "Welcome! This is the employee overview. Take a look around.",
+    "hint_add_person": "Fill in a name and email to add a new employee to the system.",
+    "hint_create_team": "Enter a team name to create your first team.",
+    "hint_add_member": "Select a person from the list to add them to this team.",
+    "hint_create_department": "Give your department a name and optionally a description.",
+    "hint_assign_team_to_department": "Pick a team from the dropdown to assign it to this department.",
+    "hint_manage_permissions": "Grant or deny individual permissions for this user.",
+    "hint_view_audit_log": "This log records every action taken in the system."
   }
 }
