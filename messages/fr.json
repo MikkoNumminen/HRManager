@@ -263,6 +263,8 @@
     "nav_click_a_department": "Click a department to assign teams to it.",
     "nav_click_a_user": "Click a user to manage their permissions.",
     "nav_open_menu": "Open the user menu to access User Management.",
-    "nav_open_menu_audit": "Open the user menu to access the Audit Log."
+    "nav_open_menu_audit": "Open the user menu to access the Audit Log.",
+    "nav_click_user_management": "Cliquez sur Gestion des utilisateurs pour gérer les permissions.",
+    "nav_click_audit_log": "Cliquez sur Journal d'audit pour consulter l'historique."
   }
 }

@@ -2,7 +2,7 @@ import {
   matchRoute,
   emitTutorialEvent,
   completeTutorialStep,
-  findNavigationHint,
+  findNavigationHints,
   TUTORIAL_STEPS,
   DEMO_EMAIL,
   STORAGE_KEY,
@@ -118,34 +118,43 @@ describe("tutorialConfig", () => {
     }
   });
 
-  // findNavigationHint returns matching hint for the current route
-  test("findNavigationHint returns matching hint", () => {
+  // findNavigationHints returns matching hints for the current route
+  test("findNavigationHints returns matching hints", () => {
     const createTeamStep = TUTORIAL_STEPS.find((s) => s.id === "create_team")!;
-    const hint = findNavigationHint(createTeamStep, "/");
-    expect(hint).not.toBeNull();
-    expect(hint!.hintKey).toBe("nav_click_teams");
+    const hints = findNavigationHints(createTeamStep, "/");
+    expect(hints).toHaveLength(1);
+    expect(hints[0].hintKey).toBe("nav_click_teams");
   });
 
-  // findNavigationHint returns null when no hint matches the route
-  test("findNavigationHint returns null for non-matching route", () => {
+  // findNavigationHints returns empty array when no hint matches the route
+  test("findNavigationHints returns empty array for non-matching route", () => {
     const createTeamStep = TUTORIAL_STEPS.find((s) => s.id === "create_team")!;
-    const hint = findNavigationHint(createTeamStep, "/admin/audit");
-    expect(hint).toBeNull();
+    const hints = findNavigationHints(createTeamStep, "/admin/audit");
+    expect(hints).toHaveLength(0);
   });
 
-  // findNavigationHint returns null for steps without navigation hints
-  test("findNavigationHint returns null for steps without hints", () => {
+  // findNavigationHints returns empty array for steps without navigation hints
+  test("findNavigationHints returns empty array for steps without hints", () => {
     const viewStep = TUTORIAL_STEPS.find((s) => s.id === "view_employees")!;
-    const hint = findNavigationHint(viewStep, "/");
-    expect(hint).toBeNull();
+    const hints = findNavigationHints(viewStep, "/");
+    expect(hints).toHaveLength(0);
   });
 
-  // findNavigationHint matches RegExp fromRoute
-  test("findNavigationHint matches RegExp fromRoute", () => {
+  // findNavigationHints matches RegExp fromRoute
+  test("findNavigationHints matches RegExp fromRoute", () => {
     const createTeamStep = TUTORIAL_STEPS.find((s) => s.id === "create_team")!;
-    const hint = findNavigationHint(createTeamStep, "/managePersons");
-    expect(hint).not.toBeNull();
-    expect(hint!.hintKey).toBe("nav_go_back_home");
+    const hints = findNavigationHints(createTeamStep, "/managePersons");
+    expect(hints).toHaveLength(1);
+    expect(hints[0].hintKey).toBe("nav_go_back_home");
+  });
+
+  // findNavigationHints returns multiple hints for routes with fallback options
+  test("findNavigationHints returns multiple hints for menu-based steps", () => {
+    const permStep = TUTORIAL_STEPS.find((s) => s.id === "manage_permissions")!;
+    const hints = findNavigationHints(permStep, "/");
+    expect(hints.length).toBeGreaterThanOrEqual(2);
+    expect(hints[0].targetSelector).toContain("nav-user-management");
+    expect(hints[1].targetSelector).toContain("user-menu-button");
   });
 
   // Navigation hints for back button target the correct selector

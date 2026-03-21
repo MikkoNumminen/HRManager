@@ -165,6 +165,7 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
                     href="/admin"
                     onClick={() => setAnchorEl(null)}
                     sx={userMenuItemStyles}
+                    data-tutorial="nav-user-management"
                   >
                     {t("userManagement")}
                   </MenuItem>
@@ -175,6 +176,7 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
                     href="/admin/audit"
                     onClick={() => setAnchorEl(null)}
                     sx={userMenuItemStyles}
+                    data-tutorial="nav-audit-log"
                   >
                     {t("auditLog")}
                   </MenuItem>

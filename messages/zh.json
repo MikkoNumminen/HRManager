@@ -263,6 +263,8 @@
     "nav_click_a_department": "Click a department to assign teams to it.",
     "nav_click_a_user": "Click a user to manage their permissions.",
     "nav_open_menu": "Open the user menu to access User Management.",
-    "nav_open_menu_audit": "Open the user menu to access the Audit Log."
+    "nav_open_menu_audit": "Open the user menu to access the Audit Log.",
+    "nav_click_user_management": "点击用户管理来管理权限。",
+    "nav_click_audit_log": "点击审计日志查看历史记录。"
   }
 }

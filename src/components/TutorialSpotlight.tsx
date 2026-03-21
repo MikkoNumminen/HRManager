@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Box, Paper, Popper, Typography } from "@mui/material";
 import { colors } from "@/muiStyles";
 import { useTutorial } from "./TutorialProvider";
-import { matchRoute, findNavigationHint } from "@/tutorialConfig";
+import { matchRoute, findNavigationHints, NavigationHint } from "@/tutorialConfig";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 
@@ -26,28 +26,43 @@ export default function TutorialSpotlight() {
   const { isActive, currentStep, completedSteps } = useTutorial();
   const pathname = usePathname();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [activeHint, setActiveHint] = useState<NavigationHint | null>(null);
   const previousTargetRef = useRef<HTMLElement | null>(null);
   const observerRef = useRef<MutationObserver | null>(null);
 
   const isOnStepRoute = currentStep && matchRoute(currentStep.route, pathname);
-  const navHint = currentStep && !isOnStepRoute ? findNavigationHint(currentStep, pathname) : null;
-
-  const activeSelector = isOnStepRoute
-    ? currentStep?.targetSelector
-    : (navHint?.targetSelector ?? null);
+  const navHints = useMemo(
+    () => (currentStep && !isOnStepRoute ? findNavigationHints(currentStep, pathname) : []),
+    [currentStep, isOnStepRoute, pathname],
+  );
 
   useEffect(() => {
-    if (!isActive || !currentStep || !activeSelector) {
+    if (!isActive || !currentStep) {
       if (previousTargetRef.current) {
         previousTargetRef.current.classList.remove("tutorial-spotlight-target");
         previousTargetRef.current = null;
       }
       setAnchorEl(null);
+      setActiveHint(null);
       return;
     }
 
     const findTarget = () => {
-      const el = document.querySelector(activeSelector) as HTMLElement | null;
+      let el: HTMLElement | null = null;
+      let matchedHint: NavigationHint | null = null;
+
+      if (isOnStepRoute) {
+        el = document.querySelector(currentStep.targetSelector) as HTMLElement | null;
+      } else {
+        for (const hint of navHints) {
+          const candidate = document.querySelector(hint.targetSelector) as HTMLElement | null;
+          if (candidate) {
+            el = candidate;
+            matchedHint = hint;
+            break;
+          }
+        }
+      }
 
       if (previousTargetRef.current && previousTargetRef.current !== el) {
         previousTargetRef.current.classList.remove("tutorial-spotlight-target");
@@ -57,8 +72,10 @@ export default function TutorialSpotlight() {
         el.classList.add("tutorial-spotlight-target");
         previousTargetRef.current = el;
         setAnchorEl(el);
+        setActiveHint(matchedHint);
       } else {
         setAnchorEl(null);
+        setActiveHint(null);
       }
     };
 
@@ -76,16 +93,16 @@ export default function TutorialSpotlight() {
         previousTargetRef.current = null;
       }
     };
-  }, [isActive, currentStep, activeSelector, completedSteps]);
+  }, [isActive, currentStep, isOnStepRoute, navHints, completedSteps]);
 
-  if (!isActive || !currentStep || !activeSelector || !anchorEl) return null;
+  if (!isActive || !currentStep || !anchorEl) return null;
 
   const stepIndex = completedSteps.size + 1;
 
   const titleKey = `step_${currentStep.id}` as Parameters<typeof t>[0];
   const hintText = isOnStepRoute
     ? t(`hint_${currentStep.id}` as Parameters<typeof t>[0])
-    : t(navHint!.hintKey as Parameters<typeof t>[0]);
+    : t(activeHint!.hintKey as Parameters<typeof t>[0]);
 
   return (
     <>

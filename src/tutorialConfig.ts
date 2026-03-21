@@ -128,6 +128,11 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
       },
       {
         fromRoute: "/",
+        targetSelector: "[data-tutorial='nav-user-management']",
+        hintKey: "nav_click_user_management",
+      },
+      {
+        fromRoute: "/",
         targetSelector: "[data-tutorial='user-menu-button']",
         hintKey: "nav_open_menu",
       },
@@ -151,8 +156,18 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
       },
       {
         fromRoute: "/",
+        targetSelector: "[data-tutorial='nav-audit-log']",
+        hintKey: "nav_click_audit_log",
+      },
+      {
+        fromRoute: "/",
         targetSelector: "[data-tutorial='user-menu-button']",
         hintKey: "nav_open_menu_audit",
+      },
+      {
+        fromRoute: "/admin",
+        targetSelector: "[data-tutorial='nav-audit-log']",
+        hintKey: "nav_click_audit_log",
       },
       {
         fromRoute: "/admin",
@@ -200,7 +215,7 @@ export function completeTutorialStep(stepId: TutorialStepId): void {
   }
 }
 
-export function findNavigationHint(step: TutorialStep, pathname: string): NavigationHint | null {
-  if (!step.navigationHints) return null;
-  return step.navigationHints.find((hint) => matchRoute(hint.fromRoute, pathname)) ?? null;
+export function findNavigationHints(step: TutorialStep, pathname: string): NavigationHint[] {
+  if (!step.navigationHints) return [];
+  return step.navigationHints.filter((hint) => matchRoute(hint.fromRoute, pathname));
 }
