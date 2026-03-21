@@ -89,7 +89,12 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
         }}
         elevation={0}
       >
-        <Toolbar sx={{ position: "relative" }}>
+        <Toolbar
+          sx={{
+            position: "relative",
+            ...(backHref && { pl: { xs: "56px", sm: "72px" } }),
+          }}
+        >
           {backHref && (
             <IconButton
               component={Link}
@@ -98,7 +103,7 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
               data-tutorial="back-button"
               sx={{
                 position: "absolute",
-                left: { xs: -36, sm: -44 },
+                left: { xs: 4, sm: 8 },
                 color: colors.slate100,
                 "&:hover": { backgroundColor: colors.hoverOverlay },
               }}
