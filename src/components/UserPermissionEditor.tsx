@@ -254,7 +254,7 @@ export default function UserPermissionEditor({
                       sx={{
                         "& .MuiToggleButton-root": {
                           color: colors.slate400,
-                          borderColor: colors.slate500,
+                          borderColor: colors.slate400,
                           fontSize: "0.7rem",
                           py: 0.25,
                           px: 1.5,
