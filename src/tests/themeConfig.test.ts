@@ -82,7 +82,7 @@ describe("themeConfig", () => {
   // No palette has empty string values
   test("no palette has empty string values", () => {
     for (const name of THEME_NAMES) {
-      for (const [key, value] of Object.entries(THEME_PALETTES[name])) {
+      for (const [_key, value] of Object.entries(THEME_PALETTES[name])) {
         expect(value).not.toBe("");
       }
     }
