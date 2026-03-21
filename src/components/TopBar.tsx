@@ -82,21 +82,10 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
           backgroundColor: colors.slate600,
           borderRadius: "4px",
           border: `1px solid ${colors.slate300}`,
-          ...(backHref && {
-            ml: { xs: "-40px", sm: "-48px" },
-            width: { xs: "calc(100% + 40px)", sm: "calc(100% + 48px)" },
-          }),
         }}
         elevation={0}
       >
-        <Toolbar
-          sx={{
-            position: "relative",
-            ...(backHref && {
-              paddingLeft: { xs: "48px !important", sm: "64px !important" },
-            }),
-          }}
-        >
+        <Toolbar>
           {backHref && (
             <IconButton
               component={Link}
@@ -104,8 +93,7 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
               aria-label={tc("goBack")}
               data-tutorial="back-button"
               sx={{
-                position: "absolute",
-                left: 4,
+                mr: 1,
                 color: colors.slate100,
                 "&:hover": { backgroundColor: colors.hoverOverlay },
               }}
