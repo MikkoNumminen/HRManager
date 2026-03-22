@@ -206,6 +206,7 @@
     "tooltipAction": "Suoritetun toiminnon tyyppi (luonti, päivitys, poisto jne.)",
     "tooltipType": "Muutetun resurssin tyyppi",
     "tooltipChanges": "Mitä muuttui — näyttää ennen ja jälkeen arvot päivityksille",
+    "filters": "Suodattimet",
     "noEntries": "Ei tapahtumamerkintöjä",
     "system": "Järjestelmä",
     "addedPerson": "Lisättiin uusi henkilö: {name}",

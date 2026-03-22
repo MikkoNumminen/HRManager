@@ -206,6 +206,7 @@
     "tooltipAction": "Typen av åtgärd (skapa, uppdatera, ta bort etc.)",
     "tooltipType": "Typen av resurs som påverkades",
     "tooltipChanges": "Vad som ändrades — visar före och efter värden för uppdateringar",
+    "filters": "Filter",
     "noEntries": "Inga händelser hittades",
     "system": "Systemet",
     "addedPerson": "Lade till en ny person: {name}",

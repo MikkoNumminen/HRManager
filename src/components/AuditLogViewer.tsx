@@ -2,7 +2,9 @@
 
 import {
   Box,
+  Button,
   Chip,
+  Collapse,
   FormControl,
   InputLabel,
   MenuItem,
@@ -18,10 +20,11 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import FilterListIcon from "@mui/icons-material/FilterList";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useMemo, useCallback } from "react";
-import { colors } from "@/muiStyles";
+import { useMemo, useCallback, useState } from "react";
+import { colors, mobileCardStyles } from "@/muiStyles";
 import { AuditLog } from "@/schemas";
 
 const actionColors: Record<string, string> = {
@@ -285,192 +288,291 @@ export default function AuditLogViewer({
     router.push(`/admin/audit?${params.toString()}`);
   };
 
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const activeFilterCount = [
+    currentFilters.userEmail,
+    currentFilters.action,
+    currentFilters.entityType,
+  ].filter(Boolean).length;
+
+  const filterControls = (
+    <Box display="flex" gap={{ xs: 1, sm: 2 }} mb={2} flexWrap="wrap">
+      <FormControl size="small">
+        <InputLabel sx={labelStyles}>{t("filterUser")}</InputLabel>
+        <Select
+          value={currentFilters.userEmail ?? ""}
+          onChange={(e) => updateFilter("userEmail", e.target.value)}
+          label={t("filterUser")}
+          sx={selectStyles}
+        >
+          <MenuItem value="">{t("allUsers")}</MenuItem>
+          {userEmails.map((email) => (
+            <MenuItem key={email} value={email}>
+              {email}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
+      <FormControl size="small">
+        <InputLabel sx={labelStyles}>{t("filterAction")}</InputLabel>
+        <Select
+          value={currentFilters.action ?? ""}
+          onChange={(e) => updateFilter("action", e.target.value)}
+          label={t("filterAction")}
+          sx={selectStyles}
+        >
+          <MenuItem value="">{t("allActions")}</MenuItem>
+          {Object.entries(actionLabels).map(([key, label]) => (
+            <MenuItem key={key} value={key}>
+              {label}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
+      <FormControl size="small">
+        <InputLabel sx={labelStyles}>{t("filterType")}</InputLabel>
+        <Select
+          value={currentFilters.entityType ?? ""}
+          onChange={(e) => updateFilter("entityType", e.target.value)}
+          label={t("filterType")}
+          sx={selectStyles}
+        >
+          <MenuItem value="">{t("allTypes")}</MenuItem>
+          {Object.entries(entityTypeLabels).map(([key, label]) => (
+            <MenuItem key={key} value={key}>
+              {label}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    </Box>
+  );
+
   return (
     <>
-      <Box display="flex" gap={{ xs: 1, sm: 2 }} mb={2} flexWrap="wrap">
-        <FormControl size="small">
-          <InputLabel sx={labelStyles}>{t("filterUser")}</InputLabel>
-          <Select
-            value={currentFilters.userEmail ?? ""}
-            onChange={(e) => updateFilter("userEmail", e.target.value)}
-            label={t("filterUser")}
-            sx={selectStyles}
-          >
-            <MenuItem value="">{t("allUsers")}</MenuItem>
-            {userEmails.map((email) => (
-              <MenuItem key={email} value={email}>
-                {email}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+      {/* Desktop filters — always visible */}
+      <Box sx={{ display: { xs: "none", md: "block" } }}>{filterControls}</Box>
 
-        <FormControl size="small">
-          <InputLabel sx={labelStyles}>{t("filterAction")}</InputLabel>
-          <Select
-            value={currentFilters.action ?? ""}
-            onChange={(e) => updateFilter("action", e.target.value)}
-            label={t("filterAction")}
-            sx={selectStyles}
-          >
-            <MenuItem value="">{t("allActions")}</MenuItem>
-            {Object.entries(actionLabels).map(([key, label]) => (
-              <MenuItem key={key} value={key}>
-                {label}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        <FormControl size="small">
-          <InputLabel sx={labelStyles}>{t("filterType")}</InputLabel>
-          <Select
-            value={currentFilters.entityType ?? ""}
-            onChange={(e) => updateFilter("entityType", e.target.value)}
-            label={t("filterType")}
-            sx={selectStyles}
-          >
-            <MenuItem value="">{t("allTypes")}</MenuItem>
-            {Object.entries(entityTypeLabels).map(([key, label]) => (
-              <MenuItem key={key} value={key}>
-                {label}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+      {/* Mobile filters — collapsible */}
+      <Box sx={{ display: { xs: "block", md: "none" }, mb: 2 }}>
+        <Button
+          onClick={() => setFiltersOpen(!filtersOpen)}
+          startIcon={<FilterListIcon />}
+          sx={{
+            color: colors.slate300,
+            borderColor: colors.slate300,
+            mb: 1,
+            width: "100%",
+            justifyContent: "flex-start",
+          }}
+          variant="outlined"
+          data-testid="filter-toggle"
+        >
+          {t("filters")}
+          {activeFilterCount > 0 && ` (${activeFilterCount})`}
+        </Button>
+        <Collapse in={filtersOpen}>{filterControls}</Collapse>
       </Box>
 
-      <TableContainer component={Paper}>
-        <Table sx={{ tableLayout: "fixed", width: "100%" }} aria-label="audit log table">
-          <TableHead>
-            <TableRow>
-              <Tooltip title={t("tooltipTimestamp")} placement="top" arrow>
-                <TableCell
-                  scope="col"
-                  sx={{ color: colors.slate400, cursor: "help", width: "15%" }}
-                >
-                  {t("columnTimestamp")}
-                </TableCell>
-              </Tooltip>
-              <Tooltip title={t("tooltipUser")} placement="top" arrow>
-                <TableCell
-                  scope="col"
-                  sx={{ color: colors.slate400, cursor: "help", width: "18%" }}
-                >
-                  {t("columnUser")}
-                </TableCell>
-              </Tooltip>
-              <Tooltip title={t("tooltipAction")} placement="top" arrow>
-                <TableCell scope="col" sx={{ color: colors.slate400, cursor: "help", width: "9%" }}>
-                  {t("columnAction")}
-                </TableCell>
-              </Tooltip>
-              <Tooltip title={t("tooltipType")} placement="top" arrow>
-                <TableCell
-                  scope="col"
-                  sx={{ color: colors.slate400, cursor: "help", width: "10%" }}
-                >
-                  {t("columnType")}
-                </TableCell>
-              </Tooltip>
-              <Tooltip title={t("tooltipChanges")} placement="top" arrow>
-                <TableCell scope="col" sx={{ color: colors.slate400, cursor: "help" }}>
-                  {t("columnChanges")}
-                </TableCell>
-              </Tooltip>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {logs.length === 0 ? (
+      {/* Desktop table view */}
+      <Box data-testid="table-view" sx={{ display: { xs: "none", md: "block" } }}>
+        <TableContainer component={Paper}>
+          <Table sx={{ tableLayout: "fixed", width: "100%" }} aria-label="audit log table">
+            <TableHead>
               <TableRow>
-                <TableCell colSpan={5}>
-                  <Box display="flex" justifyContent="center" alignItems="center" height="100px">
-                    <Typography align="center">{t("noEntries")}</Typography>
-                  </Box>
-                </TableCell>
+                <Tooltip title={t("tooltipTimestamp")} placement="top" arrow>
+                  <TableCell
+                    scope="col"
+                    sx={{ color: colors.slate400, cursor: "help", width: "15%" }}
+                  >
+                    {t("columnTimestamp")}
+                  </TableCell>
+                </Tooltip>
+                <Tooltip title={t("tooltipUser")} placement="top" arrow>
+                  <TableCell
+                    scope="col"
+                    sx={{ color: colors.slate400, cursor: "help", width: "18%" }}
+                  >
+                    {t("columnUser")}
+                  </TableCell>
+                </Tooltip>
+                <Tooltip title={t("tooltipAction")} placement="top" arrow>
+                  <TableCell
+                    scope="col"
+                    sx={{ color: colors.slate400, cursor: "help", width: "9%" }}
+                  >
+                    {t("columnAction")}
+                  </TableCell>
+                </Tooltip>
+                <Tooltip title={t("tooltipType")} placement="top" arrow>
+                  <TableCell
+                    scope="col"
+                    sx={{ color: colors.slate400, cursor: "help", width: "10%" }}
+                  >
+                    {t("columnType")}
+                  </TableCell>
+                </Tooltip>
+                <Tooltip title={t("tooltipChanges")} placement="top" arrow>
+                  <TableCell scope="col" sx={{ color: colors.slate400, cursor: "help" }}>
+                    {t("columnChanges")}
+                  </TableCell>
+                </Tooltip>
               </TableRow>
-            ) : (
-              logs.map((log) => (
-                <TableRow key={log.id}>
-                  <TableCell
-                    sx={{ whiteSpace: "nowrap", fontSize: { xs: "0.75rem", sm: "0.8rem" } }}
-                  >
-                    {new Date(log.createdAt).toLocaleString()}
-                  </TableCell>
-                  <TableCell
-                    sx={{
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    <Tooltip title={log.userEmail ?? t("system")} placement="top" arrow>
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          cursor: "help",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          whiteSpace: "nowrap",
-                        }}
-                      >
-                        {(log.userEmail && userNames[log.userEmail]) ??
-                          log.userEmail ??
-                          t("system")}
-                      </Typography>
-                    </Tooltip>
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      label={log.action}
-                      size="small"
-                      sx={{
-                        color: actionColors[log.action] ?? colors.slate300,
-                        borderColor: actionColors[log.action] ?? colors.slate300,
-                        fontWeight: 600,
-                        textTransform: "capitalize",
-                      }}
-                      variant="outlined"
-                    />
-                  </TableCell>
-                  <TableCell>{entityTypeLabels[log.entityType] ?? log.entityType}</TableCell>
-                  <TableCell>
-                    <Tooltip
-                      title={describeChanges(log.action, log.entityType, log.before, log.after)}
-                      placement="top"
-                      arrow
-                    >
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          cursor: "help",
-                          display: "-webkit-box",
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: "vertical",
-                          overflow: "hidden",
-                          wordBreak: "break-word",
-                        }}
-                      >
-                        {describeChanges(log.action, log.entityType, log.before, log.after)}
-                      </Typography>
-                    </Tooltip>
+            </TableHead>
+            <TableBody>
+              {logs.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5}>
+                    <Box display="flex" justifyContent="center" alignItems="center" height="100px">
+                      <Typography align="center">{t("noEntries")}</Typography>
+                    </Box>
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-        <TablePagination
-          component="div"
-          count={total}
-          page={currentPage - 1}
-          onPageChange={handlePageChange}
-          rowsPerPage={pageSize}
-          onRowsPerPageChange={handleRowsPerPageChange}
-          rowsPerPageOptions={[10, 25, 50, 100]}
-          sx={{ color: colors.slate300 }}
-        />
-      </TableContainer>
+              ) : (
+                logs.map((log) => (
+                  <TableRow key={log.id}>
+                    <TableCell
+                      sx={{ whiteSpace: "nowrap", fontSize: { xs: "0.75rem", sm: "0.8rem" } }}
+                    >
+                      {new Date(log.createdAt).toLocaleString()}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      <Tooltip title={log.userEmail ?? t("system")} placement="top" arrow>
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            cursor: "help",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {(log.userEmail && userNames[log.userEmail]) ??
+                            log.userEmail ??
+                            t("system")}
+                        </Typography>
+                      </Tooltip>
+                    </TableCell>
+                    <TableCell>
+                      <Chip
+                        label={log.action}
+                        size="small"
+                        sx={{
+                          color: actionColors[log.action] ?? colors.slate300,
+                          borderColor: actionColors[log.action] ?? colors.slate300,
+                          fontWeight: 600,
+                          textTransform: "capitalize",
+                        }}
+                        variant="outlined"
+                      />
+                    </TableCell>
+                    <TableCell>{entityTypeLabels[log.entityType] ?? log.entityType}</TableCell>
+                    <TableCell>
+                      <Tooltip
+                        title={describeChanges(log.action, log.entityType, log.before, log.after)}
+                        placement="top"
+                        arrow
+                      >
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            cursor: "help",
+                            display: "-webkit-box",
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: "vertical",
+                            overflow: "hidden",
+                            wordBreak: "break-word",
+                          }}
+                        >
+                          {describeChanges(log.action, log.entityType, log.before, log.after)}
+                        </Typography>
+                      </Tooltip>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+          <TablePagination
+            component="div"
+            count={total}
+            page={currentPage - 1}
+            onPageChange={handlePageChange}
+            rowsPerPage={pageSize}
+            onRowsPerPageChange={handleRowsPerPageChange}
+            rowsPerPageOptions={[10, 25, 50, 100]}
+            sx={{ color: colors.slate300 }}
+          />
+        </TableContainer>
+      </Box>
+
+      {/* Mobile card view */}
+      <Box data-testid="card-view" sx={{ display: { xs: "block", md: "none" } }}>
+        {logs.length === 0 ? (
+          <Box display="flex" justifyContent="center" alignItems="center" height="100px">
+            <Typography align="center">{t("noEntries")}</Typography>
+          </Box>
+        ) : (
+          <>
+            {logs.map((log) => (
+              <Box key={log.id} sx={mobileCardStyles}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    mb: 1,
+                  }}
+                >
+                  <Chip
+                    label={log.action}
+                    size="small"
+                    sx={{
+                      color: actionColors[log.action] ?? colors.slate300,
+                      borderColor: actionColors[log.action] ?? colors.slate300,
+                      fontWeight: 600,
+                      textTransform: "capitalize",
+                    }}
+                    variant="outlined"
+                  />
+                  <Typography variant="caption" sx={{ color: colors.slate400 }}>
+                    {entityTypeLabels[log.entityType] ?? log.entityType}
+                  </Typography>
+                </Box>
+                <Typography
+                  variant="body2"
+                  sx={{ color: colors.slate100, mb: 0.5, wordBreak: "break-word" }}
+                >
+                  {describeChanges(log.action, log.entityType, log.before, log.after)}
+                </Typography>
+                <Typography variant="caption" sx={{ color: colors.slate400 }}>
+                  {(log.userEmail && userNames[log.userEmail]) ?? log.userEmail ?? t("system")}
+                  {" · "}
+                  {new Date(log.createdAt).toLocaleString()}
+                </Typography>
+              </Box>
+            ))}
+            <TablePagination
+              component="div"
+              count={total}
+              page={currentPage - 1}
+              onPageChange={handlePageChange}
+              rowsPerPage={pageSize}
+              onRowsPerPageChange={handleRowsPerPageChange}
+              rowsPerPageOptions={[10, 25, 50, 100]}
+              sx={{ color: colors.slate300 }}
+            />
+          </>
+        )}
+      </Box>
     </>
   );
 }

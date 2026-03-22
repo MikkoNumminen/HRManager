@@ -206,6 +206,7 @@
     "tooltipAction": "Aina ya kitendo kilichofanywa (kuunda, kusasisha, kufuta, n.k.)",
     "tooltipType": "Aina ya rasilimali iliyoathiriwa",
     "tooltipChanges": "Kilichobadilika — kinaonyesha thamani za kabla na baada kwa masasisho",
+    "filters": "Vichujio",
     "noEntries": "Hakuna maingizo ya ukaguzi yaliyopatikana",
     "system": "Mfumo",
     "addedPerson": "Mtu mpya ameongezwa: {name}",

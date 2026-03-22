@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, within } from "@testing-library/react";
 import AuditLogViewer from "../components/AuditLogViewer";
 import { AuditLog } from "../schemas";
 
@@ -39,23 +39,26 @@ describe("AuditLogViewer", () => {
   // Shows empty state message when there are no log entries.
   test("shows empty state when no logs", () => {
     render(<AuditLogViewer logs={[]} {...defaultProps} />);
-    expect(screen.getByText("No audit log entries found")).toBeInTheDocument();
+    const table = within(screen.getByTestId("table-view"));
+    expect(table.getByText("No audit log entries found")).toBeInTheDocument();
   });
 
   // Renders a log entry with user email, action chip, and entity type.
   test("renders a log entry row", () => {
     const log = makelog();
     render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
-    expect(screen.getByText("alice@example.com")).toBeInTheDocument();
-    expect(screen.getByText("create")).toBeInTheDocument();
-    expect(screen.getByText("Person")).toBeInTheDocument();
+    const table = within(screen.getByTestId("table-view"));
+    expect(table.getByText("alice@example.com")).toBeInTheDocument();
+    expect(table.getByText("create")).toBeInTheDocument();
+    expect(table.getByText("Person")).toBeInTheDocument();
   });
 
   // Shows "System" when userEmail is null (e.g. automated actions).
   test("shows System for null userEmail", () => {
     const log = makelog({ userEmail: null });
     render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
-    expect(screen.getByText("System")).toBeInTheDocument();
+    const table = within(screen.getByTestId("table-view"));
+    expect(table.getByText("System")).toBeInTheDocument();
   });
 
   // Shows user name instead of email when userNames map is provided.
@@ -63,7 +66,8 @@ describe("AuditLogViewer", () => {
     const log = makelog();
     const userNames = { "alice@example.com": "Alice Smith" };
     render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} userNames={userNames} />);
-    expect(screen.getByText("Alice Smith")).toBeInTheDocument();
+    const table = within(screen.getByTestId("table-view"));
+    expect(table.getByText("Alice Smith")).toBeInTheDocument();
   });
 
   // Falls back to email when the user is not in the userNames map.
@@ -71,13 +75,14 @@ describe("AuditLogViewer", () => {
     const log = makelog();
     const userNames = { "other@example.com": "Other User" };
     render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} userNames={userNames} />);
-    expect(screen.getByText("alice@example.com")).toBeInTheDocument();
+    const table = within(screen.getByTestId("table-view"));
+    expect(table.getByText("alice@example.com")).toBeInTheDocument();
   });
 
   // Renders all three filter controls (User, Action, Type).
   test("renders filter controls", () => {
     render(<AuditLogViewer logs={[]} {...defaultProps} />);
-    // Each filter has a FormControl with an InputLabel
+    // Each filter has a FormControl with an InputLabel — both desktop and mobile versions
     expect(screen.getAllByText("User").length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText("Action").length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText("Type").length).toBeGreaterThanOrEqual(1);
@@ -87,14 +92,16 @@ describe("AuditLogViewer", () => {
   test("maps teamMember entity type to Team Member label", () => {
     const log = makelog({ entityType: "teamMember" });
     render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
-    expect(screen.getByText("Team Member")).toBeInTheDocument();
+    const table = within(screen.getByTestId("table-view"));
+    expect(table.getByText("Team Member")).toBeInTheDocument();
   });
 
   // Shows the correct entity type label for userPermission.
   test("maps userPermission entity type to Permission label", () => {
     const log = makelog({ entityType: "userPermission" });
     render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
-    expect(screen.getByText("Permission")).toBeInTheDocument();
+    const table = within(screen.getByTestId("table-view"));
+    expect(table.getByText("Permission")).toBeInTheDocument();
   });
 
   // Describes a person name change in plain language.
@@ -133,14 +140,15 @@ describe("AuditLogViewer", () => {
     const logs = [makelog()];
     render(<AuditLogViewer logs={logs} {...defaultProps} total={50} />);
     // MUI TablePagination renders the count info
-    expect(screen.getByText(/of 50/)).toBeInTheDocument();
+    expect(screen.getAllByText(/of 50/).length).toBeGreaterThan(0);
   });
 
   // Renders all column headers with info tooltips.
   test("renders column headers", () => {
     render(<AuditLogViewer logs={[]} {...defaultProps} />);
-    expect(screen.getByText("Timestamp")).toBeInTheDocument();
-    expect(screen.getByText("Changes")).toBeInTheDocument();
+    const table = within(screen.getByTestId("table-view"));
+    expect(table.getByText("Timestamp")).toBeInTheDocument();
+    expect(table.getByText("Changes")).toBeInTheDocument();
     // "User", "Action", "Type" appear as both column headers and filter labels
     expect(screen.getAllByText("User").length).toBeGreaterThanOrEqual(2);
     expect(screen.getAllByText("Action").length).toBeGreaterThanOrEqual(2);
@@ -154,8 +162,9 @@ describe("AuditLogViewer", () => {
       makelog({ id: "b1ffcd00-1111-2222-3333-444455556666", userEmail: "bob@example.com" }),
     ];
     render(<AuditLogViewer logs={logs} {...defaultProps} total={2} />);
-    expect(screen.getByText("alice@example.com")).toBeInTheDocument();
-    expect(screen.getByText("bob@example.com")).toBeInTheDocument();
+    const table = within(screen.getByTestId("table-view"));
+    expect(table.getByText("alice@example.com")).toBeInTheDocument();
+    expect(table.getByText("bob@example.com")).toBeInTheDocument();
   });
 
   // Describes person deletion in plain language.
@@ -245,27 +254,27 @@ describe("AuditLogViewer", () => {
   test("renders seed action chip", () => {
     const log = makelog({ action: "seed" });
     render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
-    expect(screen.getByText("seed")).toBeInTheDocument();
+    expect(screen.getAllByText("seed").length).toBeGreaterThan(0);
   });
 
   test("renders reset action chip", () => {
     const log = makelog({ action: "reset" });
     render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
-    expect(screen.getByText("reset")).toBeInTheDocument();
+    expect(screen.getAllByText("reset").length).toBeGreaterThan(0);
   });
 
   // Renders delete action chip.
   test("renders delete action chip", () => {
     const log = makelog({ action: "delete" });
     render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
-    expect(screen.getByText("delete")).toBeInTheDocument();
+    expect(screen.getAllByText("delete").length).toBeGreaterThan(0);
   });
 
   // Renders update action chip.
   test("renders update action chip", () => {
     const log = makelog({ action: "update" });
     render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
-    expect(screen.getByText("update")).toBeInTheDocument();
+    expect(screen.getAllByText("update").length).toBeGreaterThan(0);
   });
 
   // Describes a user role change in plain language, showing target name.
@@ -510,7 +519,7 @@ describe("AuditLogViewer", () => {
   test("shows raw entity type for unmapped types", () => {
     const log = makelog({ entityType: "customWidget" });
     render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
-    expect(screen.getByText("customWidget")).toBeInTheDocument();
+    expect(screen.getAllByText("customWidget").length).toBeGreaterThan(0);
   });
 
   // Falls back to after string when before is null and after is invalid JSON.
@@ -524,7 +533,7 @@ describe("AuditLogViewer", () => {
   test("renders action chip with fallback color for unknown action", () => {
     const log = makelog({ action: "archive" });
     render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
-    expect(screen.getByText("archive")).toBeInTheDocument();
+    expect(screen.getAllByText("archive").length).toBeGreaterThan(0);
   });
 
   // Navigates when user email filter is changed.
@@ -672,9 +681,9 @@ describe("AuditLogViewer", () => {
   test("navigates when page is changed via pagination", () => {
     const logs = [makelog()];
     render(<AuditLogViewer logs={logs} {...defaultProps} total={50} />);
-    // MUI TablePagination renders next page button
-    const nextPageButton = screen.getByLabelText("Go to next page");
-    fireEvent.click(nextPageButton);
+    // MUI TablePagination renders next page button — both desktop and mobile have one
+    const nextPageButtons = screen.getAllByLabelText("Go to next page");
+    fireEvent.click(nextPageButtons[0]);
     expect(mockPush).toHaveBeenCalledWith(expect.stringContaining("page=2"));
   });
 
@@ -683,8 +692,9 @@ describe("AuditLogViewer", () => {
     const logs = [makelog()];
     render(<AuditLogViewer logs={logs} {...defaultProps} total={50} pageSize={10} />);
     // MUI v7 TablePagination renders an input with role="combobox" for rows-per-page.
-    // Multiple comboboxes exist (filter selects); the rows-per-page one is the last one.
+    // Multiple comboboxes exist (filter selects + pagination); pick the rows-per-page one.
     const comboboxes = screen.getAllByRole("combobox");
+    // The rows-per-page comboboxes come after the filter selects
     const rowsInput = comboboxes[comboboxes.length - 1];
     // MUI Select: open the dropdown, then pick the option
     fireEvent.mouseDown(rowsInput);
@@ -698,7 +708,7 @@ describe("AuditLogViewer", () => {
   test("renders kickout action chip", () => {
     const log = makelog({ action: "kickout" });
     render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
-    expect(screen.getByText("kickout")).toBeInTheDocument();
+    expect(screen.getAllByText("kickout").length).toBeGreaterThan(0);
   });
 
   // Describes kicking out a user in plain language with name, email, and role.
@@ -733,5 +743,111 @@ describe("AuditLogViewer", () => {
     const actionSelect = screen.getAllByRole("combobox")[1];
     fireEvent.mouseDown(actionSelect);
     expect(screen.getByRole("option", { name: "Kick Out" })).toBeInTheDocument();
+  });
+
+  // Describes permission denied security event.
+  test("describes permission denied event", () => {
+    const log = makelog({
+      action: "permission_denied",
+      entityType: "security",
+      after: '{"permissionKey":"person:create"}',
+    });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(screen.getAllByText(/Permission denied.*person:create/).length).toBeGreaterThan(0);
+  });
+
+  // Describes rate limited security event.
+  test("describes rate limited event", () => {
+    const log = makelog({
+      action: "rate_limited",
+      entityType: "security",
+      after: '{"rateLimitedAction":"createPerson"}',
+    });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(screen.getAllByText(/Rate limit exceeded.*createPerson/).length).toBeGreaterThan(0);
+  });
+});
+
+describe("AuditLogViewer mobile card view", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  // Card view renders log entry data.
+  test("card view renders log entry data", () => {
+    const log = makelog();
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    const cards = within(screen.getByTestId("card-view"));
+    expect(cards.getByText("create")).toBeInTheDocument();
+    expect(cards.getByText("Person")).toBeInTheDocument();
+    expect(cards.getByText(/alice@example.com/)).toBeInTheDocument();
+  });
+
+  // Card view shows empty state message.
+  test("card view shows empty state", () => {
+    render(<AuditLogViewer logs={[]} {...defaultProps} />);
+    const cards = within(screen.getByTestId("card-view"));
+    expect(cards.getByText("No audit log entries found")).toBeInTheDocument();
+  });
+
+  // Card view shows user name when userNames map is provided.
+  test("card view shows user name from userNames map", () => {
+    const log = makelog();
+    const userNames = { "alice@example.com": "Alice Smith" };
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} userNames={userNames} />);
+    const cards = within(screen.getByTestId("card-view"));
+    expect(cards.getByText(/Alice Smith/)).toBeInTheDocument();
+  });
+
+  // Card view shows System for null userEmail.
+  test("card view shows System for null userEmail", () => {
+    const log = makelog({ userEmail: null });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    const cards = within(screen.getByTestId("card-view"));
+    expect(cards.getByText(/System/)).toBeInTheDocument();
+  });
+
+  // Card view renders change description.
+  test("card view renders change description", () => {
+    const log = makelog({ action: "create", after: '{"name":"Bob"}' });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    const cards = within(screen.getByTestId("card-view"));
+    expect(cards.getByText("Added a new person: Bob")).toBeInTheDocument();
+  });
+
+  // Mobile filter toggle button renders.
+  test("mobile filter toggle renders", () => {
+    render(<AuditLogViewer logs={[]} {...defaultProps} />);
+    expect(screen.getByTestId("filter-toggle")).toBeInTheDocument();
+  });
+
+  // Clicking mobile filter toggle shows filters.
+  test("clicking filter toggle shows filters", () => {
+    render(<AuditLogViewer logs={[]} {...defaultProps} />);
+    const toggle = screen.getByTestId("filter-toggle");
+    fireEvent.click(toggle);
+    // Filters should now be visible — at least the desktop + mobile sets
+    expect(screen.getAllByText("User").length).toBeGreaterThanOrEqual(2);
+  });
+
+  // Mobile filter toggle shows active filter count.
+  test("filter toggle shows active filter count", () => {
+    render(
+      <AuditLogViewer
+        logs={[]}
+        {...defaultProps}
+        currentFilters={{ action: "create", entityType: "person" }}
+      />,
+    );
+    const toggle = screen.getByTestId("filter-toggle");
+    expect(toggle.textContent).toContain("(2)");
+  });
+
+  // Card view shows pagination.
+  test("card view shows pagination", () => {
+    const log = makelog();
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={50} />);
+    // Both desktop and mobile have pagination
+    expect(screen.getAllByText(/of 50/).length).toBeGreaterThan(0);
   });
 });

@@ -206,6 +206,7 @@
     "tooltipAction": "Typ wykonanej akcji (tworzenie, aktualizacja, usuwanie itp.)",
     "tooltipType": "Typ zasobu, którego dotyczyła zmiana",
     "tooltipChanges": "Co się zmieniło — pokazuje wartości przed i po dla aktualizacji",
+    "filters": "Filtry",
     "noEntries": "Nie znaleziono wpisów audytu",
     "system": "Systemowy",
     "addedPerson": "Dodano nową osobę: {name}",

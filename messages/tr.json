@@ -206,6 +206,7 @@
     "tooltipAction": "Gerçekleştirilen işlem türü (oluşturma, güncelleme, silme vb.)",
     "tooltipType": "Etkilenen kaynak türü",
     "tooltipChanges": "Ne değişti — güncellemeler için önceki ve sonraki değerleri gösterir",
+    "filters": "Filtreler",
     "noEntries": "Denetim kaydı bulunamadı",
     "system": "Sistem",
     "addedPerson": "Yeni kişi eklendi: {name}",

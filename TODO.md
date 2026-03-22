@@ -12,7 +12,7 @@ In Progress items must show the owner: `[worktree-name]` or `[main]`.
   - [x] TopBar: hamburger menu + drawer for mobile navigation
   - [x] Tables: card/list view on mobile (< sm breakpoint)
   - [x] Forms: full-width inputs, responsive button layout
-  - [ ] AuditLogViewer: collapsible filters, card view for entries
+  - [x] AuditLogViewer: collapsible filters, card view for entries
   - [ ] Layout: responsive container + manage page padding
   - [ ] muiStyles.ts: add mobile-first responsive tokens
   - [ ] Tests for new responsive behavior

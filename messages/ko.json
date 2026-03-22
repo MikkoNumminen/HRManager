@@ -206,6 +206,7 @@
     "tooltipAction": "수행된 작업 유형 (생성, 수정, 삭제 등)",
     "tooltipType": "영향을 받은 리소스 유형",
     "tooltipChanges": "변경 내용 — 수정 시 변경 전후 값을 표시",
+    "filters": "필터",
     "noEntries": "감사 로그 항목을 찾을 수 없습니다",
     "system": "시스템",
     "addedPerson": "새 인원을 추가했습니다: {name}",

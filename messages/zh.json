@@ -206,6 +206,7 @@
     "tooltipAction": "操作类型（创建、更新、删除等）",
     "tooltipType": "受影响的资源类型",
     "tooltipChanges": "变更内容 — 对于更新操作，显示变更前后的值",
+    "filters": "筛选",
     "noEntries": "未找到审计日志记录",
     "system": "系统",
     "addedPerson": "添加了新人员：{name}",

@@ -206,6 +206,7 @@
     "tooltipAction": "O tipo de ação realizada (criar, atualizar, excluir, etc.)",
     "tooltipType": "O tipo de recurso afetado",
     "tooltipChanges": "O que mudou — mostra valores antes e depois para atualizações",
+    "filters": "Filtros",
     "noEntries": "Nenhuma entrada de auditoria encontrada",
     "system": "Sistema",
     "addedPerson": "Nova pessoa adicionada: {name}",

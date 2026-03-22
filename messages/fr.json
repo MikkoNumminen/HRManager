@@ -206,6 +206,7 @@
     "tooltipAction": "Le type d'action effectuée (création, mise à jour, suppression, etc.)",
     "tooltipType": "Le type de ressource affectée",
     "tooltipChanges": "Ce qui a changé — affiche les valeurs avant et après pour les mises à jour",
+    "filters": "Filtres",
     "noEntries": "Aucune entrée de journal trouvée",
     "system": "Système",
     "addedPerson": "Ajout d'une nouvelle personne : {name}",

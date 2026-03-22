@@ -206,6 +206,7 @@
     "tooltipAction": "実行された操作の種類（作成、更新、削除など）",
     "tooltipType": "影響を受けたリソースの種類",
     "tooltipChanges": "変更内容 — 更新の場合は変更前後の値を表示",
+    "filters": "フィルター",
     "noEntries": "監査ログのエントリが見つかりません",
     "system": "システム",
     "addedPerson": "新しい人員を追加しました: {name}",

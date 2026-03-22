@@ -206,6 +206,7 @@
     "tooltipAction": "Die Art der durchgeführten Aktion (erstellen, aktualisieren, löschen usw.)",
     "tooltipType": "Die Art der betroffenen Ressource",
     "tooltipChanges": "Was sich geändert hat — zeigt Vorher- und Nachher-Werte für Aktualisierungen",
+    "filters": "Filter",
     "noEntries": "Keine Protokolleinträge gefunden",
     "system": "System",
     "addedPerson": "Neue Person hinzugefügt: {name}",
