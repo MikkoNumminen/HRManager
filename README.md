@@ -1,6 +1,6 @@
 # HRManager
 
-A production-grade HR management system with granular RBAC, audit logging, rate limiting, CSP + security headers, AI-powered i18n across 18 languages, and 929 tests (895 unit/integration + 34 E2E) at 99.7% line coverage.
+A production-grade HR management system with granular RBAC, audit logging, rate limiting, CSP + security headers, AI-powered i18n across 18 languages, and 933 tests (899 unit/integration + 34 E2E) at 99.6% line coverage.
 
 [![CI](https://github.com/MikkoNumminen/HRManager/actions/workflows/ci.yml/badge.svg)](https://github.com/MikkoNumminen/HRManager/actions/workflows/ci.yml)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)
@@ -27,9 +27,9 @@ A production-grade HR management system with granular RBAC, audit logging, rate 
 
 ## Highlights
 
-- **929 tests (895 unit/integration + 34 E2E), 99.7% line coverage** — Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, rate limiting, auth route handlers, CSP proxy, audit logging, all 42 UI components tested against real PostgreSQL, plus Playwright E2E covering full user flows
+- **933 tests (899 unit/integration + 34 E2E), 99.6% line coverage** — Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, rate limiting, auth route handlers, CSP proxy, audit logging, all 42 UI components tested against real PostgreSQL, plus Playwright E2E covering full user flows
 - **Granular RBAC** — 4 roles, 23 permission keys, per-user grant/deny overrides with three-state toggles (deny / role default / grant), and "kick out" user removal with confirmation dialog
-- **Immutable audit trail** — every mutation logged with before/after JSON snapshots inside the same `$transaction` for atomicity
+- **Immutable audit trail** — every mutation logged with before/after JSON snapshots inside the same `$transaction` for atomicity; permission denials and rate limit hits also logged as security events
 - **18 languages** — next-intl with cookie persistence, Accept-Language detection, and an AI-powered translation pipeline using parallel Claude Code agents
 - **Gamified demo tour** — 8-step tutorial with DOM-aware navigation hints, spotlight overlays, confetti celebrations, and auto-detection of task completion
 - **Snackbar notifications** — global success/error toasts via React context + MUI Snackbar; consistent feedback across all 15 form actions
@@ -108,18 +108,18 @@ Individual permissions can be overridden per-user — e.g. granting `person:crea
 | Prisma queries   | 40      |
 | Server actions   | 137     |
 | Auth callbacks   | 25      |
-| Audit logging    | 6       |
+| Audit logging    | 10      |
 | Rate limiting    | 18      |
 | Auth route       | 5       |
 | CSP proxy        | 20      |
 | RBAC logic       | 28      |
 | UI components    | 545     |
 | E2E (Playwright) | 34      |
-| **Total**        | **929** |
+| **Total**        | **933** |
 
 ```
-Statements : 99.12%    Branches : 95.65%
-Functions  : 99.44%    Lines    : 99.73%
+Statements : 99.03%    Branches : 95.12%
+Functions  : 99.45%    Lines    : 99.63%
 ```
 
 Server-side tests run against a real PostgreSQL test database. Client-side tests cover all 42 components including permission toggles, audit log filtering, tutorial system, snackbar notifications, theme switching, and language selection. Playwright E2E tests run against a production build covering authentication, CRUD for all entities, admin/audit access, guest access control, theme/language persistence, and snackbar lifecycle.

@@ -31,7 +31,7 @@ This is a **portfolio / showcase project**. The goal is to demonstrate technical
 
 - **Reads** go in `queries.ts` (no `"use server"`). Validated through Zod schemas.
 - **Mutations** go in `serverActions.ts` (marked `"use server"`). Always inside `prisma.$transaction()` — even single operations. Every mutation is audit-logged via `logAudit()` from `auditLog.ts` inside the same transaction for atomicity.
-- **Audit logging** — `auditLog.ts` provides `logAudit()` which records who, what action, which entity, and before/after JSON snapshots. Uses `getCurrentUser()` for actor identity. Accepts optional `tx` param to run inside an existing transaction. No FK to User — logs survive user deletion.
+- **Audit logging** — `auditLog.ts` provides `logAudit()` which records who, what action, which entity, and before/after JSON snapshots. Uses `auth()` session for actor identity. Accepts optional `tx` param to run inside an existing transaction. No FK to User — logs survive user deletion. `logPermissionDenial()` and `logRateLimitHit()` log security events (permission denials and rate limit hits) to the same audit trail.
 - Pages are async Server Components that fetch data and pass it as props to Client Components. No `useEffect` data fetching.
 - Forms use React 19's `useActionState` with `action=` prop, not `onSubmit`.
 - Types are derived from Zod schemas in `schemas.ts` via `z.infer` — `Person`, `CombinedTeam`, `Department`, `AppUser`, `AuditLog`, `Permissions`. Do not create duplicate interfaces in components.
@@ -61,7 +61,7 @@ src/
 │   └── manageTeams/             # Team management (permission-protected)
 ├── components/       # Reusable MUI client components (42 components)
 ├── i18n/             # next-intl configuration (actions, config, request)
-├── tests/            # Jest tests (895 tests)
+├── tests/            # Jest tests (899 tests)
 ├── types/            # TypeScript module augmentations (next-auth.d.ts)
 ├── auditLog.ts       # Audit logging helper (logAudit)
 ├── auth.ts           # NextAuth v5 configuration + RBAC callbacks
