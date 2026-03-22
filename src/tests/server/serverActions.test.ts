@@ -46,6 +46,8 @@ import {
   createDepartment,
   removeDepartment,
   updateDepartment,
+  updatePersonName,
+  updateTeamName,
   updateDepartmentHead,
   assignTeamToDepartment,
   removeTeamFromDepartment,
@@ -215,6 +217,50 @@ describe("removePerson", () => {
   });
 });
 
+describe("updatePersonName", () => {
+  beforeEach(() => cleanDb());
+  afterAll(async () => {
+    await cleanDb();
+    await testPrisma.$disconnect();
+  });
+
+  // Change someone's name and verify the database actually saved it.
+  test("updates a person's name", async () => {
+    const person = await testPrisma.person.create({
+      data: { name: "Alice", email: "alice@test.com" },
+    });
+
+    await updatePersonName(formData({ personID: person.id, name: "Alicia" }));
+
+    const updated = await testPrisma.person.findUnique({ where: { id: person.id } });
+    expect(updated!.name).toBe("Alicia");
+  });
+
+  // We need to know WHOSE name to update — can't do it without an ID.
+  test("throws when no personID provided", async () => {
+    await expect(updatePersonName(formData({ name: "Bob" }))).rejects.toThrow(
+      "No personID provided",
+    );
+  });
+
+  // The ID has to be a proper UUID, not some random string.
+  test("throws on invalid UUID", async () => {
+    await expect(updatePersonName(formData({ personID: "bad", name: "Bob" }))).rejects.toThrow(
+      "Invalid personID format",
+    );
+  });
+
+  // You can't set someone's name to nothing — names are required.
+  test("throws when name is empty", async () => {
+    const person = await testPrisma.person.create({
+      data: { name: "Alice", email: "alice@test.com" },
+    });
+    await expect(updatePersonName(formData({ personID: person.id, name: "" }))).rejects.toThrow(
+      "New name is missing",
+    );
+  });
+});
+
 describe("updatePosition", () => {
   beforeEach(() => cleanDb());
   afterAll(async () => {
@@ -361,6 +407,50 @@ describe("createTeam", () => {
   // Spaces alone don't count as a team name, just like with person names.
   test("throws on whitespace-only name", async () => {
     await expect(createTeam(formData({ name: "   " }))).rejects.toThrow("Invalid Name");
+  });
+});
+
+describe("updateTeamName", () => {
+  beforeEach(() => cleanDb());
+  afterAll(async () => {
+    await cleanDb();
+    await testPrisma.$disconnect();
+  });
+
+  // Rename a team and verify the database actually saved it.
+  test("renames a team", async () => {
+    const team = await testPrisma.team.create({
+      data: { teamName: "Engineering" },
+    });
+
+    await updateTeamName(formData({ teamID: team.teamId, name: "Platform" }));
+
+    const updated = await testPrisma.team.findUnique({ where: { teamId: team.teamId } });
+    expect(updated!.teamName).toBe("Platform");
+  });
+
+  // We need to know WHICH team to rename — can't do it without an ID.
+  test("throws when no teamID provided", async () => {
+    await expect(updateTeamName(formData({ name: "New Name" }))).rejects.toThrow(
+      "No teamID provided",
+    );
+  });
+
+  // The ID has to be a proper UUID, not some random string.
+  test("throws on invalid UUID", async () => {
+    await expect(updateTeamName(formData({ teamID: "bad", name: "New Name" }))).rejects.toThrow(
+      "Invalid teamID format",
+    );
+  });
+
+  // You can't set a team's name to nothing — names are required.
+  test("throws when name is empty", async () => {
+    const team = await testPrisma.team.create({
+      data: { teamName: "Engineering" },
+    });
+    await expect(updateTeamName(formData({ teamID: team.teamId, name: "" }))).rejects.toThrow(
+      "New team name is missing",
+    );
   });
 });
 
