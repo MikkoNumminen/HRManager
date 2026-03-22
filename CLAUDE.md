@@ -108,6 +108,8 @@ docker-compose.yml    # PostgreSQL 17 + app with health checks
 
 Every TODO item must have a color-coded size estimate prefix: 🟢 small, 🟡 medium, 🔴 large. When listing estimates in text, use: 🟢 **[S]**, 🟡 **[M]**, 🔴 **[L]**.
 
+**⚠️ MANDATORY: Every Claude instance MUST mark what it is working on in TODO.md BEFORE starting any work.** Move the task to "In Progress" with your `[worktree-name]` or `[main]` tag. If your task is not already in the list, add it first. The user monitors TODO.md to know what every Claude is doing — unmarked work is invisible and causes confusion and collisions. **No exceptions. No silent work.**
+
 ## Commit style
 
 [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
@@ -117,6 +119,8 @@ Every TODO item must have a color-coded size estimate prefix: 🟢 small, 🟡 m
 - **STOP after every commit boundary.** Provide the commit message, list the files included, and **wait for the user to confirm** before writing any more code. The user needs to commit and push each change separately and in order. **Never continue to the next commit's work without explicit confirmation.** This is non-negotiable.
 - **Before providing any commit message, update ALL affected files first.** If the code change affects test counts, coverage, features, architecture, or file structure, update `README.md` (and any other stale files) **before** presenting the commit message. Never provide a commit message while dependent files are still out of date.
 - Changes to `CLAUDE.md` or `README.md` must be committed **separately** from code changes — always provide a dedicated `docs()` commit message for them.
+- **⚠️ After every push, ALWAYS re-read `TODO.md` and present the full current task list (In Progress + Backlog) to the user.** The user relies on this as their primary progress tracker. Never skip this step.
+- **⚠️ When you edit any `.md` file (TODO.md, README.md, CLAUDE.md, etc.), you MUST re-read it and present the updated content back to the user.** The user cannot see your edits directly — they need you to repeat the content so they can verify it. This is non-negotiable.
 
 ## Formatting
 
