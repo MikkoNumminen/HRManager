@@ -4,7 +4,8 @@
 
 ```mermaid
 graph LR
-    Browser -->|HTTP| Next["Next.js App Router"]
+    Browser -->|HTTP| Proxy["proxy.ts<br/>(CSP + nonce)"]
+    Proxy -->|Next.js App Router| Next["Next.js"]
     Next -->|auth()| Auth["NextAuth v5<br/>(JWT)"]
     Next -->|Server Component| SC["Page (async)"]
     SC -->|read| Q["queries.ts<br/>Zod-validated"]
@@ -34,27 +35,39 @@ erDiagram
         uuid id PK
         string name
         string position
-        string email UK
+        string email "partial unique"
+        datetime deletedAt
     }
 
     Team {
         uuid teamId PK
-        string teamName UK
+        string teamName "partial unique"
         uuid teamManagerId FK
         uuid departmentId FK
+        datetime deletedAt
     }
 
     Department {
         uuid id PK
-        string name UK
+        string name "partial unique"
         string description
         uuid headId FK
+        datetime deletedAt
     }
 
     TeamMember {
         uuid id PK
         uuid personId FK
         uuid teamId FK
+        datetime deletedAt
+    }
+
+    RateLimit {
+        uuid id PK
+        string identifier
+        string action
+        int count
+        datetime windowStart
     }
 
     User {
@@ -97,7 +110,7 @@ flowchart TD
     A[Incoming request] --> B{Authenticated?}
     B -->|No| C[Guest permissions<br/>read-only]
     B -->|Yes| D{Role?}
-    D -->|superuser| E[All 23 permissions<br/>immutable]
+    D -->|superuser| E[All 24 permissions<br/>immutable]
     D -->|administrator / user| F[Load role defaults]
     F --> G{User overrides?}
     G -->|Yes| H[Apply grant/deny<br/>overrides per key]

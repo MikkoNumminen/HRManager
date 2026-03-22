@@ -90,7 +90,7 @@ docker-compose.yml    # PostgreSQL 17 + app with health checks
 
 ## Data model
 
-- **Person** — name, email, title, optional manager (FK to Person). Can belong to multiple teams. Soft-deleted via `deletedAt`; cascade soft-deletes TeamMember rows and nulls team manager / department head FK refs.
+- **Person** — name, email, position. Can belong to multiple teams, manage teams, and head departments. Soft-deleted via `deletedAt`; cascade soft-deletes TeamMember rows and nulls team manager / department head FK refs.
 - **Team** — name, manager (FK to Person), optional department (FK to Department, SetNull), members via TeamMember join table. Soft-deleted via `deletedAt`; cascade soft-deletes TeamMember rows.
 - **Department** — name, optional description, optional head (FK to Person, SetNull). Teams assigned via Team.departmentId. Soft-deleted via `deletedAt`; nulls team departmentId refs.
 - **TeamMember** — join table between Person and Team. Soft-deleted via `deletedAt`; re-adding a soft-deleted member restores the record.
@@ -132,7 +132,7 @@ Every TODO item must have a color-coded size estimate prefix: 🟢 small, 🟡 m
 - Do not mock core logic — test real functionality.
 - Always add a comment above each test explaining what it does in plain, simple language ("Barney style").
 - **Every new schema, component, or module must have corresponding tests.** Never leave new code untested — if you add it, you test it.
-- **Always aim for 100% coverage.** The project currently has 100% line and function coverage — maintain this. Add tests for every branch, edge case, error fallback, and interaction. If a new line or function is added, it must be covered. This is a portfolio project; comprehensive test coverage is a strength, not over-engineering.
+- **Always aim for 100% coverage.** The project currently has 99.5% line and 99.45% function coverage — push toward 100%. Add tests for every branch, edge case, error fallback, and interaction. If a new line or function is added, it must be covered. This is a portfolio project; comprehensive test coverage is a strength, not over-engineering.
 
 ## Docker
 
