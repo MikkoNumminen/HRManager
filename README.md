@@ -1,6 +1,6 @@
 # HRManager
 
-A production-grade HR management system with granular RBAC, audit logging, rate limiting, security headers, AI-powered i18n across 18 languages, and 899 tests (865 unit/integration + 34 E2E) at 99.7% line coverage.
+A production-grade HR management system with granular RBAC, audit logging, rate limiting, security headers, AI-powered i18n across 18 languages, and 909 tests (875 unit/integration + 34 E2E) at 99.7% line coverage.
 
 [![CI](https://github.com/MikkoNumminen/HRManager/actions/workflows/ci.yml/badge.svg)](https://github.com/MikkoNumminen/HRManager/actions/workflows/ci.yml)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)
@@ -27,7 +27,7 @@ A production-grade HR management system with granular RBAC, audit logging, rate 
 
 ## Highlights
 
-- **899 tests (865 unit/integration + 34 E2E), 99.7% line coverage** — Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, rate limiting, audit logging, all 42 UI components tested against real PostgreSQL, plus Playwright E2E covering full user flows
+- **909 tests (875 unit/integration + 34 E2E), 99.7% line coverage** — Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, rate limiting, auth route handlers, audit logging, all 42 UI components tested against real PostgreSQL, plus Playwright E2E covering full user flows
 - **Granular RBAC** — 4 roles, 23 permission keys, per-user grant/deny overrides with three-state toggles (deny / role default / grant), and "kick out" user removal with confirmation dialog
 - **Immutable audit trail** — every mutation logged with before/after JSON snapshots inside the same `$transaction` for atomicity
 - **18 languages** — next-intl with cookie persistence, Accept-Language detection, and an AI-powered translation pipeline using parallel Claude Code agents
@@ -36,7 +36,7 @@ A production-grade HR management system with granular RBAC, audit logging, rate 
 - **Accessibility (WCAG)** — semantic landmarks, skip-to-content link, ARIA labels on dialogs and controls, `role="alert"` on all error messages, keyboard-navigable table rows, `scope="col"` on all table headers
 - **6 visual themes** — CSS custom properties with FOUC-preventing inline script; instant switching without re-render
 - **Security headers** — X-Frame-Options, HSTS, X-Content-Type-Options, Referrer-Policy, Permissions-Policy on all routes
-- **Rate limiting** — PostgreSQL-based sliding window (30 req/min per user/IP per action) on all server actions; user-based for authenticated users, IP-based fallback; no external services required
+- **Rate limiting** — PostgreSQL-based sliding window on all server actions (30 req/min) and auth endpoints (10 req/min); user-based for authenticated users, IP-based for auth and anonymous; no external services required
 - **Docker-ready** — `docker compose up` for a fully working local environment with PostgreSQL, auto-migration, and demo login
 
 ---
@@ -108,15 +108,16 @@ Individual permissions can be overridden per-user — e.g. granting `person:crea
 | Server actions   | 137     |
 | Auth callbacks   | 25      |
 | Audit logging    | 6       |
-| Rate limiting    | 13      |
+| Rate limiting    | 18      |
+| Auth route       | 5       |
 | RBAC logic       | 28      |
 | UI components    | 545     |
 | E2E (Playwright) | 34      |
-| **Total**        | **899** |
+| **Total**        | **909** |
 
 ```
-Statements : 99.07%    Branches : 95.65%
-Functions  : 99.15%    Lines    : 99.73%
+Statements : 99.12%    Branches : 95.65%
+Functions  : 99.44%    Lines    : 99.73%
 ```
 
 Server-side tests run against a real PostgreSQL test database. Client-side tests cover all 42 components including permission toggles, audit log filtering, tutorial system, snackbar notifications, theme switching, and language selection. Playwright E2E tests run against a production build covering authentication, CRUD for all entities, admin/audit access, guest access control, theme/language persistence, and snackbar lifecycle.

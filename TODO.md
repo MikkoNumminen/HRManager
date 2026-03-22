@@ -6,13 +6,11 @@ In Progress items must show the owner: `[worktree-name]` or `[main]`.
 
 ## In Progress
 
-_(none)_
+- 🟡 CSP header — needs careful tuning for MUI inline styles (unsafe-inline) `[snackbar-notifications]`
+- 🔴 Add dashboard page with MUI charts `[dashboard]`
 
 ## Backlog
 
-- 🔴 Add dashboard page with MUI charts
-- 🟡 CSP header — needs careful tuning for MUI inline styles (unsafe-inline)
-- 🟡 Auth endpoint rate limiting — NextAuth route handlers need wrapper middleware
 - 🟡 Audit log for failed attempts — log permission denials and rate limit hits
 - 🔴 Soft deletes — preserve historical audit trail on cascaded deletions
 - 🟡 Optimistic updates

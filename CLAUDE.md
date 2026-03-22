@@ -42,7 +42,7 @@ This is a **portfolio / showcase project**. The goal is to demonstrate technical
 - **TopBar** — the user avatar dropdown menu contains: User Management, Audit Log (permission-gated), Load Mock Data, Reset All Data (permission-gated), and Sign Out. The `permissions` prop must be passed on every page so all menu items are available everywhere.
 - **Client-heavy rendering**: Keep the server thin — it handles only data fetching, auth, and validation. All rendering logic, UI state, filtering, sorting, and heavy computation belong in Client Components so the server stays lightweight and responsive. Security-sensitive logic (auth checks, input sanitization, access control, database queries) must always remain server-side — never trust the client for authorization or data integrity.
 - **Security headers** — `next.config.mjs` sets X-Frame-Options, HSTS, X-Content-Type-Options, Referrer-Policy, and Permissions-Policy on all routes.
-- **Rate limiting** — `rateLimit.ts` provides a PostgreSQL-based sliding window rate limiter (30 req/min per user/IP per action). Uses user-based identification for authenticated users (via `auth()`), IP-based fallback for anonymous. Called at the top of every server action after `requirePermission()`. Uses a `RateLimit` table with upsert — no external services. `cleanupExpiredRateLimits()` removes stale records.
+- **Rate limiting** — `rateLimit.ts` provides a PostgreSQL-based sliding window rate limiter. Server actions use `rateLimit()` (30 req/min, user-based for authenticated, IP fallback). Auth endpoints use `rateLimitAuth()` (10 req/min, IP-only — can't call `auth()` during sign-in). The NextAuth POST handler in `route.ts` wraps with `rateLimitAuth()`, returning 429 JSON on limit; GET requests (session/CSRF) are unthrottled. Uses a `RateLimit` table with upsert — no external services. `cleanupExpiredRateLimits()` removes stale records.
 - **Input validation** — all string inputs (names, emails, positions, descriptions) are validated with Zod `max()` constraints in `schemas.ts` and enforced in server actions before database writes.
 - **Entity existence checks** — server actions verify that referenced entities (persons, teams, departments) exist inside the transaction before FK assignments to prevent dangling references.
 - **JWT permission freshness** — `auth.ts` uses a `permissionsVersion` column on User to detect stale JWT permissions efficiently. Only performs a full permission re-fetch when the version changes, avoiding unnecessary DB load.
@@ -61,7 +61,7 @@ src/
 │   └── manageTeams/             # Team management (permission-protected)
 ├── components/       # Reusable MUI client components (42 components)
 ├── i18n/             # next-intl configuration (actions, config, request)
-├── tests/            # Jest tests (865 tests)
+├── tests/            # Jest tests (875 tests)
 ├── types/            # TypeScript module augmentations (next-auth.d.ts)
 ├── auditLog.ts       # Audit logging helper (logAudit)
 ├── auth.ts           # NextAuth v5 configuration + RBAC callbacks
