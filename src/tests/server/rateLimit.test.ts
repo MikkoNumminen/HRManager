@@ -18,7 +18,7 @@ jest.mock("next/headers", () => ({
   })),
 }));
 
-import { rateLimit, RateLimitError, cleanupExpiredRateLimits } from "@/rateLimit";
+import { rateLimit, rateLimitAuth, RateLimitError, cleanupExpiredRateLimits } from "@/rateLimit";
 
 beforeEach(async () => {
   await testPrisma.rateLimit.deleteMany();
@@ -171,6 +171,65 @@ test("uses user-based identifier for authenticated users", async () => {
 
   const record = await testPrisma.rateLimit.findFirst();
   expect(record?.identifier).toBe("user:user-abc-123");
+});
+
+// rateLimitAuth uses IP-only identification (never calls auth())
+test("rateLimitAuth uses IP-based identifier", async () => {
+  await rateLimitAuth("signin");
+
+  const record = await testPrisma.rateLimit.findFirst();
+  expect(record?.identifier).toBe("ip:192.168.1.1");
+  expect(record?.action).toBe("auth:signin");
+});
+
+// rateLimitAuth uses IP even when user is authenticated (ignores auth session)
+test("rateLimitAuth ignores auth session and uses IP", async () => {
+  const { auth } = require("@/auth");
+  auth.mockReturnValueOnce({ user: { id: "user-abc-123" } });
+
+  await rateLimitAuth("signin");
+
+  const record = await testPrisma.rateLimit.findFirst();
+  expect(record?.identifier).toBe("ip:192.168.1.1");
+  expect(record?.action).toBe("auth:signin");
+});
+
+// rateLimitAuth enforces stricter limit (10 req/min vs 30)
+test("rateLimitAuth throws at 10 requests instead of 30", async () => {
+  await testPrisma.rateLimit.create({
+    data: {
+      identifier: "ip:192.168.1.1",
+      action: "auth:signin",
+      count: 10,
+      windowStart: new Date(),
+    },
+  });
+
+  await expect(rateLimitAuth("signin")).rejects.toThrow(RateLimitError);
+});
+
+// rateLimitAuth allows requests under the stricter limit
+test("rateLimitAuth allows requests under the 10-request limit", async () => {
+  await testPrisma.rateLimit.create({
+    data: {
+      identifier: "ip:192.168.1.1",
+      action: "auth:signin",
+      count: 9,
+      windowStart: new Date(),
+    },
+  });
+
+  await expect(rateLimitAuth("signin")).resolves.toBeUndefined();
+});
+
+// rateLimitAuth falls back to anonymous when no IP headers present
+test("rateLimitAuth uses anonymous when no IP headers present", async () => {
+  mockHeaders.clear();
+
+  await rateLimitAuth("signin");
+
+  const record = await testPrisma.rateLimit.findFirst();
+  expect(record?.identifier).toBe("anonymous");
 });
 
 // cleanupExpiredRateLimits removes old records and returns the count
