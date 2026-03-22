@@ -23,14 +23,7 @@ export default function OptimisticDepartments({
 
   const [optimisticDepartments, addOptimistic] = useOptimistic<Department[], OptimisticAction>(
     departments,
-    (state, action) => {
-      switch (action.type) {
-        case "add":
-          return [...state, action.department];
-        default:
-          return state;
-      }
-    },
+    (state, action) => (action.type === "add" ? [...state, action.department] : state),
   );
 
   const handleOptimisticAdd = (name: string, description: string) => {

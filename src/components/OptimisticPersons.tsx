@@ -20,14 +20,7 @@ export default function OptimisticPersons({ persons, canCreate }: OptimisticPers
 
   const [optimisticPersons, addOptimistic] = useOptimistic<Person[], OptimisticAction>(
     persons,
-    (state, action) => {
-      switch (action.type) {
-        case "add":
-          return [...state, action.person];
-        default:
-          return state;
-      }
-    },
+    (state, action) => (action.type === "add" ? [...state, action.person] : state),
   );
 
   const handleOptimisticAdd = (name: string, email: string) => {

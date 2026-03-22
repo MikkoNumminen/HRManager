@@ -1,6 +1,7 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import OptimisticPersons from "@/components/OptimisticPersons";
 import { Person } from "@/schemas";
+import { createPerson } from "../serverActions";
 
 jest.mock("next/navigation", () => ({
   useRouter: jest.fn(() => ({ push: jest.fn() })),
@@ -65,5 +66,30 @@ describe("OptimisticPersons", () => {
     render(<OptimisticPersons persons={persons} canCreate={false} />);
     expect(screen.getByText("Alice")).toBeInTheDocument();
     expect(screen.getByText("Bob")).toBeInTheDocument();
+  });
+
+  // Submitting the form optimistically adds the new person to the table
+  // before the server responds.
+  test("optimistically adds person to table on form submit", async () => {
+    let resolveCreate!: () => void;
+    (createPerson as jest.Mock).mockImplementation(
+      () => new Promise<void>((resolve) => (resolveCreate = resolve)),
+    );
+
+    render(<OptimisticPersons persons={mockPersons} canCreate={true} />);
+
+    fireEvent.change(screen.getByLabelText(/Enter Name/i), {
+      target: { value: "New Person" },
+    });
+    fireEvent.change(screen.getByLabelText(/Enter Email/i), {
+      target: { value: "new@test.com" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /Create/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText("New Person")).toBeInTheDocument();
+    });
+
+    resolveCreate();
   });
 });

@@ -1,6 +1,7 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import OptimisticTeams from "@/components/OptimisticTeams";
 import { CombinedTeam } from "@/schemas";
+import { createTeam } from "../serverActions";
 
 jest.mock("next/navigation", () => ({
   useRouter: jest.fn(() => ({ push: jest.fn() })),
@@ -71,5 +72,27 @@ describe("OptimisticTeams", () => {
     render(<OptimisticTeams teams={teams} canCreate={false} />);
     expect(screen.getByText("Engineering")).toBeInTheDocument();
     expect(screen.getByText("Design")).toBeInTheDocument();
+  });
+
+  // Submitting the form optimistically adds the new team to the table
+  // before the server responds.
+  test("optimistically adds team to table on form submit", async () => {
+    let resolveCreate!: () => void;
+    (createTeam as jest.Mock).mockImplementation(
+      () => new Promise<void>((resolve) => (resolveCreate = resolve)),
+    );
+
+    render(<OptimisticTeams teams={mockTeams} canCreate={true} />);
+
+    fireEvent.change(screen.getByLabelText(/Enter Team Name/i), {
+      target: { value: "New Team" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /Create/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText("New Team")).toBeInTheDocument();
+    });
+
+    resolveCreate();
   });
 });

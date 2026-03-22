@@ -20,14 +20,7 @@ export default function OptimisticTeams({ teams, canCreate }: OptimisticTeamsPro
 
   const [optimisticTeams, addOptimistic] = useOptimistic<CombinedTeam[], OptimisticAction>(
     teams,
-    (state, action) => {
-      switch (action.type) {
-        case "add":
-          return [...state, action.team];
-        default:
-          return state;
-      }
-    },
+    (state, action) => (action.type === "add" ? [...state, action.team] : state),
   );
 
   const handleOptimisticAdd = (teamName: string) => {

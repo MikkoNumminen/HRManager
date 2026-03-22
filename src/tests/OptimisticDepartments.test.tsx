@@ -1,6 +1,7 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import OptimisticDepartments from "@/components/OptimisticDepartments";
 import { Department } from "@/schemas";
+import { createDepartment } from "../serverActions";
 
 jest.mock("next/navigation", () => ({
   useRouter: jest.fn(() => ({ push: jest.fn() })),
@@ -69,5 +70,27 @@ describe("OptimisticDepartments", () => {
     render(<OptimisticDepartments departments={departments} canCreate={false} />);
     expect(screen.getByText("Engineering")).toBeInTheDocument();
     expect(screen.getByText("Marketing")).toBeInTheDocument();
+  });
+
+  // Submitting the form optimistically adds the new department to the table
+  // before the server responds.
+  test("optimistically adds department to table on form submit", async () => {
+    let resolveCreate!: () => void;
+    (createDepartment as jest.Mock).mockImplementation(
+      () => new Promise<void>((resolve) => (resolveCreate = resolve)),
+    );
+
+    render(<OptimisticDepartments departments={mockDepartments} canCreate={true} />);
+
+    fireEvent.change(screen.getByLabelText(/Enter Department Name/i), {
+      target: { value: "New Dept" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /Create/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText("New Dept")).toBeInTheDocument();
+    });
+
+    resolveCreate();
   });
 });
