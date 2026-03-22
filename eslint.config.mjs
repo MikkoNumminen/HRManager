@@ -24,6 +24,20 @@ const eslintConfig = [
     },
   },
   {
+    // E2E tests: Playwright uses the same query names as Testing Library
+    // (getByRole, getByText, etc.) but they are NOT Testing Library queries.
+    // Disable testing-library and jest-dom rules for the e2e directory.
+    files: ["e2e/**"],
+    rules: {
+      "testing-library/prefer-screen-queries": "off",
+      "testing-library/no-node-access": "off",
+      "testing-library/no-wait-for-multiple-assertions": "off",
+      "testing-library/no-debugging-utils": "off",
+      "testing-library/await-async-utils": "off",
+      "jest-dom/prefer-enabled-disabled": "off",
+    },
+  },
+  {
     // Test files: allow require() for Jest mocking and downgrade
     // test-style rules that were not enforced before the migration
     // from FlatCompat to native flat config
