@@ -25,6 +25,7 @@ export const PERMISSION_KEYS = [
   "admin:manage_users",
   "admin:assign_permissions",
   "admin:view_audit_log",
+  "dashboard:view",
 ] as const;
 
 export type PermissionKey = (typeof PERMISSION_KEYS)[number];
@@ -51,6 +52,7 @@ export const ROLE_DEFAULTS: Record<string, PermissionKey[]> = {
     "department:assign_team",
     "department:read",
     "admin:view_audit_log",
+    "dashboard:view",
   ],
   user: ["person:read", "team:read", "department:read"],
   guest: ["person:read", "team:read", "department:read"],
@@ -93,6 +95,7 @@ function formatPermissionDescription(key: PermissionKey): string {
     "admin:manage_users": "Access user management",
     "admin:assign_permissions": "Grant or revoke user permissions",
     "admin:view_audit_log": "View audit log history",
+    "dashboard:view": "View dashboard with analytics",
   };
   return descriptions[key];
 }

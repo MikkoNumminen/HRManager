@@ -134,9 +134,9 @@ describe("Permission Resolution", () => {
     expect(ROLE_DEFAULTS).toHaveProperty("guest");
   });
 
-  // There are exactly 23 permission keys (16 original + 5 department + 2 rename)
-  test("PERMISSION_KEYS has 23 entries", () => {
-    expect(PERMISSION_KEYS).toHaveLength(23);
+  // There are exactly 24 permission keys (16 original + 5 department + 2 rename + 1 dashboard)
+  test("PERMISSION_KEYS has 24 entries", () => {
+    expect(PERMISSION_KEYS).toHaveLength(24);
   });
 });
 
