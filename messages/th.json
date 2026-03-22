@@ -270,7 +270,8 @@
     "typeSecurity": "ความปลอดภัย",
     "permissionDenied": "ไม่มีสิทธิ์: {key}",
     "rateLimited": "เกินขีดจำกัดคำขอสำหรับการดำเนินการ: {action}",
-    "permViewDashboard": "ดูแดชบอร์ด"
+    "permViewDashboard": "ดูแดชบอร์ด",
+    "filters": "ตัวกรอง"
   },
   "notifications": {
     "personCreated": "สร้างบุคคลสำเร็จ",

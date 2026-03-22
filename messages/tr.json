@@ -270,7 +270,8 @@
     "typeSecurity": "Güvenlik",
     "permissionDenied": "İzin reddedildi: {key}",
     "rateLimited": "İşlem için hız sınırı aşıldı: {action}",
-    "permViewDashboard": "gösterge panelini görüntüle"
+    "permViewDashboard": "gösterge panelini görüntüle",
+    "filters": "Filtreler"
   },
   "notifications": {
     "personCreated": "Kişi başarıyla oluşturuldu",

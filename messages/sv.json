@@ -270,7 +270,8 @@
     "typeSecurity": "Säkerhet",
     "permissionDenied": "Åtkomst nekad: {key}",
     "rateLimited": "Hastighetsgräns överskriden för åtgärd: {action}",
-    "permViewDashboard": "visa instrumentpanelen"
+    "permViewDashboard": "visa instrumentpanelen",
+    "filters": "Filter"
   },
   "notifications": {
     "personCreated": "Person skapad",

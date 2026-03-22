@@ -270,7 +270,8 @@
     "typeSecurity": "Безпека",
     "permissionDenied": "Доступ заборонено: {key}",
     "rateLimited": "Перевищено ліміт запитів для дії: {action}",
-    "permViewDashboard": "переглянути панель"
+    "permViewDashboard": "переглянути панель",
+    "filters": "Фільтри"
   },
   "notifications": {
     "personCreated": "Особу успішно створено",

@@ -270,7 +270,8 @@
     "typeSecurity": "الأمان",
     "permissionDenied": "تم رفض الإذن: {key}",
     "rateLimited": "تم تجاوز حد الطلبات للإجراء: {action}",
-    "permViewDashboard": "عرض لوحة المعلومات"
+    "permViewDashboard": "عرض لوحة المعلومات",
+    "filters": "المرشحات"
   },
   "notifications": {
     "personCreated": "تم إنشاء الشخص بنجاح",

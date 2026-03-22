@@ -270,7 +270,8 @@
     "typeSecurity": "安全",
     "permissionDenied": "权限被拒绝: {key}",
     "rateLimited": "操作超出速率限制: {action}",
-    "permViewDashboard": "查看仪表板"
+    "permViewDashboard": "查看仪表板",
+    "filters": "筛选"
   },
   "notifications": {
     "personCreated": "人员创建成功",

@@ -270,7 +270,8 @@
     "typeSecurity": "보안",
     "permissionDenied": "권한이 거부되었습니다: {key}",
     "rateLimited": "작업에 대한 속도 제한 초과: {action}",
-    "permViewDashboard": "대시보드 보기"
+    "permViewDashboard": "대시보드 보기",
+    "filters": "필터"
   },
   "notifications": {
     "personCreated": "직원이 생성되었습니다",

@@ -270,7 +270,8 @@
     "typeSecurity": "セキュリティ",
     "permissionDenied": "権限が拒否されました: {key}",
     "rateLimited": "アクションのレート制限を超えました: {action}",
-    "permViewDashboard": "ダッシュボードを表示"
+    "permViewDashboard": "ダッシュボードを表示",
+    "filters": "フィルター"
   },
   "notifications": {
     "personCreated": "担当者を作成しました",

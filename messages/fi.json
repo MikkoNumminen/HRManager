@@ -270,7 +270,8 @@
     "typeSecurity": "Turvallisuus",
     "permissionDenied": "Käyttö estetty: {key}",
     "rateLimited": "Pyyntöraja ylitetty toiminnolle: {action}",
-    "permViewDashboard": "nähdä kojelaudan"
+    "permViewDashboard": "nähdä kojelaudan",
+    "filters": "Suodattimet"
   },
   "notifications": {
     "personCreated": "Henkilö luotu onnistuneesti",

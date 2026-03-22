@@ -270,7 +270,8 @@
     "typeSecurity": "Bezpieczeństwo",
     "permissionDenied": "Odmowa dostępu: {key}",
     "rateLimited": "Przekroczono limit żądań dla akcji: {action}",
-    "permViewDashboard": "wyświetlić panel"
+    "permViewDashboard": "wyświetlić panel",
+    "filters": "Filtry"
   },
   "notifications": {
     "personCreated": "Osoba utworzona pomyślnie",

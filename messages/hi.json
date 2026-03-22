@@ -270,7 +270,8 @@
     "typeSecurity": "सुरक्षा",
     "permissionDenied": "अनुमति अस्वीकृत: {key}",
     "rateLimited": "कार्रवाई के लिए दर सीमा पार: {action}",
-    "permViewDashboard": "डैशबोर्ड देखें"
+    "permViewDashboard": "डैशबोर्ड देखें",
+    "filters": "फ़िल्टर"
   },
   "notifications": {
     "personCreated": "व्यक्ति सफलतापूर्वक बनाया गया",

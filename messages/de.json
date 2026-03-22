@@ -270,7 +270,8 @@
     "typeSecurity": "Sicherheit",
     "permissionDenied": "Zugriff verweigert: {key}",
     "rateLimited": "Ratenbegrenzung überschritten für Aktion: {action}",
-    "permViewDashboard": "Dashboard anzeigen"
+    "permViewDashboard": "Dashboard anzeigen",
+    "filters": "Filter"
   },
   "notifications": {
     "personCreated": "Person erfolgreich erstellt",

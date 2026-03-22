@@ -270,7 +270,8 @@
     "typeSecurity": "Безопасность",
     "permissionDenied": "Доступ запрещён: {key}",
     "rateLimited": "Превышен лимит запросов для действия: {action}",
-    "permViewDashboard": "просмотр панели"
+    "permViewDashboard": "просмотр панели",
+    "filters": "Фильтры"
   },
   "notifications": {
     "personCreated": "Сотрудник успешно создан",

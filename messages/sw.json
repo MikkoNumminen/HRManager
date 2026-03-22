@@ -270,7 +270,8 @@
     "typeSecurity": "Usalama",
     "permissionDenied": "Ruhusa imekataliwa: {key}",
     "rateLimited": "Kikomo cha maombi kimezidishwa kwa kitendo: {action}",
-    "permViewDashboard": "kuona dashibodi"
+    "permViewDashboard": "kuona dashibodi",
+    "filters": "Vichujio"
   },
   "notifications": {
     "personCreated": "Mtu ameundwa kwa mafanikio",

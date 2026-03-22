@@ -270,7 +270,8 @@
     "typeSecurity": "Segurança",
     "permissionDenied": "Permissão negada: {key}",
     "rateLimited": "Limite de requisições excedido para a ação: {action}",
-    "permViewDashboard": "ver o painel"
+    "permViewDashboard": "ver o painel",
+    "filters": "Filtros"
   },
   "notifications": {
     "personCreated": "Pessoa criada com sucesso",
