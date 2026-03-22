@@ -8,9 +8,8 @@ In Progress items must show the owner: `[worktree-name]` or `[main]`.
 
 - 🔴 Add dashboard page with MUI charts `[dashboard]`
 
-
 - 🔴 Mobile-first redesign `[main]`
-  - [ ] TopBar: hamburger menu + drawer for mobile navigation
+  - [x] TopBar: hamburger menu + drawer for mobile navigation
   - [ ] Tables: card/list view on mobile (< sm breakpoint)
   - [ ] Forms: full-width inputs, responsive button layout
   - [ ] AuditLogViewer: collapsible filters, card view for entries
