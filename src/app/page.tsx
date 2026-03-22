@@ -76,7 +76,7 @@ export default async function Home() {
       <TopBar title={t("title")} permissions={permissions} />
       {session ? (
         canManagePersons ? (
-          <Link href="/managePersons" sx={{ textDecoration: "none" }}>
+          <Link href="/managePersons" sx={{ textDecoration: "none", color: "inherit" }}>
             <Tooltip title={t("goToPersons")} placement="right" arrow>
               <Box component="div" sx={boxStyles} data-tutorial="persons-section">
                 <Typography variant="h6" gutterBottom>
@@ -105,7 +105,7 @@ export default async function Home() {
 
       {session ? (
         canManageTeams ? (
-          <Link href="/manageTeams" sx={{ textDecoration: "none" }}>
+          <Link href="/manageTeams" sx={{ textDecoration: "none", color: "inherit" }}>
             <Tooltip title={t("goToTeams")} placement="right" arrow>
               <Box component="div" sx={boxStyles} data-tutorial="teams-section">
                 <Typography variant="h6" gutterBottom>
@@ -134,7 +134,7 @@ export default async function Home() {
 
       {session ? (
         canManageDepartments ? (
-          <Link href="/manageDepartments" sx={{ textDecoration: "none" }}>
+          <Link href="/manageDepartments" sx={{ textDecoration: "none", color: "inherit" }}>
             <Tooltip title={t("goToDepartments")} placement="right" arrow>
               <Box component="div" sx={boxStyles} data-tutorial="departments-section">
                 <Typography variant="h6" gutterBottom>
