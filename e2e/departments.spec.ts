@@ -50,7 +50,10 @@ test.describe("Department Management", () => {
     await page.getByRole("button", { name: /^remove$/i }).click();
 
     // Confirm the deletion in the dialog
-    await page.getByRole("button", { name: /^remove$/i }).last().click();
+    await page
+      .getByRole("button", { name: /^remove$/i })
+      .last()
+      .click();
 
     // Server action redirects back to /manageDepartments
     await expect(page).toHaveURL(/\/manageDepartments$/, { timeout: 10_000 });

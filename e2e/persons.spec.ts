@@ -60,7 +60,10 @@ test.describe("Person Management", () => {
     await page.getByRole("button", { name: /^remove$/i }).click();
 
     // Confirm the deletion in the dialog
-    await page.getByRole("button", { name: /^remove$/i }).last().click();
+    await page
+      .getByRole("button", { name: /^remove$/i })
+      .last()
+      .click();
 
     // Should show snackbar and redirect back
     await expect(snackbar(page)).toContainText(/removed|deleted/i, { timeout: 10_000 });
