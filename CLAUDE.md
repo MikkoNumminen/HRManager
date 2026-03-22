@@ -94,6 +94,10 @@ docker-compose.yml    # PostgreSQL 17 + app with health checks
 - **AuditLog** — immutable log of all mutations: who, what action, which entity, before/after JSON snapshots. No FK to User so logs survive user deletion.
 - **RateLimit** — sliding window rate limit counters per identifier (IP) and action. Auto-cleaned on window expiry.
 
+## Task tracking
+
+`TODO.md` is the shared task list across all Claude Code sessions. Read it at the start of every session to understand current priorities. Update it when tasks are added, started, or completed. Keep it concise — no completed items, just in-progress and backlog. After finishing a task, note how long it took (from start of work to commit+push) before removing it from the list.
+
 ## Commit style
 
 [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
