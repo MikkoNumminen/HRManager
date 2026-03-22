@@ -153,7 +153,12 @@
     "denied": "Denied",
     "granted": "Granted",
     "grant": "Grant",
-    "deny": "Deny"
+    "deny": "Deny",
+    "dangerZone": "Danger Zone",
+    "kickOut": "Kick Out",
+    "kickOutTitle": "Kick Out User",
+    "kickOutDescription": "Remove this user from the system. They will lose all access and permission overrides.",
+    "kickOutConfirm": "Are you sure you want to kick out {name}? They will lose access and all permission overrides."
   },
   "audit": {
     "filterUser": "User",
@@ -166,6 +171,7 @@
     "actionUpdate": "Update",
     "actionDelete": "Delete",
     "actionSeed": "Seed",
+    "actionKickout": "Kick Out",
     "actionReset": "Reset",
     "typePerson": "Person",
     "typeTeam": "Team",
@@ -211,6 +217,7 @@
     "renamedDepartment": "Renamed department from \"{oldValue}\" to \"{newValue}\"",
     "updatedDepartment": "Updated department details",
     "changedRole": "Changed {target}'s role from \"{oldValue}\" to \"{newValue}\"",
+    "kickedOutUser": "Kicked out {name} ({email}, role: {role})",
     "grantedPermission": "Granted {target} the ability to {label}",
     "revokedPermission": "Revoked {target}'s ability to {label}",
     "recordUpdated": "Record updated",
@@ -262,7 +269,8 @@
     "roleUpdated": "User role updated successfully",
     "permissionUpdated": "Permission updated successfully",
     "mockDataLoaded": "Mock data loaded successfully",
-    "dataReset": "All data reset successfully"
+    "dataReset": "All data reset successfully",
+    "userKickedOut": "{name} has been kicked out"
   },
   "tutorial": {
     "checklistTitle": "Demo Tour",

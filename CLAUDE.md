@@ -57,7 +57,7 @@ src/
 │   └── manageTeams/             # Team management (permission-protected)
 ├── components/       # Reusable MUI client components (42 components)
 ├── i18n/             # next-intl configuration (actions, config, request)
-├── tests/            # Jest tests (818 tests)
+├── tests/            # Jest tests (834 tests)
 ├── types/            # TypeScript module augmentations (next-auth.d.ts)
 ├── auditLog.ts       # Audit logging helper (logAudit)
 ├── auth.ts           # NextAuth v5 configuration + RBAC callbacks

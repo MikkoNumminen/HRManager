@@ -153,7 +153,12 @@
     "denied": "Refusé",
     "granted": "Accordé",
     "grant": "Accorder",
-    "deny": "Refuser"
+    "deny": "Refuser",
+    "dangerZone": "Zone de danger",
+    "kickOut": "Exclure",
+    "kickOutTitle": "Exclure l'utilisateur",
+    "kickOutDescription": "Supprimer cet utilisateur du système. Il perdra tous ses accès et ses dérogations de permissions.",
+    "kickOutConfirm": "Êtes-vous sûr de vouloir exclure {name} ? Il perdra ses accès et toutes ses dérogations de permissions."
   },
   "audit": {
     "filterUser": "Utilisateur",
@@ -165,6 +170,7 @@
     "actionCreate": "Création",
     "actionUpdate": "Mise à jour",
     "actionDelete": "Suppression",
+    "actionKickout": "Exclusion",
     "actionSeed": "Données de test",
     "actionReset": "Réinitialisation",
     "typePerson": "Personne",
@@ -196,6 +202,7 @@
     "deletedDepartment": "Département supprimé : {name}",
     "resetPermission": "Autorisation « {label} » de {target} réinitialisée au défaut du rôle",
     "recordDeleted": "Enregistrement supprimé",
+    "kickedOutUser": "{name} a été exclu ({email}, rôle : {role})",
     "changedPosition": "Poste modifié de « {oldValue} » à « {newValue} »",
     "changedEmail": "E-mail modifié de « {oldValue} » à « {newValue} »",
     "updatedPerson": "Détails de la personne mis à jour",
@@ -262,7 +269,8 @@
     "dataReset": "Toutes les données réinitialisées avec succès",
     "nameUpdated": "Nom mis à jour avec succès",
     "teamRenamed": "Équipe renommée avec succès",
-    "departmentUpdated": "Département mis à jour avec succès"
+    "departmentUpdated": "Département mis à jour avec succès",
+    "userKickedOut": "{name} a été exclu"
   },
   "tutorial": {
     "checklistTitle": "Visite guidée",

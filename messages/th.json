@@ -153,7 +153,12 @@
     "denied": "ปฏิเสธ",
     "granted": "ได้รับอนุญาต",
     "grant": "อนุญาต",
-    "deny": "ปฏิเสธ"
+    "deny": "ปฏิเสธ",
+    "dangerZone": "โซนอันตราย",
+    "kickOut": "ไล่ออก",
+    "kickOutTitle": "ไล่ผู้ใช้ออก",
+    "kickOutDescription": "ลบผู้ใช้นี้ออกจากระบบ พวกเขาจะสูญเสียสิทธิ์การเข้าถึงทั้งหมดและการแทนที่สิทธิ์",
+    "kickOutConfirm": "คุณแน่ใจหรือไม่ว่าต้องการไล่ {name} ออก? พวกเขาจะสูญเสียสิทธิ์การเข้าถึงและการแทนที่สิทธิ์ทั้งหมด"
   },
   "audit": {
     "filterUser": "ผู้ใช้",
@@ -165,6 +170,7 @@
     "actionCreate": "สร้าง",
     "actionUpdate": "อัปเดต",
     "actionDelete": "ลบ",
+    "actionKickout": "การไล่ออก",
     "actionSeed": "เติมข้อมูล",
     "actionReset": "รีเซ็ต",
     "typePerson": "บุคลากร",
@@ -196,6 +202,7 @@
     "deletedDepartment": "ลบแผนก: {name}",
     "resetPermission": "รีเซ็ต \"{label}\" ของ {target} กลับเป็นค่าเริ่มต้นตามบทบาท",
     "recordDeleted": "ลบบันทึกแล้ว",
+    "kickedOutUser": "ไล่ {name} ออก ({email}, บทบาท: {role})",
     "changedPosition": "เปลี่ยนตำแหน่งจาก \"{oldValue}\" เป็น \"{newValue}\"",
     "changedEmail": "เปลี่ยนอีเมลจาก \"{oldValue}\" เป็น \"{newValue}\"",
     "updatedPerson": "อัปเดตข้อมูลบุคลากร",
@@ -262,7 +269,8 @@
     "dataReset": "รีเซ็ตข้อมูลทั้งหมดสำเร็จ",
     "nameUpdated": "อัปเดตชื่อสำเร็จ",
     "teamRenamed": "เปลี่ยนชื่อทีมสำเร็จ",
-    "departmentUpdated": "อัปเดตแผนกสำเร็จ"
+    "departmentUpdated": "อัปเดตแผนกสำเร็จ",
+    "userKickedOut": "{name} ถูกไล่ออกแล้ว"
   },
   "tutorial": {
     "checklistTitle": "ทัวร์สาธิต",

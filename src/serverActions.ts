@@ -977,3 +977,31 @@ export async function updateUserPermission(data: FormData) {
   });
   revalidatePath("/admin");
 }
+
+export async function kickOutUser(data: FormData) {
+  await requirePermission("admin:manage_users");
+  await rateLimit("kickOutUser");
+
+  const userId = data.get("userId")?.toString();
+  if (!userId) throw new Error("No userId provided");
+  validateUUID(userId, "userId");
+
+  const targetUser = await prisma.user.findUnique({ where: { id: userId } });
+  if (!targetUser) throw new Error("User not found");
+  if (targetUser.role === "superuser") {
+    throw new Error("Cannot kick out the superuser");
+  }
+
+  await prisma.$transaction(async (tx) => {
+    await tx.userPermission.deleteMany({ where: { userId } });
+    await tx.user.delete({ where: { id: userId } });
+    await logAudit({
+      action: "kickout",
+      entityType: "user",
+      entityId: userId,
+      before: { email: targetUser.email, name: targetUser.name, role: targetUser.role },
+      tx,
+    });
+  });
+  revalidatePath("/admin");
+}

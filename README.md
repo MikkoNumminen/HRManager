@@ -1,6 +1,6 @@
 # HRManager
 
-A production-grade HR management system with granular RBAC, audit logging, rate limiting, AI-powered i18n across 18 languages, and 818 tests at 99.8% line coverage.
+A production-grade HR management system with granular RBAC, audit logging, rate limiting, AI-powered i18n across 18 languages, and 834 tests at 99.8% line coverage.
 
 [![CI](https://github.com/MikkoNumminen/HRManager/actions/workflows/ci.yml/badge.svg)](https://github.com/MikkoNumminen/HRManager/actions/workflows/ci.yml)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)
@@ -27,8 +27,8 @@ A production-grade HR management system with granular RBAC, audit logging, rate 
 
 ## Highlights
 
-- **818 tests, 99.8% line coverage** — Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, rate limiting, audit logging, and all 42 UI components tested against real PostgreSQL
-- **Granular RBAC** — 4 roles, 23 permission keys, per-user grant/deny overrides with three-state toggles (deny / role default / grant)
+- **834 tests, 99.8% line coverage** — Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, rate limiting, audit logging, and all 42 UI components tested against real PostgreSQL
+- **Granular RBAC** — 4 roles, 23 permission keys, per-user grant/deny overrides with three-state toggles (deny / role default / grant), and "kick out" user removal with confirmation dialog
 - **Immutable audit trail** — every mutation logged with before/after JSON snapshots inside the same `$transaction` for atomicity
 - **18 languages** — next-intl with cookie persistence, Accept-Language detection, and an AI-powered translation pipeline using parallel Claude Code agents
 - **Gamified demo tour** — 8-step tutorial with DOM-aware navigation hints, spotlight overlays, confetti celebrations, and auto-detection of task completion
@@ -104,13 +104,13 @@ Individual permissions can be overridden per-user — e.g. granting `person:crea
 | -------------- | ------- |
 | Zod schemas    | 71      |
 | Prisma queries | 38      |
-| Server actions | 106     |
+| Server actions | 111     |
 | Auth callbacks | 20      |
 | Audit logging  | 6       |
 | Rate limiting  | 12      |
 | RBAC logic     | 28      |
-| UI components  | 534     |
-| **Total**      | **818** |
+| UI components  | 545     |
+| **Total**      | **834** |
 
 ```
 Statements : 99.11%    Branches : 95.61%

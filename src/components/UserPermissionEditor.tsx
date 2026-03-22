@@ -1,6 +1,6 @@
 "use client";
 
-import { updateUserRole, updateUserPermission } from "@/serverActions";
+import { updateUserRole, updateUserPermission, kickOutUser } from "@/serverActions";
 import {
   colors,
   formStyles,
@@ -23,8 +23,10 @@ import {
 } from "@mui/material";
 import { useActionState, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import { completeTutorialStep } from "@/tutorialConfig";
 import { useSnackbar } from "./SnackbarProvider";
+import ConfirmDialog from "./ConfirmDialog";
 
 interface UserData {
   id: string;
@@ -61,11 +63,14 @@ export default function UserPermissionEditor({
   const tc = useTranslations("common");
   const tn = useTranslations("notifications");
   const { showSnackbar } = useSnackbar();
+  const router = useRouter();
   const [selectedRole, setSelectedRole] = useState(user.role);
   const roleChanged = selectedRole !== user.role;
   const isSuperuser = user.role === "superuser";
   const [isPending, startTransition] = useTransition();
   const [permError, setPermError] = useState<string | null>(null);
+  const [kickOutOpen, setKickOutOpen] = useState(false);
+  const [kickOutPending, setKickOutPending] = useState(false);
 
   const roleLabels: Record<string, string> = {
     superuser: t("roleSuperuser"),
@@ -105,6 +110,21 @@ export default function UserPermissionEditor({
         setPermError(e instanceof Error ? e.message : tc("error"));
       }
     });
+  };
+
+  const handleKickOut = async () => {
+    setKickOutPending(true);
+    try {
+      const formData = new FormData();
+      formData.set("userId", user.id);
+      await kickOutUser(formData);
+      showSnackbar(tn("userKickedOut", { name: user.name ?? user.email }));
+      router.push("/admin");
+    } catch (e) {
+      setPermError(e instanceof Error ? e.message : tc("error"));
+      setKickOutPending(false);
+    }
+    setKickOutOpen(false);
   };
 
   const formatKey = (key: string) => {
@@ -325,6 +345,42 @@ export default function UserPermissionEditor({
           ))
         )}
       </Box>
+
+      {!isSuperuser && (
+        <Box sx={formStyles}>
+          <Box sx={headerStyles}>
+            <Typography variant="h6" sx={{ color: colors.error }}>
+              {t("dangerZone")}
+            </Typography>
+          </Box>
+          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <Typography variant="body2" sx={{ color: colors.slate400 }}>
+              {t("kickOutDescription")}
+            </Typography>
+            <Button
+              onClick={() => setKickOutOpen(true)}
+              disabled={kickOutPending}
+              sx={{
+                color: colors.error,
+                borderColor: colors.error,
+                "&:hover": { backgroundColor: colors.errorBg, borderColor: colors.error },
+                minWidth: 120,
+              }}
+              variant="outlined"
+            >
+              {t("kickOut")}
+            </Button>
+          </Box>
+          <ConfirmDialog
+            open={kickOutOpen}
+            title={t("kickOutTitle")}
+            message={t("kickOutConfirm", { name: user.name ?? user.email })}
+            confirmLabel={t("kickOut")}
+            onConfirm={handleKickOut}
+            onCancel={() => setKickOutOpen(false)}
+          />
+        </Box>
+      )}
     </Box>
   );
 }

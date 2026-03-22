@@ -153,7 +153,12 @@
     "denied": "مرفوض",
     "granted": "ممنوح",
     "grant": "منح",
-    "deny": "رفض"
+    "deny": "رفض",
+    "dangerZone": "منطقة الخطر",
+    "kickOut": "طرد",
+    "kickOutTitle": "طرد المستخدم",
+    "kickOutDescription": "إزالة هذا المستخدم من النظام. سيفقد جميع صلاحيات الوصول وتجاوزات الأذونات.",
+    "kickOutConfirm": "هل أنت متأكد من طرد {name}؟ سيفقد صلاحيات الوصول وجميع تجاوزات الأذونات."
   },
   "audit": {
     "filterUser": "المستخدم",
@@ -165,6 +170,7 @@
     "actionCreate": "إنشاء",
     "actionUpdate": "تحديث",
     "actionDelete": "حذف",
+    "actionKickout": "طرد",
     "actionSeed": "تعبئة",
     "actionReset": "إعادة تعيين",
     "typePerson": "شخص",
@@ -196,6 +202,7 @@
     "deletedDepartment": "تم حذف القسم: {name}",
     "resetPermission": "تمت إعادة تعيين \"{label}\" لـ {target} إلى الإعداد الافتراضي للدور",
     "recordDeleted": "تم حذف السجل",
+    "kickedOutUser": "تم طرد {name} ({email}، الدور: {role})",
     "changedPosition": "تم تغيير المنصب من \"{oldValue}\" إلى \"{newValue}\"",
     "changedEmail": "تم تغيير البريد الإلكتروني من \"{oldValue}\" إلى \"{newValue}\"",
     "updatedPerson": "تم تحديث بيانات الشخص",
@@ -262,7 +269,8 @@
     "dataReset": "تم إعادة تعيين جميع البيانات بنجاح",
     "nameUpdated": "تم تحديث الاسم بنجاح",
     "teamRenamed": "تمت إعادة تسمية الفريق بنجاح",
-    "departmentUpdated": "تم تحديث القسم بنجاح"
+    "departmentUpdated": "تم تحديث القسم بنجاح",
+    "userKickedOut": "تم طرد {name}"
   },
   "tutorial": {
     "checklistTitle": "جولة تعريفية",

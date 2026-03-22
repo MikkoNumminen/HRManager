@@ -153,7 +153,12 @@
     "denied": "Запрещено",
     "granted": "Предоставлено",
     "grant": "Предоставить",
-    "deny": "Запретить"
+    "deny": "Запретить",
+    "dangerZone": "Опасная зона",
+    "kickOut": "Исключить",
+    "kickOutTitle": "Исключить пользователя",
+    "kickOutDescription": "Удалить этого пользователя из системы. Все права доступа и переопределения разрешений будут потеряны.",
+    "kickOutConfirm": "Вы уверены, что хотите исключить {name}? Все права доступа и переопределения разрешений будут потеряны."
   },
   "audit": {
     "filterUser": "Пользователь",
@@ -165,6 +170,7 @@
     "actionCreate": "Создание",
     "actionUpdate": "Обновление",
     "actionDelete": "Удаление",
+    "actionKickout": "Исключение",
     "actionSeed": "Тестовые данные",
     "actionReset": "Сброс",
     "typePerson": "Сотрудник",
@@ -196,6 +202,7 @@
     "deletedDepartment": "Удалён отдел: {name}",
     "resetPermission": "Право «{label}» пользователя {target} сброшено к умолчанию роли",
     "recordDeleted": "Запись удалена",
+    "kickedOutUser": "Исключён {name} ({email}, роль: {role})",
     "changedPosition": "Должность изменена с «{oldValue}» на «{newValue}»",
     "changedEmail": "Эл. почта изменена с «{oldValue}» на «{newValue}»",
     "updatedPerson": "Данные сотрудника обновлены",
@@ -262,7 +269,8 @@
     "dataReset": "Все данные успешно сброшены",
     "nameUpdated": "Имя успешно обновлено",
     "teamRenamed": "Команда успешно переименована",
-    "departmentUpdated": "Отдел успешно обновлён"
+    "departmentUpdated": "Отдел успешно обновлён",
+    "userKickedOut": "{name} был исключён"
   },
   "tutorial": {
     "checklistTitle": "Обзор демо",

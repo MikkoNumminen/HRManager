@@ -65,7 +65,7 @@ export const PermissionsSchema = z.record(z.string(), z.boolean());
 
 export type Permissions = z.infer<typeof PermissionsSchema>;
 
-export const AuditActionSchema = z.enum(["create", "update", "delete", "seed", "reset"]);
+export const AuditActionSchema = z.enum(["create", "update", "delete", "kickout", "seed", "reset"]);
 
 export const AuditEntityTypeSchema = z.enum([
   "person",

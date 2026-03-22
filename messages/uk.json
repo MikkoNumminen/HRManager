@@ -153,7 +153,12 @@
     "denied": "Заборонено",
     "granted": "Надано",
     "grant": "Надати",
-    "deny": "Заборонити"
+    "deny": "Заборонити",
+    "dangerZone": "Небезпечна зона",
+    "kickOut": "Виключити",
+    "kickOutTitle": "Виключити користувача",
+    "kickOutDescription": "Видалити цього користувача із системи. Усі права доступу та перевизначення дозволів будуть втрачені.",
+    "kickOutConfirm": "Ви впевнені, що хочете виключити {name}? Усі права доступу та перевизначення дозволів будуть втрачені."
   },
   "audit": {
     "filterUser": "Користувач",
@@ -165,6 +170,7 @@
     "actionCreate": "Створення",
     "actionUpdate": "Оновлення",
     "actionDelete": "Видалення",
+    "actionKickout": "Виключення",
     "actionSeed": "Заповнення",
     "actionReset": "Скидання",
     "typePerson": "Співробітник",
@@ -196,6 +202,7 @@
     "deletedDepartment": "Видалено відділ: {name}",
     "resetPermission": "Скинуто \"{label}\" для {target} до значення за замовчуванням",
     "recordDeleted": "Запис видалено",
+    "kickedOutUser": "Виключено {name} ({email}, роль: {role})",
     "changedPosition": "Змінено посаду з \"{oldValue}\" на \"{newValue}\"",
     "changedEmail": "Змінено електронну пошту з \"{oldValue}\" на \"{newValue}\"",
     "updatedPerson": "Оновлено дані співробітника",
@@ -262,7 +269,8 @@
     "dataReset": "Усі дані успішно скинуто",
     "nameUpdated": "Ім'я успішно оновлено",
     "teamRenamed": "Команду успішно перейменовано",
-    "departmentUpdated": "Відділ успішно оновлено"
+    "departmentUpdated": "Відділ успішно оновлено",
+    "userKickedOut": "{name} було виключено"
   },
   "tutorial": {
     "checklistTitle": "Огляд демо",

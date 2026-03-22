@@ -153,7 +153,12 @@
     "denied": "अस्वीकृत",
     "granted": "प्रदत्त",
     "grant": "अनुदान",
-    "deny": "अस्वीकार"
+    "deny": "अस्वीकार",
+    "dangerZone": "खतरनाक क्षेत्र",
+    "kickOut": "निकालें",
+    "kickOutTitle": "उपयोगकर्ता को निकालें",
+    "kickOutDescription": "इस उपयोगकर्ता को सिस्टम से हटाएँ। सभी पहुँच और अनुमति ओवरराइड खो जाएँगे।",
+    "kickOutConfirm": "क्या आप वाकई {name} को निकालना चाहते हैं? पहुँच और सभी अनुमति ओवरराइड खो जाएँगे।"
   },
   "audit": {
     "filterUser": "उपयोगकर्ता",
@@ -165,6 +170,7 @@
     "actionCreate": "बनाना",
     "actionUpdate": "अपडेट",
     "actionDelete": "हटाना",
+    "actionKickout": "निकासी",
     "actionSeed": "सीड",
     "actionReset": "रीसेट",
     "typePerson": "व्यक्ति",
@@ -196,6 +202,7 @@
     "deletedDepartment": "विभाग हटाया गया: {name}",
     "resetPermission": "{target} की \"{label}\" भूमिका डिफ़ॉल्ट पर रीसेट की गई",
     "recordDeleted": "रिकॉर्ड हटाया गया",
+    "kickedOutUser": "{name} को निकाला गया ({email}, भूमिका: {role})",
     "changedPosition": "पद \"{oldValue}\" से \"{newValue}\" में बदला गया",
     "changedEmail": "ईमेल \"{oldValue}\" से \"{newValue}\" में बदला गया",
     "updatedPerson": "व्यक्ति का विवरण अपडेट किया गया",
@@ -262,7 +269,8 @@
     "dataReset": "सभी डेटा सफलतापूर्वक रीसेट किया गया",
     "nameUpdated": "नाम सफलतापूर्वक अपडेट किया गया",
     "teamRenamed": "टीम का नाम सफलतापूर्वक बदला गया",
-    "departmentUpdated": "विभाग सफलतापूर्वक अपडेट किया गया"
+    "departmentUpdated": "विभाग सफलतापूर्वक अपडेट किया गया",
+    "userKickedOut": "{name} को निकाल दिया गया है"
   },
   "tutorial": {
     "checklistTitle": "डेमो टूर",

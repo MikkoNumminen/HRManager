@@ -693,4 +693,45 @@ describe("AuditLogViewer", () => {
     expect(mockPush).toHaveBeenCalledWith(expect.stringContaining("pageSize=50"));
     expect(mockPush).toHaveBeenCalledWith(expect.stringContaining("page=1"));
   });
+
+  // Renders kickout action chip with the correct label.
+  test("renders kickout action chip", () => {
+    const log = makelog({ action: "kickout" });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(screen.getByText("kickout")).toBeInTheDocument();
+  });
+
+  // Describes kicking out a user in plain language with name, email, and role.
+  test("describes user kickout in Barney style", () => {
+    const log = makelog({
+      action: "kickout",
+      entityType: "user",
+      before: '{"name":"Bob","email":"bob@test.com","role":"user"}',
+      after: null,
+    });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(screen.getAllByText("Kicked out Bob (bob@test.com, role: user)").length).toBeGreaterThan(
+      0,
+    );
+  });
+
+  // Falls back to generic "Record deleted" when kickout is on a non-user entity.
+  test("describes kickout on non-user entity as generic record deleted", () => {
+    const log = makelog({
+      action: "kickout",
+      entityType: "person",
+      before: "{}",
+      after: null,
+    });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(screen.getAllByText("Record deleted").length).toBeGreaterThan(0);
+  });
+
+  // Shows "Kick Out" option in the action filter dropdown.
+  test("shows Kick Out in action filter dropdown", () => {
+    render(<AuditLogViewer logs={[]} {...defaultProps} />);
+    const actionSelect = screen.getAllByRole("combobox")[1];
+    fireEvent.mouseDown(actionSelect);
+    expect(screen.getByRole("option", { name: "Kick Out" })).toBeInTheDocument();
+  });
 });

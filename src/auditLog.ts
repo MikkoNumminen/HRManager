@@ -2,7 +2,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/db";
 import { getCurrentUser } from "@/permissions";
 
-export type AuditAction = "create" | "update" | "delete" | "seed" | "reset";
+export type AuditAction = "create" | "update" | "delete" | "kickout" | "seed" | "reset";
 
 export type AuditEntityType =
   | "person"

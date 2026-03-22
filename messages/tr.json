@@ -153,7 +153,12 @@
     "denied": "Reddedildi",
     "granted": "Verildi",
     "grant": "Ver",
-    "deny": "Reddet"
+    "deny": "Reddet",
+    "dangerZone": "Tehlikeli Bölge",
+    "kickOut": "At",
+    "kickOutTitle": "Kullanıcıyı At",
+    "kickOutDescription": "Bu kullanıcıyı sistemden kaldırın. Tüm erişim hakları ve izin geçersiz kılmaları kaybedilecektir.",
+    "kickOutConfirm": "{name} kullanıcısını atmak istediğinizden emin misiniz? Erişim hakları ve tüm izin geçersiz kılmaları kaybedilecektir."
   },
   "audit": {
     "filterUser": "Kullanıcı",
@@ -165,6 +170,7 @@
     "actionCreate": "Oluşturma",
     "actionUpdate": "Güncelleme",
     "actionDelete": "Silme",
+    "actionKickout": "Atma",
     "actionSeed": "Test verileri",
     "actionReset": "Sıfırlama",
     "typePerson": "Kişi",
@@ -196,6 +202,7 @@
     "deletedDepartment": "Departman silindi: {name}",
     "resetPermission": "{target} kullanıcısının \"{label}\" izni rol varsayılanına sıfırlandı",
     "recordDeleted": "Kayıt silindi",
+    "kickedOutUser": "{name} atıldı ({email}, rol: {role})",
     "changedPosition": "Pozisyon \"{oldValue}\" yerine \"{newValue}\" olarak değiştirildi",
     "changedEmail": "E-posta \"{oldValue}\" yerine \"{newValue}\" olarak değiştirildi",
     "updatedPerson": "Kişi bilgileri güncellendi",
@@ -262,7 +269,8 @@
     "dataReset": "Tüm veriler başarıyla sıfırlandı",
     "nameUpdated": "Ad başarıyla güncellendi",
     "teamRenamed": "Ekip başarıyla yeniden adlandırıldı",
-    "departmentUpdated": "Departman başarıyla güncellendi"
+    "departmentUpdated": "Departman başarıyla güncellendi",
+    "userKickedOut": "{name} atıldı"
   },
   "tutorial": {
     "checklistTitle": "Demo Turu",

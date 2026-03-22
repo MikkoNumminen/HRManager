@@ -1,10 +1,17 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import UserPermissionEditor from "../components/UserPermissionEditor";
-import { updateUserRole, updateUserPermission } from "../serverActions";
+import { updateUserRole, updateUserPermission, kickOutUser } from "../serverActions";
+
+const mockPush = jest.fn();
+
+jest.mock("next/navigation", () => ({
+  useRouter: () => ({ push: mockPush }),
+}));
 
 jest.mock("../serverActions", () => ({
   updateUserRole: jest.fn(),
   updateUserPermission: jest.fn(),
+  kickOutUser: jest.fn(),
 }));
 
 const roleDefaults: Record<string, string[]> = {
@@ -26,6 +33,10 @@ const baseUser = {
 const allKeys = ["person:create", "person:read", "admin:manage_users"];
 
 describe("UserPermissionEditor", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   // Shows the user's current role in the header
   test("displays the user role chip", () => {
     render(
@@ -416,5 +427,137 @@ describe("UserPermissionEditor", () => {
       />,
     );
     expect(screen.getByText("unknown (alice@example.com)")).toBeInTheDocument();
+  });
+
+  // Shows "Danger Zone" section with "Kick Out" button for non-superuser
+  test("shows kick out button for non-superuser", () => {
+    render(
+      <UserPermissionEditor
+        user={baseUser}
+        allPermissionKeys={allKeys}
+        roleDefaults={roleDefaults}
+        canAssignPermissions={true}
+      />,
+    );
+    expect(screen.getByText("Danger Zone")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Kick Out/i })).toBeInTheDocument();
+  });
+
+  // Hides the danger zone / kick out section for superusers
+  test("hides kick out button for superuser", () => {
+    const superUser = { ...baseUser, role: "superuser" };
+    render(
+      <UserPermissionEditor
+        user={superUser}
+        allPermissionKeys={allKeys}
+        roleDefaults={roleDefaults}
+        canAssignPermissions={true}
+      />,
+    );
+    expect(screen.queryByText("Danger Zone")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Kick Out/i })).not.toBeInTheDocument();
+  });
+
+  // Clicking the kick out button opens the confirmation dialog
+  test("opens confirmation dialog when kick out is clicked", () => {
+    render(
+      <UserPermissionEditor
+        user={baseUser}
+        allPermissionKeys={allKeys}
+        roleDefaults={roleDefaults}
+        canAssignPermissions={true}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: /Kick Out/i }));
+    expect(
+      screen.getByText(
+        "Are you sure you want to kick out Alice? They will lose access and all permission overrides.",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  // Confirming the kick out dialog calls kickOutUser and redirects
+  test("calls kickOutUser and redirects on confirm", async () => {
+    (kickOutUser as jest.Mock).mockResolvedValue(undefined);
+    render(
+      <UserPermissionEditor
+        user={baseUser}
+        allPermissionKeys={allKeys}
+        roleDefaults={roleDefaults}
+        canAssignPermissions={true}
+      />,
+    );
+    // Open the dialog
+    fireEvent.click(screen.getByRole("button", { name: /Kick Out/i }));
+    // Click the confirm button inside the dialog
+    const confirmButtons = screen.getAllByRole("button", { name: /Kick Out/i });
+    const dialogConfirm = confirmButtons[confirmButtons.length - 1];
+    fireEvent.click(dialogConfirm);
+
+    await waitFor(() => {
+      expect(kickOutUser).toHaveBeenCalled();
+    });
+    await waitFor(() => {
+      expect(mockPush).toHaveBeenCalledWith("/admin");
+    });
+  });
+
+  // Shows error when kickOutUser fails
+  test("shows error when kick out fails", async () => {
+    (kickOutUser as jest.Mock).mockRejectedValue(new Error("Cannot kick out"));
+    render(
+      <UserPermissionEditor
+        user={baseUser}
+        allPermissionKeys={allKeys}
+        roleDefaults={roleDefaults}
+        canAssignPermissions={true}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: /Kick Out/i }));
+    const confirmButtons = screen.getAllByRole("button", { name: /Kick Out/i });
+    fireEvent.click(confirmButtons[confirmButtons.length - 1]);
+
+    await waitFor(() => {
+      expect(screen.getByText("Cannot kick out")).toBeInTheDocument();
+    });
+  });
+
+  // Shows generic error when kickOutUser throws a non-Error value
+  test("shows generic error when kick out throws non-Error", async () => {
+    (kickOutUser as jest.Mock).mockRejectedValue("string error");
+    render(
+      <UserPermissionEditor
+        user={baseUser}
+        allPermissionKeys={allKeys}
+        roleDefaults={roleDefaults}
+        canAssignPermissions={true}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: /Kick Out/i }));
+    const confirmButtons = screen.getAllByRole("button", { name: /Kick Out/i });
+    fireEvent.click(confirmButtons[confirmButtons.length - 1]);
+
+    await waitFor(() => {
+      expect(screen.getByText("An error occurred")).toBeInTheDocument();
+    });
+  });
+
+  // Uses email as display name for kick out confirm when user name is null
+  test("kick out confirm dialog uses email when name is null", () => {
+    const nullNameUser = { ...baseUser, name: null as string | null };
+    render(
+      <UserPermissionEditor
+        user={nullNameUser}
+        allPermissionKeys={allKeys}
+        roleDefaults={roleDefaults}
+        canAssignPermissions={true}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: /Kick Out/i }));
+    expect(
+      screen.getByText(
+        "Are you sure you want to kick out alice@example.com? They will lose access and all permission overrides.",
+      ),
+    ).toBeInTheDocument();
   });
 });

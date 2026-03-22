@@ -153,7 +153,12 @@
     "denied": "拒否",
     "granted": "付与済み",
     "grant": "許可する",
-    "deny": "拒否する"
+    "deny": "拒否する",
+    "dangerZone": "危険ゾーン",
+    "kickOut": "追放",
+    "kickOutTitle": "ユーザーを追放",
+    "kickOutDescription": "このユーザーをシステムから削除します。すべてのアクセス権と権限の上書きが失われます。",
+    "kickOutConfirm": "{name}を追放してもよろしいですか？アクセス権とすべての権限の上書きが失われます。"
   },
   "audit": {
     "filterUser": "ユーザー",
@@ -165,6 +170,7 @@
     "actionCreate": "作成",
     "actionUpdate": "更新",
     "actionDelete": "削除",
+    "actionKickout": "追放",
     "actionSeed": "シード",
     "actionReset": "リセット",
     "typePerson": "人員",
@@ -196,6 +202,7 @@
     "deletedDepartment": "部門を削除しました: {name}",
     "resetPermission": "{target}の「{label}」をロールデフォルトにリセットしました",
     "recordDeleted": "レコードを削除しました",
+    "kickedOutUser": "{name}を追放しました（{email}、役割：{role}）",
     "changedPosition": "役職を「{oldValue}」から「{newValue}」に変更しました",
     "changedEmail": "メールアドレスを「{oldValue}」から「{newValue}」に変更しました",
     "updatedPerson": "人員の詳細を更新しました",
@@ -262,7 +269,8 @@
     "dataReset": "すべてのデータをリセットしました",
     "nameUpdated": "名前を更新しました",
     "teamRenamed": "チーム名を変更しました",
-    "departmentUpdated": "部門を更新しました"
+    "departmentUpdated": "部門を更新しました",
+    "userKickedOut": "{name}が追放されました"
   },
   "tutorial": {
     "checklistTitle": "デモツアー",

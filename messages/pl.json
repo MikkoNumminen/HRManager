@@ -153,7 +153,12 @@
     "denied": "Odmówione",
     "granted": "Przyznane",
     "grant": "Przyznaj",
-    "deny": "Odmów"
+    "deny": "Odmów",
+    "dangerZone": "Strefa zagrożenia",
+    "kickOut": "Wyrzuć",
+    "kickOutTitle": "Wyrzuć użytkownika",
+    "kickOutDescription": "Usuń tego użytkownika z systemu. Utraci wszystkie uprawnienia dostępu i nadpisania uprawnień.",
+    "kickOutConfirm": "Czy na pewno chcesz wyrzucić {name}? Utraci dostęp i wszystkie nadpisania uprawnień."
   },
   "audit": {
     "filterUser": "Użytkownik",
@@ -165,6 +170,7 @@
     "actionCreate": "Tworzenie",
     "actionUpdate": "Aktualizacja",
     "actionDelete": "Usuwanie",
+    "actionKickout": "Wyrzucenie",
     "actionSeed": "Dane testowe",
     "actionReset": "Resetowanie",
     "typePerson": "Osoba",
@@ -196,6 +202,7 @@
     "deletedDepartment": "Usunięto dział: {name}",
     "resetPermission": "Zresetowano uprawnienie „{label}” użytkownika {target} do domyślnych roli",
     "recordDeleted": "Rekord usunięty",
+    "kickedOutUser": "Wyrzucono {name} ({email}, rola: {role})",
     "changedPosition": "Zmieniono stanowisko z „{oldValue}” na „{newValue}”",
     "changedEmail": "Zmieniono e-mail z „{oldValue}” na „{newValue}”",
     "updatedPerson": "Zaktualizowano dane osoby",
@@ -262,7 +269,8 @@
     "dataReset": "Wszystkie dane zresetowane pomyślnie",
     "nameUpdated": "Imię zaktualizowane pomyślnie",
     "teamRenamed": "Nazwa zespołu zmieniona pomyślnie",
-    "departmentUpdated": "Dział zaktualizowany pomyślnie"
+    "departmentUpdated": "Dział zaktualizowany pomyślnie",
+    "userKickedOut": "{name} został wyrzucony"
   },
   "tutorial": {
     "checklistTitle": "Przewodnik demo",

@@ -153,7 +153,12 @@
     "denied": "거부",
     "granted": "부여됨",
     "grant": "부여",
-    "deny": "거부"
+    "deny": "거부",
+    "dangerZone": "위험 구역",
+    "kickOut": "추방",
+    "kickOutTitle": "사용자 추방",
+    "kickOutDescription": "이 사용자를 시스템에서 제거합니다. 모든 접근 권한과 권한 재정의가 삭제됩니다.",
+    "kickOutConfirm": "{name}을(를) 추방하시겠습니까? 접근 권한과 모든 권한 재정의가 삭제됩니다."
   },
   "audit": {
     "filterUser": "사용자",
@@ -165,6 +170,7 @@
     "actionCreate": "생성",
     "actionUpdate": "수정",
     "actionDelete": "삭제",
+    "actionKickout": "추방",
     "actionSeed": "시드",
     "actionReset": "초기화",
     "typePerson": "인원",
@@ -196,6 +202,7 @@
     "deletedDepartment": "부서를 삭제했습니다: {name}",
     "resetPermission": "{target}의 \"{label}\"을(를) 역할 기본값으로 초기화했습니다",
     "recordDeleted": "레코드가 삭제되었습니다",
+    "kickedOutUser": "{name}을(를) 추방했습니다 ({email}, 역할: {role})",
     "changedPosition": "직책을 \"{oldValue}\"에서 \"{newValue}\"(으)로 변경했습니다",
     "changedEmail": "이메일을 \"{oldValue}\"에서 \"{newValue}\"(으)로 변경했습니다",
     "updatedPerson": "인원 정보를 수정했습니다",
@@ -262,7 +269,8 @@
     "dataReset": "모든 데이터가 초기화되었습니다",
     "nameUpdated": "이름이 업데이트되었습니다",
     "teamRenamed": "팀 이름이 변경되었습니다",
-    "departmentUpdated": "부서가 업데이트되었습니다"
+    "departmentUpdated": "부서가 업데이트되었습니다",
+    "userKickedOut": "{name}이(가) 추방되었습니다"
   },
   "tutorial": {
     "checklistTitle": "데모 투어",

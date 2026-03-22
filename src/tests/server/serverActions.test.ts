@@ -62,6 +62,7 @@ import {
   initializePermissions,
   updateUserRole,
   updateUserPermission,
+  kickOutUser,
 } from "@/serverActions";
 
 // Helper to build FormData — server actions receive form submissions,
@@ -1388,5 +1389,64 @@ describe("removeTeamFromDepartment", () => {
   // Throws when teamID is missing.
   test("throws on missing teamID", async () => {
     await expect(removeTeamFromDepartment(formData({}))).rejects.toThrow("No teamID provided");
+  });
+});
+
+describe("kickOutUser", () => {
+  beforeEach(() => cleanDb());
+  afterAll(async () => {
+    await cleanDb();
+  });
+
+  // Deletes the user and all their permission overrides from the database.
+  test("removes user and their permissions", async () => {
+    const user = await testPrisma.user.create({
+      data: { email: "kick@test.com", name: "Kickable", role: "user" },
+    });
+    const perm = await testPrisma.permission.findFirst({ where: { key: "person:read" } });
+    if (perm) {
+      await testPrisma.userPermission.create({
+        data: { userId: user.id, permissionId: perm.id, granted: true },
+      });
+    }
+
+    await kickOutUser(formData({ userId: user.id }));
+
+    const deletedUser = await testPrisma.user.findUnique({ where: { id: user.id } });
+    expect(deletedUser).toBeNull();
+    const perms = await testPrisma.userPermission.findMany({ where: { userId: user.id } });
+    expect(perms).toHaveLength(0);
+  });
+
+  // Refuses to kick out a superuser — they are untouchable.
+  test("throws when trying to kick out a superuser", async () => {
+    const superuser = await testPrisma.user.create({
+      data: { email: "super@test.com", name: "Super", role: "superuser" },
+    });
+
+    await expect(kickOutUser(formData({ userId: superuser.id }))).rejects.toThrow(
+      "Cannot kick out the superuser",
+    );
+
+    // Verify user was not deleted
+    const stillExists = await testPrisma.user.findUnique({ where: { id: superuser.id } });
+    expect(stillExists).not.toBeNull();
+  });
+
+  // Throws when no userId is provided in the form data.
+  test("throws on missing userId", async () => {
+    await expect(kickOutUser(formData({}))).rejects.toThrow("No userId provided");
+  });
+
+  // Throws when the userId doesn't match any user in the database.
+  test("throws on non-existent user", async () => {
+    await expect(
+      kickOutUser(formData({ userId: "00000000-0000-0000-0000-000000000000" })),
+    ).rejects.toThrow("User not found");
+  });
+
+  // Throws when userId is not a valid UUID format.
+  test("throws on invalid UUID", async () => {
+    await expect(kickOutUser(formData({ userId: "not-a-uuid" }))).rejects.toThrow();
   });
 });

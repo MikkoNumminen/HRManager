@@ -83,6 +83,7 @@ export default function AuditLogViewer({
     create: t("actionCreate"),
     update: t("actionUpdate"),
     delete: t("actionDelete"),
+    kickout: t("actionKickout"),
     seed: t("actionSeed"),
     reset: t("actionReset"),
   };
@@ -151,6 +152,17 @@ export default function AuditLogViewer({
           const label = permissionLabels[key] ?? key;
           const target = resolveTarget();
           return t("resetPermission", { target, label });
+        }
+        return t("recordDeleted");
+      }
+
+      if (action === "kickout") {
+        if (entityType === "user") {
+          return t("kickedOutUser", {
+            name: b?.name ?? unknown,
+            email: b?.email ?? "",
+            role: b?.role ?? "",
+          });
         }
         return t("recordDeleted");
       }

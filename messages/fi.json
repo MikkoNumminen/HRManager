@@ -153,7 +153,12 @@
     "denied": "Estetty",
     "granted": "Myönnetty",
     "grant": "Myönnä",
-    "deny": "Estä"
+    "deny": "Estä",
+    "dangerZone": "Vaaravyöhyke",
+    "kickOut": "Poista käyttäjä",
+    "kickOutTitle": "Poista käyttäjä",
+    "kickOutDescription": "Poista tämä käyttäjä järjestelmästä. He menettävät kaikki käyttöoikeudet ja ohitukset.",
+    "kickOutConfirm": "Haluatko varmasti poistaa käyttäjän {name}? He menettävät käyttöoikeutensa ja kaikki ohitukset."
   },
   "audit": {
     "filterUser": "Käyttäjä",
@@ -165,6 +170,7 @@
     "actionCreate": "Luonti",
     "actionUpdate": "Päivitys",
     "actionDelete": "Poisto",
+    "actionKickout": "Poisto",
     "actionSeed": "Esimerkkitiedot",
     "actionReset": "Tyhjennys",
     "typePerson": "Henkilö",
@@ -196,6 +202,7 @@
     "deletedDepartment": "Poistettiin osasto: {name}",
     "resetPermission": "Palautettiin käyttäjän {target} oikeus \"{label}\" roolin oletukseen",
     "recordDeleted": "Tietue poistettu",
+    "kickedOutUser": "Poistettiin {name} ({email}, rooli: {role})",
     "changedPosition": "Tehtävänimike vaihdettu: \"{oldValue}\" → \"{newValue}\"",
     "changedEmail": "Sähköposti vaihdettu: \"{oldValue}\" → \"{newValue}\"",
     "updatedPerson": "Henkilötietoja päivitetty",
@@ -262,7 +269,8 @@
     "dataReset": "Kaikki tiedot nollattu onnistuneesti",
     "nameUpdated": "Nimi päivitetty onnistuneesti",
     "teamRenamed": "Tiimi nimetty uudelleen onnistuneesti",
-    "departmentUpdated": "Osasto päivitetty onnistuneesti"
+    "departmentUpdated": "Osasto päivitetty onnistuneesti",
+    "userKickedOut": "{name} on poistettu järjestelmästä"
   },
   "tutorial": {
     "checklistTitle": "Demokierros",

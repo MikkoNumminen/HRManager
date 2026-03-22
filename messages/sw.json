@@ -153,7 +153,12 @@
     "denied": "Imezuiwa",
     "granted": "Imetolewa",
     "grant": "Ruhusu",
-    "deny": "Zuia"
+    "deny": "Zuia",
+    "dangerZone": "Eneo Hatari",
+    "kickOut": "Fukuza",
+    "kickOutTitle": "Fukuza Mtumiaji",
+    "kickOutDescription": "Ondoa mtumiaji huyu kutoka kwenye mfumo. Atapoteza ufikiaji wote na ubatilishaji wa ruhusa.",
+    "kickOutConfirm": "Una uhakika unataka kumfukuza {name}? Atapoteza ufikiaji na ubatilishaji wote wa ruhusa."
   },
   "audit": {
     "filterUser": "Mtumiaji",
@@ -165,6 +170,7 @@
     "actionCreate": "Kuunda",
     "actionUpdate": "Kusasisha",
     "actionDelete": "Kufuta",
+    "actionKickout": "Kufukuzwa",
     "actionSeed": "Data ya majaribio",
     "actionReset": "Kuweka upya",
     "typePerson": "Mtu",
@@ -196,6 +202,7 @@
     "deletedDepartment": "Idara imefutwa: {name}",
     "resetPermission": "Ruhusa \"{label}\" ya {target} imewekwa upya kwenye chaguo-msingi la jukumu",
     "recordDeleted": "Rekodi imefutwa",
+    "kickedOutUser": "Amefukuzwa {name} ({email}, jukumu: {role})",
     "changedPosition": "Nafasi imebadilishwa kutoka \"{oldValue}\" hadi \"{newValue}\"",
     "changedEmail": "Barua pepe imebadilishwa kutoka \"{oldValue}\" hadi \"{newValue}\"",
     "updatedPerson": "Maelezo ya mtu yamesasishwa",
@@ -262,7 +269,8 @@
     "dataReset": "Data yote imewekwa upya kwa mafanikio",
     "nameUpdated": "Jina limesasishwa kwa mafanikio",
     "teamRenamed": "Timu imebadilishwa jina kwa mafanikio",
-    "departmentUpdated": "Idara imesasishwa kwa mafanikio"
+    "departmentUpdated": "Idara imesasishwa kwa mafanikio",
+    "userKickedOut": "{name} amefukuzwa"
   },
   "tutorial": {
     "checklistTitle": "Ziara ya Demo",

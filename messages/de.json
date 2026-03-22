@@ -153,7 +153,12 @@
     "denied": "Verweigert",
     "granted": "Gewährt",
     "grant": "Gewähren",
-    "deny": "Verweigern"
+    "deny": "Verweigern",
+    "dangerZone": "Gefahrenzone",
+    "kickOut": "Rauswerfen",
+    "kickOutTitle": "Benutzer rauswerfen",
+    "kickOutDescription": "Diesen Benutzer aus dem System entfernen. Alle Zugriffsrechte und Berechtigungsüberschreibungen gehen verloren.",
+    "kickOutConfirm": "Möchten Sie {name} wirklich rauswerfen? Alle Zugriffsrechte und Berechtigungsüberschreibungen gehen verloren."
   },
   "audit": {
     "filterUser": "Benutzer",
@@ -165,6 +170,7 @@
     "actionCreate": "Erstellen",
     "actionUpdate": "Aktualisieren",
     "actionDelete": "Löschen",
+    "actionKickout": "Rauswurf",
     "actionSeed": "Testdaten",
     "actionReset": "Zurücksetzen",
     "typePerson": "Person",
@@ -196,6 +202,7 @@
     "deletedDepartment": "Abteilung gelöscht: {name}",
     "resetPermission": "Berechtigung \"{label}\" von {target} auf Rollenstandard zurückgesetzt",
     "recordDeleted": "Datensatz gelöscht",
+    "kickedOutUser": "{name} wurde rausgeworfen ({email}, Rolle: {role})",
     "changedPosition": "Position geändert von \"{oldValue}\" zu \"{newValue}\"",
     "changedEmail": "E-Mail geändert von \"{oldValue}\" zu \"{newValue}\"",
     "updatedPerson": "Personendaten aktualisiert",
@@ -262,7 +269,8 @@
     "dataReset": "Alle Daten erfolgreich zurückgesetzt",
     "nameUpdated": "Name erfolgreich aktualisiert",
     "teamRenamed": "Team erfolgreich umbenannt",
-    "departmentUpdated": "Abteilung erfolgreich aktualisiert"
+    "departmentUpdated": "Abteilung erfolgreich aktualisiert",
+    "userKickedOut": "{name} wurde rausgeworfen"
   },
   "tutorial": {
     "checklistTitle": "Demo-Rundgang",

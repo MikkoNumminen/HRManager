@@ -153,7 +153,12 @@
     "denied": "Denegado",
     "granted": "Otorgado",
     "grant": "Otorgar",
-    "deny": "Denegar"
+    "deny": "Denegar",
+    "dangerZone": "Zona de peligro",
+    "kickOut": "Expulsar",
+    "kickOutTitle": "Expulsar usuario",
+    "kickOutDescription": "Eliminar este usuario del sistema. Perderá todos los accesos y las anulaciones de permisos.",
+    "kickOutConfirm": "¿Estás seguro de que quieres expulsar a {name}? Perderá sus accesos y todas las anulaciones de permisos."
   },
   "audit": {
     "filterUser": "Usuario",
@@ -165,6 +170,7 @@
     "actionCreate": "Crear",
     "actionUpdate": "Actualizar",
     "actionDelete": "Eliminar",
+    "actionKickout": "Expulsión",
     "actionSeed": "Datos de prueba",
     "actionReset": "Restablecer",
     "typePerson": "Persona",
@@ -196,6 +202,7 @@
     "deletedDepartment": "Departamento eliminado: {name}",
     "resetPermission": "Se restableció «{label}» de {target} al predeterminado del rol",
     "recordDeleted": "Registro eliminado",
+    "kickedOutUser": "Se expulsó a {name} ({email}, rol: {role})",
     "changedPosition": "Cargo cambiado de «{oldValue}» a «{newValue}»",
     "changedEmail": "Correo cambiado de «{oldValue}» a «{newValue}»",
     "updatedPerson": "Detalles de persona actualizados",
@@ -262,7 +269,8 @@
     "dataReset": "Todos los datos restablecidos correctamente",
     "nameUpdated": "Nombre actualizado correctamente",
     "teamRenamed": "Equipo renombrado correctamente",
-    "departmentUpdated": "Departamento actualizado correctamente"
+    "departmentUpdated": "Departamento actualizado correctamente",
+    "userKickedOut": "{name} ha sido expulsado"
   },
   "tutorial": {
     "checklistTitle": "Visita guiada",

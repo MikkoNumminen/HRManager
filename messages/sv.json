@@ -153,7 +153,12 @@
     "denied": "Nekad",
     "granted": "Beviljad",
     "grant": "Bevilja",
-    "deny": "Neka"
+    "deny": "Neka",
+    "dangerZone": "Farozon",
+    "kickOut": "Sparka ut",
+    "kickOutTitle": "Sparka ut användare",
+    "kickOutDescription": "Ta bort denna användare från systemet. De förlorar all åtkomst och behörighetsöverskridanden.",
+    "kickOutConfirm": "Är du säker på att du vill sparka ut {name}? De förlorar åtkomst och alla behörighetsöverskridanden."
   },
   "audit": {
     "filterUser": "Användare",
@@ -165,6 +170,7 @@
     "actionCreate": "Skapa",
     "actionUpdate": "Uppdatera",
     "actionDelete": "Ta bort",
+    "actionKickout": "Utsparkning",
     "actionSeed": "Testdata",
     "actionReset": "Rensa",
     "typePerson": "Person",
@@ -196,6 +202,7 @@
     "deletedDepartment": "Tog bort avdelning: {name}",
     "resetPermission": "Återställde {target}s \"{label}\" till rollstandard",
     "recordDeleted": "Post borttagen",
+    "kickedOutUser": "{name} sparkades ut ({email}, roll: {role})",
     "changedPosition": "Ändrade befattning från \"{oldValue}\" till \"{newValue}\"",
     "changedEmail": "Ändrade e-post från \"{oldValue}\" till \"{newValue}\"",
     "updatedPerson": "Uppdaterade personuppgifter",
@@ -262,7 +269,8 @@
     "dataReset": "All data återställd",
     "nameUpdated": "Namn uppdaterat",
     "teamRenamed": "Teamnamn ändrat",
-    "departmentUpdated": "Avdelning uppdaterad"
+    "departmentUpdated": "Avdelning uppdaterad",
+    "userKickedOut": "{name} har sparkats ut"
   },
   "tutorial": {
     "checklistTitle": "Demoguide",

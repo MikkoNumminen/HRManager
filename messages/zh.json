@@ -153,7 +153,12 @@
     "denied": "拒绝",
     "granted": "已授予",
     "grant": "授予",
-    "deny": "拒绝"
+    "deny": "拒绝",
+    "dangerZone": "危险区域",
+    "kickOut": "踢出",
+    "kickOutTitle": "踢出用户",
+    "kickOutDescription": "从系统中移除此用户。他们将失去所有访问权限和权限覆盖。",
+    "kickOutConfirm": "确定要踢出{name}吗？他们将失去访问权限和所有权限覆盖。"
   },
   "audit": {
     "filterUser": "用户",
@@ -165,6 +170,7 @@
     "actionCreate": "创建",
     "actionUpdate": "更新",
     "actionDelete": "删除",
+    "actionKickout": "踢出",
     "actionSeed": "填充",
     "actionReset": "重置",
     "typePerson": "人员",
@@ -196,6 +202,7 @@
     "deletedDepartment": "删除了部门：{name}",
     "resetPermission": "已将{target}的\"{label}\"重置为角色默认值",
     "recordDeleted": "记录已删除",
+    "kickedOutUser": "踢出了{name}（{email}，角色：{role}）",
     "changedPosition": "职位从\"{oldValue}\"更改为\"{newValue}\"",
     "changedEmail": "邮箱从\"{oldValue}\"更改为\"{newValue}\"",
     "updatedPerson": "更新了人员详情",
@@ -262,7 +269,8 @@
     "dataReset": "所有数据重置成功",
     "nameUpdated": "姓名更新成功",
     "teamRenamed": "团队重命名成功",
-    "departmentUpdated": "部门更新成功"
+    "departmentUpdated": "部门更新成功",
+    "userKickedOut": "{name}已被踢出"
   },
   "tutorial": {
     "checklistTitle": "演示导览",
