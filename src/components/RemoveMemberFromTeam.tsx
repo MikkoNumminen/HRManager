@@ -1,7 +1,13 @@
 "use client";
 
 import { removeMember } from "@/serverActions";
-import { activeButtonStyles, formStyles, headerStyles, smallButtonStyles } from "@/muiStyles";
+import {
+  activeButtonStyles,
+  formButtonContainerStyles,
+  formStyles,
+  headerStyles,
+  smallButtonStyles,
+} from "@/muiStyles";
 import { Box, Button, Typography } from "@mui/material";
 import { useActionState, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
@@ -74,7 +80,7 @@ const RemoveMemberForm: React.FC<{
         ))}
       </Box>
 
-      <Box display="flex" gap={1} justifyContent="flex-end">
+      <Box sx={formButtonContainerStyles}>
         <Button
           disabled={!selectedMember || isPending}
           onClick={() => setDialogOpen(true)}

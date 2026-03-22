@@ -11,14 +11,20 @@ In Progress items must show the owner: `[worktree-name]` or `[main]`.
 - 🔴 Mobile-first redesign `[main]`
   - [x] TopBar: hamburger menu + drawer for mobile navigation
   - [x] Tables: card/list view on mobile (< sm breakpoint)
-  - [ ] Forms: full-width inputs, responsive button layout
+  - [x] Forms: full-width inputs, responsive button layout
   - [ ] AuditLogViewer: collapsible filters, card view for entries
   - [ ] Layout: responsive container + manage page padding
   - [ ] muiStyles.ts: add mobile-first responsive tokens
   - [ ] Tests for new responsive behavior
   - [ ] Update README.md and CLAUDE.md
 
+- 🟡 Optimistic updates `[snackbar-notifications]`
+  - [ ] Identify which actions benefit most from optimistic UI
+  - [ ] Implement useOptimistic for delete actions (person, team, department)
+  - [ ] Implement useOptimistic for inline edits (name, position, email)
+  - [ ] Update tests
+  - [ ] Update README.md and CLAUDE.md
+
 ## Backlog
 
-- 🟡 Optimistic updates
 - 🔴 Demo session isolation — per-session data instead of shared DB

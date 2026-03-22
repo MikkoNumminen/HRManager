@@ -3,6 +3,7 @@
 import { updateUserRole, updateUserPermission, kickOutUser } from "@/serverActions";
 import {
   colors,
+  formButtonContainerStyles,
   formStyles,
   headerStyles,
   smallButtonStyles,
@@ -180,7 +181,7 @@ export default function UserPermissionEditor({
           </Typography>
         ) : (
           <>
-            <FormControl size="small" sx={{ minWidth: 200 }}>
+            <FormControl size="small" sx={{ minWidth: { xs: "100%", sm: 200 } }}>
               <InputLabel sx={{ color: colors.slate400 }}>{t("role")}</InputLabel>
               <Select
                 name="role"
@@ -199,7 +200,7 @@ export default function UserPermissionEditor({
                 <MenuItem value="guest">{t("roleGuest")}</MenuItem>
               </Select>
             </FormControl>
-            <Box display="flex" gap={1} justifyContent="flex-end">
+            <Box sx={formButtonContainerStyles}>
               <Button
                 type="submit"
                 disabled={!roleChanged || roleIsPending}
@@ -357,7 +358,15 @@ export default function UserPermissionEditor({
               {t("dangerZone")}
             </Typography>
           </Box>
-          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: { xs: "stretch", sm: "center" },
+              justifyContent: "space-between",
+              flexDirection: { xs: "column", sm: "row" },
+              gap: { xs: 1.5, sm: 2 },
+            }}
+          >
             <Typography variant="body2" sx={{ color: colors.slate400 }}>
               {t("kickOutDescription")}
             </Typography>
@@ -368,7 +377,7 @@ export default function UserPermissionEditor({
                 color: colors.error,
                 borderColor: colors.error,
                 "&:hover": { backgroundColor: colors.errorBg, borderColor: colors.error },
-                minWidth: 120,
+                minWidth: { xs: "auto", sm: 120 },
               }}
               variant="outlined"
             >

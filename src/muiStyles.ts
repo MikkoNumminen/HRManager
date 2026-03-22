@@ -149,6 +149,13 @@ export const mobileCardClickableStyles = {
   outline: "none",
 };
 
+export const formButtonContainerStyles = {
+  display: "flex",
+  gap: 1,
+  flexDirection: { xs: "column" as const, sm: "row" as const },
+  justifyContent: "flex-end",
+};
+
 export const boxStyles = {
   flex: "1",
   padding: { xs: "16px", sm: "20px" },

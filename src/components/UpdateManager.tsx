@@ -1,7 +1,13 @@
 "use client";
 
 import { addManager } from "@/serverActions";
-import { activeButtonStyles, formStyles, headerStyles, smallButtonStyles } from "@/muiStyles";
+import {
+  activeButtonStyles,
+  formButtonContainerStyles,
+  formStyles,
+  headerStyles,
+  smallButtonStyles,
+} from "@/muiStyles";
 import { Box, Button, Typography } from "@mui/material";
 import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
@@ -70,7 +76,7 @@ const UpdateManagerForm: React.FC<{ teamID: string; persons: Person[]; excludeId
         ))}
       </Box>
 
-      <Box display="flex" gap={1} justifyContent="flex-end">
+      <Box sx={formButtonContainerStyles}>
         <Button
           type="submit"
           disabled={!newManager || isPending}

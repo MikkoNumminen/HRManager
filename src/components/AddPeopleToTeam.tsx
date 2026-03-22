@@ -1,7 +1,13 @@
 "use client";
 
 import { addMember } from "@/serverActions";
-import { activeButtonStyles, formStyles, headerStyles, smallButtonStyles } from "@/muiStyles";
+import {
+  activeButtonStyles,
+  formButtonContainerStyles,
+  formStyles,
+  headerStyles,
+  smallButtonStyles,
+} from "@/muiStyles";
 import { Box, Button, Typography } from "@mui/material";
 import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
@@ -72,7 +78,7 @@ const AddMemberForm: React.FC<{ teamID: string; persons: Person[]; excludeIds?: 
         ))}
       </Box>
 
-      <Box display="flex" gap={1} justifyContent="flex-end">
+      <Box sx={formButtonContainerStyles}>
         <Button
           type="submit"
           disabled={!selectedMember || isPending}

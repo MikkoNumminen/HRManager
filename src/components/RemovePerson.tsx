@@ -1,6 +1,6 @@
 "use client";
 
-import { formStyles, smallButtonStyles } from "@/muiStyles";
+import { formButtonContainerStyles, formStyles, smallButtonStyles } from "@/muiStyles";
 import { removePerson } from "@/serverActions";
 import { Box, Button, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
@@ -43,7 +43,7 @@ const RemovePersonForm: React.FC<{ personID: string }> = ({ personID }) => {
         </Typography>
       )}
       <input type="hidden" name="personID" value={personID} />
-      <Box display="flex" gap={1} justifyContent="flex-end">
+      <Box sx={formButtonContainerStyles}>
         <Button disabled={isPending} onClick={() => setDialogOpen(true)} sx={smallButtonStyles}>
           {tc("remove")}
         </Button>

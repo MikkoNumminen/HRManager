@@ -1,6 +1,12 @@
 "use client";
 
-import { activeButtonStyles, formStyles, smallButtonStyles, textFieldStyles } from "@/muiStyles";
+import {
+  activeButtonStyles,
+  formButtonContainerStyles,
+  formStyles,
+  smallButtonStyles,
+  textFieldStyles,
+} from "@/muiStyles";
 import { createTeam } from "@/serverActions";
 import { Box, Button, TextField, Tooltip, Typography } from "@mui/material";
 import { useActionState, useEffect, useState } from "react";
@@ -59,7 +65,7 @@ const AddTeamForm: React.FC = () => {
           sx={textFieldStyles}
         />
       </Tooltip>
-      <Box display="flex" gap={1} justifyContent="flex-end">
+      <Box sx={formButtonContainerStyles}>
         <Button
           type="submit"
           disabled={!isValid || isPending}

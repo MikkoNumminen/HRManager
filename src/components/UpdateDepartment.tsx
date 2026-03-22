@@ -1,6 +1,12 @@
 "use client";
 
-import { activeButtonStyles, formStyles, smallButtonStyles, textFieldStyles } from "@/muiStyles";
+import {
+  activeButtonStyles,
+  formButtonContainerStyles,
+  formStyles,
+  smallButtonStyles,
+  textFieldStyles,
+} from "@/muiStyles";
 import { updateDepartment } from "@/serverActions";
 import { Box, Button, TextField, Tooltip, Typography } from "@mui/material";
 import { useActionState, useState } from "react";
@@ -66,7 +72,7 @@ const UpdateDepartmentForm: React.FC<{
         multiline
         minRows={2}
       />
-      <Box display="flex" gap={1} justifyContent="flex-end">
+      <Box sx={formButtonContainerStyles}>
         <Button
           type="submit"
           disabled={!isValid || isPending}

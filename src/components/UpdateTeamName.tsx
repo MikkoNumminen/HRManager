@@ -1,6 +1,12 @@
 "use client";
 
-import { activeButtonStyles, formStyles, smallButtonStyles, textFieldStyles } from "@/muiStyles";
+import {
+  activeButtonStyles,
+  formButtonContainerStyles,
+  formStyles,
+  smallButtonStyles,
+  textFieldStyles,
+} from "@/muiStyles";
 import { updateTeamName } from "@/serverActions";
 import { Box, Button, TextField, Tooltip, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
@@ -56,7 +62,7 @@ const UpdateTeamNameForm: React.FC<{ teamID: string; currentName: string }> = ({
           sx={textFieldStyles}
         />
       </Tooltip>
-      <Box display="flex" gap={1} justifyContent="flex-end">
+      <Box sx={formButtonContainerStyles}>
         <Button
           type="submit"
           disabled={!isValid || isPending}

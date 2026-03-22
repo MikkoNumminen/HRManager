@@ -1,6 +1,6 @@
 "use client";
 
-import { formStyles, smallButtonStyles } from "@/muiStyles";
+import { formButtonContainerStyles, formStyles, smallButtonStyles } from "@/muiStyles";
 import { removeTeam } from "@/serverActions";
 import { Box, Button, Typography } from "@mui/material";
 import { useActionState, useRef, useState } from "react";
@@ -40,7 +40,7 @@ const RemoveTeamForm: React.FC<{ teamID: string }> = ({ teamID }) => {
         </Typography>
       )}
       <input type="hidden" name="teamID" value={teamID} />
-      <Box display="flex" gap={1} justifyContent="flex-end">
+      <Box sx={formButtonContainerStyles}>
         <Button disabled={isPending} onClick={() => setDialogOpen(true)} sx={smallButtonStyles}>
           {tc("remove")}
         </Button>

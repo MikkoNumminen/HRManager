@@ -1,7 +1,13 @@
 "use client";
 
 import { removeTeamFromDepartment } from "@/serverActions";
-import { activeButtonStyles, formStyles, smallButtonStyles, textFieldStyles } from "@/muiStyles";
+import {
+  activeButtonStyles,
+  formButtonContainerStyles,
+  formStyles,
+  smallButtonStyles,
+  textFieldStyles,
+} from "@/muiStyles";
 import { Box, Button, MenuItem, TextField, Typography } from "@mui/material";
 import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
@@ -58,7 +64,7 @@ const RemoveTeamFromDepartmentForm: React.FC<{
         ))}
       </TextField>
 
-      <Box display="flex" gap={1} justifyContent="flex-end">
+      <Box sx={formButtonContainerStyles}>
         <Button
           type="submit"
           disabled={!selectedTeam || isPending}
