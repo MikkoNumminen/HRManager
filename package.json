@@ -17,6 +17,8 @@
     "i18n:fix": "npx tsx scripts/i18n-sync.ts --fix",
     "i18n:translate": "npx tsx scripts/i18n-sync.ts --fix --translate",
     "validate": "prettier --check . && eslint . && (npx tsx scripts/i18n-sync.ts || true) && npx prisma db push --skip-generate --accept-data-loss && jest --config jest.config.all.ts --runInBand --verbose",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
     "prepare": "husky"
   },
   "dependencies": {
@@ -36,6 +38,7 @@
   },
   "devDependencies": {
     "@anthropic-ai/sdk": "^0.80.0",
+    "@playwright/test": "^1.58.2",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",

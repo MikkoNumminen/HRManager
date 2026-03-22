@@ -42,5 +42,12 @@ prisma/dev.db-journal
 prisma/**/test.db
 prisma/**/test.db-journal
 
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/e2e/.auth/
+
 # Claude
 .claude/

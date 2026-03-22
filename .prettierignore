@@ -4,3 +4,5 @@ prisma/dev.db
 prisma/test.db
 prisma/migrations/
 coverage/
+test-results/
+playwright-report/
