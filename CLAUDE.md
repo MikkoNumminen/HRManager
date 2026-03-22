@@ -41,7 +41,11 @@ This is a **portfolio / showcase project**. The goal is to demonstrate technical
 - **Guest mode**: unauthenticated users see read-only minimal views (MUI Chips) of Persons, Departments, and Teams on the main page. Manage routes (`/managePersons`, `/manageDepartments`, `/manageTeams`) redirect to `/`.
 - **TopBar** — the user avatar dropdown menu contains: User Management, Audit Log (permission-gated), Load Mock Data, Reset All Data (permission-gated), and Sign Out. The `permissions` prop must be passed on every page so all menu items are available everywhere.
 - **Client-heavy rendering**: Keep the server thin — it handles only data fetching, auth, and validation. All rendering logic, UI state, filtering, sorting, and heavy computation belong in Client Components so the server stays lightweight and responsive. Security-sensitive logic (auth checks, input sanitization, access control, database queries) must always remain server-side — never trust the client for authorization or data integrity.
-- **Rate limiting** — `rateLimit.ts` provides a PostgreSQL-based sliding window rate limiter (30 req/min per IP per action). Called at the top of every server action after `requirePermission()`. Uses a `RateLimit` table with upsert — no external services. `cleanupExpiredRateLimits()` removes stale records.
+- **Security headers** — `next.config.mjs` sets X-Frame-Options, HSTS, X-Content-Type-Options, Referrer-Policy, and Permissions-Policy on all routes.
+- **Rate limiting** — `rateLimit.ts` provides a PostgreSQL-based sliding window rate limiter (30 req/min per user/IP per action). Uses user-based identification for authenticated users (via `auth()`), IP-based fallback for anonymous. Called at the top of every server action after `requirePermission()`. Uses a `RateLimit` table with upsert — no external services. `cleanupExpiredRateLimits()` removes stale records.
+- **Input validation** — all string inputs (names, emails, positions, descriptions) are validated with Zod `max()` constraints in `schemas.ts` and enforced in server actions before database writes.
+- **Entity existence checks** — server actions verify that referenced entities (persons, teams, departments) exist inside the transaction before FK assignments to prevent dangling references.
+- **JWT permission freshness** — `auth.ts` uses a `permissionsVersion` column on User to detect stale JWT permissions efficiently. Only performs a full permission re-fetch when the version changes, avoiding unnecessary DB load.
 - **Transaction nesting** — never nest `$transaction` calls. In `seedMockData`, separate transactions run sequentially (main data → cleanup → `seedPermissions()` → user creation) to avoid deadlock.
 
 ## File structure
@@ -57,7 +61,7 @@ src/
 │   └── manageTeams/             # Team management (permission-protected)
 ├── components/       # Reusable MUI client components (42 components)
 ├── i18n/             # next-intl configuration (actions, config, request)
-├── tests/            # Jest tests (834 tests)
+├── tests/            # Jest tests (863 tests)
 ├── types/            # TypeScript module augmentations (next-auth.d.ts)
 ├── auditLog.ts       # Audit logging helper (logAudit)
 ├── auth.ts           # NextAuth v5 configuration + RBAC callbacks
@@ -97,6 +101,8 @@ docker-compose.yml    # PostgreSQL 17 + app with health checks
 ## Task tracking
 
 `TODO.md` is the shared task list across all Claude Code sessions. Read it at the start of every session to understand current priorities. Update it when tasks are added, started, or completed. Keep it concise — no completed items, just in-progress and backlog. After finishing a task, note how long it took (from start of work to commit+push) before removing it from the list.
+
+Every TODO item must have a color-coded size estimate prefix: 🟢 small, 🟡 medium, 🔴 large. When listing estimates in text, use: 🟢 **[S]**, 🟡 **[M]**, 🔴 **[L]**.
 
 ## Commit style
 

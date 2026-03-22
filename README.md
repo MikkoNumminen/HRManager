@@ -1,6 +1,6 @@
 # HRManager
 
-A production-grade HR management system with granular RBAC, audit logging, rate limiting, AI-powered i18n across 18 languages, and 868 tests (834 unit/integration + 34 E2E) at 99.8% line coverage.
+A production-grade HR management system with granular RBAC, audit logging, rate limiting, security headers, AI-powered i18n across 18 languages, and 897 tests (863 unit/integration + 34 E2E) at 99.7% line coverage.
 
 [![CI](https://github.com/MikkoNumminen/HRManager/actions/workflows/ci.yml/badge.svg)](https://github.com/MikkoNumminen/HRManager/actions/workflows/ci.yml)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)
@@ -27,7 +27,7 @@ A production-grade HR management system with granular RBAC, audit logging, rate 
 
 ## Highlights
 
-- **868 tests (834 unit/integration + 34 E2E), 99.8% line coverage** — Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, rate limiting, audit logging, all 42 UI components tested against real PostgreSQL, plus Playwright E2E covering full user flows
+- **897 tests (863 unit/integration + 34 E2E), 99.7% line coverage** — Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, rate limiting, audit logging, all 42 UI components tested against real PostgreSQL, plus Playwright E2E covering full user flows
 - **Granular RBAC** — 4 roles, 23 permission keys, per-user grant/deny overrides with three-state toggles (deny / role default / grant), and "kick out" user removal with confirmation dialog
 - **Immutable audit trail** — every mutation logged with before/after JSON snapshots inside the same `$transaction` for atomicity
 - **18 languages** — next-intl with cookie persistence, Accept-Language detection, and an AI-powered translation pipeline using parallel Claude Code agents
@@ -35,7 +35,8 @@ A production-grade HR management system with granular RBAC, audit logging, rate 
 - **Snackbar notifications** — global success/error toasts via React context + MUI Snackbar; consistent feedback across all 15 form actions
 - **Accessibility (WCAG)** — semantic landmarks, skip-to-content link, ARIA labels on dialogs and controls, `role="alert"` on all error messages, keyboard-navigable table rows, `scope="col"` on all table headers
 - **6 visual themes** — CSS custom properties with FOUC-preventing inline script; instant switching without re-render
-- **Rate limiting** — PostgreSQL-based sliding window (30 req/min per IP per action) on all server actions; no external services required
+- **Security headers** — X-Frame-Options, HSTS, X-Content-Type-Options, Referrer-Policy, Permissions-Policy on all routes
+- **Rate limiting** — PostgreSQL-based sliding window (30 req/min per user/IP per action) on all server actions; user-based for authenticated users, IP-based fallback; no external services required
 - **Docker-ready** — `docker compose up` for a fully working local environment with PostgreSQL, auto-migration, and demo login
 
 ---
@@ -77,7 +78,7 @@ graph LR
 - **Reads** in `queries.ts` — Zod-validated, no `"use server"`
 - **Mutations** in `serverActions.ts` — always inside `$transaction`, always audit-logged
 - **Types** in `schemas.ts` — Zod schemas with `z.infer` exports, used everywhere
-- **Auth** in `auth.ts` — JWT strategy with permission-enriched tokens; automatic superuser bootstrapping
+- **Auth** in `auth.ts` — JWT strategy with permission-enriched tokens; automatic superuser bootstrapping; `permissionsVersion`-based stale permission detection
 - **RBAC** in `permissions.ts` — resolution: superuser (all) → user override → role default
 - **Forms** — React 19 `useActionState` with `action=` prop, no `onSubmit`; success/error feedback via global snackbar
 - **Themes** — CSS custom properties injected before hydration; 6 palettes switchable at runtime
@@ -103,19 +104,19 @@ Individual permissions can be overridden per-user — e.g. granting `person:crea
 | Layer            | Tests   |
 | ---------------- | ------- |
 | Zod schemas      | 71      |
-| Prisma queries   | 38      |
-| Server actions   | 111     |
-| Auth callbacks   | 20      |
+| Prisma queries   | 40      |
+| Server actions   | 137     |
+| Auth callbacks   | 23      |
 | Audit logging    | 6       |
-| Rate limiting    | 12      |
+| Rate limiting    | 13      |
 | RBAC logic       | 28      |
 | UI components    | 545     |
 | E2E (Playwright) | 34      |
-| **Total**        | **868** |
+| **Total**        | **897** |
 
 ```
-Statements : 99.11%    Branches : 95.61%
-Functions  : 99.71%    Lines    : 99.77%
+Statements : 99.07%    Branches : 95.65%
+Functions  : 99.15%    Lines    : 99.73%
 ```
 
 Server-side tests run against a real PostgreSQL test database. Client-side tests cover all 42 components including permission toggles, audit log filtering, tutorial system, snackbar notifications, theme switching, and language selection. Playwright E2E tests run against a production build covering authentication, CRUD for all entities, admin/audit access, guest access control, theme/language persistence, and snackbar lifecycle.
