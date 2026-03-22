@@ -1,6 +1,6 @@
 # HRManager
 
-A production-grade HR management system with granular RBAC, audit logging, rate limiting, security headers, AI-powered i18n across 18 languages, and 909 tests (875 unit/integration + 34 E2E) at 99.7% line coverage.
+A production-grade HR management system with granular RBAC, audit logging, rate limiting, CSP + security headers, AI-powered i18n across 18 languages, and 929 tests (895 unit/integration + 34 E2E) at 99.7% line coverage.
 
 [![CI](https://github.com/MikkoNumminen/HRManager/actions/workflows/ci.yml/badge.svg)](https://github.com/MikkoNumminen/HRManager/actions/workflows/ci.yml)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)
@@ -27,7 +27,7 @@ A production-grade HR management system with granular RBAC, audit logging, rate 
 
 ## Highlights
 
-- **909 tests (875 unit/integration + 34 E2E), 99.7% line coverage** — Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, rate limiting, auth route handlers, audit logging, all 42 UI components tested against real PostgreSQL, plus Playwright E2E covering full user flows
+- **929 tests (895 unit/integration + 34 E2E), 99.7% line coverage** — Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, rate limiting, auth route handlers, CSP proxy, audit logging, all 42 UI components tested against real PostgreSQL, plus Playwright E2E covering full user flows
 - **Granular RBAC** — 4 roles, 23 permission keys, per-user grant/deny overrides with three-state toggles (deny / role default / grant), and "kick out" user removal with confirmation dialog
 - **Immutable audit trail** — every mutation logged with before/after JSON snapshots inside the same `$transaction` for atomicity
 - **18 languages** — next-intl with cookie persistence, Accept-Language detection, and an AI-powered translation pipeline using parallel Claude Code agents
@@ -35,7 +35,7 @@ A production-grade HR management system with granular RBAC, audit logging, rate 
 - **Snackbar notifications** — global success/error toasts via React context + MUI Snackbar; consistent feedback across all 15 form actions
 - **Accessibility (WCAG)** — semantic landmarks, skip-to-content link, ARIA labels on dialogs and controls, `role="alert"` on all error messages, keyboard-navigable table rows, `scope="col"` on all table headers
 - **6 visual themes** — CSS custom properties with FOUC-preventing inline script; instant switching without re-render
-- **Security headers** — X-Frame-Options, HSTS, X-Content-Type-Options, Referrer-Policy, Permissions-Policy on all routes
+- **Content-Security-Policy** — nonce-based CSP via Next.js 16 proxy with per-request nonce generation; Emotion/MUI style injection, FOUC prevention script, and OAuth avatar domains whitelisted; plus X-Frame-Options, X-Content-Type-Options, Referrer-Policy, and Permissions-Policy on all routes
 - **Rate limiting** — PostgreSQL-based sliding window on all server actions (30 req/min) and auth endpoints (10 req/min); user-based for authenticated users, IP-based for auth and anonymous; no external services required
 - **Docker-ready** — `docker compose up` for a fully working local environment with PostgreSQL, auto-migration, and demo login
 
@@ -63,7 +63,8 @@ A production-grade HR management system with granular RBAC, audit logging, rate 
 
 ```mermaid
 graph LR
-    Browser -->|HTTP| Next["Next.js App Router"]
+    Browser -->|HTTP| Proxy["proxy.ts (CSP + nonce)"]
+    Proxy -->|Next.js App Router| Next["Next.js"]
     Next -->|Server Component| SC["Page (async)"]
     SC -->|read| Q["queries.ts"]
     SC -->|props| CC["Client Component"]
@@ -110,10 +111,11 @@ Individual permissions can be overridden per-user — e.g. granting `person:crea
 | Audit logging    | 6       |
 | Rate limiting    | 18      |
 | Auth route       | 5       |
+| CSP proxy        | 20      |
 | RBAC logic       | 28      |
 | UI components    | 545     |
 | E2E (Playwright) | 34      |
-| **Total**        | **909** |
+| **Total**        | **929** |
 
 ```
 Statements : 99.12%    Branches : 95.65%
