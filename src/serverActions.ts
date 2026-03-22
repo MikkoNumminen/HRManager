@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requirePermission, seedPermissions } from "@/permissions";
 import { logAudit } from "@/auditLog";
+import { rateLimit } from "@/rateLimit";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -15,6 +16,7 @@ function validateUUID(value: string, fieldName: string): void {
 
 export async function createPerson(data: FormData) {
   await requirePermission("person:create");
+  await rateLimit("createPerson");
   const name = data.get("name")?.valueOf();
   if (typeof name !== "string" || name.trim().length === 0) {
     throw new Error("Invalid Name");
@@ -55,6 +57,7 @@ export async function createPerson(data: FormData) {
 
 export async function removePerson(data: FormData) {
   await requirePermission("person:delete");
+  await rateLimit("removePerson");
   const personIDs = data.getAll("personID").filter((v): v is string => typeof v === "string");
   if (personIDs.length === 0) {
     throw new Error("No personID selected");
@@ -90,6 +93,7 @@ export async function removePerson(data: FormData) {
 
 export async function updatePersonName(data: FormData) {
   await requirePermission("person:update_name");
+  await rateLimit("updatePersonName");
   const personID = data.get("personID")?.toString();
   if (!personID) {
     throw new Error("No personID provided");
@@ -122,6 +126,7 @@ export async function updatePersonName(data: FormData) {
 
 export async function updatePosition(data: FormData) {
   await requirePermission("person:update_position");
+  await rateLimit("updatePosition");
   const personID = data.get("personID")?.toString();
   if (!personID) {
     throw new Error("No personID provided");
@@ -153,6 +158,7 @@ export async function updatePosition(data: FormData) {
 
 export async function updateEmail(data: FormData) {
   await requirePermission("person:update_email");
+  await rateLimit("updateEmail");
   const personID = data.get("personID")?.toString();
   if (!personID) {
     throw new Error("No personID selected");
@@ -192,6 +198,7 @@ export async function updateEmail(data: FormData) {
 
 export async function addManager(data: FormData) {
   await requirePermission("team:update_manager");
+  await rateLimit("addManager");
   const teamIDs = data.getAll("teamID").filter((v): v is string => typeof v === "string");
   const personID = data.get("personID")?.toString();
 
@@ -251,6 +258,7 @@ export async function addManager(data: FormData) {
 
 export async function addMember(data: FormData) {
   await requirePermission("team:add_member");
+  await rateLimit("addMember");
   const teamID = data.get("teamID")?.toString();
   const personID = data.get("personID")?.toString();
 
@@ -297,6 +305,7 @@ export async function addMember(data: FormData) {
 
 export async function createTeam(data: FormData) {
   await requirePermission("team:create");
+  await rateLimit("createTeam");
   const name = data.get("name")?.valueOf();
   if (typeof name !== "string" || name.trim().length === 0) {
     throw new Error("Invalid Name");
@@ -323,6 +332,7 @@ export async function createTeam(data: FormData) {
 
 export async function updateTeamName(data: FormData) {
   await requirePermission("team:update_name");
+  await rateLimit("updateTeamName");
   const teamID = data.get("teamID")?.toString();
   if (!teamID) {
     throw new Error("No teamID provided");
@@ -355,6 +365,7 @@ export async function updateTeamName(data: FormData) {
 
 export async function removeTeam(data: FormData) {
   await requirePermission("team:delete");
+  await rateLimit("removeTeam");
   const teamIDs = data.getAll("teamID").filter((v): v is string => typeof v === "string");
   if (teamIDs.length === 0) {
     throw new Error("No teamID selected");
@@ -387,6 +398,7 @@ export async function removeTeam(data: FormData) {
 
 export async function removeMember(data: FormData) {
   await requirePermission("team:remove_member");
+  await rateLimit("removeMember");
   const teamID = data.get("teamID")?.toString();
   const personID = data.get("personID")?.toString();
 
@@ -451,6 +463,7 @@ export async function removeMember(data: FormData) {
 
 export async function createDepartment(data: FormData) {
   await requirePermission("department:create");
+  await rateLimit("createDepartment");
   const name = data.get("name")?.valueOf();
   if (typeof name !== "string" || name.trim().length === 0) {
     throw new Error("Invalid Name");
@@ -479,6 +492,7 @@ export async function createDepartment(data: FormData) {
 
 export async function removeDepartment(data: FormData) {
   await requirePermission("department:delete");
+  await rateLimit("removeDepartment");
   const departmentIDs = data
     .getAll("departmentID")
     .filter((v): v is string => typeof v === "string");
@@ -519,6 +533,7 @@ export async function removeDepartment(data: FormData) {
 
 export async function updateDepartment(data: FormData) {
   await requirePermission("department:update");
+  await rateLimit("updateDepartment");
   const departmentID = data.get("departmentID")?.toString();
   if (!departmentID) {
     throw new Error("No departmentID provided");
@@ -553,6 +568,7 @@ export async function updateDepartment(data: FormData) {
 
 export async function updateDepartmentHead(data: FormData) {
   await requirePermission("department:update");
+  await rateLimit("updateDepartmentHead");
   const departmentID = data.get("departmentID")?.toString();
   const personID = data.get("personID")?.toString() || null;
 
@@ -584,6 +600,7 @@ export async function updateDepartmentHead(data: FormData) {
 
 export async function assignTeamToDepartment(data: FormData) {
   await requirePermission("department:assign_team");
+  await rateLimit("assignTeamToDepartment");
   const departmentID = data.get("departmentID")?.toString();
   const teamID = data.get("teamID")?.toString();
 
@@ -615,6 +632,7 @@ export async function assignTeamToDepartment(data: FormData) {
 
 export async function removeTeamFromDepartment(data: FormData) {
   await requirePermission("department:assign_team");
+  await rateLimit("removeTeamFromDepartment");
   const teamID = data.get("teamID")?.toString();
 
   if (!teamID) throw new Error("No teamID provided");
@@ -643,6 +661,7 @@ export async function removeTeamFromDepartment(data: FormData) {
 
 export async function resetAll() {
   await requirePermission("data:reset");
+  await rateLimit("resetAll");
   await prisma.$transaction(async (tx) => {
     const counts = {
       teamMembers: await tx.teamMember.count(),
@@ -669,6 +688,7 @@ export async function resetAll() {
 
 export async function seedMockData(clearExisting: boolean = true) {
   await requirePermission("data:seed");
+  await rateLimit("seedMockData");
   await prisma.$transaction(async (prisma) => {
     if (clearExisting) {
       await prisma.teamMember.deleteMany();
@@ -857,11 +877,13 @@ export async function seedMockData(clearExisting: boolean = true) {
 
 export async function initializePermissions() {
   await requirePermission("admin:manage_users");
+  await rateLimit("initializePermissions");
   await seedPermissions();
 }
 
 export async function updateUserRole(data: FormData) {
   await requirePermission("admin:manage_users");
+  await rateLimit("updateUserRole");
 
   const userId = data.get("userId")?.toString();
   const newRole = data.get("role")?.toString();
@@ -900,6 +922,7 @@ export async function updateUserRole(data: FormData) {
 
 export async function updateUserPermission(data: FormData) {
   await requirePermission("admin:assign_permissions");
+  await rateLimit("updateUserPermission");
 
   const userId = data.get("userId")?.toString();
   const permissionKey = data.get("permissionKey")?.toString();

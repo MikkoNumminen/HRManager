@@ -87,6 +87,17 @@ model UserPermission {
   @@unique([userId, permissionId])
 }
 
+model RateLimit {
+  id         String   @id @default(uuid())
+  identifier String
+  action     String
+  count      Int      @default(1)
+  windowStart DateTime @default(now())
+
+  @@unique([identifier, action])
+  @@index([windowStart])
+}
+
 model AuditLog {
   id         String   @id @default(uuid())
   userId     String?

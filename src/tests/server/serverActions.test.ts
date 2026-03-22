@@ -24,6 +24,12 @@ jest.mock("@/auditLog", () => ({
   logAudit: jest.fn(),
 }));
 
+// Mock rate limiting — rateLimit uses next/headers which doesn't exist in tests.
+// Rate limiting behavior is tested separately in rateLimit.test.ts.
+jest.mock("@/rateLimit", () => ({
+  rateLimit: jest.fn(),
+}));
+
 // Mock Next.js server functions — these don't exist in a test environment,
 // but the server actions call them after every mutation.
 jest.mock("next/cache", () => ({

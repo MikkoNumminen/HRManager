@@ -13,4 +13,5 @@ export async function cleanDb() {
   await testPrisma.person.deleteMany();
   await testPrisma.user.deleteMany();
   await testPrisma.permission.deleteMany();
+  await testPrisma.rateLimit.deleteMany();
 }
