@@ -5,19 +5,13 @@ jest.mock("@/db", () => ({
   prisma: require("./testDb").testPrisma,
 }));
 
-// Mock auth — needed by getCurrentUser
+// Mock auth — logAudit uses auth() to identify the acting user
 const mockAuth = jest.fn();
 jest.mock("@/auth", () => ({
   auth: (...args: unknown[]) => mockAuth(...args),
 }));
 
-// Mock getCurrentUser to control who the "acting user" is
-const mockGetCurrentUser = jest.fn();
-jest.mock("@/permissions", () => ({
-  getCurrentUser: (...args: unknown[]) => mockGetCurrentUser(...args),
-}));
-
-import { logAudit } from "@/auditLog";
+import { logAudit, logPermissionDenial, logRateLimitHit } from "@/auditLog";
 
 beforeEach(async () => {
   jest.clearAllMocks();
@@ -31,9 +25,8 @@ afterAll(async () => {
 describe("logAudit", () => {
   // Creates an audit log entry with the current user's info.
   test("creates an audit log entry with user info", async () => {
-    mockGetCurrentUser.mockResolvedValue({
-      id: "user-123",
-      email: "alice@example.com",
+    mockAuth.mockResolvedValue({
+      user: { id: "user-123", email: "alice@example.com" },
     });
 
     await logAudit({
@@ -56,7 +49,7 @@ describe("logAudit", () => {
 
   // Creates an audit log with null user when no one is logged in.
   test("creates audit log with null user when unauthenticated", async () => {
-    mockGetCurrentUser.mockResolvedValue(null);
+    mockAuth.mockResolvedValue(null);
 
     await logAudit({
       action: "seed",
@@ -73,7 +66,7 @@ describe("logAudit", () => {
 
   // Stores before and after as JSON strings.
   test("serializes before and after as JSON", async () => {
-    mockGetCurrentUser.mockResolvedValue(null);
+    mockAuth.mockResolvedValue(null);
 
     await logAudit({
       action: "update",
@@ -90,7 +83,7 @@ describe("logAudit", () => {
 
   // Stores null when before/after are not provided (undefined).
   test("stores null for undefined before and after", async () => {
-    mockGetCurrentUser.mockResolvedValue(null);
+    mockAuth.mockResolvedValue(null);
 
     await logAudit({
       action: "delete",
@@ -105,7 +98,7 @@ describe("logAudit", () => {
 
   // Stores null for entityId when not provided.
   test("stores null for undefined entityId", async () => {
-    mockGetCurrentUser.mockResolvedValue(null);
+    mockAuth.mockResolvedValue(null);
 
     await logAudit({
       action: "reset",
@@ -119,9 +112,8 @@ describe("logAudit", () => {
 
   // Works with a transaction client — audit entry is created inside the tx.
   test("uses transaction client when tx is provided", async () => {
-    mockGetCurrentUser.mockResolvedValue({
-      id: "user-1",
-      email: "bob@example.com",
+    mockAuth.mockResolvedValue({
+      user: { id: "user-1", email: "bob@example.com" },
     });
 
     await testPrisma.$transaction(async (tx) => {
@@ -138,5 +130,69 @@ describe("logAudit", () => {
     expect(logs).toHaveLength(1);
     expect(logs[0].entityType).toBe("team");
     expect(logs[0].after).toBe('{"teamName":"Engineering"}');
+  });
+});
+
+describe("logPermissionDenial", () => {
+  // Logs a permission denial with user info from the session.
+  test("logs permission denial with authenticated user", async () => {
+    mockAuth.mockResolvedValue({
+      user: { id: "user-456", email: "denied@example.com" },
+    });
+
+    await logPermissionDenial("person:delete");
+
+    const logs = await testPrisma.auditLog.findMany();
+    expect(logs).toHaveLength(1);
+    expect(logs[0].action).toBe("permission_denied");
+    expect(logs[0].entityType).toBe("security");
+    expect(logs[0].userId).toBe("user-456");
+    expect(logs[0].userEmail).toBe("denied@example.com");
+    expect(JSON.parse(logs[0].after!)).toEqual({ permissionKey: "person:delete" });
+  });
+
+  // Logs a permission denial with null user when unauthenticated.
+  test("logs permission denial for unauthenticated user", async () => {
+    mockAuth.mockResolvedValue(null);
+
+    await logPermissionDenial("admin:manage_users");
+
+    const logs = await testPrisma.auditLog.findMany();
+    expect(logs).toHaveLength(1);
+    expect(logs[0].action).toBe("permission_denied");
+    expect(logs[0].userId).toBeNull();
+    expect(logs[0].userEmail).toBeNull();
+    expect(JSON.parse(logs[0].after!)).toEqual({ permissionKey: "admin:manage_users" });
+  });
+});
+
+describe("logRateLimitHit", () => {
+  // Logs a rate limit hit with action and identifier.
+  test("logs rate limit hit with action and identifier", async () => {
+    await logRateLimitHit("createPerson", "ip:192.168.1.1");
+
+    const logs = await testPrisma.auditLog.findMany();
+    expect(logs).toHaveLength(1);
+    expect(logs[0].action).toBe("rate_limited");
+    expect(logs[0].entityType).toBe("security");
+    expect(logs[0].userId).toBeNull();
+    expect(logs[0].userEmail).toBeNull();
+    expect(JSON.parse(logs[0].after!)).toEqual({
+      rateLimitedAction: "createPerson",
+      identifier: "ip:192.168.1.1",
+    });
+  });
+
+  // Logs a rate limit hit for auth endpoint.
+  test("logs rate limit hit for auth endpoint", async () => {
+    await logRateLimitHit("auth:signin", "ip:10.0.0.1");
+
+    const logs = await testPrisma.auditLog.findMany();
+    expect(logs).toHaveLength(1);
+    expect(logs[0].action).toBe("rate_limited");
+    expect(JSON.parse(logs[0].after!)).toEqual({
+      rateLimitedAction: "auth:signin",
+      identifier: "ip:10.0.0.1",
+    });
   });
 });

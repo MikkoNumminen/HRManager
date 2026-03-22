@@ -174,6 +174,9 @@ export async function hasPermission(permissionKey: string): Promise<boolean> {
 export async function requirePermission(permissionKey: string): Promise<void> {
   const allowed = await hasPermission(permissionKey);
   if (!allowed) {
+    // Lazy import to avoid circular dependency (permissions → auditLog → auth → permissions)
+    const { logPermissionDenial } = await import("@/auditLog");
+    await logPermissionDenial(permissionKey);
     throw new Error(`Permission denied: ${permissionKey}`);
   }
 }

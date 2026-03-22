@@ -246,7 +246,13 @@
     "changedName": "姓名从\"{oldValue}\"更改为\"{newValue}\"",
     "renamedTeam": "团队从\"{oldValue}\"重命名为\"{newValue}\"",
     "permChangeName": "更改人员姓名",
-    "permRenameTeams": "重命名团队"
+    "permRenameTeams": "重命名团队",
+    "actionPermissionDenied": "Permission Denied",
+    "actionRateLimited": "Rate Limited",
+    "typeAuth": "Auth",
+    "typeSecurity": "Security",
+    "permissionDenied": "Permission denied: {key}",
+    "rateLimited": "Rate limit exceeded for action: {action}"
   },
   "notifications": {
     "personCreated": "人员创建成功",

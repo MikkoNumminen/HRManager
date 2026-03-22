@@ -246,7 +246,13 @@
     "changedName": "Ändrade namn från \"{oldValue}\" till \"{newValue}\"",
     "renamedTeam": "Bytte namn på team från \"{oldValue}\" till \"{newValue}\"",
     "permChangeName": "ändra personers namn",
-    "permRenameTeams": "byta namn på team"
+    "permRenameTeams": "byta namn på team",
+    "actionPermissionDenied": "Permission Denied",
+    "actionRateLimited": "Rate Limited",
+    "typeAuth": "Auth",
+    "typeSecurity": "Security",
+    "permissionDenied": "Permission denied: {key}",
+    "rateLimited": "Rate limit exceeded for action: {action}"
   },
   "notifications": {
     "personCreated": "Person skapad",

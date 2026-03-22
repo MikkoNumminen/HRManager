@@ -14,6 +14,10 @@ jest.mock("../auth", () => ({
   auth: (...args: unknown[]) => mockAuth(...args),
 }));
 
+jest.mock("@/auditLog", () => ({
+  logPermissionDenial: jest.fn(),
+}));
+
 const mockUpsert = jest.fn();
 const mockTransaction = jest.fn();
 const mockFindUnique = jest.fn();

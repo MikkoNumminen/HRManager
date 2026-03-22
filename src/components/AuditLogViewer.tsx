@@ -30,6 +30,8 @@ const actionColors: Record<string, string> = {
   delete: colors.error,
   seed: colors.warning,
   reset: colors.warning,
+  permission_denied: colors.error,
+  rate_limited: colors.error,
 };
 
 const selectStyles = {
@@ -79,6 +81,8 @@ export default function AuditLogViewer({
       department: t("typeDepartment"),
       user: t("typeUser"),
       userPermission: t("typePermission"),
+      auth: t("typeAuth"),
+      security: t("typeSecurity"),
     }),
     [t],
   );
@@ -91,6 +95,8 @@ export default function AuditLogViewer({
       kickout: t("actionKickout"),
       seed: t("actionSeed"),
       reset: t("actionReset"),
+      permission_denied: t("actionPermissionDenied"),
+      rate_limited: t("actionRateLimited"),
     }),
     [t],
   );
@@ -237,6 +243,14 @@ export default function AuditLogViewer({
             teams: String(teams),
             departments: String(departments),
           });
+        }
+
+        if (action === "permission_denied") {
+          return t("permissionDenied", { key: a?.permissionKey ?? unknown });
+        }
+
+        if (action === "rate_limited") {
+          return t("rateLimited", { action: a?.rateLimitedAction ?? unknown });
         }
 
         return tc("dash");

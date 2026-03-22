@@ -246,7 +246,13 @@
     "changedName": "Ad \"{oldValue}\" yerine \"{newValue}\" olarak değiştirildi",
     "renamedTeam": "Ekip \"{oldValue}\" yerine \"{newValue}\" olarak yeniden adlandırıldı",
     "permChangeName": "kişilerin adlarını değiştirmek",
-    "permRenameTeams": "ekipleri yeniden adlandırmak"
+    "permRenameTeams": "ekipleri yeniden adlandırmak",
+    "actionPermissionDenied": "Permission Denied",
+    "actionRateLimited": "Rate Limited",
+    "typeAuth": "Auth",
+    "typeSecurity": "Security",
+    "permissionDenied": "Permission denied: {key}",
+    "rateLimited": "Rate limit exceeded for action: {action}"
   },
   "notifications": {
     "personCreated": "Kişi başarıyla oluşturuldu",

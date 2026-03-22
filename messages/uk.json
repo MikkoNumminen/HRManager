@@ -246,7 +246,13 @@
     "changedName": "Змінено ім'я з \"{oldValue}\" на \"{newValue}\"",
     "renamedTeam": "Перейменовано команду з \"{oldValue}\" на \"{newValue}\"",
     "permChangeName": "змінювати імена співробітників",
-    "permRenameTeams": "перейменовувати команди"
+    "permRenameTeams": "перейменовувати команди",
+    "actionPermissionDenied": "Permission Denied",
+    "actionRateLimited": "Rate Limited",
+    "typeAuth": "Auth",
+    "typeSecurity": "Security",
+    "permissionDenied": "Permission denied: {key}",
+    "rateLimited": "Rate limit exceeded for action: {action}"
   },
   "notifications": {
     "personCreated": "Особу успішно створено",

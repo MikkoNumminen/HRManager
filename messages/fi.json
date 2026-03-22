@@ -246,7 +246,13 @@
     "changedName": "Nimi vaihdettu: \"{oldValue}\" → \"{newValue}\"",
     "renamedTeam": "Tiimi nimetty uudelleen: \"{oldValue}\" → \"{newValue}\"",
     "permChangeName": "vaihtaa henkilöiden nimiä",
-    "permRenameTeams": "nimetä tiimejä uudelleen"
+    "permRenameTeams": "nimetä tiimejä uudelleen",
+    "actionPermissionDenied": "Permission Denied",
+    "actionRateLimited": "Rate Limited",
+    "typeAuth": "Auth",
+    "typeSecurity": "Security",
+    "permissionDenied": "Permission denied: {key}",
+    "rateLimited": "Rate limit exceeded for action: {action}"
   },
   "notifications": {
     "personCreated": "Henkilö luotu onnistuneesti",

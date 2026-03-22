@@ -1,6 +1,7 @@
 import { prisma } from "@/db";
 import { headers } from "next/headers";
 import { auth } from "@/auth";
+import { logRateLimitHit } from "@/auditLog";
 
 const WINDOW_MS = 60 * 1000; // 1 minute
 const MAX_REQUESTS = 30; // 30 requests per window
@@ -50,6 +51,7 @@ async function checkRateLimit(
 
   if (existing && existing.windowStart > windowStart) {
     if (existing.count >= maxRequests) {
+      await logRateLimitHit(action, identifier);
       throw new RateLimitError();
     }
     await prisma.rateLimit.update({

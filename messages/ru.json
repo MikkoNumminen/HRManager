@@ -246,7 +246,13 @@
     "changedName": "Имя изменено с «{oldValue}» на «{newValue}»",
     "renamedTeam": "Команда переименована с «{oldValue}» на «{newValue}»",
     "permChangeName": "изменять имена сотрудников",
-    "permRenameTeams": "переименовывать команды"
+    "permRenameTeams": "переименовывать команды",
+    "actionPermissionDenied": "Permission Denied",
+    "actionRateLimited": "Rate Limited",
+    "typeAuth": "Auth",
+    "typeSecurity": "Security",
+    "permissionDenied": "Permission denied: {key}",
+    "rateLimited": "Rate limit exceeded for action: {action}"
   },
   "notifications": {
     "personCreated": "Сотрудник успешно создан",

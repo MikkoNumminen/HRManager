@@ -246,7 +246,13 @@
     "changedName": "Nome alterado de \"{oldValue}\" para \"{newValue}\"",
     "renamedTeam": "Equipe renomeada de \"{oldValue}\" para \"{newValue}\"",
     "permChangeName": "alterar nomes de pessoas",
-    "permRenameTeams": "renomear equipes"
+    "permRenameTeams": "renomear equipes",
+    "actionPermissionDenied": "Permission Denied",
+    "actionRateLimited": "Rate Limited",
+    "typeAuth": "Auth",
+    "typeSecurity": "Security",
+    "permissionDenied": "Permission denied: {key}",
+    "rateLimited": "Rate limit exceeded for action: {action}"
   },
   "notifications": {
     "personCreated": "Pessoa criada com sucesso",

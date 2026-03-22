@@ -246,7 +246,13 @@
     "changedName": "เปลี่ยนชื่อจาก \"{oldValue}\" เป็น \"{newValue}\"",
     "renamedTeam": "เปลี่ยนชื่อทีมจาก \"{oldValue}\" เป็น \"{newValue}\"",
     "permChangeName": "เปลี่ยนชื่อบุคลากร",
-    "permRenameTeams": "เปลี่ยนชื่อทีม"
+    "permRenameTeams": "เปลี่ยนชื่อทีม",
+    "actionPermissionDenied": "Permission Denied",
+    "actionRateLimited": "Rate Limited",
+    "typeAuth": "Auth",
+    "typeSecurity": "Security",
+    "permissionDenied": "Permission denied: {key}",
+    "rateLimited": "Rate limit exceeded for action: {action}"
   },
   "notifications": {
     "personCreated": "สร้างบุคคลสำเร็จ",

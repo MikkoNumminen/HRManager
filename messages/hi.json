@@ -246,7 +246,13 @@
     "changedName": "नाम \"{oldValue}\" से \"{newValue}\" में बदला गया",
     "renamedTeam": "टीम का नाम \"{oldValue}\" से \"{newValue}\" में बदला गया",
     "permChangeName": "व्यक्तियों के नाम बदलना",
-    "permRenameTeams": "टीमों के नाम बदलना"
+    "permRenameTeams": "टीमों के नाम बदलना",
+    "actionPermissionDenied": "Permission Denied",
+    "actionRateLimited": "Rate Limited",
+    "typeAuth": "Auth",
+    "typeSecurity": "Security",
+    "permissionDenied": "Permission denied: {key}",
+    "rateLimited": "Rate limit exceeded for action: {action}"
   },
   "notifications": {
     "personCreated": "व्यक्ति सफलतापूर्वक बनाया गया",

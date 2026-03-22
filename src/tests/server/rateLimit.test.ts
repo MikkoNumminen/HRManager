@@ -22,12 +22,14 @@ import { rateLimit, rateLimitAuth, RateLimitError, cleanupExpiredRateLimits } fr
 
 beforeEach(async () => {
   await testPrisma.rateLimit.deleteMany();
+  await testPrisma.auditLog.deleteMany();
   mockHeaders.clear();
   mockHeaders.set("x-forwarded-for", "192.168.1.1");
 });
 
 afterAll(async () => {
   await testPrisma.rateLimit.deleteMany();
+  await testPrisma.auditLog.deleteMany();
   await testPrisma.$disconnect();
 });
 
@@ -54,7 +56,7 @@ test("increments count on subsequent requests", async () => {
   expect(record?.count).toBe(3);
 });
 
-// Throws RateLimitError when the limit is exceeded
+// Throws RateLimitError when the limit is exceeded and logs to audit
 test("throws RateLimitError when limit exceeded", async () => {
   // Seed a record at the limit
   await testPrisma.rateLimit.create({
@@ -68,6 +70,13 @@ test("throws RateLimitError when limit exceeded", async () => {
 
   await expect(rateLimit("testAction")).rejects.toThrow(RateLimitError);
   await expect(rateLimit("testAction")).rejects.toThrow("Too many requests");
+
+  // Verify audit log entries were created for each rate limit hit
+  const auditLogs = await testPrisma.auditLog.findMany({
+    where: { action: "rate_limited" },
+  });
+  expect(auditLogs.length).toBeGreaterThanOrEqual(1);
+  expect(JSON.parse(auditLogs[0].after!).rateLimitedAction).toBe("testAction");
 });
 
 // Allows requests after the window expires by resetting the counter

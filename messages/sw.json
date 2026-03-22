@@ -246,7 +246,13 @@
     "changedName": "Jina limebadilishwa kutoka \"{oldValue}\" hadi \"{newValue}\"",
     "renamedTeam": "Timu imebadilishwa jina kutoka \"{oldValue}\" hadi \"{newValue}\"",
     "permChangeName": "kubadilisha majina ya watu",
-    "permRenameTeams": "kubadilisha majina ya timu"
+    "permRenameTeams": "kubadilisha majina ya timu",
+    "actionPermissionDenied": "Permission Denied",
+    "actionRateLimited": "Rate Limited",
+    "typeAuth": "Auth",
+    "typeSecurity": "Security",
+    "permissionDenied": "Permission denied: {key}",
+    "rateLimited": "Rate limit exceeded for action: {action}"
   },
   "notifications": {
     "personCreated": "Mtu ameundwa kwa mafanikio",
