@@ -5,6 +5,12 @@ import { redirect } from "next/navigation";
 import { requirePermission, seedPermissions } from "@/permissions";
 import { logAudit } from "@/auditLog";
 import { rateLimit } from "@/rateLimit";
+import {
+  MAX_NAME_LENGTH,
+  MAX_EMAIL_LENGTH,
+  MAX_POSITION_LENGTH,
+  MAX_DESCRIPTION_LENGTH,
+} from "@/schemas";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -21,21 +27,27 @@ export async function createPerson(data: FormData) {
   if (typeof name !== "string" || name.trim().length === 0) {
     throw new Error("Invalid Name");
   }
+  if (name.trim().length > MAX_NAME_LENGTH) {
+    throw new Error(`Name must be ${MAX_NAME_LENGTH} characters or less`);
+  }
 
   const email = data.get("email")?.valueOf();
   if (typeof email !== "string" || email.trim().length === 0) {
     throw new Error("Email is required");
   }
+  if (email.trim().length > MAX_EMAIL_LENGTH) {
+    throw new Error(`Email must be ${MAX_EMAIL_LENGTH} characters or less`);
+  }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     throw new Error("Invalid email format");
   }
 
-  const existingPerson = await prisma.person.findUnique({ where: { email } });
-  if (existingPerson) {
-    throw new Error("A person with this email already exists");
-  }
-
   await prisma.$transaction(async (tx) => {
+    const existingPerson = await tx.person.findUnique({ where: { email } });
+    if (existingPerson) {
+      throw new Error("A person with this email already exists");
+    }
+
     const person = await tx.person.create({
       data: {
         name: name.trim(),
@@ -104,9 +116,15 @@ export async function updatePersonName(data: FormData) {
   if (!newName) {
     throw new Error("New name is missing");
   }
+  if (newName.length > MAX_NAME_LENGTH) {
+    throw new Error(`Name must be ${MAX_NAME_LENGTH} characters or less`);
+  }
 
   await prisma.$transaction(async (tx) => {
     const personBefore = await tx.person.findUnique({ where: { id: personID } });
+    if (!personBefore) {
+      throw new Error("Person not found");
+    }
     await tx.person.update({
       where: { id: personID },
       data: { name: newName },
@@ -115,7 +133,7 @@ export async function updatePersonName(data: FormData) {
       action: "update",
       entityType: "person",
       entityId: personID,
-      before: { name: personBefore?.name },
+      before: { name: personBefore.name },
       after: { name: newName },
       tx,
     });
@@ -133,13 +151,19 @@ export async function updatePosition(data: FormData) {
   }
   validateUUID(personID, "personID");
 
-  const newPosition = data.get("name")?.toString().trim();
+  const newPosition = (data.get("position") ?? data.get("name"))?.toString().trim();
   if (!newPosition) {
     throw new Error("New position is missing");
+  }
+  if (newPosition.length > MAX_POSITION_LENGTH) {
+    throw new Error(`Position must be ${MAX_POSITION_LENGTH} characters or less`);
   }
 
   await prisma.$transaction(async (tx) => {
     const personBefore = await tx.person.findUnique({ where: { id: personID } });
+    if (!personBefore) {
+      throw new Error("Person not found");
+    }
     await tx.person.update({
       where: { id: personID },
       data: { position: newPosition },
@@ -148,12 +172,13 @@ export async function updatePosition(data: FormData) {
       action: "update",
       entityType: "person",
       entityId: personID,
-      before: { position: personBefore?.position },
+      before: { position: personBefore.position },
       after: { position: newPosition },
       tx,
     });
   });
   revalidatePath("/managePersons");
+  revalidatePath("/");
 }
 
 export async function updateEmail(data: FormData) {
@@ -165,21 +190,27 @@ export async function updateEmail(data: FormData) {
   }
   validateUUID(personID, "personID");
 
-  const newEmail = data.get("name")?.toString().trim();
+  const newEmail = (data.get("email") ?? data.get("name"))?.toString().trim();
   if (!newEmail) {
     throw new Error("New Email is missing");
+  }
+  if (newEmail.length > MAX_EMAIL_LENGTH) {
+    throw new Error(`Email must be ${MAX_EMAIL_LENGTH} characters or less`);
   }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) {
     throw new Error("Invalid email format");
   }
 
-  const existingPerson = await prisma.person.findUnique({ where: { email: newEmail } });
-  if (existingPerson) {
-    throw new Error("A person with this email already exists");
-  }
-
   await prisma.$transaction(async (tx) => {
+    const existingPerson = await tx.person.findUnique({ where: { email: newEmail } });
+    if (existingPerson && existingPerson.id !== personID) {
+      throw new Error("A person with this email already exists");
+    }
+
     const personBefore = await tx.person.findUnique({ where: { id: personID } });
+    if (!personBefore) {
+      throw new Error("Person not found");
+    }
     await tx.person.update({
       where: { id: personID },
       data: { email: newEmail },
@@ -212,7 +243,14 @@ export async function addManager(data: FormData) {
   validateUUID(personID, "personID");
 
   await prisma.$transaction(async (tx) => {
+    const person = await tx.person.findUnique({ where: { id: personID } });
+    if (!person) {
+      throw new Error("Person not found");
+    }
     const teamBefore = await tx.team.findUnique({ where: { teamId: teamIDs[0] } });
+    if (!teamBefore) {
+      throw new Error("Team not found");
+    }
     await tx.team.update({
       where: { teamId: teamIDs[0] },
       data: { teamManagerId: personID },
@@ -310,6 +348,9 @@ export async function createTeam(data: FormData) {
   if (typeof name !== "string" || name.trim().length === 0) {
     throw new Error("Invalid Name");
   }
+  if (name.trim().length > MAX_NAME_LENGTH) {
+    throw new Error(`Name must be ${MAX_NAME_LENGTH} characters or less`);
+  }
 
   await prisma.$transaction(async (tx) => {
     const team = await tx.team.create({
@@ -343,9 +384,15 @@ export async function updateTeamName(data: FormData) {
   if (!newName) {
     throw new Error("New team name is missing");
   }
+  if (newName.length > MAX_NAME_LENGTH) {
+    throw new Error(`Name must be ${MAX_NAME_LENGTH} characters or less`);
+  }
 
   await prisma.$transaction(async (tx) => {
     const teamBefore = await tx.team.findUnique({ where: { teamId: teamID } });
+    if (!teamBefore) {
+      throw new Error("Team not found");
+    }
     await tx.team.update({
       where: { teamId: teamID },
       data: { teamName: newName },
@@ -354,7 +401,7 @@ export async function updateTeamName(data: FormData) {
       action: "update",
       entityType: "team",
       entityId: teamID,
-      before: { teamName: teamBefore?.teamName },
+      before: { teamName: teamBefore.teamName },
       after: { teamName: newName },
       tx,
     });
@@ -468,8 +515,14 @@ export async function createDepartment(data: FormData) {
   if (typeof name !== "string" || name.trim().length === 0) {
     throw new Error("Invalid Name");
   }
+  if (name.trim().length > MAX_NAME_LENGTH) {
+    throw new Error(`Name must be ${MAX_NAME_LENGTH} characters or less`);
+  }
 
   const description = data.get("description")?.toString().trim() || null;
+  if (description && description.length > MAX_DESCRIPTION_LENGTH) {
+    throw new Error(`Description must be ${MAX_DESCRIPTION_LENGTH} characters or less`);
+  }
 
   await prisma.$transaction(async (tx) => {
     const department = await tx.department.create({
@@ -544,11 +597,20 @@ export async function updateDepartment(data: FormData) {
   if (!name) {
     throw new Error("Department name is required");
   }
+  if (name.length > MAX_NAME_LENGTH) {
+    throw new Error(`Name must be ${MAX_NAME_LENGTH} characters or less`);
+  }
 
   const description = data.get("description")?.toString().trim() || null;
+  if (description && description.length > MAX_DESCRIPTION_LENGTH) {
+    throw new Error(`Description must be ${MAX_DESCRIPTION_LENGTH} characters or less`);
+  }
 
   await prisma.$transaction(async (tx) => {
     const before = await tx.department.findUnique({ where: { id: departmentID } });
+    if (!before) {
+      throw new Error("Department not found");
+    }
     await tx.department.update({
       where: { id: departmentID },
       data: { name, description },
@@ -557,7 +619,7 @@ export async function updateDepartment(data: FormData) {
       action: "update",
       entityType: "department",
       entityId: departmentID,
-      before: { name: before?.name, description: before?.description },
+      before: { name: before.name, description: before.description },
       after: { name, description },
       tx,
     });
@@ -579,7 +641,16 @@ export async function updateDepartmentHead(data: FormData) {
   if (personID) validateUUID(personID, "personID");
 
   await prisma.$transaction(async (tx) => {
+    if (personID) {
+      const person = await tx.person.findUnique({ where: { id: personID } });
+      if (!person) {
+        throw new Error("Person not found");
+      }
+    }
     const before = await tx.department.findUnique({ where: { id: departmentID } });
+    if (!before) {
+      throw new Error("Department not found");
+    }
     await tx.department.update({
       where: { id: departmentID },
       data: { headId: personID },
@@ -588,7 +659,7 @@ export async function updateDepartmentHead(data: FormData) {
       action: "update",
       entityType: "department",
       entityId: departmentID,
-      before: { headId: before?.headId },
+      before: { headId: before.headId },
       after: { headId: personID },
       tx,
     });
@@ -610,7 +681,14 @@ export async function assignTeamToDepartment(data: FormData) {
   validateUUID(teamID, "teamID");
 
   await prisma.$transaction(async (tx) => {
+    const department = await tx.department.findUnique({ where: { id: departmentID } });
+    if (!department) {
+      throw new Error("Department not found");
+    }
     const teamBefore = await tx.team.findUnique({ where: { teamId: teamID } });
+    if (!teamBefore) {
+      throw new Error("Team not found");
+    }
     await tx.team.update({
       where: { teamId: teamID },
       data: { departmentId: departmentID },
@@ -619,7 +697,7 @@ export async function assignTeamToDepartment(data: FormData) {
       action: "update",
       entityType: "team",
       entityId: teamID,
-      before: { departmentId: teamBefore?.departmentId },
+      before: { departmentId: teamBefore.departmentId },
       after: { departmentId: departmentID },
       tx,
     });
@@ -640,6 +718,9 @@ export async function removeTeamFromDepartment(data: FormData) {
 
   await prisma.$transaction(async (tx) => {
     const teamBefore = await tx.team.findUnique({ where: { teamId: teamID } });
+    if (!teamBefore) {
+      throw new Error("Team not found");
+    }
     await tx.team.update({
       where: { teamId: teamID },
       data: { departmentId: null },
@@ -648,7 +729,7 @@ export async function removeTeamFromDepartment(data: FormData) {
       action: "update",
       entityType: "team",
       entityId: teamID,
-      before: { departmentId: teamBefore?.departmentId },
+      before: { departmentId: teamBefore.departmentId },
       after: { departmentId: null },
       tx,
     });
@@ -906,7 +987,7 @@ export async function updateUserRole(data: FormData) {
   await prisma.$transaction(async (tx) => {
     await tx.user.update({
       where: { id: userId },
-      data: { role: newRole },
+      data: { role: newRole, permissionsVersion: { increment: 1 } },
     });
     await logAudit({
       action: "update",
@@ -974,6 +1055,11 @@ export async function updateUserPermission(data: FormData) {
         tx,
       });
     }
+    // Bump version so JWT callback detects the change
+    await tx.user.update({
+      where: { id: userId },
+      data: { permissionsVersion: { increment: 1 } },
+    });
   });
   revalidatePath("/admin");
 }

@@ -1,5 +1,6 @@
 import { prisma } from "@/db";
 import { headers } from "next/headers";
+import { auth } from "@/auth";
 
 const WINDOW_MS = 60 * 1000; // 1 minute
 const MAX_REQUESTS = 30; // 30 requests per window
@@ -12,12 +13,23 @@ export class RateLimitError extends Error {
 }
 
 async function getIdentifier(): Promise<string> {
+  // Prefer user-based rate limiting for authenticated users
+  const session = await auth();
+  if (session?.user?.id) {
+    return `user:${session.user.id}`;
+  }
+
+  // Fall back to IP-based for unauthenticated requests
   const headersList = await headers();
-  return (
+  const ip =
     headersList.get("x-forwarded-for")?.split(",")[0]?.trim() ??
     headersList.get("x-real-ip") ??
-    "unknown"
-  );
+    null;
+
+  if (!ip) {
+    return "anonymous";
+  }
+  return `ip:${ip}`;
 }
 
 export async function rateLimit(action: string): Promise<void> {

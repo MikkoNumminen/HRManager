@@ -65,7 +65,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async jwt({ token, trigger }) {
       if (!token.email) return token;
 
-      if (trigger === "signIn" || !token.role) {
+      const needsFullRefresh =
+        trigger === "signIn" || !token.role || typeof token.permissionsVersion !== "number";
+
+      if (needsFullRefresh) {
+        // Full fetch: signIn, first load, or missing version
         const dbUser = await prisma.user.findUnique({
           where: { email: token.email },
           include: {
@@ -75,14 +79,57 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           },
         });
 
-        if (dbUser) {
-          token.userId = dbUser.id;
-          token.role = dbUser.role;
-          const overrides = dbUser.permissions.map((up) => ({
-            key: up.permission.key,
-            granted: up.granted,
-          }));
-          token.permissions = await resolvePermissions(dbUser.role, overrides);
+        if (!dbUser) {
+          delete token.userId;
+          delete token.role;
+          delete token.permissions;
+          delete token.permissionsVersion;
+          return token;
+        }
+
+        token.userId = dbUser.id;
+        token.role = dbUser.role;
+        token.permissionsVersion = dbUser.permissionsVersion;
+        const overrides = dbUser.permissions.map((up) => ({
+          key: up.permission.key,
+          granted: up.granted,
+        }));
+        token.permissions = await resolvePermissions(dbUser.role, overrides);
+      } else {
+        // Lightweight check: only fetch version to detect permission changes
+        const dbUser = await prisma.user.findUnique({
+          where: { email: token.email },
+          select: { id: true, role: true, permissionsVersion: true },
+        });
+
+        if (!dbUser) {
+          delete token.userId;
+          delete token.role;
+          delete token.permissions;
+          delete token.permissionsVersion;
+          return token;
+        }
+
+        if (dbUser.permissionsVersion !== token.permissionsVersion || dbUser.role !== token.role) {
+          // Permissions or role changed — full refresh
+          const fullUser = await prisma.user.findUnique({
+            where: { id: dbUser.id },
+            include: {
+              permissions: {
+                include: { permission: true },
+              },
+            },
+          });
+
+          if (fullUser) {
+            token.role = fullUser.role;
+            token.permissionsVersion = fullUser.permissionsVersion;
+            const overrides = fullUser.permissions.map((up) => ({
+              key: up.permission.key,
+              granted: up.granted,
+            }));
+            token.permissions = await resolvePermissions(fullUser.role, overrides);
+          }
         }
       }
 

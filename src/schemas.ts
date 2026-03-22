@@ -1,10 +1,15 @@
 import { z } from "zod";
 
+export const MAX_NAME_LENGTH = 255;
+export const MAX_EMAIL_LENGTH = 320;
+export const MAX_POSITION_LENGTH = 255;
+export const MAX_DESCRIPTION_LENGTH = 1000;
+
 export const PersonSchema = z.object({
   id: z.string().uuid(),
-  name: z.string().min(1),
-  position: z.string().nullable(),
-  email: z.string().nullable(),
+  name: z.string().min(1).max(MAX_NAME_LENGTH),
+  position: z.string().max(MAX_POSITION_LENGTH).nullable(),
+  email: z.string().max(MAX_EMAIL_LENGTH).nullable(),
   createdAt: z.date(),
   updatedAt: z.date(),
 });
@@ -19,7 +24,7 @@ export const TeamMemberSchema = z.object({
 
 export const TeamSchema = z.object({
   teamId: z.string().uuid(),
-  teamName: z.string().min(1),
+  teamName: z.string().min(1).max(MAX_NAME_LENGTH),
   teamManagerId: z.string().uuid().nullable(),
   managerName: z.string().nullable(),
   departmentId: z.string().uuid().nullable(),
@@ -38,8 +43,8 @@ export const DepartmentTeamSchema = z.object({
 
 export const DepartmentSchema = z.object({
   id: z.string().uuid(),
-  name: z.string().min(1),
-  description: z.string().nullable(),
+  name: z.string().min(1).max(MAX_NAME_LENGTH),
+  description: z.string().max(MAX_DESCRIPTION_LENGTH).nullable(),
   headId: z.string().uuid().nullable(),
   headName: z.string().nullable(),
   createdAt: z.date(),

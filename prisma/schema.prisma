@@ -57,14 +57,15 @@ model TeamMember {
 }
 
 model User {
-  id          String           @id @default(uuid())
-  email       String           @unique
-  name        String?
-  image       String?
-  role        String           @default("user")
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-  permissions UserPermission[]
+  id                 String           @id @default(uuid())
+  email              String           @unique
+  name               String?
+  image              String?
+  role               String           @default("user")
+  permissionsVersion Int              @default(0)
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  permissions        UserPermission[]
 }
 
 model Permission {
@@ -110,6 +111,7 @@ model AuditLog {
   createdAt  DateTime @default(now())
 
   @@index([userId])
+  @@index([userEmail])
   @@index([action])
   @@index([entityType])
   @@index([createdAt])
