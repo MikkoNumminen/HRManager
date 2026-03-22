@@ -15,7 +15,7 @@ import {
   Typography,
 } from "@mui/material";
 import { CombinedTeam } from "@/schemas";
-import { colors } from "@/muiStyles";
+import { colors, mobileCardStyles } from "@/muiStyles";
 import { useTranslations } from "next-intl";
 
 interface CombinedTeamProps {
@@ -68,49 +68,94 @@ const TeamsTable: React.FC<CombinedTeamProps> = ({ combinedTeams, minimal = fals
     );
   }
 
+  const emptyMessage = (
+    <Box display="flex" justifyContent="center" alignItems="center" height="100px">
+      <Typography align="center">{t("noTeams")}</Typography>
+    </Box>
+  );
+
   return (
-    <TableContainer component={Paper} sx={{ marginBottom: "20px" }}>
-      <Table sx={{ minWidth: { xs: 500, sm: 650 } }} aria-label="teams table">
-        <TableHead>
-          <TableRow>
-            <TableCell scope="col">{t("teamName")}</TableCell>
-            <TableCell scope="col">{t("teamManager")}</TableCell>
-            <TableCell scope="col">{t("teamMembers")}</TableCell>
-            <TableCell scope="col">{tc("createdAt")}</TableCell>
-            <TableCell scope="col">{tc("updatedAt")}</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {combinedTeams.length === 0 ? (
-            <TableRow>
-              <TableCell colSpan={5}>
-                <Box display="flex" justifyContent="center" alignItems="center" height="100px">
-                  <Typography align="center">{t("noTeams")}</Typography>
-                </Box>
-              </TableCell>
-            </TableRow>
-          ) : (
-            combinedTeams.map((team) => (
-              <TableRow key={team.teamId}>
-                <TableCell>{team.teamName}</TableCell>
-                <TableCell>{team.managerName || t("noManager")}</TableCell>
-                <TableCell>
-                  <Box>
+    <>
+      {/* Desktop: table view */}
+      <Box data-testid="table-view" sx={{ display: { xs: "none", md: "block" } }}>
+        <TableContainer component={Paper} sx={{ marginBottom: "20px" }}>
+          <Table sx={{ minWidth: { xs: 500, sm: 650 } }} aria-label="teams table">
+            <TableHead>
+              <TableRow>
+                <TableCell scope="col">{t("teamName")}</TableCell>
+                <TableCell scope="col">{t("teamManager")}</TableCell>
+                <TableCell scope="col">{t("teamMembers")}</TableCell>
+                <TableCell scope="col">{tc("createdAt")}</TableCell>
+                <TableCell scope="col">{tc("updatedAt")}</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {combinedTeams.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5}>{emptyMessage}</TableCell>
+                </TableRow>
+              ) : (
+                combinedTeams.map((team) => (
+                  <TableRow key={team.teamId}>
+                    <TableCell>{team.teamName}</TableCell>
+                    <TableCell>{team.managerName || t("noManager")}</TableCell>
+                    <TableCell>
+                      <Box>
+                        {team.members.map((member) => (
+                          <Typography key={member.personId} variant="body2">
+                            {member.name}
+                          </Typography>
+                        ))}
+                      </Box>
+                    </TableCell>
+                    <TableCell>{new Date(team.createdAt).toLocaleString()}</TableCell>
+                    <TableCell>{new Date(team.updatedAt).toLocaleString()}</TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
+
+      {/* Mobile: card view */}
+      <Box data-testid="card-view" sx={{ display: { xs: "block", md: "none" }, mb: 2 }}>
+        {combinedTeams.length === 0
+          ? emptyMessage
+          : combinedTeams.map((team) => (
+              <Box key={team.teamId} sx={mobileCardStyles}>
+                <Typography variant="subtitle1" sx={{ color: colors.slate100, fontWeight: 600 }}>
+                  {team.teamName}
+                </Typography>
+                <Typography variant="body2" sx={{ color: colors.slate300 }}>
+                  {t("teamManager")}: {team.managerName || t("noManager")}
+                </Typography>
+                {team.members.length > 0 && (
+                  <Box sx={{ mt: 0.5 }}>
+                    <Typography variant="caption" sx={{ color: colors.slate400 }}>
+                      {t("teamMembers")}:
+                    </Typography>
                     {team.members.map((member) => (
-                      <Typography key={member.personId} variant="body2">
+                      <Typography
+                        key={member.personId}
+                        variant="body2"
+                        sx={{ color: colors.slate300, pl: 1 }}
+                      >
                         {member.name}
                       </Typography>
                     ))}
                   </Box>
-                </TableCell>
-                <TableCell>{new Date(team.createdAt).toLocaleString()}</TableCell>
-                <TableCell>{new Date(team.updatedAt).toLocaleString()}</TableCell>
-              </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
-    </TableContainer>
+                )}
+                <Typography
+                  variant="caption"
+                  sx={{ color: colors.slate400, mt: 0.5, display: "block" }}
+                >
+                  {tc("createdAt")}: {new Date(team.createdAt).toLocaleString()}
+                </Typography>
+              </Box>
+            ))}
+      </Box>
+    </>
   );
 };
 

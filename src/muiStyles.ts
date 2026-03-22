@@ -132,6 +132,23 @@ export const tableStyles = {
   width: "100%",
 };
 
+export const mobileCardStyles = {
+  border: `1px solid ${colors.slate300}`,
+  borderRadius: "4px",
+  p: 2,
+  mb: 1.5,
+};
+
+export const mobileCardClickableStyles = {
+  ...mobileCardStyles,
+  cursor: "pointer",
+  transition: "background-color 0.15s ease",
+  "&:hover, &:focus-visible": {
+    backgroundColor: colors.rowHover,
+  },
+  outline: "none",
+};
+
 export const boxStyles = {
   flex: "1",
   padding: { xs: "16px", sm: "20px" },

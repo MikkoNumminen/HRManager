@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import TeamsTable from "@/components/TeamsTable";
 
 const mockCombinedTeams = [
@@ -38,25 +38,27 @@ describe("TeamsTable Component", () => {
   test("should render the table headers correctly", () => {
     render(<TeamsTable combinedTeams={mockCombinedTeams} />);
 
-    expect(screen.getByText(/Team Name/)).toBeInTheDocument();
-    expect(screen.getByText(/Team Manager/)).toBeInTheDocument();
-    expect(screen.getByText(/Team Members/)).toBeInTheDocument();
-    expect(screen.getByText(/Created At/)).toBeInTheDocument();
-    expect(screen.getByText(/Updated At/)).toBeInTheDocument();
+    const table = within(screen.getByTestId("table-view"));
+    expect(table.getByText(/Team Name/)).toBeInTheDocument();
+    expect(table.getByText(/Team Manager/)).toBeInTheDocument();
+    expect(table.getByText(/Team Members/)).toBeInTheDocument();
+    expect(table.getByText(/Created At/)).toBeInTheDocument();
+    expect(table.getByText(/Updated At/)).toBeInTheDocument();
   });
 
   // Each team's name, manager, members, and timestamps should all be visible.
   test("should render the team data correctly", () => {
     render(<TeamsTable combinedTeams={mockCombinedTeams} />);
 
+    const table = within(screen.getByTestId("table-view"));
     mockCombinedTeams.forEach((team) => {
-      expect(screen.getByText(team.teamName)).toBeInTheDocument();
-      expect(screen.getByText(team.managerName)).toBeInTheDocument();
+      expect(table.getByText(team.teamName)).toBeInTheDocument();
+      expect(table.getByText(team.managerName)).toBeInTheDocument();
       team.members.forEach((member) => {
-        expect(screen.getByText(member.name)).toBeInTheDocument();
+        expect(table.getByText(member.name)).toBeInTheDocument();
       });
-      expect(screen.getByText(new Date(team.createdAt).toLocaleString())).toBeInTheDocument();
-      expect(screen.getByText(new Date(team.updatedAt).toLocaleString())).toBeInTheDocument();
+      expect(table.getByText(new Date(team.createdAt).toLocaleString())).toBeInTheDocument();
+      expect(table.getByText(new Date(team.updatedAt).toLocaleString())).toBeInTheDocument();
     });
   });
 
@@ -64,7 +66,8 @@ describe("TeamsTable Component", () => {
   test('should render "No Teams Available" when there are no teams', () => {
     render(<TeamsTable combinedTeams={[]} />);
 
-    expect(screen.getByText(/No Teams Available/)).toBeInTheDocument();
+    const table = within(screen.getByTestId("table-view"));
+    expect(table.getByText(/No Teams Available/)).toBeInTheDocument();
   });
 
   // When a team has no manager, the table should display a fallback text.
@@ -78,7 +81,8 @@ describe("TeamsTable Component", () => {
     ];
     render(<TeamsTable combinedTeams={teamNoManager} />);
 
-    expect(screen.getByText("No Manager Assigned")).toBeInTheDocument();
+    const table = within(screen.getByTestId("table-view"));
+    expect(table.getByText("No Manager Assigned")).toBeInTheDocument();
   });
 });
 
@@ -110,5 +114,34 @@ describe("TeamsTable minimal mode", () => {
     render(<TeamsTable combinedTeams={[]} minimal />);
 
     expect(screen.getByText(/No Teams Available/)).toBeInTheDocument();
+  });
+});
+
+describe("TeamsTable mobile card view", () => {
+  // Card view shows team data in stacked card layout
+  test("renders card view with team data", () => {
+    render(<TeamsTable combinedTeams={mockCombinedTeams} />);
+
+    const cards = within(screen.getByTestId("card-view"));
+    expect(cards.getByText("Development")).toBeInTheDocument();
+    expect(cards.getByText("Design")).toBeInTheDocument();
+    expect(cards.getByText("John Doe")).toBeInTheDocument();
+  });
+
+  // Card view shows empty message when no teams
+  test("renders empty message in card view", () => {
+    render(<TeamsTable combinedTeams={[]} />);
+
+    const cards = within(screen.getByTestId("card-view"));
+    expect(cards.getByText(/No Teams Available/)).toBeInTheDocument();
+  });
+
+  // Card view shows "No Manager Assigned" fallback
+  test("card view shows no manager fallback", () => {
+    const teamNoManager = [{ ...mockCombinedTeams[0], teamManagerId: null, managerName: null }];
+    render(<TeamsTable combinedTeams={teamNoManager} />);
+
+    const cards = within(screen.getByTestId("card-view"));
+    expect(cards.getByText(/No Manager Assigned/)).toBeInTheDocument();
   });
 });

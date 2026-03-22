@@ -14,7 +14,7 @@ import {
   Typography,
 } from "@mui/material";
 import { Person } from "@/schemas";
-import { colors } from "@/muiStyles";
+import { colors, mobileCardStyles } from "@/muiStyles";
 import { useTranslations } from "next-intl";
 
 interface PersonTableProps {
@@ -67,41 +67,77 @@ const PersonTable: React.FC<PersonTableProps> = ({ persons, minimal = false }) =
     );
   }
 
+  const emptyMessage = (
+    <Box display="flex" justifyContent="center" alignItems="center" height="100px">
+      <Typography align="center">{t("noPersons")}</Typography>
+    </Box>
+  );
+
   return (
-    <TableContainer component={Paper} sx={{ marginBottom: "20px" }}>
-      <Table sx={{ minWidth: { xs: 500, sm: 650 } }} aria-label="person table">
-        <TableHead>
-          <TableRow>
-            <TableCell scope="col">{tc("name")}</TableCell>
-            <TableCell scope="col">{t("position")}</TableCell>
-            <TableCell scope="col">{tc("email")}</TableCell>
-            <TableCell scope="col">{tc("createdAt")}</TableCell>
-            <TableCell scope="col">{tc("updatedAt")}</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {persons.length === 0 ? (
-            <TableRow>
-              <TableCell colSpan={5}>
-                <Box display="flex" justifyContent="center" alignItems="center" height="100px">
-                  <Typography align="center">{t("noPersons")}</Typography>
-                </Box>
-              </TableCell>
-            </TableRow>
-          ) : (
-            persons.map((person) => (
-              <TableRow key={person.id}>
-                <TableCell>{person.name}</TableCell>
-                <TableCell>{person.position ?? ""}</TableCell>
-                <TableCell>{person.email ?? ""}</TableCell>
-                <TableCell>{new Date(person.createdAt).toLocaleString()}</TableCell>
-                <TableCell>{new Date(person.updatedAt).toLocaleString()}</TableCell>
+    <>
+      {/* Desktop: table view */}
+      <Box data-testid="table-view" sx={{ display: { xs: "none", md: "block" } }}>
+        <TableContainer component={Paper} sx={{ marginBottom: "20px" }}>
+          <Table sx={{ minWidth: { xs: 500, sm: 650 } }} aria-label="person table">
+            <TableHead>
+              <TableRow>
+                <TableCell scope="col">{tc("name")}</TableCell>
+                <TableCell scope="col">{t("position")}</TableCell>
+                <TableCell scope="col">{tc("email")}</TableCell>
+                <TableCell scope="col">{tc("createdAt")}</TableCell>
+                <TableCell scope="col">{tc("updatedAt")}</TableCell>
               </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
-    </TableContainer>
+            </TableHead>
+            <TableBody>
+              {persons.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5}>{emptyMessage}</TableCell>
+                </TableRow>
+              ) : (
+                persons.map((person) => (
+                  <TableRow key={person.id}>
+                    <TableCell>{person.name}</TableCell>
+                    <TableCell>{person.position ?? ""}</TableCell>
+                    <TableCell>{person.email ?? ""}</TableCell>
+                    <TableCell>{new Date(person.createdAt).toLocaleString()}</TableCell>
+                    <TableCell>{new Date(person.updatedAt).toLocaleString()}</TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
+
+      {/* Mobile: card view */}
+      <Box data-testid="card-view" sx={{ display: { xs: "block", md: "none" }, mb: 2 }}>
+        {persons.length === 0
+          ? emptyMessage
+          : persons.map((person) => (
+              <Box key={person.id} sx={mobileCardStyles}>
+                <Typography variant="subtitle1" sx={{ color: colors.slate100, fontWeight: 600 }}>
+                  {person.name}
+                </Typography>
+                {person.position && (
+                  <Typography variant="body2" sx={{ color: colors.slate300 }}>
+                    {person.position}
+                  </Typography>
+                )}
+                {person.email && (
+                  <Typography variant="body2" sx={{ color: colors.slate400 }}>
+                    {person.email}
+                  </Typography>
+                )}
+                <Typography
+                  variant="caption"
+                  sx={{ color: colors.slate400, mt: 0.5, display: "block" }}
+                >
+                  {tc("createdAt")}: {new Date(person.createdAt).toLocaleString()}
+                </Typography>
+              </Box>
+            ))}
+      </Box>
+    </>
   );
 };
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import DepartmentsTable from "@/components/DepartmentsTable";
 import { Department } from "@/schemas";
 
@@ -34,31 +34,34 @@ describe("DepartmentsTable Component", () => {
   test("renders table headers correctly", () => {
     render(<DepartmentsTable departments={mockDepartments} />);
 
-    expect(screen.getByText("Name")).toBeInTheDocument();
-    expect(screen.getByText("Description")).toBeInTheDocument();
-    expect(screen.getByText("Head")).toBeInTheDocument();
-    expect(screen.getByText("Teams")).toBeInTheDocument();
-    expect(screen.getByText("Created At")).toBeInTheDocument();
-    expect(screen.getByText("Updated At")).toBeInTheDocument();
+    const table = within(screen.getByTestId("table-view"));
+    expect(table.getByText("Name")).toBeInTheDocument();
+    expect(table.getByText("Description")).toBeInTheDocument();
+    expect(table.getByText("Head")).toBeInTheDocument();
+    expect(table.getByText("Teams")).toBeInTheDocument();
+    expect(table.getByText("Created At")).toBeInTheDocument();
+    expect(table.getByText("Updated At")).toBeInTheDocument();
   });
 
   // Each department's name, description, head, teams, and dates should be visible.
   test("renders department data correctly", () => {
     render(<DepartmentsTable departments={mockDepartments} />);
 
-    expect(screen.getByText("Engineering")).toBeInTheDocument();
-    expect(screen.getByText("Software development")).toBeInTheDocument();
-    expect(screen.getByText("Alice Manager")).toBeInTheDocument();
-    expect(screen.getByText("Frontend")).toBeInTheDocument();
-    expect(screen.getByText("Backend")).toBeInTheDocument();
-    expect(screen.getByText("Product")).toBeInTheDocument();
+    const table = within(screen.getByTestId("table-view"));
+    expect(table.getByText("Engineering")).toBeInTheDocument();
+    expect(table.getByText("Software development")).toBeInTheDocument();
+    expect(table.getByText("Alice Manager")).toBeInTheDocument();
+    expect(table.getByText("Frontend")).toBeInTheDocument();
+    expect(table.getByText("Backend")).toBeInTheDocument();
+    expect(table.getByText("Product")).toBeInTheDocument();
   });
 
   // A department with no description should show a dash.
   test("shows dash for null description", () => {
     render(<DepartmentsTable departments={mockDepartments} />);
 
-    const productRow = screen.getByText("Product").closest("tr")!;
+    const table = within(screen.getByTestId("table-view"));
+    const productRow = table.getByText("Product").closest("tr")!;
     const cells = productRow.querySelectorAll("td");
     expect(cells[1].textContent).toBe("-");
   });
@@ -67,14 +70,16 @@ describe("DepartmentsTable Component", () => {
   test("shows fallback for null headName", () => {
     render(<DepartmentsTable departments={mockDepartments} />);
 
-    expect(screen.getByText("No Head Assigned")).toBeInTheDocument();
+    const table = within(screen.getByTestId("table-view"));
+    expect(table.getByText("No Head Assigned")).toBeInTheDocument();
   });
 
   // A department with no teams should show a dash.
   test("shows dash for empty teams", () => {
     render(<DepartmentsTable departments={mockDepartments} />);
 
-    const productRow = screen.getByText("Product").closest("tr")!;
+    const table = within(screen.getByTestId("table-view"));
+    const productRow = table.getByText("Product").closest("tr")!;
     const cells = productRow.querySelectorAll("td");
     expect(cells[3].textContent).toBe("-");
   });
@@ -83,15 +88,17 @@ describe("DepartmentsTable Component", () => {
   test("shows empty state when no departments", () => {
     render(<DepartmentsTable departments={[]} />);
 
-    expect(screen.getByText("No Departments Available")).toBeInTheDocument();
+    const table = within(screen.getByTestId("table-view"));
+    expect(table.getByText("No Departments Available")).toBeInTheDocument();
   });
 
   // Renders formatted dates for each department.
   test("renders formatted dates", () => {
     render(<DepartmentsTable departments={mockDepartments} />);
 
-    expect(screen.getByText(new Date("2024-01-01T10:00:00Z").toLocaleString())).toBeInTheDocument();
-    expect(screen.getByText(new Date("2024-01-10T10:00:00Z").toLocaleString())).toBeInTheDocument();
+    const table = within(screen.getByTestId("table-view"));
+    expect(table.getByText(new Date("2024-01-01T10:00:00Z").toLocaleString())).toBeInTheDocument();
+    expect(table.getByText(new Date("2024-01-10T10:00:00Z").toLocaleString())).toBeInTheDocument();
   });
 
   // In minimal mode, departments are rendered as chips instead of a table.
@@ -138,5 +145,35 @@ describe("DepartmentsTable Component", () => {
     render(<DepartmentsTable departments={multiWord} minimal />);
 
     expect(screen.getByText("HR")).toBeInTheDocument();
+  });
+});
+
+describe("DepartmentsTable mobile card view", () => {
+  // Card view shows department data in stacked card layout
+  test("renders card view with department data", () => {
+    render(<DepartmentsTable departments={mockDepartments} />);
+
+    const cards = within(screen.getByTestId("card-view"));
+    expect(cards.getByText("Engineering")).toBeInTheDocument();
+    expect(cards.getByText("Software development")).toBeInTheDocument();
+    expect(cards.getByText(/Alice Manager/)).toBeInTheDocument();
+    expect(cards.getByText("Frontend")).toBeInTheDocument();
+  });
+
+  // Card view shows empty message when no departments
+  test("renders empty message in card view", () => {
+    render(<DepartmentsTable departments={[]} />);
+
+    const cards = within(screen.getByTestId("card-view"));
+    expect(cards.getByText("No Departments Available")).toBeInTheDocument();
+  });
+
+  // Card view shows head fallback
+  test("card view shows no head fallback", () => {
+    const deptNoHead: Department[] = [{ ...mockDepartments[1] }];
+    render(<DepartmentsTable departments={deptNoHead} />);
+
+    const cards = within(screen.getByTestId("card-view"));
+    expect(cards.getByText(/No Head Assigned/)).toBeInTheDocument();
   });
 });

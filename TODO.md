@@ -4,13 +4,13 @@ Shared task list across all Claude Code sessions. After completing a task, note 
 Every item must have a size estimate: 🟢 small, 🟡 medium, 🔴 large.
 In Progress items must show the owner: `[worktree-name]` or `[main]`.
 
-## In Progress
+**NOTE:** 3 Claude instances run in parallel. Always re-read TODO.md before presenting tasks. Maintain this list carefully — other Claudes depend on it.
 
-- 🔴 Add dashboard page with MUI charts `[dashboard]`
+## In Progress
 
 - 🔴 Mobile-first redesign `[main]`
   - [x] TopBar: hamburger menu + drawer for mobile navigation
-  - [ ] Tables: card/list view on mobile (< sm breakpoint)
+  - [x] Tables: card/list view on mobile (< sm breakpoint)
   - [ ] Forms: full-width inputs, responsive button layout
   - [ ] AuditLogViewer: collapsible filters, card view for entries
   - [ ] Layout: responsive container + manage page padding

@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, within } from "@testing-library/react";
 import EditableDepartmentsTable from "@/components/EditableDepartmentsTable";
 import { useRouter } from "next/navigation";
 import { Department } from "@/schemas";
@@ -49,29 +49,32 @@ describe("EditableDepartmentsTable Component", () => {
   test("renders table headers correctly", () => {
     render(<EditableDepartmentsTable departments={mockDepartments} />);
 
-    expect(screen.getByText("Name")).toBeInTheDocument();
-    expect(screen.getByText("Description")).toBeInTheDocument();
-    expect(screen.getByText("Head")).toBeInTheDocument();
-    expect(screen.getByText("Teams")).toBeInTheDocument();
-    expect(screen.getByText("Created At")).toBeInTheDocument();
-    expect(screen.getByText("Updated At")).toBeInTheDocument();
+    const table = within(screen.getByTestId("table-view"));
+    expect(table.getByText("Name")).toBeInTheDocument();
+    expect(table.getByText("Description")).toBeInTheDocument();
+    expect(table.getByText("Head")).toBeInTheDocument();
+    expect(table.getByText("Teams")).toBeInTheDocument();
+    expect(table.getByText("Created At")).toBeInTheDocument();
+    expect(table.getByText("Updated At")).toBeInTheDocument();
   });
 
   // Shows each department's data in the table.
   test("renders department data correctly", () => {
     render(<EditableDepartmentsTable departments={mockDepartments} />);
 
-    expect(screen.getByText("Engineering")).toBeInTheDocument();
-    expect(screen.getByText("Software development")).toBeInTheDocument();
-    expect(screen.getByText("Alice Manager")).toBeInTheDocument();
-    expect(screen.getByText("Product")).toBeInTheDocument();
+    const table = within(screen.getByTestId("table-view"));
+    expect(table.getByText("Engineering")).toBeInTheDocument();
+    expect(table.getByText("Software development")).toBeInTheDocument();
+    expect(table.getByText("Alice Manager")).toBeInTheDocument();
+    expect(table.getByText("Product")).toBeInTheDocument();
   });
 
   // Clicking a row navigates to that department's manage page.
   test("navigates to department page on row click", () => {
     render(<EditableDepartmentsTable departments={mockDepartments} />);
 
-    fireEvent.click(screen.getByText("Engineering"));
+    const table = within(screen.getByTestId("table-view"));
+    fireEvent.click(table.getByText("Engineering"));
     expect(mockPush).toHaveBeenCalledWith("/manageDepartments/dept-1");
   });
 
@@ -79,7 +82,8 @@ describe("EditableDepartmentsTable Component", () => {
   test("navigates to correct department on second row click", () => {
     render(<EditableDepartmentsTable departments={mockDepartments} />);
 
-    fireEvent.click(screen.getByText("Product"));
+    const table = within(screen.getByTestId("table-view"));
+    fireEvent.click(table.getByText("Product"));
     expect(mockPush).toHaveBeenCalledWith("/manageDepartments/dept-2");
   });
 
@@ -87,7 +91,8 @@ describe("EditableDepartmentsTable Component", () => {
   test("navigates to department page on Enter key", () => {
     render(<EditableDepartmentsTable departments={mockDepartments} />);
 
-    const row = screen.getByText("Engineering").closest("tr")!;
+    const table = within(screen.getByTestId("table-view"));
+    const row = table.getByText("Engineering").closest("tr")!;
     fireEvent.keyDown(row, { key: "Enter" });
 
     expect(mockPush).toHaveBeenCalledWith("/manageDepartments/dept-1");
@@ -97,7 +102,8 @@ describe("EditableDepartmentsTable Component", () => {
   test("navigates to department page on Space key", () => {
     render(<EditableDepartmentsTable departments={mockDepartments} />);
 
-    const row = screen.getByText("Product").closest("tr")!;
+    const table = within(screen.getByTestId("table-view"));
+    const row = table.getByText("Product").closest("tr")!;
     fireEvent.keyDown(row, { key: " " });
 
     expect(mockPush).toHaveBeenCalledWith("/manageDepartments/dept-2");
@@ -107,7 +113,8 @@ describe("EditableDepartmentsTable Component", () => {
   test("does not navigate on non-trigger key", () => {
     render(<EditableDepartmentsTable departments={mockDepartments} />);
 
-    const row = screen.getByText("Engineering").closest("tr")!;
+    const table = within(screen.getByTestId("table-view"));
+    const row = table.getByText("Engineering").closest("tr")!;
     fireEvent.keyDown(row, { key: "Tab" });
 
     expect(mockPush).not.toHaveBeenCalled();
@@ -117,14 +124,16 @@ describe("EditableDepartmentsTable Component", () => {
   test("shows fallback for null headName", () => {
     render(<EditableDepartmentsTable departments={mockDepartments} />);
 
-    expect(screen.getByText("No Head Assigned")).toBeInTheDocument();
+    const table = within(screen.getByTestId("table-view"));
+    expect(table.getByText("No Head Assigned")).toBeInTheDocument();
   });
 
   // A department with no description shows a dash.
   test("shows dash for null description", () => {
     render(<EditableDepartmentsTable departments={mockDepartments} />);
 
-    const productRow = screen.getByText("Product").closest("tr")!;
+    const table = within(screen.getByTestId("table-view"));
+    const productRow = table.getByText("Product").closest("tr")!;
     const cells = productRow.querySelectorAll("td");
     expect(cells[1].textContent).toBe("-");
   });
@@ -133,21 +142,82 @@ describe("EditableDepartmentsTable Component", () => {
   test("renders team names in teams column", () => {
     render(<EditableDepartmentsTable departments={mockDepartments} />);
 
-    expect(screen.getByText("Frontend")).toBeInTheDocument();
-    expect(screen.getByText("Backend")).toBeInTheDocument();
+    const table = within(screen.getByTestId("table-view"));
+    expect(table.getByText("Frontend")).toBeInTheDocument();
+    expect(table.getByText("Backend")).toBeInTheDocument();
   });
 
   // Empty departments array shows the "No Departments Available" message.
   test("shows empty state when no departments", () => {
     render(<EditableDepartmentsTable departments={[]} />);
 
-    expect(screen.getByText("No Departments Available")).toBeInTheDocument();
+    const table = within(screen.getByTestId("table-view"));
+    expect(table.getByText("No Departments Available")).toBeInTheDocument();
   });
 
   // Renders formatted dates.
   test("renders formatted dates", () => {
     render(<EditableDepartmentsTable departments={mockDepartments} />);
 
-    expect(screen.getByText(new Date("2024-01-01T10:00:00Z").toLocaleString())).toBeInTheDocument();
+    const table = within(screen.getByTestId("table-view"));
+    expect(table.getByText(new Date("2024-01-01T10:00:00Z").toLocaleString())).toBeInTheDocument();
+  });
+});
+
+describe("EditableDepartmentsTable mobile card view", () => {
+  const mockPush = jest.fn();
+
+  beforeAll(() => {
+    (useRouter as jest.Mock).mockReturnValue({ push: mockPush });
+  });
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  // Clickable cards render with department data
+  test("renders clickable cards with department data", () => {
+    render(<EditableDepartmentsTable departments={mockDepartments} />);
+
+    const cards = within(screen.getByTestId("card-view"));
+    expect(cards.getByText("Engineering")).toBeInTheDocument();
+    expect(cards.getByText("Software development")).toBeInTheDocument();
+    expect(cards.getByText(/Alice Manager/)).toBeInTheDocument();
+  });
+
+  // Clicking a card navigates to the department page
+  test("card click navigates to department page", () => {
+    render(<EditableDepartmentsTable departments={[mockDepartments[0]]} />);
+
+    const cards = within(screen.getByTestId("card-view"));
+    fireEvent.click(cards.getByRole("button"));
+
+    expect(mockPush).toHaveBeenCalledWith("/manageDepartments/dept-1");
+  });
+
+  // Enter key on a card navigates
+  test("card Enter key navigates to department page", () => {
+    render(<EditableDepartmentsTable departments={[mockDepartments[0]]} />);
+
+    const cards = within(screen.getByTestId("card-view"));
+    fireEvent.keyDown(cards.getByRole("button"), { key: "Enter" });
+
+    expect(mockPush).toHaveBeenCalledWith("/manageDepartments/dept-1");
+  });
+
+  // Empty state shows message in card view
+  test("card view shows empty message", () => {
+    render(<EditableDepartmentsTable departments={[]} />);
+
+    const cards = within(screen.getByTestId("card-view"));
+    expect(cards.getByText("No Departments Available")).toBeInTheDocument();
+  });
+
+  // Card view shows head fallback
+  test("card view shows no head fallback", () => {
+    render(<EditableDepartmentsTable departments={[mockDepartments[1]]} />);
+
+    const cards = within(screen.getByTestId("card-view"));
+    expect(cards.getByText(/No Head Assigned/)).toBeInTheDocument();
   });
 });

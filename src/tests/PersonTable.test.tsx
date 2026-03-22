@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import PersonTable from "@/components/PersonsTable";
 import { Person } from "@/schemas";
 
@@ -26,25 +26,27 @@ describe("PersonTable Component", () => {
   test("should render table with provided persons data", () => {
     render(<PersonTable persons={mockPersons} />);
 
-    expect(screen.getByText(/Name/i)).toBeInTheDocument();
-    expect(screen.getByText(/Position/i)).toBeInTheDocument();
-    expect(screen.getByText(/Email/i)).toBeInTheDocument();
-    expect(screen.getByText(/Created At/i)).toBeInTheDocument();
-    expect(screen.getByText(/Updated At/i)).toBeInTheDocument();
+    const table = within(screen.getByTestId("table-view"));
+    expect(table.getByText(/Name/i)).toBeInTheDocument();
+    expect(table.getByText(/Position/i)).toBeInTheDocument();
+    expect(table.getByText(/Email/i)).toBeInTheDocument();
+    expect(table.getByText(/Created At/i)).toBeInTheDocument();
+    expect(table.getByText(/Updated At/i)).toBeInTheDocument();
 
-    expect(screen.getByText("John Doe")).toBeInTheDocument();
-    expect(screen.getByText("Developer")).toBeInTheDocument();
-    expect(screen.getByText("john.doe@example.com")).toBeInTheDocument();
-    expect(screen.getByText("Jane Smith")).toBeInTheDocument();
-    expect(screen.getByText("Designer")).toBeInTheDocument();
-    expect(screen.getByText("jane.smith@example.com")).toBeInTheDocument();
+    expect(table.getByText("John Doe")).toBeInTheDocument();
+    expect(table.getByText("Developer")).toBeInTheDocument();
+    expect(table.getByText("john.doe@example.com")).toBeInTheDocument();
+    expect(table.getByText("Jane Smith")).toBeInTheDocument();
+    expect(table.getByText("Designer")).toBeInTheDocument();
+    expect(table.getByText("jane.smith@example.com")).toBeInTheDocument();
   });
 
   // When there are no people to show, display a friendly message instead of an empty table.
   test('should render "No Persons Available" when there are no persons', () => {
     render(<PersonTable persons={[]} />);
 
-    expect(screen.getByText(/No Persons Available/)).toBeInTheDocument();
+    const table = within(screen.getByTestId("table-view"));
+    expect(table.getByText(/No Persons Available/)).toBeInTheDocument();
   });
 
   // If position or email are null in the database, the table cell should just be empty.
@@ -58,7 +60,8 @@ describe("PersonTable Component", () => {
     ];
     render(<PersonTable persons={personsWithNulls} />);
 
-    const row = screen.getByText("John Doe").closest("tr")!;
+    const table = within(screen.getByTestId("table-view"));
+    const row = table.getByText("John Doe").closest("tr")!;
     const cells = row.querySelectorAll("td");
     expect(cells[1].textContent).toBe("");
     expect(cells[2].textContent).toBe("");
@@ -102,5 +105,37 @@ describe("PersonTable minimal mode", () => {
     render(<PersonTable persons={singleName} minimal />);
 
     expect(screen.getByText("C")).toBeInTheDocument();
+  });
+});
+
+describe("PersonTable mobile card view", () => {
+  // Mobile card view shows person data in stacked card layout
+  test("renders card view with person data", () => {
+    render(<PersonTable persons={mockPersons} />);
+
+    const cards = within(screen.getByTestId("card-view"));
+    expect(cards.getByText("John Doe")).toBeInTheDocument();
+    expect(cards.getByText("Developer")).toBeInTheDocument();
+    expect(cards.getByText("john.doe@example.com")).toBeInTheDocument();
+    expect(cards.getByText("Jane Smith")).toBeInTheDocument();
+  });
+
+  // Card view shows empty message when no persons
+  test("renders empty message in card view", () => {
+    render(<PersonTable persons={[]} />);
+
+    const cards = within(screen.getByTestId("card-view"));
+    expect(cards.getByText(/No Persons Available/)).toBeInTheDocument();
+  });
+
+  // Card view hides position and email when null
+  test("hides null fields in card view", () => {
+    const personsWithNulls: Person[] = [{ ...mockPersons[0], position: null, email: null }];
+    render(<PersonTable persons={personsWithNulls} />);
+
+    const cards = within(screen.getByTestId("card-view"));
+    expect(cards.getByText("John Doe")).toBeInTheDocument();
+    expect(cards.queryByText("Developer")).not.toBeInTheDocument();
+    expect(cards.queryByText("john.doe@example.com")).not.toBeInTheDocument();
   });
 });
