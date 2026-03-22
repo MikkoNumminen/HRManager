@@ -89,10 +89,11 @@ docker-compose.yml    # PostgreSQL 17 + app with health checks
 
 ## Data model
 
-- **Person** — name, email, title, optional manager (FK to Person). Can belong to multiple teams.
-- **Team** — name, manager (FK to Person), optional department (FK to Department, SetNull), members via TeamMember join table.
-- **Department** — name, optional description, optional head (FK to Person, SetNull). Teams assigned via Team.departmentId.
-- **TeamMember** — join table between Person and Team, cascade delete on removal.
+- **Person** — name, email, title, optional manager (FK to Person). Can belong to multiple teams. Soft-deleted via `deletedAt`; cascade soft-deletes TeamMember rows and nulls team manager / department head FK refs.
+- **Team** — name, manager (FK to Person), optional department (FK to Department, SetNull), members via TeamMember join table. Soft-deleted via `deletedAt`; cascade soft-deletes TeamMember rows.
+- **Department** — name, optional description, optional head (FK to Person, SetNull). Teams assigned via Team.departmentId. Soft-deleted via `deletedAt`; nulls team departmentId refs.
+- **TeamMember** — join table between Person and Team. Soft-deleted via `deletedAt`; re-adding a soft-deleted member restores the record.
+- All four entity models use **partial unique indexes** (`WHERE deletedAt IS NULL`) so soft-deleted records retain original values without blocking new active records.
 - **User** — authenticated identity (email, name, image, role). Linked to NextAuth OAuth.
 - **Permission** — catalog of 23 granular permission keys (e.g. `person:create`, `team:delete`, `department:assign_team`).
 - **UserPermission** — per-user permission overrides (grant/deny) with role-default fallback.

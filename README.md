@@ -29,6 +29,7 @@ A production-grade HR management system with granular RBAC, audit logging, rate 
 
 - **933 tests (899 unit/integration + 34 E2E), 99.6% line coverage** — Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, rate limiting, auth route handlers, CSP proxy, audit logging, all 42 UI components tested against real PostgreSQL, plus Playwright E2E covering full user flows
 - **Granular RBAC** — 4 roles, 23 permission keys, per-user grant/deny overrides with three-state toggles (deny / role default / grant), and "kick out" user removal with confirmation dialog
+- **Soft deletes** — `deletedAt` column on Person, Team, Department, and TeamMember with partial unique indexes (`WHERE deletedAt IS NULL`); cascade soft-deletes for team memberships and FK nulling for manager/head references; preserves full audit history
 - **Immutable audit trail** — every mutation logged with before/after JSON snapshots inside the same `$transaction` for atomicity; permission denials and rate limit hits also logged as security events
 - **18 languages** — next-intl with cookie persistence, Accept-Language detection, and an AI-powered translation pipeline using parallel Claude Code agents
 - **Gamified demo tour** — 8-step tutorial with DOM-aware navigation hints, spotlight overlays, confetti celebrations, and auto-detection of task completion
@@ -77,7 +78,7 @@ graph LR
 ```
 
 - **Reads** in `queries.ts` — Zod-validated, no `"use server"`
-- **Mutations** in `serverActions.ts` — always inside `$transaction`, always audit-logged
+- **Mutations** in `serverActions.ts` — always inside `$transaction`, always audit-logged; deletes are soft (set `deletedAt`) with cascade logic
 - **Types** in `schemas.ts` — Zod schemas with `z.infer` exports, used everywhere
 - **Auth** in `auth.ts` — JWT strategy with permission-enriched tokens; automatic superuser bootstrapping; `permissionsVersion`-based stale permission detection
 - **RBAC** in `permissions.ts` — resolution: superuser (all) → user override → role default
