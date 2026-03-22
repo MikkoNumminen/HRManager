@@ -105,9 +105,7 @@ describe("AuditLogViewer", () => {
       after: '{"name":"Alicia"}',
     });
     render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
-    expect(
-      screen.getAllByText('Changed name from "Alice" to "Alicia"').length,
-    ).toBeGreaterThan(0);
+    expect(screen.getAllByText('Changed name from "Alice" to "Alicia"').length).toBeGreaterThan(0);
   });
 
   // Describes a position update in plain language.
@@ -448,9 +446,7 @@ describe("AuditLogViewer", () => {
       after: '{"teamName":"New"}',
     });
     render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
-    expect(
-      screen.getAllByText('Renamed team from "Old" to "New"').length,
-    ).toBeGreaterThan(0);
+    expect(screen.getAllByText('Renamed team from "Old" to "New"').length).toBeGreaterThan(0);
   });
 
   // Shows generic team update message when no specific field changed.
