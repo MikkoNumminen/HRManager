@@ -9,51 +9,62 @@ datasource db {
 }
 
 model Person {
-  id String @id @default(uuid())
-  name String
-  position String?
-  email String? @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  teams TeamMember[]
-  managedTeams Team[]
+  id        String      @id @default(uuid())
+  name      String
+  position  String?
+  email     String?
+  deletedAt DateTime?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  teams             TeamMember[]
+  managedTeams      Team[]
   headOfDepartments Department[]
+
+  @@index([deletedAt])
 }
 
 model Department {
-  id          String   @id @default(uuid())
-  name        String   @unique
+  id          String    @id @default(uuid())
+  name        String
   description String?
   headId      String?
-  head        Person?  @relation(fields: [headId], references: [id], onDelete: SetNull)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  head        Person?   @relation(fields: [headId], references: [id], onDelete: SetNull)
+  deletedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
   teams       Team[]
+
+  @@index([deletedAt])
 }
 
 model Team {
-  teamId String @id @default(uuid())
-  teamName String @unique
+  teamId        String      @id @default(uuid())
+  teamName      String
   teamManagerId String?
-  departmentId String?
-  manager Person? @relation(fields: [teamManagerId], references: [id], onDelete: SetNull)
-  department Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  members TeamMember[]
+  departmentId  String?
+  manager       Person?     @relation(fields: [teamManagerId], references: [id], onDelete: SetNull)
+  department    Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  deletedAt     DateTime?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  members       TeamMember[]
+
+  @@index([deletedAt])
 }
 
 model TeamMember {
-  id String @id @default(uuid())
-  personId String
-  teamId String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        String    @id @default(uuid())
+  personId  String
+  teamId    String
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   person Person @relation(fields: [personId], references: [id])
-  team Team @relation(fields: [teamId], references: [teamId], onDelete: Cascade)
+  team   Team   @relation(fields: [teamId], references: [teamId], onDelete: Cascade)
 
   @@unique([personId, teamId])
+  @@index([deletedAt])
 }
 
 model User {
