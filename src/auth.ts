@@ -4,6 +4,7 @@ import GitHub from "next-auth/providers/github";
 import Credentials from "next-auth/providers/credentials";
 import { prisma } from "@/db";
 import { resolvePermissions } from "@/permissions";
+import { seedDemoData, cleanupStaleDemoSessions } from "@/demoSession";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
@@ -30,7 +31,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             data: { role: "superuser" },
           });
         }
-        return { id: user.id, email: user.email, name: user.name };
+
+        const demoSession = await prisma.demoSession.create({
+          data: { userId: user.id },
+        });
+
+        await seedDemoData(demoSession.id);
+
+        // Clean up stale sessions in the background — don't block login
+        cleanupStaleDemoSessions().catch(() => {});
+
+        return { id: user.id, email: user.email, name: user.name, demoSessionId: demoSession.id };
       },
     }),
   ],
@@ -62,8 +73,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return true;
     },
 
-    async jwt({ token, trigger }) {
+    async jwt({ token, trigger, user }) {
       if (!token.email) return token;
+
+      // Persist demoSessionId from authorize() on sign-in
+      if (trigger === "signIn" && user?.demoSessionId) {
+        token.demoSessionId = user.demoSessionId;
+      }
 
       const needsFullRefresh =
         trigger === "signIn" || !token.role || typeof token.permissionsVersion !== "number";
@@ -141,6 +157,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (token.role) session.user.role = token.role as string;
       if (token.permissions)
         session.user.permissions = token.permissions as Record<string, boolean>;
+      if (token.demoSessionId) session.user.demoSessionId = token.demoSessionId as string;
       return session;
     },
   },

@@ -1,6 +1,10 @@
 import "next-auth";
 
 declare module "next-auth" {
+  interface User {
+    demoSessionId?: string;
+  }
+
   interface Session {
     user: {
       id?: string;
@@ -9,6 +13,7 @@ declare module "next-auth" {
       image?: string | null;
       role?: string;
       permissions?: Record<string, boolean>;
+      demoSessionId?: string;
     };
   }
 }
@@ -18,5 +23,6 @@ declare module "next-auth/jwt" {
     role?: string;
     permissions?: Record<string, boolean>;
     userId?: string;
+    demoSessionId?: string;
   }
 }
