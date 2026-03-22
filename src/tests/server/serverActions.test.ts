@@ -186,13 +186,15 @@ describe("removePerson", () => {
     });
 
     await removePerson(formData({ personID: person.id }));
-    const remaining = await testPrisma.person.findMany();
+    // Record still exists but is soft-deleted
+    const remaining = await testPrisma.person.findMany({ where: { deletedAt: null } });
     expect(remaining).toHaveLength(0);
+    const softDeleted = await testPrisma.person.findUnique({ where: { id: person.id } });
+    expect(softDeleted!.deletedAt).not.toBeNull();
   });
 
   // If someone is on a team and gets deleted, their team membership
-  // has to be cleaned up first — otherwise the database would have
-  // orphan records pointing to a person that no longer exists.
+  // is also soft-deleted — the records are preserved for audit history.
   test("removes person's team memberships before deleting", async () => {
     const person = await testPrisma.person.create({
       data: { name: "Member", email: "member@test.com" },
@@ -206,9 +208,9 @@ describe("removePerson", () => {
 
     await removePerson(formData({ personID: person.id }));
 
-    const members = await testPrisma.teamMember.findMany();
+    const members = await testPrisma.teamMember.findMany({ where: { deletedAt: null } });
     expect(members).toHaveLength(0);
-    const persons = await testPrisma.person.findMany();
+    const persons = await testPrisma.person.findMany({ where: { deletedAt: null } });
     expect(persons).toHaveLength(0);
   });
 
@@ -223,7 +225,7 @@ describe("removePerson", () => {
     });
 
     await removePerson(formData({ personID: [p1.id, p2.id] }));
-    const remaining = await testPrisma.person.findMany();
+    const remaining = await testPrisma.person.findMany({ where: { deletedAt: null } });
     expect(remaining).toHaveLength(0);
   });
 
@@ -562,19 +564,19 @@ describe("removeTeam", () => {
     await testPrisma.$disconnect();
   });
 
-  // Delete a team and confirm it's gone.
+  // Delete a team and confirm it's soft-deleted.
   test("removes a team", async () => {
     const team = await testPrisma.team.create({
       data: { teamName: "To Delete" },
     });
 
     await removeTeam(formData({ teamID: team.teamId }));
-    const teams = await testPrisma.team.findMany();
+    const teams = await testPrisma.team.findMany({ where: { deletedAt: null } });
     expect(teams).toHaveLength(0);
   });
 
-  // When a team is deleted, all its membership records should be automatically
-  // cleaned up (cascade delete). But the people themselves should still exist —
+  // When a team is soft-deleted, all its membership records are also
+  // soft-deleted. But the people themselves should still exist —
   // deleting a team doesn't fire the employees!
   test("cascade deletes team members when team is removed", async () => {
     const person = await testPrisma.person.create({
@@ -589,10 +591,10 @@ describe("removeTeam", () => {
 
     await removeTeam(formData({ teamID: team.teamId }));
 
-    const members = await testPrisma.teamMember.findMany();
+    const members = await testPrisma.teamMember.findMany({ where: { deletedAt: null } });
     expect(members).toHaveLength(0);
-    // Person should still exist
-    const persons = await testPrisma.person.findMany();
+    // Person should still exist (not deleted)
+    const persons = await testPrisma.person.findMany({ where: { deletedAt: null } });
     expect(persons).toHaveLength(1);
   });
 
@@ -802,7 +804,7 @@ describe("removeMember", () => {
 
     await removeMember(formData({ teamID: team.teamId, personID: person.id }));
 
-    const members = await testPrisma.teamMember.findMany();
+    const members = await testPrisma.teamMember.findMany({ where: { deletedAt: null } });
     expect(members).toHaveLength(0);
   });
 
@@ -1202,19 +1204,19 @@ describe("seedMockData", () => {
   test("assigns correct managers to teams", async () => {
     await seedMockData();
 
-    const engineering = await testPrisma.team.findUnique({
+    const engineering = await testPrisma.team.findFirst({
       where: { teamName: "Engineering" },
       include: { manager: true },
     });
     expect(engineering!.manager!.name).toBe("Alice Johnson");
 
-    const design = await testPrisma.team.findUnique({
+    const design = await testPrisma.team.findFirst({
       where: { teamName: "Design" },
       include: { manager: true },
     });
     expect(design!.manager!.name).toBe("Carol Davis");
 
-    const platform = await testPrisma.team.findUnique({
+    const platform = await testPrisma.team.findFirst({
       where: { teamName: "Platform" },
       include: { manager: true },
     });
@@ -1380,9 +1382,11 @@ describe("removeDepartment", () => {
 
     await removeDepartment(formData({ departmentID: dept.id }));
 
-    const departments = await testPrisma.department.findMany();
+    const departments = await testPrisma.department.findMany({ where: { deletedAt: null } });
     expect(departments).toHaveLength(0);
-    const team = await testPrisma.team.findFirst({ where: { teamName: "Platform" } });
+    const team = await testPrisma.team.findFirst({
+      where: { teamName: "Platform", deletedAt: null },
+    });
     expect(team).not.toBeNull();
     expect(team!.departmentId).toBeNull();
   });

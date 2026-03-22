@@ -47,9 +47,7 @@ describe("proxy", () => {
   it("allows form-action for OAuth endpoints", () => {
     const res = proxy(makeRequest());
     const csp = res.headers.get("Content-Security-Policy")!;
-    expect(csp).toContain(
-      "form-action 'self' https://accounts.google.com https://github.com",
-    );
+    expect(csp).toContain("form-action 'self' https://accounts.google.com https://github.com");
   });
 
   // CSP blocks iframes via frame-ancestors 'none'
@@ -103,9 +101,7 @@ describe("proxy", () => {
   // Sets Referrer-Policy to strict-origin-when-cross-origin
   it("sets Referrer-Policy header", () => {
     const res = proxy(makeRequest());
-    expect(res.headers.get("Referrer-Policy")).toBe(
-      "strict-origin-when-cross-origin",
-    );
+    expect(res.headers.get("Referrer-Policy")).toBe("strict-origin-when-cross-origin");
   });
 
   // Sets X-Frame-Options: DENY to prevent clickjacking
@@ -117,9 +113,7 @@ describe("proxy", () => {
   // Sets Permissions-Policy to disable unused browser APIs
   it("sets Permissions-Policy header", () => {
     const res = proxy(makeRequest());
-    expect(res.headers.get("Permissions-Policy")).toBe(
-      "camera=(), microphone=(), geolocation=()",
-    );
+    expect(res.headers.get("Permissions-Policy")).toBe("camera=(), microphone=(), geolocation=()");
   });
 
   // CSP default-src is 'self' — fallback for any unlisted directive
@@ -163,9 +157,7 @@ describe("proxy config", () => {
   it("matcher skips prefetch requests", () => {
     const missing = config.matcher[0].missing;
     expect(missing).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ key: "next-router-prefetch" }),
-      ]),
+      expect.arrayContaining([expect.objectContaining({ key: "next-router-prefetch" })]),
     );
   });
 });

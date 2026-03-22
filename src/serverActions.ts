@@ -43,7 +43,9 @@ export async function createPerson(data: FormData) {
   }
 
   await prisma.$transaction(async (tx) => {
-    const existingPerson = await tx.person.findUnique({ where: { email } });
+    const existingPerson = await tx.person.findFirst({
+      where: { email, deletedAt: null },
+    });
     if (existingPerson) {
       throw new Error("A person with this email already exists");
     }
@@ -76,17 +78,34 @@ export async function removePerson(data: FormData) {
   }
   personIDs.forEach((id) => validateUUID(id, "personID"));
 
+  const now = new Date();
   await prisma.$transaction(async (tx) => {
     const personsToDelete = await tx.person.findMany({
-      where: { id: { in: personIDs } },
+      where: { id: { in: personIDs }, deletedAt: null },
     });
 
-    await tx.teamMember.deleteMany({
-      where: { personId: { in: personIDs } },
+    // Cascade soft-delete: mark TeamMember rows as deleted
+    await tx.teamMember.updateMany({
+      where: { personId: { in: personIDs }, deletedAt: null },
+      data: { deletedAt: now },
     });
 
-    await tx.person.deleteMany({
+    // Null FK refs: teams managed by these persons
+    await tx.team.updateMany({
+      where: { teamManagerId: { in: personIDs } },
+      data: { teamManagerId: null },
+    });
+
+    // Null FK refs: departments headed by these persons
+    await tx.department.updateMany({
+      where: { headId: { in: personIDs } },
+      data: { headId: null },
+    });
+
+    // Soft-delete the persons
+    await tx.person.updateMany({
       where: { id: { in: personIDs } },
+      data: { deletedAt: now },
     });
 
     for (const person of personsToDelete) {
@@ -100,6 +119,8 @@ export async function removePerson(data: FormData) {
     }
   });
   revalidatePath("/managePersons");
+  revalidatePath("/manageTeams");
+  revalidatePath("/manageDepartments");
   revalidatePath("/");
 }
 
@@ -202,7 +223,9 @@ export async function updateEmail(data: FormData) {
   }
 
   await prisma.$transaction(async (tx) => {
-    const existingPerson = await tx.person.findUnique({ where: { email: newEmail } });
+    const existingPerson = await tx.person.findFirst({
+      where: { email: newEmail, deletedAt: null },
+    });
     if (existingPerson && existingPerson.id !== personID) {
       throw new Error("A person with this email already exists");
     }
@@ -264,13 +287,8 @@ export async function addManager(data: FormData) {
       tx,
     });
 
-    const existingMember = await tx.teamMember.findUnique({
-      where: {
-        personId_teamId: {
-          personId: personID,
-          teamId: teamIDs[0],
-        },
-      },
+    const existingMember = await tx.teamMember.findFirst({
+      where: { personId: personID, teamId: teamIDs[0] },
     });
 
     if (!existingMember) {
@@ -284,6 +302,19 @@ export async function addManager(data: FormData) {
         action: "create",
         entityType: "teamMember",
         entityId: member.id,
+        after: { personId: personID, teamId: teamIDs[0] },
+        tx,
+      });
+    } else if (existingMember.deletedAt) {
+      // Restore soft-deleted membership
+      await tx.teamMember.update({
+        where: { id: existingMember.id },
+        data: { deletedAt: null },
+      });
+      await logAudit({
+        action: "create",
+        entityType: "teamMember",
+        entityId: existingMember.id,
         after: { personId: personID, teamId: teamIDs[0] },
         tx,
       });
@@ -310,25 +341,29 @@ export async function addMember(data: FormData) {
   validateUUID(personID, "personID");
 
   await prisma.$transaction(async (tx) => {
-    const existingMember = await tx.teamMember.findUnique({
-      where: {
-        personId_teamId: {
-          personId: personID,
-          teamId: teamID,
-        },
-      },
+    const existingMember = await tx.teamMember.findFirst({
+      where: { personId: personID, teamId: teamID },
     });
 
-    if (existingMember) {
+    if (existingMember && !existingMember.deletedAt) {
       throw new Error("Person is already a member of the team");
     }
 
-    const member = await tx.teamMember.create({
-      data: {
-        personId: personID,
-        teamId: teamID,
-      },
-    });
+    let member;
+    if (existingMember?.deletedAt) {
+      // Restore soft-deleted membership
+      member = await tx.teamMember.update({
+        where: { id: existingMember.id },
+        data: { deletedAt: null },
+      });
+    } else {
+      member = await tx.teamMember.create({
+        data: {
+          personId: personID,
+          teamId: teamID,
+        },
+      });
+    }
     await logAudit({
       action: "create",
       entityType: "teamMember",
@@ -419,13 +454,22 @@ export async function removeTeam(data: FormData) {
   }
   teamIDs.forEach((id) => validateUUID(id, "teamID"));
 
+  const now = new Date();
   await prisma.$transaction(async (tx) => {
     const teamsToDelete = await tx.team.findMany({
-      where: { teamId: { in: teamIDs } },
+      where: { teamId: { in: teamIDs }, deletedAt: null },
     });
 
-    await tx.team.deleteMany({
+    // Cascade soft-delete: mark TeamMember rows as deleted
+    await tx.teamMember.updateMany({
+      where: { teamId: { in: teamIDs }, deletedAt: null },
+      data: { deletedAt: now },
+    });
+
+    // Soft-delete the teams
+    await tx.team.updateMany({
       where: { teamId: { in: teamIDs } },
+      data: { deletedAt: now },
     });
 
     for (const team of teamsToDelete) {
@@ -459,12 +503,11 @@ export async function removeMember(data: FormData) {
   validateUUID(personID, "personID");
 
   await prisma.$transaction(async (tx) => {
-    const existingMember = await tx.teamMember.findUnique({
+    const existingMember = await tx.teamMember.findFirst({
       where: {
-        personId_teamId: {
-          personId: personID,
-          teamId: teamID,
-        },
+        personId: personID,
+        teamId: teamID,
+        deletedAt: null,
       },
     });
 
@@ -472,13 +515,9 @@ export async function removeMember(data: FormData) {
       throw new Error("Person is not a member of the team");
     }
 
-    await tx.teamMember.delete({
-      where: {
-        personId_teamId: {
-          personId: personID,
-          teamId: teamID,
-        },
-      },
+    await tx.teamMember.update({
+      where: { id: existingMember.id },
+      data: { deletedAt: new Date() },
     });
     await logAudit({
       action: "delete",
@@ -554,18 +593,22 @@ export async function removeDepartment(data: FormData) {
   }
   departmentIDs.forEach((id) => validateUUID(id, "departmentID"));
 
+  const now = new Date();
   await prisma.$transaction(async (tx) => {
     const departmentsToDelete = await tx.department.findMany({
-      where: { id: { in: departmentIDs } },
+      where: { id: { in: departmentIDs }, deletedAt: null },
     });
 
+    // Null FK refs: teams assigned to these departments
     await tx.team.updateMany({
       where: { departmentId: { in: departmentIDs } },
       data: { departmentId: null },
     });
 
-    await tx.department.deleteMany({
+    // Soft-delete the departments
+    await tx.department.updateMany({
       where: { id: { in: departmentIDs } },
+      data: { deletedAt: now },
     });
 
     for (const dept of departmentsToDelete) {
@@ -792,11 +835,10 @@ export async function seedMockData(clearExisting: boolean = true) {
     ];
     const persons = [];
     for (const p of personSeeds) {
-      const person = await prisma.person.upsert({
-        where: { email: p.email },
-        update: {},
-        create: p,
+      const existing = await prisma.person.findFirst({
+        where: { email: p.email, deletedAt: null },
       });
+      const person = existing ?? (await prisma.person.create({ data: p }));
       persons.push(person);
     }
     const [alice, bob, carol, dave, eve, frank, grace, henry, ivy] = persons;
@@ -811,11 +853,10 @@ export async function seedMockData(clearExisting: boolean = true) {
     ];
     const teams = [];
     for (const t of teamSeeds) {
-      const team = await prisma.team.upsert({
-        where: { teamName: t.teamName },
-        update: {},
-        create: t,
+      const existing = await prisma.team.findFirst({
+        where: { teamName: t.teamName, deletedAt: null },
       });
+      const team = existing ?? (await prisma.team.create({ data: t }));
       teams.push(team);
     }
     const [engineering, design, platform, dataAnalytics, peopleCulture] = teams;
@@ -834,8 +875,8 @@ export async function seedMockData(clearExisting: boolean = true) {
       { personId: ivy.id, teamId: peopleCulture.teamId },
     ];
     for (const m of memberships) {
-      const existing = await prisma.teamMember.findUnique({
-        where: { personId_teamId: { personId: m.personId, teamId: m.teamId } },
+      const existing = await prisma.teamMember.findFirst({
+        where: { personId: m.personId, teamId: m.teamId, deletedAt: null },
       });
       if (!existing) {
         await prisma.teamMember.create({ data: m });
@@ -870,11 +911,14 @@ export async function seedMockData(clearExisting: boolean = true) {
       },
     ];
     for (const d of departmentSeeds) {
-      const dept = await prisma.department.upsert({
-        where: { name: d.name },
-        update: {},
-        create: { name: d.name, description: d.description, headId: d.headId },
+      const existingDept = await prisma.department.findFirst({
+        where: { name: d.name, deletedAt: null },
       });
+      const dept =
+        existingDept ??
+        (await prisma.department.create({
+          data: { name: d.name, description: d.description, headId: d.headId },
+        }));
       for (const teamName of d.teamNames) {
         await prisma.team.updateMany({
           where: { teamName, departmentId: null },

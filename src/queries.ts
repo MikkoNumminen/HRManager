@@ -16,17 +16,21 @@ import {
 import { resolvePermissions, PERMISSION_KEYS, hasPermission } from "@/permissions";
 
 export async function getPersons(): Promise<Person[]> {
-  const persons = await prisma.person.findMany();
+  const persons = await prisma.person.findMany({
+    where: { deletedAt: null },
+  });
 
   return persons.map((person) => PersonSchema.parse(person));
 }
 
 export async function getTeams(): Promise<CombinedTeam[]> {
   const teams = await prisma.team.findMany({
+    where: { deletedAt: null },
     include: {
       manager: true,
       department: true,
       members: {
+        where: { deletedAt: null },
         include: {
           person: true,
         },
@@ -56,9 +60,10 @@ export async function getTeams(): Promise<CombinedTeam[]> {
 
 export async function getDepartments(): Promise<Department[]> {
   const departments = await prisma.department.findMany({
+    where: { deletedAt: null },
     include: {
       head: true,
-      teams: true,
+      teams: { where: { deletedAt: null } },
     },
   });
 
