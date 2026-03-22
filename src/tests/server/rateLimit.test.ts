@@ -5,6 +5,11 @@ jest.mock("@/db", () => ({
   prisma: require("./testDb").testPrisma,
 }));
 
+// Mock @/auth — rateLimit uses auth() to identify authenticated users
+jest.mock("@/auth", () => ({
+  auth: jest.fn(() => null),
+}));
+
 // Mock next/headers — provides the client IP for rate limit identification
 const mockHeaders = new Map<string, string>();
 jest.mock("next/headers", () => ({
@@ -32,7 +37,7 @@ test("creates a rate limit record on first request", async () => {
 
   const records = await testPrisma.rateLimit.findMany();
   expect(records).toHaveLength(1);
-  expect(records[0].identifier).toBe("192.168.1.1");
+  expect(records[0].identifier).toBe("ip:192.168.1.1");
   expect(records[0].action).toBe("testAction");
   expect(records[0].count).toBe(1);
 });
@@ -44,7 +49,7 @@ test("increments count on subsequent requests", async () => {
   await rateLimit("testAction");
 
   const record = await testPrisma.rateLimit.findUnique({
-    where: { identifier_action: { identifier: "192.168.1.1", action: "testAction" } },
+    where: { identifier_action: { identifier: "ip:192.168.1.1", action: "testAction" } },
   });
   expect(record?.count).toBe(3);
 });
@@ -54,7 +59,7 @@ test("throws RateLimitError when limit exceeded", async () => {
   // Seed a record at the limit
   await testPrisma.rateLimit.create({
     data: {
-      identifier: "192.168.1.1",
+      identifier: "ip:192.168.1.1",
       action: "testAction",
       count: 30,
       windowStart: new Date(),
@@ -70,7 +75,7 @@ test("resets counter after window expires", async () => {
   // Seed a record with an expired window (2 minutes ago)
   await testPrisma.rateLimit.create({
     data: {
-      identifier: "192.168.1.1",
+      identifier: "ip:192.168.1.1",
       action: "testAction",
       count: 30,
       windowStart: new Date(Date.now() - 120_000),
@@ -82,7 +87,7 @@ test("resets counter after window expires", async () => {
 
   // Counter should be reset to 1
   const record = await testPrisma.rateLimit.findUnique({
-    where: { identifier_action: { identifier: "192.168.1.1", action: "testAction" } },
+    where: { identifier_action: { identifier: "ip:192.168.1.1", action: "testAction" } },
   });
   expect(record?.count).toBe(1);
 });
@@ -94,10 +99,10 @@ test("tracks different actions independently", async () => {
   await rateLimit("action1");
 
   const record1 = await testPrisma.rateLimit.findUnique({
-    where: { identifier_action: { identifier: "192.168.1.1", action: "action1" } },
+    where: { identifier_action: { identifier: "ip:192.168.1.1", action: "action1" } },
   });
   const record2 = await testPrisma.rateLimit.findUnique({
-    where: { identifier_action: { identifier: "192.168.1.1", action: "action2" } },
+    where: { identifier_action: { identifier: "ip:192.168.1.1", action: "action2" } },
   });
   expect(record1?.count).toBe(2);
   expect(record2?.count).toBe(1);
@@ -126,17 +131,17 @@ test("uses x-real-ip as fallback identifier", async () => {
   await rateLimit("testAction");
 
   const record = await testPrisma.rateLimit.findFirst();
-  expect(record?.identifier).toBe("172.16.0.1");
+  expect(record?.identifier).toBe("ip:172.16.0.1");
 });
 
-// Falls back to "unknown" when no IP headers are present
-test("uses 'unknown' when no IP headers present", async () => {
+// Falls back to "anonymous" when no IP headers are present
+test("uses 'anonymous' when no IP headers present", async () => {
   mockHeaders.clear();
 
   await rateLimit("testAction");
 
   const record = await testPrisma.rateLimit.findFirst();
-  expect(record?.identifier).toBe("unknown");
+  expect(record?.identifier).toBe("anonymous");
 });
 
 // Handles x-forwarded-for with multiple IPs (takes the first one)
@@ -146,7 +151,7 @@ test("extracts first IP from x-forwarded-for with multiple IPs", async () => {
   await rateLimit("testAction");
 
   const record = await testPrisma.rateLimit.findFirst();
-  expect(record?.identifier).toBe("203.0.113.1");
+  expect(record?.identifier).toBe("ip:203.0.113.1");
 });
 
 // RateLimitError has correct name property

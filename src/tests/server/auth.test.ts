@@ -142,20 +142,57 @@ describe("auth.ts callbacks", () => {
       expect(result.permissions).toBeDefined();
     });
 
-    // Skips enrichment when token already has a role and trigger is not signIn.
-    test("skips enrichment when token already has role and not signIn", async () => {
-      const token = { email: "skip@example.com", role: "user", permissions: {} };
+    // Skips full refresh when user exists, role matches, and permissionsVersion matches.
+    test("skips full refresh when token has matching role and permissionsVersion", async () => {
+      const user = await testPrisma.user.create({
+        data: { email: "skip@example.com", name: "Skip", role: "administrator" },
+      });
+      // Simulate a token that already has role + permissionsVersion matching the DB
+      const token = {
+        email: "skip@example.com",
+        role: "administrator",
+        permissions: { "person:read": true },
+        permissionsVersion: user.permissionsVersion,
+      };
       const result = await callbacks.jwt({ token, trigger: undefined });
-      // Should return unchanged — no DB lookup
-      expect(result.role).toBe("user");
+      // Should keep existing permissions — no full refresh needed
+      expect(result.role).toBe("administrator");
+      expect(result.permissions).toEqual({ "person:read": true });
     });
 
-    // Returns token unchanged when user is not found in the database.
-    test("returns token unchanged when user not found in database", async () => {
-      const token = { email: "ghost@example.com" };
+    // Clears token fields when user is not found (e.g. kicked out).
+    test("clears token when user not found in database", async () => {
+      const token = {
+        email: "ghost@example.com",
+        userId: "old-id",
+        role: "user",
+        permissions: { "person:read": true },
+      };
       const result = await callbacks.jwt({ token, trigger: "signIn" });
       expect(result.userId).toBeUndefined();
       expect(result.role).toBeUndefined();
+      expect(result.permissions).toBeUndefined();
+    });
+
+    // Clears token when user is kicked out between JWT refreshes.
+    test("invalidates token after user is kicked out", async () => {
+      const user = await testPrisma.user.create({
+        data: { email: "kickable@example.com", name: "Kickable", role: "user" },
+      });
+      // First JWT call — user exists, token is enriched
+      const token = { email: "kickable@example.com" };
+      const enriched = await callbacks.jwt({ token, trigger: "signIn" });
+      expect(enriched.userId).toBe(user.id);
+      expect(enriched.role).toBe("user");
+
+      // Kick out the user (delete from DB)
+      await testPrisma.user.delete({ where: { id: user.id } });
+
+      // Next JWT call — user no longer exists, token should be cleared
+      const cleared = await callbacks.jwt({ token: enriched, trigger: undefined });
+      expect(cleared.userId).toBeUndefined();
+      expect(cleared.role).toBeUndefined();
+      expect(cleared.permissions).toBeUndefined();
     });
 
     // Includes permission overrides when user has custom permissions.

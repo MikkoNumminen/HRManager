@@ -154,6 +154,22 @@ describe("createPerson", () => {
     const [person] = await testPrisma.person.findMany();
     expect(person.position).toBeNull();
   });
+
+  // Names longer than 255 characters are rejected to prevent abuse and DB bloat.
+  test("throws when name exceeds max length", async () => {
+    const longName = "A".repeat(256);
+    await expect(
+      createPerson(formData({ name: longName, email: "long@test.com" })),
+    ).rejects.toThrow("characters or less");
+  });
+
+  // Email addresses longer than 320 characters are rejected.
+  test("throws when email exceeds max length", async () => {
+    const longEmail = "a".repeat(315) + "@test.com";
+    await expect(createPerson(formData({ name: "Alice", email: longEmail }))).rejects.toThrow(
+      "characters or less",
+    );
+  });
 });
 
 describe("removePerson", () => {
@@ -266,6 +282,24 @@ describe("updatePersonName", () => {
       "New name is missing",
     );
   });
+
+  // Attempting to update a non-existent person throws a clear error.
+  test("throws when person does not exist", async () => {
+    await expect(
+      updatePersonName(formData({ personID: "00000000-0000-0000-0000-000000000000", name: "Bob" })),
+    ).rejects.toThrow("Person not found");
+  });
+
+  // Names longer than 255 characters are rejected.
+  test("throws when name exceeds max length", async () => {
+    const person = await testPrisma.person.create({
+      data: { name: "Alice", email: "alice@test.com" },
+    });
+    const longName = "A".repeat(256);
+    await expect(
+      updatePersonName(formData({ personID: person.id, name: longName })),
+    ).rejects.toThrow("characters or less");
+  });
 });
 
 describe("updatePosition", () => {
@@ -308,6 +342,24 @@ describe("updatePosition", () => {
     await expect(updatePosition(formData({ personID: person.id, name: "" }))).rejects.toThrow(
       "New position is missing",
     );
+  });
+
+  // Attempting to update a non-existent person throws a clear error.
+  test("throws when person does not exist", async () => {
+    await expect(
+      updatePosition(formData({ personID: "00000000-0000-0000-0000-000000000000", name: "Dev" })),
+    ).rejects.toThrow("Person not found");
+  });
+
+  // Position strings longer than 255 characters are rejected.
+  test("throws when position exceeds max length", async () => {
+    const person = await testPrisma.person.create({
+      data: { name: "Alice", email: "alice@test.com" },
+    });
+    const longPosition = "A".repeat(256);
+    await expect(
+      updatePosition(formData({ personID: person.id, name: longPosition })),
+    ).rejects.toThrow("characters or less");
   });
 });
 
@@ -377,6 +429,26 @@ describe("updateEmail", () => {
   test("throws on invalid UUID", async () => {
     await expect(updateEmail(formData({ personID: "nope", name: "a@b.com" }))).rejects.toThrow(
       "Invalid personID format",
+    );
+  });
+
+  // Attempting to update email on a non-existent person throws a clear error.
+  test("throws when person does not exist", async () => {
+    await expect(
+      updateEmail(
+        formData({ personID: "00000000-0000-0000-0000-000000000000", name: "new@test.com" }),
+      ),
+    ).rejects.toThrow("Person not found");
+  });
+
+  // Email addresses longer than 320 characters are rejected.
+  test("throws when email exceeds max length", async () => {
+    const person = await testPrisma.person.create({
+      data: { name: "Alice", email: "alice@test.com" },
+    });
+    const longEmail = "a".repeat(315) + "@test.com";
+    await expect(updateEmail(formData({ personID: person.id, name: longEmail }))).rejects.toThrow(
+      "characters or less",
     );
   });
 });

@@ -11,6 +11,13 @@ jest.mock("@/auth", () => ({
   auth: jest.fn(),
 }));
 
+// Mock permissions — hasPermission is used in audit log queries.
+// We allow all permissions so query tests focus on data logic.
+jest.mock("@/permissions", () => ({
+  ...jest.requireActual("@/permissions"),
+  hasPermission: jest.fn(() => true),
+}));
+
 import {
   getPersons,
   getTeams,
@@ -601,5 +608,25 @@ describe("getDepartments", () => {
     await testPrisma.department.create({ data: { name: "Ops" } });
     const result = await getDepartments();
     expect(result[0].description).toBeNull();
+  });
+});
+
+describe("audit log permission checks", () => {
+  const { hasPermission } = require("@/permissions");
+
+  afterEach(() => {
+    hasPermission.mockResolvedValue(true);
+  });
+
+  // Audit log queries are protected — users without admin:view_audit_log get denied.
+  test("getAuditLogs throws when permission is denied", async () => {
+    hasPermission.mockResolvedValueOnce(false);
+    await expect(getAuditLogs()).rejects.toThrow("Permission denied");
+  });
+
+  // Same check applies to the email list query.
+  test("getAuditLogUserEmails throws when permission is denied", async () => {
+    hasPermission.mockResolvedValueOnce(false);
+    await expect(getAuditLogUserEmails()).rejects.toThrow("Permission denied");
   });
 });
