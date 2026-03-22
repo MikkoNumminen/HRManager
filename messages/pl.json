@@ -37,7 +37,8 @@
     "keepExisting": "Zachowaj istniejące",
     "replaceAll": "Zastąp wszystko",
     "language": "Język",
-    "theme": "Motyw"
+    "theme": "Motyw",
+    "dashboard": "Panel"
   },
   "home": {
     "title": "System Zarządzania Zasobami Ludzkimi",
@@ -132,7 +133,7 @@
     "auditHeading": "Historia aktywności",
     "userRole": "Rola użytkownika",
     "roleSuperuser": "Superadministrator",
-    "roleAdministrator": "Administrator",
+    "roleAdministrator": "Zarządca",
     "roleUser": "Użytkownik",
     "roleGuest": "Gość",
     "superuserCannotChange": "Rola superadministratora nie może być zmieniona.",
@@ -159,6 +160,21 @@
     "kickOutTitle": "Wyrzuć użytkownika",
     "kickOutDescription": "Usuń tego użytkownika z systemu. Utraci wszystkie uprawnienia dostępu i nadpisania uprawnień.",
     "kickOutConfirm": "Czy na pewno chcesz wyrzucić {name}? Utraci dostęp i wszystkie nadpisania uprawnień."
+  },
+  "dashboard": {
+    "title": "Panel",
+    "persons": "Osoby",
+    "teams": "Zespoły",
+    "departments": "Działy",
+    "users": "Użytkownicy",
+    "membersPerTeam": "Członkowie na zespół",
+    "teamsPerDepartment": "Zespoły na dział",
+    "organizationGrowth": "Rozwój organizacji",
+    "recentActivity": "Ostatnia aktywność",
+    "members": "Członkowie",
+    "noData": "Brak dostępnych danych",
+    "noActivity": "Brak ostatniej aktywności",
+    "system": "Systemowy"
   },
   "audit": {
     "filterUser": "Użytkownik",
@@ -190,7 +206,7 @@
     "tooltipType": "Typ zasobu, którego dotyczyła zmiana",
     "tooltipChanges": "Co się zmieniło — pokazuje wartości przed i po dla aktualizacji",
     "noEntries": "Nie znaleziono wpisów audytu",
-    "system": "System",
+    "system": "Systemowy",
     "addedPerson": "Dodano nową osobę: {name}",
     "createdTeam": "Utworzono nowy zespół: {name}",
     "addedMember": "Dodano członka do zespołu",
@@ -246,7 +262,8 @@
     "changedName": "Zmieniono imię z \"{oldValue}\" na \"{newValue}\"",
     "renamedTeam": "Zmieniono nazwę zespołu z \"{oldValue}\" na \"{newValue}\"",
     "permChangeName": "zmieniać imiona osób",
-    "permRenameTeams": "zmieniać nazwy zespołów"
+    "permRenameTeams": "zmieniać nazwy zespołów",
+    "permViewDashboard": "wyświetlić panel"
   },
   "notifications": {
     "personCreated": "Osoba utworzona pomyślnie",

@@ -37,7 +37,8 @@
     "keepExisting": "मौजूदा रखें",
     "replaceAll": "सब बदलें",
     "language": "भाषा",
-    "theme": "थीम"
+    "theme": "थीम",
+    "dashboard": "डैशबोर्ड"
   },
   "home": {
     "title": "मानव संसाधन प्रबंधन प्रणाली",
@@ -160,6 +161,21 @@
     "kickOutDescription": "इस उपयोगकर्ता को सिस्टम से हटाएँ। सभी पहुँच और अनुमति ओवरराइड खो जाएँगे।",
     "kickOutConfirm": "क्या आप वाकई {name} को निकालना चाहते हैं? पहुँच और सभी अनुमति ओवरराइड खो जाएँगे।"
   },
+  "dashboard": {
+    "title": "डैशबोर्ड",
+    "persons": "व्यक्ति",
+    "teams": "टीमें",
+    "departments": "विभाग",
+    "users": "उपयोगकर्ता",
+    "membersPerTeam": "प्रति टीम सदस्य",
+    "teamsPerDepartment": "प्रति विभाग टीमें",
+    "organizationGrowth": "संगठन की वृद्धि",
+    "recentActivity": "हालिया गतिविधि",
+    "members": "सदस्य",
+    "noData": "कोई डेटा उपलब्ध नहीं",
+    "noActivity": "कोई हालिया गतिविधि नहीं",
+    "system": "सिस्टम"
+  },
   "audit": {
     "filterUser": "उपयोगकर्ता",
     "filterAction": "कार्रवाई",
@@ -246,7 +262,8 @@
     "changedName": "नाम \"{oldValue}\" से \"{newValue}\" में बदला गया",
     "renamedTeam": "टीम का नाम \"{oldValue}\" से \"{newValue}\" में बदला गया",
     "permChangeName": "व्यक्तियों के नाम बदलना",
-    "permRenameTeams": "टीमों के नाम बदलना"
+    "permRenameTeams": "टीमों के नाम बदलना",
+    "permViewDashboard": "डैशबोर्ड देखें"
   },
   "notifications": {
     "personCreated": "व्यक्ति सफलतापूर्वक बनाया गया",

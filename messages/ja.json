@@ -37,7 +37,8 @@
     "keepExisting": "既存を保持",
     "replaceAll": "すべて置換",
     "language": "言語",
-    "theme": "テーマ"
+    "theme": "テーマ",
+    "dashboard": "ダッシュボード"
   },
   "home": {
     "title": "人事管理システム",
@@ -160,6 +161,21 @@
     "kickOutDescription": "このユーザーをシステムから削除します。すべてのアクセス権と権限の上書きが失われます。",
     "kickOutConfirm": "{name}を追放してもよろしいですか？アクセス権とすべての権限の上書きが失われます。"
   },
+  "dashboard": {
+    "title": "ダッシュボード",
+    "persons": "人員",
+    "teams": "チーム",
+    "departments": "部門",
+    "users": "ユーザー",
+    "membersPerTeam": "チームごとのメンバー数",
+    "teamsPerDepartment": "部門ごとのチーム数",
+    "organizationGrowth": "組織の成長",
+    "recentActivity": "最近のアクティビティ",
+    "members": "メンバー",
+    "noData": "データがありません",
+    "noActivity": "最近のアクティビティはありません",
+    "system": "システム"
+  },
   "audit": {
     "filterUser": "ユーザー",
     "filterAction": "操作",
@@ -246,7 +262,8 @@
     "changedName": "名前を「{oldValue}」から「{newValue}」に変更しました",
     "renamedTeam": "チーム名を「{oldValue}」から「{newValue}」に変更しました",
     "permChangeName": "人員の名前変更",
-    "permRenameTeams": "チーム名の変更"
+    "permRenameTeams": "チーム名の変更",
+    "permViewDashboard": "ダッシュボードを表示"
   },
   "notifications": {
     "personCreated": "担当者を作成しました",

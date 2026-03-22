@@ -163,6 +163,16 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
                   </Typography>
                 </Box>
                 <Divider sx={{ borderColor: colors.slate300 }} />
+                {session?.user?.permissions?.["dashboard:view"] && (
+                  <MenuItem
+                    component={Link}
+                    href="/dashboard"
+                    onClick={() => setAnchorEl(null)}
+                    sx={userMenuItemStyles}
+                  >
+                    {t("dashboard")}
+                  </MenuItem>
+                )}
                 {session?.user?.permissions?.["admin:manage_users"] && (
                   <MenuItem
                     component={Link}

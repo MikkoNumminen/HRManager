@@ -37,7 +37,8 @@
     "keepExisting": "Vorhandene behalten",
     "replaceAll": "Alles ersetzen",
     "language": "Sprache",
-    "theme": "Thema"
+    "theme": "Thema",
+    "dashboard": "Übersicht"
   },
   "home": {
     "title": "Personalverwaltungssystem",
@@ -52,7 +53,7 @@
     "manageTitle": "Personen verwalten",
     "heading": "Personen",
     "noPersons": "Keine Personen verfügbar",
-    "position": "Position",
+    "position": "Stelle",
     "clickToManage": "Klicken um {name} zu verwalten",
     "notFound": "Person nicht gefunden",
     "manageHeading": "{name} verwalten",
@@ -70,7 +71,7 @@
   },
   "teams": {
     "manageTitle": "Teams verwalten",
-    "heading": "Teams",
+    "heading": "Mannschaften",
     "noTeams": "Keine Teams verfügbar",
     "teamName": "Teamname",
     "teamManager": "Teamleiter",
@@ -132,7 +133,7 @@
     "auditHeading": "Aktivitätsverlauf",
     "userRole": "Benutzerrolle",
     "roleSuperuser": "Hauptadministrator",
-    "roleAdministrator": "Administrator",
+    "roleAdministrator": "Verwalter",
     "roleUser": "Benutzer",
     "roleGuest": "Gast",
     "superuserCannotChange": "Die Superuser-Rolle kann nicht geändert werden.",
@@ -159,6 +160,21 @@
     "kickOutTitle": "Benutzer rauswerfen",
     "kickOutDescription": "Diesen Benutzer aus dem System entfernen. Alle Zugriffsrechte und Berechtigungsüberschreibungen gehen verloren.",
     "kickOutConfirm": "Möchten Sie {name} wirklich rauswerfen? Alle Zugriffsrechte und Berechtigungsüberschreibungen gehen verloren."
+  },
+  "dashboard": {
+    "title": "Übersicht",
+    "persons": "Personen",
+    "teams": "Teams",
+    "departments": "Abteilungen",
+    "users": "Benutzer",
+    "membersPerTeam": "Mitglieder pro Team",
+    "teamsPerDepartment": "Teams pro Abteilung",
+    "organizationGrowth": "Organisationswachstum",
+    "recentActivity": "Letzte Aktivitäten",
+    "members": "Mitglieder",
+    "noData": "Keine Daten verfügbar",
+    "noActivity": "Keine aktuellen Aktivitäten",
+    "system": "System"
   },
   "audit": {
     "filterUser": "Benutzer",
@@ -246,7 +262,8 @@
     "changedName": "Name geändert von \"{oldValue}\" zu \"{newValue}\"",
     "renamedTeam": "Team umbenannt von \"{oldValue}\" zu \"{newValue}\"",
     "permChangeName": "Namen von Personen ändern",
-    "permRenameTeams": "Teams umbenennen"
+    "permRenameTeams": "Teams umbenennen",
+    "permViewDashboard": "Dashboard anzeigen"
   },
   "notifications": {
     "personCreated": "Person erfolgreich erstellt",

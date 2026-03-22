@@ -37,7 +37,8 @@
     "keepExisting": "Conserver",
     "replaceAll": "Tout remplacer",
     "language": "Langue",
-    "theme": "Thème"
+    "theme": "Thème",
+    "dashboard": "Tableau de bord"
   },
   "home": {
     "title": "Système de gestion des ressources humaines",
@@ -98,7 +99,7 @@
     "manageTitle": "Gérer les départements",
     "heading": "Départements",
     "noDepartments": "Aucun département disponible",
-    "description": "Description",
+    "description": "Descriptif",
     "descriptionTooltip": "Un bref résumé de l'objectif du département",
     "head": "Responsable",
     "headTooltip": "La personne dirigeant ce département",
@@ -147,7 +148,7 @@
     "overrideTooltip": "Une substitution par utilisateur qui accorde ou refuse cette autorisation indépendamment du rôle",
     "effective": "Effectif",
     "effectiveTooltip": "L'autorisation réellement en vigueur — déterminée par la substitution si définie, sinon par le défaut du rôle",
-    "actions": "Actions",
+    "actions": "Opérations",
     "actionsTooltip": "Accorder ou refuser une substitution, ou réinitialiser pour revenir au défaut du rôle",
     "allowed": "Autorisé",
     "denied": "Refusé",
@@ -160,10 +161,25 @@
     "kickOutDescription": "Supprimer cet utilisateur du système. Il perdra tous ses accès et ses dérogations de permissions.",
     "kickOutConfirm": "Êtes-vous sûr de vouloir exclure {name} ? Il perdra ses accès et toutes ses dérogations de permissions."
   },
+  "dashboard": {
+    "title": "Tableau de bord",
+    "persons": "Personnes",
+    "teams": "Équipes",
+    "departments": "Départements",
+    "users": "Utilisateurs",
+    "membersPerTeam": "Membres par équipe",
+    "teamsPerDepartment": "Équipes par département",
+    "organizationGrowth": "Croissance organisationnelle",
+    "recentActivity": "Activité récente",
+    "members": "Membres",
+    "noData": "Aucune donnée disponible",
+    "noActivity": "Aucune activité récente",
+    "system": "Système"
+  },
   "audit": {
     "filterUser": "Utilisateur",
-    "filterAction": "Action",
-    "filterType": "Type",
+    "filterAction": "Opération",
+    "filterType": "Catégorie",
     "allUsers": "Tous les utilisateurs",
     "allActions": "Toutes les actions",
     "allTypes": "Tous les types",
@@ -181,8 +197,8 @@
     "typePermission": "Autorisation",
     "columnTimestamp": "Horodatage",
     "columnUser": "Utilisateur",
-    "columnAction": "Action",
-    "columnType": "Type",
+    "columnAction": "Opération",
+    "columnType": "Catégorie",
     "columnChanges": "Modifications",
     "tooltipTimestamp": "Quand l'action a été effectuée",
     "tooltipUser": "L'utilisateur qui a effectué l'action",
@@ -246,7 +262,8 @@
     "changedName": "Nom modifié de « {oldValue} » à « {newValue} »",
     "renamedTeam": "Équipe renommée de « {oldValue} » à « {newValue} »",
     "permChangeName": "modifier les noms des personnes",
-    "permRenameTeams": "renommer les équipes"
+    "permRenameTeams": "renommer les équipes",
+    "permViewDashboard": "voir le tableau de bord"
   },
   "notifications": {
     "personCreated": "Personne créée avec succès",

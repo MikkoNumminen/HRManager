@@ -37,7 +37,8 @@
     "keepExisting": "Hifadhi iliyopo",
     "replaceAll": "Badilisha yote",
     "language": "Lugha",
-    "theme": "Mandhari"
+    "theme": "Mandhari",
+    "dashboard": "Dashibodi"
   },
   "home": {
     "title": "Mfumo wa Usimamizi wa Rasilimali Watu",
@@ -160,6 +161,21 @@
     "kickOutDescription": "Ondoa mtumiaji huyu kutoka kwenye mfumo. Atapoteza ufikiaji wote na ubatilishaji wa ruhusa.",
     "kickOutConfirm": "Una uhakika unataka kumfukuza {name}? Atapoteza ufikiaji na ubatilishaji wote wa ruhusa."
   },
+  "dashboard": {
+    "title": "Dashibodi",
+    "persons": "Watu",
+    "teams": "Timu",
+    "departments": "Idara",
+    "users": "Watumiaji",
+    "membersPerTeam": "Wanachama kwa timu",
+    "teamsPerDepartment": "Timu kwa idara",
+    "organizationGrowth": "Ukuaji wa shirika",
+    "recentActivity": "Shughuli za hivi karibuni",
+    "members": "Wanachama",
+    "noData": "Hakuna data inayopatikana",
+    "noActivity": "Hakuna shughuli za hivi karibuni",
+    "system": "Mfumo"
+  },
   "audit": {
     "filterUser": "Mtumiaji",
     "filterAction": "Kitendo",
@@ -246,7 +262,8 @@
     "changedName": "Jina limebadilishwa kutoka \"{oldValue}\" hadi \"{newValue}\"",
     "renamedTeam": "Timu imebadilishwa jina kutoka \"{oldValue}\" hadi \"{newValue}\"",
     "permChangeName": "kubadilisha majina ya watu",
-    "permRenameTeams": "kubadilisha majina ya timu"
+    "permRenameTeams": "kubadilisha majina ya timu",
+    "permViewDashboard": "kuona dashibodi"
   },
   "notifications": {
     "personCreated": "Mtu ameundwa kwa mafanikio",

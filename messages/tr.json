@@ -37,7 +37,8 @@
     "keepExisting": "Mevcutı koru",
     "replaceAll": "Tümünü değiştir",
     "language": "Dil",
-    "theme": "Tema"
+    "theme": "Tema",
+    "dashboard": "Gösterge Paneli"
   },
   "home": {
     "title": "İnsan Kaynakları Yönetim Sistemi",
@@ -160,6 +161,21 @@
     "kickOutDescription": "Bu kullanıcıyı sistemden kaldırın. Tüm erişim hakları ve izin geçersiz kılmaları kaybedilecektir.",
     "kickOutConfirm": "{name} kullanıcısını atmak istediğinizden emin misiniz? Erişim hakları ve tüm izin geçersiz kılmaları kaybedilecektir."
   },
+  "dashboard": {
+    "title": "Gösterge Paneli",
+    "persons": "Kişiler",
+    "teams": "Takımlar",
+    "departments": "Departmanlar",
+    "users": "Kullanıcılar",
+    "membersPerTeam": "Takım başına üye",
+    "teamsPerDepartment": "Departman başına takım",
+    "organizationGrowth": "Organizasyon büyümesi",
+    "recentActivity": "Son etkinlik",
+    "members": "Üyeler",
+    "noData": "Veri mevcut değil",
+    "noActivity": "Son etkinlik yok",
+    "system": "Sistem"
+  },
   "audit": {
     "filterUser": "Kullanıcı",
     "filterAction": "İşlem",
@@ -246,7 +262,8 @@
     "changedName": "Ad \"{oldValue}\" yerine \"{newValue}\" olarak değiştirildi",
     "renamedTeam": "Ekip \"{oldValue}\" yerine \"{newValue}\" olarak yeniden adlandırıldı",
     "permChangeName": "kişilerin adlarını değiştirmek",
-    "permRenameTeams": "ekipleri yeniden adlandırmak"
+    "permRenameTeams": "ekipleri yeniden adlandırmak",
+    "permViewDashboard": "gösterge panelini görüntüle"
   },
   "notifications": {
     "personCreated": "Kişi başarıyla oluşturuldu",
