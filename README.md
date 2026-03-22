@@ -33,7 +33,7 @@ A production-grade HR management system with granular RBAC, dashboard analytics,
 - **1103 tests (1069 unit/integration + 34 E2E), 99.5% line coverage** — Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, rate limiting, auth route handlers, CSP proxy, audit logging, style tokens, dashboard analytics, optimistic UI, demo session isolation, all 45 UI components tested against real PostgreSQL, plus Playwright E2E covering full user flows
 - **Demo session isolation** — each "Try Demo" click creates a private data sandbox with pre-seeded org data (9 people, 5 teams, 4 departments); sessions auto-expire after 24 hours of inactivity; no cross-session data leakage
 - **Granular RBAC** — 4 roles, 24 permission keys, per-user grant/deny overrides with three-state toggles (deny / role default / grant), and "kick out" user removal with confirmation dialog
-- **Soft deletes** — `deletedAt` column on Person, Team, Department, and TeamMember with partial unique indexes (`WHERE deletedAt IS NULL`); cascade soft-deletes for team memberships and FK nulling for manager/head references; preserves full audit history
+- **Soft deletes** — `deletedAt` column on Person, Team, Department, and TeamMember with partial unique indexes; split into production scope (`WHERE sessionId IS NULL`) and demo scope (`WHERE sessionId IS NOT NULL`) for multi-tenant uniqueness; cascade soft-deletes for team memberships and FK nulling for manager/head references; preserves full audit history
 - **Immutable audit trail** — every mutation logged with before/after JSON snapshots inside the same `$transaction` for atomicity; permission denials and rate limit hits also logged as security events
 - **18 languages** — next-intl with cookie persistence, Accept-Language detection, and an AI-powered translation pipeline using parallel Claude Code agents
 - **Gamified demo tour** — 8-step tutorial with DOM-aware navigation hints, spotlight overlays, confetti celebrations, and auto-detection of task completion
@@ -42,23 +42,24 @@ A production-grade HR management system with granular RBAC, dashboard analytics,
 - **6 visual themes** — CSS custom properties with FOUC-preventing inline script; instant switching without re-render
 - **Content-Security-Policy** — nonce-based CSP via Next.js 16 proxy with per-request nonce generation; Emotion/MUI style injection, FOUC prevention script, and OAuth avatar domains whitelisted; plus X-Frame-Options, X-Content-Type-Options, Referrer-Policy, and Permissions-Policy on all routes
 - **Rate limiting** — PostgreSQL-based sliding window on all server actions (30 req/min) and auth endpoints (10 req/min); user-based for authenticated users, IP-based for auth and anonymous; no external services required
+- **Autonomous CI auto-fix** — when CI fails on `main`, a GitHub Actions agent downloads failure logs, analyzes errors with Claude Code (`anthropics/claude-code-action`), and creates a fix PR for human review; restricted tool access and loop prevention for safety
 - **Docker-ready** — `docker compose up` for a fully working local environment with PostgreSQL, auto-migration, and demo login
 
 ---
 
 ## Tech stack
 
-| Layer      | Technology                                            |
-| ---------- | ----------------------------------------------------- |
-| Framework  | Next.js 16 (App Router, Server Components)            |
-| UI         | React 19 + MUI v7 + MUI X Charts                      |
-| Language   | TypeScript 5.9                                        |
-| ORM        | Prisma 6 (`relationLoadStrategy: 'join'`)             |
-| Database   | PostgreSQL (Vercel Postgres / Neon in production)     |
-| Validation | Zod 4                                                 |
-| Auth       | NextAuth v5 (JWT, Google + GitHub OAuth + demo login) |
-| Testing    | Jest 30 + React Testing Library + Playwright E2E      |
-| CI/CD      | GitHub Actions (lint, test, build on every push)      |
+| Layer      | Technology                                                     |
+| ---------- | -------------------------------------------------------------- |
+| Framework  | Next.js 16 (App Router, Server Components)                     |
+| UI         | React 19 + MUI v7 + MUI X Charts                               |
+| Language   | TypeScript 5.9                                                 |
+| ORM        | Prisma 6 (`relationLoadStrategy: 'join'`)                      |
+| Database   | PostgreSQL (Vercel Postgres / Neon in production)              |
+| Validation | Zod 4                                                          |
+| Auth       | NextAuth v5 (JWT, Google + GitHub OAuth + demo login)          |
+| Testing    | Jest 30 + React Testing Library + Playwright E2E               |
+| CI/CD      | GitHub Actions (lint, test, build) + autonomous auto-fix agent |
 
 ---
 
@@ -186,14 +187,15 @@ npx prisma migrate dev        # apply schema migrations
 npm run dev                   # start dev server at localhost:3000
 ```
 
-| Variable             | Description                  |
-| -------------------- | ---------------------------- |
-| `DATABASE_URL`       | PostgreSQL connection string |
-| `AUTH_SECRET`        | NextAuth secret              |
-| `AUTH_GOOGLE_ID`     | Google OAuth client ID       |
-| `AUTH_GOOGLE_SECRET` | Google OAuth client secret   |
-| `AUTH_GITHUB_ID`     | GitHub OAuth client ID       |
-| `AUTH_GITHUB_SECRET` | GitHub OAuth client secret   |
+| Variable             | Description                                          |
+| -------------------- | ---------------------------------------------------- |
+| `DATABASE_URL`       | PostgreSQL connection string                         |
+| `AUTH_SECRET`        | NextAuth secret                                      |
+| `AUTH_GOOGLE_ID`     | Google OAuth client ID                               |
+| `AUTH_GOOGLE_SECRET` | Google OAuth client secret                           |
+| `AUTH_GITHUB_ID`     | GitHub OAuth client ID                               |
+| `AUTH_GITHUB_SECRET` | GitHub OAuth client secret                           |
+| `ANTHROPIC_API_KEY`  | Claude API key (for auto-fix agent + i18n translate) |
 
 ---
 
