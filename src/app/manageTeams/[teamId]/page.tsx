@@ -1,4 +1,5 @@
 import UpdateManagerForm from "@/components/UpdateManager";
+import UpdateTeamNameForm from "@/components/UpdateTeamName";
 import RemoveTeamForm from "@/components/RemoveTeam";
 import { getPersons, getTeams } from "@/queries";
 import { Typography } from "@mui/material";
@@ -42,6 +43,9 @@ export default async function TeamPage({ params }: { params: Promise<{ teamId: s
         permissions={permissions}
       />
       {permissions["team:delete"] && <RemoveTeamForm teamID={teamId} />}
+      {permissions["team:update_name"] && (
+        <UpdateTeamNameForm teamID={teamId} currentName={team.teamName} />
+      )}
       {permissions["team:update_manager"] && (
         <UpdateManagerForm
           teamID={teamId}

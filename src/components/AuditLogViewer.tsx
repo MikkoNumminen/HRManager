@@ -90,11 +90,13 @@ export default function AuditLogViewer({
   const permissionLabels: Record<string, string> = {
     "person:create": t("permCreatePeople"),
     "person:delete": t("permDeletePeople"),
+    "person:update_name": t("permChangeName"),
     "person:update_position": t("permChangePosition"),
     "person:update_email": t("permChangeEmail"),
     "person:read": t("permViewPeople"),
     "team:create": t("permCreateTeams"),
     "team:delete": t("permDeleteTeams"),
+    "team:update_name": t("permRenameTeams"),
     "team:update_manager": t("permChangeManager"),
     "team:add_member": t("permAddMembers"),
     "team:remove_member": t("permRemoveMembers"),
@@ -155,6 +157,8 @@ export default function AuditLogViewer({
 
       if (action === "update") {
         if (entityType === "person") {
+          if (a?.name !== undefined && b?.name !== a.name)
+            return t("changedName", { oldValue: b?.name ?? "", newValue: a?.name ?? "" });
           if (a?.position !== undefined && b?.position !== a.position)
             return t("changedPosition", {
               oldValue: b?.position ?? "",
@@ -165,6 +169,8 @@ export default function AuditLogViewer({
           return t("updatedPerson");
         }
         if (entityType === "team") {
+          if (a?.teamName !== undefined && b?.teamName !== a.teamName)
+            return t("renamedTeam", { oldValue: b?.teamName ?? "", newValue: a?.teamName ?? "" });
           if (a?.departmentId !== undefined) {
             if (a.departmentId === null) return t("removedTeamFromDept");
             return t("assignedTeamToDept");

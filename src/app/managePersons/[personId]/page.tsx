@@ -1,4 +1,5 @@
 import RemovePersonForm from "@/components/RemovePerson";
+import UpdatePersonNameForm from "@/components/UpdatePersonName";
 import UpdateEmailForm from "@/components/UpdateEmail";
 import UpdatePositionForm from "@/components/UpdatePosition";
 import TopBar from "@/components/TopBar";
@@ -38,6 +39,9 @@ export default async function PersonPage({ params }: { params: Promise<{ personI
         permissions={permissions}
       />
       {permissions["person:delete"] && <RemovePersonForm personID={personId} />}
+      {permissions["person:update_name"] && (
+        <UpdatePersonNameForm personID={personId} currentName={person.name} />
+      )}
       {permissions["person:update_position"] && (
         <UpdatePositionForm personID={personId} currentPosition={person.position || undefined} />
       )}

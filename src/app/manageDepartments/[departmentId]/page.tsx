@@ -1,3 +1,4 @@
+import UpdateDepartmentForm from "@/components/UpdateDepartment";
 import UpdateDepartmentHeadForm from "@/components/UpdateDepartmentHead";
 import RemoveDepartmentForm from "@/components/RemoveDepartment";
 import AssignTeamToDepartmentForm from "@/components/AssignTeamToDepartment";
@@ -53,6 +54,13 @@ export default async function DepartmentPage({
         permissions={permissions}
       />
       {permissions["department:delete"] && <RemoveDepartmentForm departmentID={departmentId} />}
+      {permissions["department:update"] && (
+        <UpdateDepartmentForm
+          departmentID={departmentId}
+          currentName={department.name}
+          currentDescription={department.description}
+        />
+      )}
       {permissions["department:update"] && (
         <UpdateDepartmentHeadForm
           departmentID={departmentId}

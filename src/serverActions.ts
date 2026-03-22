@@ -88,6 +88,38 @@ export async function removePerson(data: FormData) {
   revalidatePath("/");
 }
 
+export async function updatePersonName(data: FormData) {
+  await requirePermission("person:update_name");
+  const personID = data.get("personID")?.toString();
+  if (!personID) {
+    throw new Error("No personID provided");
+  }
+  validateUUID(personID, "personID");
+
+  const newName = data.get("name")?.toString().trim();
+  if (!newName) {
+    throw new Error("New name is missing");
+  }
+
+  await prisma.$transaction(async (tx) => {
+    const personBefore = await tx.person.findUnique({ where: { id: personID } });
+    await tx.person.update({
+      where: { id: personID },
+      data: { name: newName },
+    });
+    await logAudit({
+      action: "update",
+      entityType: "person",
+      entityId: personID,
+      before: { name: personBefore?.name },
+      after: { name: newName },
+      tx,
+    });
+  });
+  revalidatePath("/managePersons");
+  revalidatePath("/");
+}
+
 export async function updatePosition(data: FormData) {
   await requirePermission("person:update_position");
   const personID = data.get("personID")?.toString();
@@ -282,6 +314,38 @@ export async function createTeam(data: FormData) {
       entityType: "team",
       entityId: team.teamId,
       after: { teamName: team.teamName },
+      tx,
+    });
+  });
+  revalidatePath("/manageTeams");
+  revalidatePath("/");
+}
+
+export async function updateTeamName(data: FormData) {
+  await requirePermission("team:update_name");
+  const teamID = data.get("teamID")?.toString();
+  if (!teamID) {
+    throw new Error("No teamID provided");
+  }
+  validateUUID(teamID, "teamID");
+
+  const newName = data.get("name")?.toString().trim();
+  if (!newName) {
+    throw new Error("New team name is missing");
+  }
+
+  await prisma.$transaction(async (tx) => {
+    const teamBefore = await tx.team.findUnique({ where: { teamId: teamID } });
+    await tx.team.update({
+      where: { teamId: teamID },
+      data: { teamName: newName },
+    });
+    await logAudit({
+      action: "update",
+      entityType: "team",
+      entityId: teamID,
+      before: { teamName: teamBefore?.teamName },
+      after: { teamName: newName },
       tx,
     });
   });

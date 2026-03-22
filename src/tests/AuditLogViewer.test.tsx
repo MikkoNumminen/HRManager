@@ -97,6 +97,19 @@ describe("AuditLogViewer", () => {
     expect(screen.getByText("Permission")).toBeInTheDocument();
   });
 
+  // Describes a person name change in plain language.
+  test("describes person name change in Barney style", () => {
+    const log = makelog({
+      action: "update",
+      before: '{"name":"Alice"}',
+      after: '{"name":"Alicia"}',
+    });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(
+      screen.getAllByText('Changed name from "Alice" to "Alicia"').length,
+    ).toBeGreaterThan(0);
+  });
+
   // Describes a position update in plain language.
   test("describes position update in Barney style", () => {
     const log = makelog({
@@ -426,13 +439,27 @@ describe("AuditLogViewer", () => {
     expect(screen.getAllByText("Changed the team manager").length).toBeGreaterThan(0);
   });
 
-  // Shows generic team update message when no teamManagerId change.
-  test("describes generic team update in Barney style", () => {
+  // Shows renamed team message when teamName changes.
+  test("describes team rename in Barney style", () => {
     const log = makelog({
       action: "update",
       entityType: "team",
       before: '{"teamName":"Old"}',
       after: '{"teamName":"New"}',
+    });
+    render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
+    expect(
+      screen.getAllByText('Renamed team from "Old" to "New"').length,
+    ).toBeGreaterThan(0);
+  });
+
+  // Shows generic team update message when no specific field changed.
+  test("describes generic team update in Barney style", () => {
+    const log = makelog({
+      action: "update",
+      entityType: "team",
+      before: '{"someField":"old"}',
+      after: '{"someField":"new"}',
     });
     render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
     expect(screen.getAllByText("Updated team details").length).toBeGreaterThan(0);
