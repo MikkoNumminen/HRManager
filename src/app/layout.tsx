@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { Inter } from "next/font/google";
 import { Box } from "@mui/material";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v16-appRouter";
@@ -24,6 +25,8 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const headerStore = await headers();
+  const nonce = headerStore.get("x-nonce") ?? "";
   const locale = await getLocale();
   const messages = await getMessages();
 
@@ -32,7 +35,7 @@ export default async function RootLayout({
   return (
     <html lang={locale} dir={locale === "ar" ? "rtl" : "ltr"}>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: foucScript }} />
+        <script nonce={nonce} dangerouslySetInnerHTML={{ __html: foucScript }} />
       </head>
       <body style={{ fontFamily: inter.style.fontFamily }}>
         <Box
@@ -55,7 +58,7 @@ export default async function RootLayout({
           Skip to main content
         </Box>
         <SessionProvider>
-          <AppRouterCacheProvider>
+          <AppRouterCacheProvider options={{ nonce }}>
             <NextIntlClientProvider locale={locale} messages={messages}>
               <ThemeRegistry>
                 <SnackbarProvider>
