@@ -95,7 +95,7 @@ export default function TutorialSpotlight() {
     };
   }, [isActive, currentStep, isOnStepRoute, navHints, completedSteps]);
 
-  if (!isActive || !currentStep || !anchorEl) return null;
+  if (!isActive || !currentStep || !anchorEl || (!isOnStepRoute && !activeHint)) return null;
 
   const stepIndex = completedSteps.size + 1;
 
