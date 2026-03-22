@@ -1,6 +1,6 @@
 # HRManager
 
-A production-grade HR management system with granular RBAC, audit logging, rate limiting, AI-powered i18n across 18 languages, and 834 tests at 99.8% line coverage.
+A production-grade HR management system with granular RBAC, audit logging, rate limiting, AI-powered i18n across 18 languages, and 868 tests (834 unit/integration + 34 E2E) at 99.8% line coverage.
 
 [![CI](https://github.com/MikkoNumminen/HRManager/actions/workflows/ci.yml/badge.svg)](https://github.com/MikkoNumminen/HRManager/actions/workflows/ci.yml)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)
@@ -27,7 +27,7 @@ A production-grade HR management system with granular RBAC, audit logging, rate 
 
 ## Highlights
 
-- **834 tests, 99.8% line coverage** — Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, rate limiting, audit logging, and all 42 UI components tested against real PostgreSQL
+- **868 tests (834 unit/integration + 34 E2E), 99.8% line coverage** — Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, rate limiting, audit logging, all 42 UI components tested against real PostgreSQL, plus Playwright E2E covering full user flows
 - **Granular RBAC** — 4 roles, 23 permission keys, per-user grant/deny overrides with three-state toggles (deny / role default / grant), and "kick out" user removal with confirmation dialog
 - **Immutable audit trail** — every mutation logged with before/after JSON snapshots inside the same `$transaction` for atomicity
 - **18 languages** — next-intl with cookie persistence, Accept-Language detection, and an AI-powered translation pipeline using parallel Claude Code agents
@@ -51,7 +51,7 @@ A production-grade HR management system with granular RBAC, audit logging, rate 
 | Database   | PostgreSQL (Vercel Postgres / Neon in production)     |
 | Validation | Zod 4                                                 |
 | Auth       | NextAuth v5 (JWT, Google + GitHub OAuth + demo login) |
-| Testing    | Jest 30 + React Testing Library                       |
+| Testing    | Jest 30 + React Testing Library + Playwright E2E      |
 | CI/CD      | GitHub Actions (lint, test, build on every push)      |
 
 ---
@@ -100,30 +100,33 @@ Individual permissions can be overridden per-user — e.g. granting `person:crea
 
 ## Testing
 
-| Layer          | Tests   |
-| -------------- | ------- |
-| Zod schemas    | 71      |
-| Prisma queries | 38      |
-| Server actions | 111     |
-| Auth callbacks | 20      |
-| Audit logging  | 6       |
-| Rate limiting  | 12      |
-| RBAC logic     | 28      |
-| UI components  | 545     |
-| **Total**      | **834** |
+| Layer            | Tests   |
+| ---------------- | ------- |
+| Zod schemas      | 71      |
+| Prisma queries   | 38      |
+| Server actions   | 111     |
+| Auth callbacks   | 20      |
+| Audit logging    | 6       |
+| Rate limiting    | 12      |
+| RBAC logic       | 28      |
+| UI components    | 545     |
+| E2E (Playwright) | 34      |
+| **Total**        | **868** |
 
 ```
 Statements : 99.11%    Branches : 95.61%
 Functions  : 99.71%    Lines    : 99.77%
 ```
 
-Server-side tests run against a real PostgreSQL test database. Client-side tests cover all 42 components including permission toggles, audit log filtering, tutorial system, snackbar notifications, theme switching, and language selection.
+Server-side tests run against a real PostgreSQL test database. Client-side tests cover all 42 components including permission toggles, audit log filtering, tutorial system, snackbar notifications, theme switching, and language selection. Playwright E2E tests run against a production build covering authentication, CRUD for all entities, admin/audit access, guest access control, theme/language persistence, and snackbar lifecycle.
 
 ---
 
 ## Developer tooling
 
 ```bash
+npm run test:e2e        # Playwright E2E tests (builds & starts production server)
+npm run test:e2e:ui     # Playwright interactive UI mode
 npm run validate        # pre-commit gate: Prettier + ESLint + i18n audit + full test suite
 npm run i18n:audit      # report missing, extra, and untranslated keys across all locales
 npm run i18n:fix        # auto-fill missing keys with English fallback, remove extras
