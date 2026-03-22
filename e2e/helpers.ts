@@ -5,9 +5,21 @@ import { Page, expect } from "@playwright/test";
  * After calling this the page is on "/" and the user menu is available.
  */
 export async function loginAsDemo(page: Page) {
-  await page.goto("/");
-  await page.getByRole("button", { name: /Try Demo/i }).click();
-  // Wait for redirect back to home after demo login
+  // Use Playwright's APIRequestContext which shares cookies with the browser context.
+  const req = page.context().request;
+  const baseURL = "http://localhost:3000";
+
+  // Step 1: GET CSRF token (also sets the csrf cookie in the shared jar)
+  const csrfRes = await req.get(`${baseURL}/api/auth/csrf`);
+  const { csrfToken } = await csrfRes.json();
+
+  // Step 2: POST to the demo credentials callback (sets session cookie in the shared jar)
+  await req.post(`${baseURL}/api/auth/callback/demo`, {
+    form: { csrfToken },
+  });
+
+  // Step 3: Navigate to home — browser sends the session cookie from the shared jar
+  await page.goto("/", { waitUntil: "networkidle" });
   await expect(page.getByRole("button", { name: /user menu/i })).toBeVisible({ timeout: 15_000 });
 }
 
