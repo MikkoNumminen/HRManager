@@ -39,7 +39,8 @@
     "language": "언어",
     "theme": "테마",
     "dashboard": "대시보드",
-    "menu": "메뉴"
+    "menu": "메뉴",
+    "profile": "Profile"
   },
   "home": {
     "title": "인사 관리 시스템",
@@ -271,8 +272,7 @@
     "typeSecurity": "보안",
     "permissionDenied": "권한이 거부되었습니다: {key}",
     "rateLimited": "작업에 대한 속도 제한 초과: {action}",
-    "permViewDashboard": "대시보드 보기",
-    "filters": "필터"
+    "permViewDashboard": "대시보드 보기"
   },
   "notifications": {
     "personCreated": "직원이 생성되었습니다",
@@ -296,7 +296,9 @@
     "nameUpdated": "이름이 업데이트되었습니다",
     "teamRenamed": "팀 이름이 변경되었습니다",
     "departmentUpdated": "부서가 업데이트되었습니다",
-    "userKickedOut": "{name}이(가) 추방되었습니다"
+    "userKickedOut": "{name}이(가) 추방되었습니다",
+    "profileNameUpdated": "Display name updated successfully",
+    "profileImageUpdated": "Profile picture updated successfully"
   },
   "tutorial": {
     "checklistTitle": "데모 투어",
@@ -335,5 +337,26 @@
     "nav_open_menu_audit": "사용자 메뉴를 열어 감사 로그에 접근하세요.",
     "nav_click_user_management": "사용자 관리를 클릭하여 권한을 관리하세요.",
     "nav_click_audit_log": "감사 로그를 클릭하여 기록을 확인하세요."
+  },
+  "profile": {
+    "title": "Profile",
+    "heading": "Your Profile",
+    "avatar": "Profile picture",
+    "changeName": "Change Name",
+    "enterNewName": "Enter New Name",
+    "email": "Email",
+    "role": "Role",
+    "joinedAt": "Joined",
+    "permissions": "Your Permissions",
+    "permissionsDescription": "Permissions granted to your account based on your role and any individual overrides.",
+    "allowed": "Allowed",
+    "denied": "Denied",
+    "noPermissions": "No permissions assigned",
+    "profilePicture": "Profile Picture",
+    "imageUrl": "Image URL",
+    "imageUrlPlaceholder": "https://example.com/avatar.jpg",
+    "setImage": "Set Image",
+    "removeImage": "Remove Image",
+    "imageHelp": "Enter a direct link to an image. Leave empty and save to use your OAuth avatar."
   }
 }

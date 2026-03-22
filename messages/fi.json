@@ -39,7 +39,8 @@
     "language": "Kieli",
     "theme": "Teema",
     "dashboard": "Kojelauta",
-    "menu": "Valikko"
+    "menu": "Valikko",
+    "profile": "Profile"
   },
   "home": {
     "title": "Henkilöstöhallintajärjestelmä",
@@ -271,8 +272,7 @@
     "typeSecurity": "Turvallisuus",
     "permissionDenied": "Käyttö estetty: {key}",
     "rateLimited": "Pyyntöraja ylitetty toiminnolle: {action}",
-    "permViewDashboard": "nähdä kojelaudan",
-    "filters": "Suodattimet"
+    "permViewDashboard": "nähdä kojelaudan"
   },
   "notifications": {
     "personCreated": "Henkilö luotu onnistuneesti",
@@ -296,7 +296,9 @@
     "nameUpdated": "Nimi päivitetty onnistuneesti",
     "teamRenamed": "Tiimi nimetty uudelleen onnistuneesti",
     "departmentUpdated": "Osasto päivitetty onnistuneesti",
-    "userKickedOut": "{name} on poistettu järjestelmästä"
+    "userKickedOut": "{name} on poistettu järjestelmästä",
+    "profileNameUpdated": "Display name updated successfully",
+    "profileImageUpdated": "Profile picture updated successfully"
   },
   "tutorial": {
     "checklistTitle": "Demokierros",
@@ -335,5 +337,26 @@
     "nav_open_menu_audit": "Avaa käyttäjävalikko siirtyäksesi Tapahtumalokiin.",
     "nav_click_user_management": "Klikkaa Käyttäjähallinta hallitaksesi oikeuksia.",
     "nav_click_audit_log": "Klikkaa Tapahtumaloki nähdäksesi tapahtumahistorian."
+  },
+  "profile": {
+    "title": "Profile",
+    "heading": "Your Profile",
+    "avatar": "Profile picture",
+    "changeName": "Change Name",
+    "enterNewName": "Enter New Name",
+    "email": "Email",
+    "role": "Role",
+    "joinedAt": "Joined",
+    "permissions": "Your Permissions",
+    "permissionsDescription": "Permissions granted to your account based on your role and any individual overrides.",
+    "allowed": "Allowed",
+    "denied": "Denied",
+    "noPermissions": "No permissions assigned",
+    "profilePicture": "Profile Picture",
+    "imageUrl": "Image URL",
+    "imageUrlPlaceholder": "https://example.com/avatar.jpg",
+    "setImage": "Set Image",
+    "removeImage": "Remove Image",
+    "imageHelp": "Enter a direct link to an image. Leave empty and save to use your OAuth avatar."
   }
 }

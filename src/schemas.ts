@@ -4,6 +4,7 @@ export const MAX_NAME_LENGTH = 255;
 export const MAX_EMAIL_LENGTH = 320;
 export const MAX_POSITION_LENGTH = 255;
 export const MAX_DESCRIPTION_LENGTH = 1000;
+export const MAX_URL_LENGTH = 2048;
 
 export const EmailSchema = z.string().email().max(MAX_EMAIL_LENGTH);
 
@@ -67,6 +68,19 @@ export const UserSchema = z.object({
 });
 
 export type AppUser = z.infer<typeof UserSchema>;
+
+export const UserProfileSchema = z.object({
+  id: z.string().uuid(),
+  email: z.string().email(),
+  name: z.string().nullable(),
+  image: z.string().nullable(),
+  role: z.enum(["superuser", "administrator", "user", "guest"]),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+  resolvedPermissions: z.record(z.string(), z.boolean()),
+});
+
+export type UserProfile = z.infer<typeof UserProfileSchema>;
 
 export const PermissionsSchema = z.record(z.string(), z.boolean());
 

@@ -39,7 +39,8 @@
     "language": "语言",
     "theme": "主题",
     "dashboard": "仪表板",
-    "menu": "菜单"
+    "menu": "菜单",
+    "profile": "Profile"
   },
   "home": {
     "title": "人力资源管理系统",
@@ -271,8 +272,7 @@
     "typeSecurity": "安全",
     "permissionDenied": "权限被拒绝: {key}",
     "rateLimited": "操作超出速率限制: {action}",
-    "permViewDashboard": "查看仪表板",
-    "filters": "筛选"
+    "permViewDashboard": "查看仪表板"
   },
   "notifications": {
     "personCreated": "人员创建成功",
@@ -296,7 +296,9 @@
     "nameUpdated": "姓名更新成功",
     "teamRenamed": "团队重命名成功",
     "departmentUpdated": "部门更新成功",
-    "userKickedOut": "{name}已被踢出"
+    "userKickedOut": "{name}已被踢出",
+    "profileNameUpdated": "Display name updated successfully",
+    "profileImageUpdated": "Profile picture updated successfully"
   },
   "tutorial": {
     "checklistTitle": "演示导览",
@@ -335,5 +337,26 @@
     "nav_open_menu_audit": "打开用户菜单以访问审计日志。",
     "nav_click_user_management": "点击用户管理来管理权限。",
     "nav_click_audit_log": "点击审计日志查看历史记录。"
+  },
+  "profile": {
+    "title": "Profile",
+    "heading": "Your Profile",
+    "avatar": "Profile picture",
+    "changeName": "Change Name",
+    "enterNewName": "Enter New Name",
+    "email": "Email",
+    "role": "Role",
+    "joinedAt": "Joined",
+    "permissions": "Your Permissions",
+    "permissionsDescription": "Permissions granted to your account based on your role and any individual overrides.",
+    "allowed": "Allowed",
+    "denied": "Denied",
+    "noPermissions": "No permissions assigned",
+    "profilePicture": "Profile Picture",
+    "imageUrl": "Image URL",
+    "imageUrlPlaceholder": "https://example.com/avatar.jpg",
+    "setImage": "Set Image",
+    "removeImage": "Remove Image",
+    "imageHelp": "Enter a direct link to an image. Leave empty and save to use your OAuth avatar."
   }
 }

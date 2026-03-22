@@ -186,6 +186,14 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
                     </Typography>
                   </Box>
                   <Divider sx={{ borderColor: colors.slate300 }} />
+                  <MenuItem
+                    component={Link}
+                    href="/profile"
+                    onClick={() => setAnchorEl(null)}
+                    sx={userMenuItemStyles}
+                  >
+                    {t("profile")}
+                  </MenuItem>
                   {session?.user?.permissions?.["dashboard:view"] && (
                     <MenuItem
                       component={Link}
@@ -337,6 +345,21 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
           )}
 
           <List sx={{ flex: 1, py: 1 }}>
+            {user && (
+              <ListItem disablePadding>
+                <ListItemButton
+                  component={Link}
+                  href="/profile"
+                  onClick={() => setDrawerOpen(false)}
+                  sx={{
+                    color: colors.slate100,
+                    "&:hover": { backgroundColor: colors.hoverOverlay },
+                  }}
+                >
+                  <ListItemText primary={t("profile")} />
+                </ListItemButton>
+              </ListItem>
+            )}
             {session?.user?.permissions?.["dashboard:view"] && (
               <ListItem disablePadding>
                 <ListItemButton

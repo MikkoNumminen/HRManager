@@ -39,7 +39,8 @@
     "language": "Langue",
     "theme": "Thème",
     "dashboard": "Tableau de bord",
-    "menu": "Menu"
+    "menu": "Menu",
+    "profile": "Profile"
   },
   "home": {
     "title": "Système de gestion des ressources humaines",
@@ -271,8 +272,7 @@
     "typeSecurity": "Sécurité",
     "permissionDenied": "Permission refusée : {key}",
     "rateLimited": "Limite de requêtes dépassée pour l'action : {action}",
-    "permViewDashboard": "voir le tableau de bord",
-    "filters": "Filtres"
+    "permViewDashboard": "voir le tableau de bord"
   },
   "notifications": {
     "personCreated": "Personne créée avec succès",
@@ -296,7 +296,9 @@
     "nameUpdated": "Nom mis à jour avec succès",
     "teamRenamed": "Équipe renommée avec succès",
     "departmentUpdated": "Département mis à jour avec succès",
-    "userKickedOut": "{name} a été exclu"
+    "userKickedOut": "{name} a été exclu",
+    "profileNameUpdated": "Display name updated successfully",
+    "profileImageUpdated": "Profile picture updated successfully"
   },
   "tutorial": {
     "checklistTitle": "Visite guidée",
@@ -335,5 +337,26 @@
     "nav_open_menu_audit": "Ouvrez le menu utilisateur pour accéder au Journal d'audit.",
     "nav_click_user_management": "Cliquez sur Gestion des utilisateurs pour gérer les permissions.",
     "nav_click_audit_log": "Cliquez sur Journal d'audit pour consulter l'historique."
+  },
+  "profile": {
+    "title": "Profile",
+    "heading": "Your Profile",
+    "avatar": "Profile picture",
+    "changeName": "Change Name",
+    "enterNewName": "Enter New Name",
+    "email": "Email",
+    "role": "Role",
+    "joinedAt": "Joined",
+    "permissions": "Your Permissions",
+    "permissionsDescription": "Permissions granted to your account based on your role and any individual overrides.",
+    "allowed": "Allowed",
+    "denied": "Denied",
+    "noPermissions": "No permissions assigned",
+    "profilePicture": "Profile Picture",
+    "imageUrl": "Image URL",
+    "imageUrlPlaceholder": "https://example.com/avatar.jpg",
+    "setImage": "Set Image",
+    "removeImage": "Remove Image",
+    "imageHelp": "Enter a direct link to an image. Leave empty and save to use your OAuth avatar."
   }
 }

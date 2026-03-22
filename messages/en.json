@@ -39,6 +39,7 @@
     "language": "Language",
     "theme": "Theme",
     "dashboard": "Dashboard",
+    "profile": "Profile",
     "menu": "Menu"
   },
   "home": {
@@ -273,6 +274,27 @@
     "permViewAuditLog": "view the audit log",
     "permViewDashboard": "view the dashboard"
   },
+  "profile": {
+    "title": "Profile",
+    "heading": "Your Profile",
+    "avatar": "Profile picture",
+    "changeName": "Change Name",
+    "enterNewName": "Enter New Name",
+    "email": "Email",
+    "role": "Role",
+    "joinedAt": "Joined",
+    "permissions": "Your Permissions",
+    "permissionsDescription": "Permissions granted to your account based on your role and any individual overrides.",
+    "allowed": "Allowed",
+    "denied": "Denied",
+    "noPermissions": "No permissions assigned",
+    "profilePicture": "Profile Picture",
+    "imageUrl": "Image URL",
+    "imageUrlPlaceholder": "https://example.com/avatar.jpg",
+    "setImage": "Set Image",
+    "removeImage": "Remove Image",
+    "imageHelp": "Enter a direct link to an image. Leave empty and save to use your OAuth avatar."
+  },
   "notifications": {
     "personCreated": "Person created successfully",
     "personRemoved": "Person removed successfully",
@@ -295,7 +317,9 @@
     "permissionUpdated": "Permission updated successfully",
     "mockDataLoaded": "Mock data loaded successfully",
     "dataReset": "All data reset successfully",
-    "userKickedOut": "{name} has been kicked out"
+    "userKickedOut": "{name} has been kicked out",
+    "profileNameUpdated": "Display name updated successfully",
+    "profileImageUpdated": "Profile picture updated successfully"
   },
   "tutorial": {
     "checklistTitle": "Demo Tour",

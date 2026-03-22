@@ -39,7 +39,8 @@
     "language": "言語",
     "theme": "テーマ",
     "dashboard": "ダッシュボード",
-    "menu": "メニュー"
+    "menu": "メニュー",
+    "profile": "Profile"
   },
   "home": {
     "title": "人事管理システム",
@@ -271,8 +272,7 @@
     "typeSecurity": "セキュリティ",
     "permissionDenied": "権限が拒否されました: {key}",
     "rateLimited": "アクションのレート制限を超えました: {action}",
-    "permViewDashboard": "ダッシュボードを表示",
-    "filters": "フィルター"
+    "permViewDashboard": "ダッシュボードを表示"
   },
   "notifications": {
     "personCreated": "担当者を作成しました",
@@ -296,7 +296,9 @@
     "nameUpdated": "名前を更新しました",
     "teamRenamed": "チーム名を変更しました",
     "departmentUpdated": "部門を更新しました",
-    "userKickedOut": "{name}が追放されました"
+    "userKickedOut": "{name}が追放されました",
+    "profileNameUpdated": "Display name updated successfully",
+    "profileImageUpdated": "Profile picture updated successfully"
   },
   "tutorial": {
     "checklistTitle": "デモツアー",
@@ -335,5 +337,26 @@
     "nav_open_menu_audit": "ユーザーメニューを開いて監査ログにアクセスしてください。",
     "nav_click_user_management": "ユーザー管理をクリックして権限を管理してください。",
     "nav_click_audit_log": "監査ログをクリックして履歴を確認してください。"
+  },
+  "profile": {
+    "title": "Profile",
+    "heading": "Your Profile",
+    "avatar": "Profile picture",
+    "changeName": "Change Name",
+    "enterNewName": "Enter New Name",
+    "email": "Email",
+    "role": "Role",
+    "joinedAt": "Joined",
+    "permissions": "Your Permissions",
+    "permissionsDescription": "Permissions granted to your account based on your role and any individual overrides.",
+    "allowed": "Allowed",
+    "denied": "Denied",
+    "noPermissions": "No permissions assigned",
+    "profilePicture": "Profile Picture",
+    "imageUrl": "Image URL",
+    "imageUrlPlaceholder": "https://example.com/avatar.jpg",
+    "setImage": "Set Image",
+    "removeImage": "Remove Image",
+    "imageHelp": "Enter a direct link to an image. Leave empty and save to use your OAuth avatar."
   }
 }

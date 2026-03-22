@@ -39,7 +39,8 @@
     "language": "Språk",
     "theme": "Tema",
     "dashboard": "Instrumentpanel",
-    "menu": "Meny"
+    "menu": "Meny",
+    "profile": "Profile"
   },
   "home": {
     "title": "Personalhanteringssystem",
@@ -271,8 +272,7 @@
     "typeSecurity": "Säkerhet",
     "permissionDenied": "Åtkomst nekad: {key}",
     "rateLimited": "Hastighetsgräns överskriden för åtgärd: {action}",
-    "permViewDashboard": "visa instrumentpanelen",
-    "filters": "Filter"
+    "permViewDashboard": "visa instrumentpanelen"
   },
   "notifications": {
     "personCreated": "Person skapad",
@@ -296,7 +296,9 @@
     "nameUpdated": "Namn uppdaterat",
     "teamRenamed": "Teamnamn ändrat",
     "departmentUpdated": "Avdelning uppdaterad",
-    "userKickedOut": "{name} har sparkats ut"
+    "userKickedOut": "{name} har sparkats ut",
+    "profileNameUpdated": "Display name updated successfully",
+    "profileImageUpdated": "Profile picture updated successfully"
   },
   "tutorial": {
     "checklistTitle": "Demoguide",
@@ -335,5 +337,26 @@
     "nav_open_menu_audit": "Öppna användarmenyn för att nå Händelseloggen.",
     "nav_click_user_management": "Klicka på Användarhantering för att hantera behörigheter.",
     "nav_click_audit_log": "Klicka på Revisionslogg för att visa händelseloggen."
+  },
+  "profile": {
+    "title": "Profile",
+    "heading": "Your Profile",
+    "avatar": "Profile picture",
+    "changeName": "Change Name",
+    "enterNewName": "Enter New Name",
+    "email": "Email",
+    "role": "Role",
+    "joinedAt": "Joined",
+    "permissions": "Your Permissions",
+    "permissionsDescription": "Permissions granted to your account based on your role and any individual overrides.",
+    "allowed": "Allowed",
+    "denied": "Denied",
+    "noPermissions": "No permissions assigned",
+    "profilePicture": "Profile Picture",
+    "imageUrl": "Image URL",
+    "imageUrlPlaceholder": "https://example.com/avatar.jpg",
+    "setImage": "Set Image",
+    "removeImage": "Remove Image",
+    "imageHelp": "Enter a direct link to an image. Leave empty and save to use your OAuth avatar."
   }
 }

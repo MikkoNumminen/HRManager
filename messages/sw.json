@@ -39,7 +39,8 @@
     "language": "Lugha",
     "theme": "Mandhari",
     "dashboard": "Dashibodi",
-    "menu": "Menyu"
+    "menu": "Menyu",
+    "profile": "Profile"
   },
   "home": {
     "title": "Mfumo wa Usimamizi wa Rasilimali Watu",
@@ -271,8 +272,7 @@
     "typeSecurity": "Usalama",
     "permissionDenied": "Ruhusa imekataliwa: {key}",
     "rateLimited": "Kikomo cha maombi kimezidishwa kwa kitendo: {action}",
-    "permViewDashboard": "kuona dashibodi",
-    "filters": "Vichujio"
+    "permViewDashboard": "kuona dashibodi"
   },
   "notifications": {
     "personCreated": "Mtu ameundwa kwa mafanikio",
@@ -296,7 +296,9 @@
     "nameUpdated": "Jina limesasishwa kwa mafanikio",
     "teamRenamed": "Timu imebadilishwa jina kwa mafanikio",
     "departmentUpdated": "Idara imesasishwa kwa mafanikio",
-    "userKickedOut": "{name} amefukuzwa"
+    "userKickedOut": "{name} amefukuzwa",
+    "profileNameUpdated": "Display name updated successfully",
+    "profileImageUpdated": "Profile picture updated successfully"
   },
   "tutorial": {
     "checklistTitle": "Ziara ya Demo",
@@ -335,5 +337,26 @@
     "nav_open_menu_audit": "Fungua menyu ya mtumiaji kupata Kumbukumbu ya Ukaguzi.",
     "nav_click_user_management": "Bofya Usimamizi wa Watumiaji kudhibiti ruhusa.",
     "nav_click_audit_log": "Bofya Kumbukumbu ya Ukaguzi kuona historia."
+  },
+  "profile": {
+    "title": "Profile",
+    "heading": "Your Profile",
+    "avatar": "Profile picture",
+    "changeName": "Change Name",
+    "enterNewName": "Enter New Name",
+    "email": "Email",
+    "role": "Role",
+    "joinedAt": "Joined",
+    "permissions": "Your Permissions",
+    "permissionsDescription": "Permissions granted to your account based on your role and any individual overrides.",
+    "allowed": "Allowed",
+    "denied": "Denied",
+    "noPermissions": "No permissions assigned",
+    "profilePicture": "Profile Picture",
+    "imageUrl": "Image URL",
+    "imageUrlPlaceholder": "https://example.com/avatar.jpg",
+    "setImage": "Set Image",
+    "removeImage": "Remove Image",
+    "imageHelp": "Enter a direct link to an image. Leave empty and save to use your OAuth avatar."
   }
 }

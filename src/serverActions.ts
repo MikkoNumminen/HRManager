@@ -3,6 +3,7 @@ import { prisma } from "@/db";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requirePermission, seedPermissions } from "@/permissions";
+import { auth } from "@/auth";
 import { logAudit } from "@/auditLog";
 import { rateLimit } from "@/rateLimit";
 import { getDemoSessionId } from "@/demoSession";
@@ -11,6 +12,7 @@ import {
   MAX_EMAIL_LENGTH,
   MAX_POSITION_LENGTH,
   MAX_DESCRIPTION_LENGTH,
+  MAX_URL_LENGTH,
   EmailSchema,
 } from "@/schemas";
 
@@ -1153,4 +1155,82 @@ export async function kickOutUser(data: FormData) {
     });
   });
   revalidatePath("/admin");
+}
+
+export async function updateProfileName(data: FormData) {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("Not authenticated");
+  await rateLimit("updateProfileName");
+
+  const name = data.get("name")?.toString();
+  if (!name || name.trim().length === 0) throw new Error("Name is required");
+  if (name.trim().length > MAX_NAME_LENGTH) {
+    throw new Error(`Name must be ${MAX_NAME_LENGTH} characters or less`);
+  }
+
+  const user = await prisma.user.findUnique({ where: { id: session.user.id } });
+  if (!user) throw new Error("User not found");
+
+  await prisma.$transaction(async (tx) => {
+    await tx.user.update({
+      where: { id: user.id },
+      data: { name: name.trim() },
+    });
+    await logAudit({
+      action: "update",
+      entityType: "user",
+      entityId: user.id,
+      before: { name: user.name },
+      after: { name: name.trim() },
+      tx,
+    });
+  });
+  revalidatePath("/profile");
+  revalidatePath("/");
+}
+
+export async function updateProfileImage(data: FormData) {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("Not authenticated");
+  await rateLimit("updateProfileImage");
+
+  const image = data.get("image")?.toString() ?? "";
+  const trimmed = image.trim();
+
+  if (trimmed.length > 0) {
+    if (trimmed.length > MAX_URL_LENGTH) {
+      throw new Error(`URL must be ${MAX_URL_LENGTH} characters or less`);
+    }
+    try {
+      const url = new URL(trimmed);
+      if (!["http:", "https:"].includes(url.protocol)) {
+        throw new Error("URL must use http or https protocol");
+      }
+    } catch (e) {
+      if (e instanceof Error && e.message.includes("protocol")) throw e;
+      throw new Error("Invalid URL format");
+    }
+  }
+
+  const user = await prisma.user.findUnique({ where: { id: session.user.id } });
+  if (!user) throw new Error("User not found");
+
+  const newImage = trimmed.length > 0 ? trimmed : null;
+
+  await prisma.$transaction(async (tx) => {
+    await tx.user.update({
+      where: { id: user.id },
+      data: { image: newImage },
+    });
+    await logAudit({
+      action: "update",
+      entityType: "user",
+      entityId: user.id,
+      before: { image: user.image },
+      after: { image: newImage },
+      tx,
+    });
+  });
+  revalidatePath("/profile");
+  revalidatePath("/");
 }

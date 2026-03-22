@@ -39,7 +39,8 @@
     "language": "Мова",
     "theme": "Тема",
     "dashboard": "Панель",
-    "menu": "Меню"
+    "menu": "Меню",
+    "profile": "Profile"
   },
   "home": {
     "title": "Система управління персоналом",
@@ -271,8 +272,7 @@
     "typeSecurity": "Безпека",
     "permissionDenied": "Доступ заборонено: {key}",
     "rateLimited": "Перевищено ліміт запитів для дії: {action}",
-    "permViewDashboard": "переглянути панель",
-    "filters": "Фільтри"
+    "permViewDashboard": "переглянути панель"
   },
   "notifications": {
     "personCreated": "Особу успішно створено",
@@ -296,7 +296,9 @@
     "nameUpdated": "Ім'я успішно оновлено",
     "teamRenamed": "Команду успішно перейменовано",
     "departmentUpdated": "Відділ успішно оновлено",
-    "userKickedOut": "{name} було виключено"
+    "userKickedOut": "{name} було виключено",
+    "profileNameUpdated": "Display name updated successfully",
+    "profileImageUpdated": "Profile picture updated successfully"
   },
   "tutorial": {
     "checklistTitle": "Огляд демо",
@@ -335,5 +337,26 @@
     "nav_open_menu_audit": "Відкрийте меню користувача для доступу до Журналу аудиту.",
     "nav_click_user_management": "Натисніть Керування користувачами для управління правами.",
     "nav_click_audit_log": "Натисніть Журнал аудиту для перегляду історії."
+  },
+  "profile": {
+    "title": "Profile",
+    "heading": "Your Profile",
+    "avatar": "Profile picture",
+    "changeName": "Change Name",
+    "enterNewName": "Enter New Name",
+    "email": "Email",
+    "role": "Role",
+    "joinedAt": "Joined",
+    "permissions": "Your Permissions",
+    "permissionsDescription": "Permissions granted to your account based on your role and any individual overrides.",
+    "allowed": "Allowed",
+    "denied": "Denied",
+    "noPermissions": "No permissions assigned",
+    "profilePicture": "Profile Picture",
+    "imageUrl": "Image URL",
+    "imageUrlPlaceholder": "https://example.com/avatar.jpg",
+    "setImage": "Set Image",
+    "removeImage": "Remove Image",
+    "imageHelp": "Enter a direct link to an image. Leave empty and save to use your OAuth avatar."
   }
 }

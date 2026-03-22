@@ -39,7 +39,8 @@
     "language": "ภาษา",
     "theme": "ธีม",
     "dashboard": "แดชบอร์ด",
-    "menu": "เมนู"
+    "menu": "เมนู",
+    "profile": "Profile"
   },
   "home": {
     "title": "ระบบจัดการทรัพยากรบุคคล",
@@ -271,8 +272,7 @@
     "typeSecurity": "ความปลอดภัย",
     "permissionDenied": "ไม่มีสิทธิ์: {key}",
     "rateLimited": "เกินขีดจำกัดคำขอสำหรับการดำเนินการ: {action}",
-    "permViewDashboard": "ดูแดชบอร์ด",
-    "filters": "ตัวกรอง"
+    "permViewDashboard": "ดูแดชบอร์ด"
   },
   "notifications": {
     "personCreated": "สร้างบุคคลสำเร็จ",
@@ -296,7 +296,9 @@
     "nameUpdated": "อัปเดตชื่อสำเร็จ",
     "teamRenamed": "เปลี่ยนชื่อทีมสำเร็จ",
     "departmentUpdated": "อัปเดตแผนกสำเร็จ",
-    "userKickedOut": "{name} ถูกไล่ออกแล้ว"
+    "userKickedOut": "{name} ถูกไล่ออกแล้ว",
+    "profileNameUpdated": "Display name updated successfully",
+    "profileImageUpdated": "Profile picture updated successfully"
   },
   "tutorial": {
     "checklistTitle": "ทัวร์สาธิต",
@@ -335,5 +337,26 @@
     "nav_open_menu_audit": "เปิดเมนูผู้ใช้เพื่อเข้าถึงบันทึกการตรวจสอบ",
     "nav_click_user_management": "คลิกการจัดการผู้ใช้เพื่อจัดการสิทธิ์",
     "nav_click_audit_log": "คลิกบันทึกการตรวจสอบเพื่อดูประวัติ"
+  },
+  "profile": {
+    "title": "Profile",
+    "heading": "Your Profile",
+    "avatar": "Profile picture",
+    "changeName": "Change Name",
+    "enterNewName": "Enter New Name",
+    "email": "Email",
+    "role": "Role",
+    "joinedAt": "Joined",
+    "permissions": "Your Permissions",
+    "permissionsDescription": "Permissions granted to your account based on your role and any individual overrides.",
+    "allowed": "Allowed",
+    "denied": "Denied",
+    "noPermissions": "No permissions assigned",
+    "profilePicture": "Profile Picture",
+    "imageUrl": "Image URL",
+    "imageUrlPlaceholder": "https://example.com/avatar.jpg",
+    "setImage": "Set Image",
+    "removeImage": "Remove Image",
+    "imageHelp": "Enter a direct link to an image. Leave empty and save to use your OAuth avatar."
   }
 }

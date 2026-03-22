@@ -39,7 +39,8 @@
     "language": "اللغة",
     "theme": "السمة",
     "dashboard": "لوحة المعلومات",
-    "menu": "القائمة"
+    "menu": "القائمة",
+    "profile": "Profile"
   },
   "home": {
     "title": "نظام إدارة الموارد البشرية",
@@ -206,7 +207,7 @@
     "tooltipAction": "نوع الإجراء المتخذ (إنشاء، تحديث، حذف، إلخ)",
     "tooltipType": "نوع المورد المتأثر",
     "tooltipChanges": "ما الذي تغير — يعرض القيم قبل وبعد التحديثات",
-    "filters": "فلاتر",
+    "filters": "المرشحات",
     "noEntries": "لم يتم العثور على إدخالات في سجل التدقيق",
     "system": "النظام",
     "addedPerson": "تمت إضافة شخص جديد: {name}",
@@ -271,8 +272,7 @@
     "typeSecurity": "الأمان",
     "permissionDenied": "تم رفض الإذن: {key}",
     "rateLimited": "تم تجاوز حد الطلبات للإجراء: {action}",
-    "permViewDashboard": "عرض لوحة المعلومات",
-    "filters": "المرشحات"
+    "permViewDashboard": "عرض لوحة المعلومات"
   },
   "notifications": {
     "personCreated": "تم إنشاء الشخص بنجاح",
@@ -296,7 +296,9 @@
     "nameUpdated": "تم تحديث الاسم بنجاح",
     "teamRenamed": "تمت إعادة تسمية الفريق بنجاح",
     "departmentUpdated": "تم تحديث القسم بنجاح",
-    "userKickedOut": "تم طرد {name}"
+    "userKickedOut": "تم طرد {name}",
+    "profileNameUpdated": "Display name updated successfully",
+    "profileImageUpdated": "Profile picture updated successfully"
   },
   "tutorial": {
     "checklistTitle": "جولة تعريفية",
@@ -335,5 +337,26 @@
     "nav_open_menu_audit": "افتح قائمة المستخدم للوصول إلى سجل التدقيق.",
     "nav_click_user_management": "انقر على إدارة المستخدمين لإدارة الأذونات.",
     "nav_click_audit_log": "انقر على سجل التدقيق لعرض السجل."
+  },
+  "profile": {
+    "title": "Profile",
+    "heading": "Your Profile",
+    "avatar": "Profile picture",
+    "changeName": "Change Name",
+    "enterNewName": "Enter New Name",
+    "email": "Email",
+    "role": "Role",
+    "joinedAt": "Joined",
+    "permissions": "Your Permissions",
+    "permissionsDescription": "Permissions granted to your account based on your role and any individual overrides.",
+    "allowed": "Allowed",
+    "denied": "Denied",
+    "noPermissions": "No permissions assigned",
+    "profilePicture": "Profile Picture",
+    "imageUrl": "Image URL",
+    "imageUrlPlaceholder": "https://example.com/avatar.jpg",
+    "setImage": "Set Image",
+    "removeImage": "Remove Image",
+    "imageHelp": "Enter a direct link to an image. Leave empty and save to use your OAuth avatar."
   }
 }
