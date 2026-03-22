@@ -41,6 +41,7 @@ This is a **portfolio / showcase project**. The goal is to demonstrate technical
 - **Guest mode**: unauthenticated users see read-only minimal views (MUI Chips) of Persons, Departments, and Teams on the main page. Manage routes (`/managePersons`, `/manageDepartments`, `/manageTeams`) redirect to `/`.
 - **TopBar** — the user avatar dropdown menu contains: User Management, Audit Log (permission-gated), Load Mock Data, Reset All Data (permission-gated), and Sign Out. The `permissions` prop must be passed on every page so all menu items are available everywhere.
 - **Client-heavy rendering**: Keep the server thin — it handles only data fetching, auth, and validation. All rendering logic, UI state, filtering, sorting, and heavy computation belong in Client Components so the server stays lightweight and responsive. Security-sensitive logic (auth checks, input sanitization, access control, database queries) must always remain server-side — never trust the client for authorization or data integrity.
+- **Rate limiting** — `rateLimit.ts` provides a PostgreSQL-based sliding window rate limiter (30 req/min per IP per action). Called at the top of every server action after `requirePermission()`. Uses a `RateLimit` table with upsert — no external services. `cleanupExpiredRateLimits()` removes stale records.
 - **Transaction nesting** — never nest `$transaction` calls. In `seedMockData`, separate transactions run sequentially (main data → cleanup → `seedPermissions()` → user creation) to avoid deadlock.
 
 ## File structure
@@ -56,7 +57,7 @@ src/
 │   └── manageTeams/             # Team management (permission-protected)
 ├── components/       # Reusable MUI client components (42 components)
 ├── i18n/             # next-intl configuration (actions, config, request)
-├── tests/            # Jest tests (806 tests)
+├── tests/            # Jest tests (818 tests)
 ├── types/            # TypeScript module augmentations (next-auth.d.ts)
 ├── auditLog.ts       # Audit logging helper (logAudit)
 ├── auth.ts           # NextAuth v5 configuration + RBAC callbacks
@@ -64,6 +65,7 @@ src/
 ├── muiStyles.ts      # Centralised MUI style tokens
 ├── permissions.ts    # RBAC: role defaults, permission resolution, guards
 ├── queries.ts        # Read-only data fetching
+├── rateLimit.ts      # PostgreSQL-based rate limiting (sliding window)
 ├── schemas.ts        # Zod schemas and inferred types
 ├── serverActions.ts  # Mutation server actions
 ├── themeConfig.ts    # 6 visual themes (CSS custom properties)
@@ -90,6 +92,7 @@ docker-compose.yml    # PostgreSQL 17 + app with health checks
 - **Permission** — catalog of 23 granular permission keys (e.g. `person:create`, `team:delete`, `department:assign_team`).
 - **UserPermission** — per-user permission overrides (grant/deny) with role-default fallback.
 - **AuditLog** — immutable log of all mutations: who, what action, which entity, before/after JSON snapshots. No FK to User so logs survive user deletion.
+- **RateLimit** — sliding window rate limit counters per identifier (IP) and action. Auto-cleaned on window expiry.
 
 ## Commit style
 
