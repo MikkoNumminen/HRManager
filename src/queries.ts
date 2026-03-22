@@ -17,23 +17,26 @@ import {
   DashboardMetrics,
 } from "./schemas";
 import { resolvePermissions, PERMISSION_KEYS, hasPermission } from "@/permissions";
+import { getDemoSessionId } from "@/demoSession";
 
 export async function getPersons(): Promise<Person[]> {
+  const sessionId = await getDemoSessionId();
   const persons = await prisma.person.findMany({
-    where: { deletedAt: null },
+    where: { deletedAt: null, sessionId },
   });
 
   return persons.map((person) => PersonSchema.parse(person));
 }
 
 export async function getTeams(): Promise<CombinedTeam[]> {
+  const sessionId = await getDemoSessionId();
   const teams = await prisma.team.findMany({
-    where: { deletedAt: null },
+    where: { deletedAt: null, sessionId },
     include: {
       manager: true,
       department: true,
       members: {
-        where: { deletedAt: null },
+        where: { deletedAt: null, sessionId },
         include: {
           person: true,
         },
@@ -62,11 +65,12 @@ export async function getTeams(): Promise<CombinedTeam[]> {
 }
 
 export async function getDepartments(): Promise<Department[]> {
+  const sessionId = await getDemoSessionId();
   const departments = await prisma.department.findMany({
-    where: { deletedAt: null },
+    where: { deletedAt: null, sessionId },
     include: {
       head: true,
-      teams: { where: { deletedAt: null } },
+      teams: { where: { deletedAt: null, sessionId } },
     },
   });
 
@@ -134,7 +138,8 @@ export async function getAuditLogs(
   const parsed = AuditLogFilterSchema.parse(filters ?? {});
   const { userEmail, action, entityType, dateFrom, dateTo, page, pageSize } = parsed;
 
-  const where: Record<string, unknown> = {};
+  const sessionId = await getDemoSessionId();
+  const where: Record<string, unknown> = { sessionId };
 
   if (userEmail) {
     where.userEmail = { contains: userEmail };
@@ -169,15 +174,19 @@ export async function getAuditLogs(
 }
 
 export async function getDashboardMetrics(): Promise<DashboardMetrics> {
+  const sessionId = await getDemoSessionId();
+  const sessionWhere = { sessionId, deletedAt: null as Date | null };
+
   const [totalPersons, totalTeams, totalDepartments, totalUsers] = await Promise.all([
-    prisma.person.count(),
-    prisma.team.count(),
-    prisma.department.count(),
+    prisma.person.count({ where: sessionWhere }),
+    prisma.team.count({ where: sessionWhere }),
+    prisma.department.count({ where: sessionWhere }),
     prisma.user.count(),
   ]);
 
   const teamsWithMembers = await prisma.team.findMany({
-    select: { teamName: true, _count: { select: { members: true } } },
+    where: sessionWhere,
+    select: { teamName: true, _count: { select: { members: { where: { sessionId } } } } },
     orderBy: { teamName: "asc" },
   });
   const teamSizes = teamsWithMembers.map((t) => ({
@@ -186,7 +195,8 @@ export async function getDashboardMetrics(): Promise<DashboardMetrics> {
   }));
 
   const departmentsWithTeams = await prisma.department.findMany({
-    select: { name: true, _count: { select: { teams: true } } },
+    where: sessionWhere,
+    select: { name: true, _count: { select: { teams: { where: sessionWhere } } } },
     orderBy: { name: "asc" },
   });
   const departmentSizes = departmentsWithTeams.map((d) => ({
@@ -195,9 +205,21 @@ export async function getDashboardMetrics(): Promise<DashboardMetrics> {
   }));
 
   const [persons, teams, departments] = await Promise.all([
-    prisma.person.findMany({ select: { createdAt: true }, orderBy: { createdAt: "asc" } }),
-    prisma.team.findMany({ select: { createdAt: true }, orderBy: { createdAt: "asc" } }),
-    prisma.department.findMany({ select: { createdAt: true }, orderBy: { createdAt: "asc" } }),
+    prisma.person.findMany({
+      where: sessionWhere,
+      select: { createdAt: true },
+      orderBy: { createdAt: "asc" },
+    }),
+    prisma.team.findMany({
+      where: sessionWhere,
+      select: { createdAt: true },
+      orderBy: { createdAt: "asc" },
+    }),
+    prisma.department.findMany({
+      where: sessionWhere,
+      select: { createdAt: true },
+      orderBy: { createdAt: "asc" },
+    }),
   ]);
 
   const growthMap = new Map<string, { persons: number; teams: number; departments: number }>();
@@ -233,6 +255,7 @@ export async function getDashboardMetrics(): Promise<DashboardMetrics> {
   });
 
   const recentLogs = await prisma.auditLog.findMany({
+    where: { sessionId },
     select: { action: true, entityType: true, userEmail: true, createdAt: true },
     orderBy: { createdAt: "desc" },
     take: 10,
@@ -256,10 +279,11 @@ export async function getAuditLogUserEmails(): Promise<string[]> {
   if (!allowed) {
     throw new Error("Permission denied");
   }
+  const sessionId = await getDemoSessionId();
   const results = await prisma.auditLog.findMany({
     select: { userEmail: true },
     distinct: ["userEmail"],
-    where: { userEmail: { not: null } },
+    where: { userEmail: { not: null }, sessionId },
     orderBy: { userEmail: "asc" },
   });
   return results.map((r) => r.userEmail!);
