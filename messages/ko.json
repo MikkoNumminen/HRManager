@@ -64,7 +64,9 @@
     "changePosition": "직책 변경",
     "enterNewPosition": "새 직책 입력",
     "changeEmail": "이메일 변경",
-    "enterNewEmail": "새 이메일 입력"
+    "enterNewEmail": "새 이메일 입력",
+    "changeName": "이름 변경",
+    "enterNewName": "새 이름 입력"
   },
   "teams": {
     "manageTitle": "팀 관리",
@@ -88,7 +90,9 @@
     "removeMember": "팀에서 멤버 제거",
     "removeMemberButton": "멤버 제거",
     "removeMemberConfirm": "{name}을(를) 팀에서 제거하시겠습니까?",
-    "removeMemberDefault": "이 멤버"
+    "removeMemberDefault": "이 멤버",
+    "renameTeam": "팀 이름 변경",
+    "enterNewTeamName": "새 팀 이름 입력"
   },
   "departments": {
     "manageTitle": "부서 관리",
@@ -113,7 +117,8 @@
     "setHeadButton": "부서장 설정",
     "assignTeam": "팀 할당",
     "selectTeam": "팀 선택",
-    "removeTeam": "부서에서 팀 제거"
+    "removeTeam": "부서에서 팀 제거",
+    "editDepartment": "부서 편집"
   },
   "admin": {
     "title": "사용자 관리",
@@ -230,7 +235,11 @@
     "permSeedData": "샘플 데이터 불러오기",
     "permManageUsers": "사용자 관리",
     "permChangePermissions": "사용자 권한 변경",
-    "permViewAuditLog": "감사 로그 조회"
+    "permViewAuditLog": "감사 로그 조회",
+    "changedName": "이름을 \"{oldValue}\"에서 \"{newValue}\"(으)로 변경했습니다",
+    "renamedTeam": "팀 이름을 \"{oldValue}\"에서 \"{newValue}\"(으)로 변경했습니다",
+    "permChangeName": "인원 이름 변경",
+    "permRenameTeams": "팀 이름 변경"
   },
   "notifications": {
     "personCreated": "직원이 생성되었습니다",
@@ -250,7 +259,10 @@
     "roleUpdated": "사용자 역할이 업데이트되었습니다",
     "permissionUpdated": "권한이 업데이트되었습니다",
     "mockDataLoaded": "테스트 데이터가 로드되었습니다",
-    "dataReset": "모든 데이터가 초기화되었습니다"
+    "dataReset": "모든 데이터가 초기화되었습니다",
+    "nameUpdated": "이름이 업데이트되었습니다",
+    "teamRenamed": "팀 이름이 변경되었습니다",
+    "departmentUpdated": "부서가 업데이트되었습니다"
   },
   "tutorial": {
     "checklistTitle": "데모 투어",

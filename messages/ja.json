@@ -64,7 +64,9 @@
     "changePosition": "役職を変更",
     "enterNewPosition": "新しい役職を入力",
     "changeEmail": "メールアドレスを変更",
-    "enterNewEmail": "新しいメールアドレスを入力"
+    "enterNewEmail": "新しいメールアドレスを入力",
+    "changeName": "名前を変更",
+    "enterNewName": "新しい名前を入力"
   },
   "teams": {
     "manageTitle": "チーム管理",
@@ -88,7 +90,9 @@
     "removeMember": "チームからメンバーを削除",
     "removeMemberButton": "メンバーを削除",
     "removeMemberConfirm": "{name}をチームから削除してもよろしいですか？",
-    "removeMemberDefault": "このメンバー"
+    "removeMemberDefault": "このメンバー",
+    "renameTeam": "チーム名を変更",
+    "enterNewTeamName": "新しいチーム名を入力"
   },
   "departments": {
     "manageTitle": "部門管理",
@@ -113,7 +117,8 @@
     "setHeadButton": "部門長を設定",
     "assignTeam": "チームを割り当て",
     "selectTeam": "チームを選択",
-    "removeTeam": "部門からチームを削除"
+    "removeTeam": "部門からチームを削除",
+    "editDepartment": "部門を編集"
   },
   "admin": {
     "title": "ユーザー管理",
@@ -230,7 +235,11 @@
     "permSeedData": "サンプルデータの読み込み",
     "permManageUsers": "ユーザーの管理",
     "permChangePermissions": "ユーザー権限の変更",
-    "permViewAuditLog": "監査ログの閲覧"
+    "permViewAuditLog": "監査ログの閲覧",
+    "changedName": "名前を「{oldValue}」から「{newValue}」に変更しました",
+    "renamedTeam": "チーム名を「{oldValue}」から「{newValue}」に変更しました",
+    "permChangeName": "人員の名前変更",
+    "permRenameTeams": "チーム名の変更"
   },
   "notifications": {
     "personCreated": "担当者を作成しました",
@@ -250,7 +259,10 @@
     "roleUpdated": "ユーザーロールを更新しました",
     "permissionUpdated": "権限を更新しました",
     "mockDataLoaded": "テストデータを読み込みました",
-    "dataReset": "すべてのデータをリセットしました"
+    "dataReset": "すべてのデータをリセットしました",
+    "nameUpdated": "名前を更新しました",
+    "teamRenamed": "チーム名を変更しました",
+    "departmentUpdated": "部門を更新しました"
   },
   "tutorial": {
     "checklistTitle": "デモツアー",

@@ -64,7 +64,9 @@
     "changePosition": "Badilisha nafasi",
     "enterNewPosition": "Ingiza nafasi mpya",
     "changeEmail": "Badilisha barua pepe",
-    "enterNewEmail": "Ingiza barua pepe mpya"
+    "enterNewEmail": "Ingiza barua pepe mpya",
+    "changeName": "Badilisha jina",
+    "enterNewName": "Ingiza jina jipya"
   },
   "teams": {
     "manageTitle": "Simamia timu",
@@ -88,7 +90,9 @@
     "removeMember": "Ondoa mwanachama kutoka timu",
     "removeMemberButton": "Ondoa mwanachama",
     "removeMemberConfirm": "Una uhakika unataka kuondoa {name} kutoka timu?",
-    "removeMemberDefault": "mwanachama huyu"
+    "removeMemberDefault": "mwanachama huyu",
+    "renameTeam": "Badilisha jina la timu",
+    "enterNewTeamName": "Ingiza jina jipya la timu"
   },
   "departments": {
     "manageTitle": "Simamia idara",
@@ -113,7 +117,8 @@
     "setHeadButton": "Weka mkuu",
     "assignTeam": "Teua timu",
     "selectTeam": "Chagua timu",
-    "removeTeam": "Ondoa timu kutoka idara"
+    "removeTeam": "Ondoa timu kutoka idara",
+    "editDepartment": "Hariri idara"
   },
   "admin": {
     "title": "Usimamizi wa watumiaji",
@@ -230,7 +235,11 @@
     "permSeedData": "kupakia data ya majaribio",
     "permManageUsers": "kusimamia watumiaji",
     "permChangePermissions": "kubadilisha ruhusa za watumiaji",
-    "permViewAuditLog": "kuona kumbukumbu ya ukaguzi"
+    "permViewAuditLog": "kuona kumbukumbu ya ukaguzi",
+    "changedName": "Jina limebadilishwa kutoka \"{oldValue}\" hadi \"{newValue}\"",
+    "renamedTeam": "Timu imebadilishwa jina kutoka \"{oldValue}\" hadi \"{newValue}\"",
+    "permChangeName": "kubadilisha majina ya watu",
+    "permRenameTeams": "kubadilisha majina ya timu"
   },
   "notifications": {
     "personCreated": "Mtu ameundwa kwa mafanikio",
@@ -250,7 +259,10 @@
     "roleUpdated": "Jukumu la mtumiaji limesasishwa kwa mafanikio",
     "permissionUpdated": "Ruhusa imesasishwa kwa mafanikio",
     "mockDataLoaded": "Data ya majaribio imepakiwa kwa mafanikio",
-    "dataReset": "Data yote imewekwa upya kwa mafanikio"
+    "dataReset": "Data yote imewekwa upya kwa mafanikio",
+    "nameUpdated": "Jina limesasishwa kwa mafanikio",
+    "teamRenamed": "Timu imebadilishwa jina kwa mafanikio",
+    "departmentUpdated": "Idara imesasishwa kwa mafanikio"
   },
   "tutorial": {
     "checklistTitle": "Ziara ya Demo",

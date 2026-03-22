@@ -64,7 +64,9 @@
     "changePosition": "Pozisyonu değiştir",
     "enterNewPosition": "Yeni pozisyon girin",
     "changeEmail": "E-postayı değiştir",
-    "enterNewEmail": "Yeni e-posta girin"
+    "enterNewEmail": "Yeni e-posta girin",
+    "changeName": "Adı değiştir",
+    "enterNewName": "Yeni ad girin"
   },
   "teams": {
     "manageTitle": "Ekipleri yönet",
@@ -88,7 +90,9 @@
     "removeMember": "Ekipten üye kaldır",
     "removeMemberButton": "Üyeyi kaldır",
     "removeMemberConfirm": "{name} ekipten kaldırmak istediğinizden emin misiniz?",
-    "removeMemberDefault": "bu üyeyi"
+    "removeMemberDefault": "bu üyeyi",
+    "renameTeam": "Ekibi yeniden adlandır",
+    "enterNewTeamName": "Yeni ekip adı girin"
   },
   "departments": {
     "manageTitle": "Departmanları yönet",
@@ -113,7 +117,8 @@
     "setHeadButton": "Başkan belirle",
     "assignTeam": "Ekip ata",
     "selectTeam": "Ekip seç",
-    "removeTeam": "Departmandan ekibi kaldır"
+    "removeTeam": "Departmandan ekibi kaldır",
+    "editDepartment": "Departmanı düzenle"
   },
   "admin": {
     "title": "Kullanıcı yönetimi",
@@ -230,7 +235,11 @@
     "permSeedData": "test verileri yüklemek",
     "permManageUsers": "kullanıcıları yönetmek",
     "permChangePermissions": "kullanıcı izinlerini değiştirmek",
-    "permViewAuditLog": "denetim günlüğünü görüntülemek"
+    "permViewAuditLog": "denetim günlüğünü görüntülemek",
+    "changedName": "Ad \"{oldValue}\" yerine \"{newValue}\" olarak değiştirildi",
+    "renamedTeam": "Ekip \"{oldValue}\" yerine \"{newValue}\" olarak yeniden adlandırıldı",
+    "permChangeName": "kişilerin adlarını değiştirmek",
+    "permRenameTeams": "ekipleri yeniden adlandırmak"
   },
   "notifications": {
     "personCreated": "Kişi başarıyla oluşturuldu",
@@ -250,7 +259,10 @@
     "roleUpdated": "Kullanıcı rolü başarıyla güncellendi",
     "permissionUpdated": "İzin başarıyla güncellendi",
     "mockDataLoaded": "Test verileri başarıyla yüklendi",
-    "dataReset": "Tüm veriler başarıyla sıfırlandı"
+    "dataReset": "Tüm veriler başarıyla sıfırlandı",
+    "nameUpdated": "Ad başarıyla güncellendi",
+    "teamRenamed": "Ekip başarıyla yeniden adlandırıldı",
+    "departmentUpdated": "Departman başarıyla güncellendi"
   },
   "tutorial": {
     "checklistTitle": "Demo Turu",

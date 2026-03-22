@@ -64,7 +64,9 @@
     "changePosition": "เปลี่ยนตำแหน่ง",
     "enterNewPosition": "กรอกตำแหน่งใหม่",
     "changeEmail": "เปลี่ยนอีเมล",
-    "enterNewEmail": "กรอกอีเมลใหม่"
+    "enterNewEmail": "กรอกอีเมลใหม่",
+    "changeName": "เปลี่ยนชื่อ",
+    "enterNewName": "กรอกชื่อใหม่"
   },
   "teams": {
     "manageTitle": "จัดการทีม",
@@ -88,7 +90,9 @@
     "removeMember": "ลบสมาชิกออกจากทีม",
     "removeMemberButton": "ลบสมาชิก",
     "removeMemberConfirm": "คุณแน่ใจหรือไม่ว่าต้องการลบ {name} ออกจากทีม?",
-    "removeMemberDefault": "สมาชิกคนนี้"
+    "removeMemberDefault": "สมาชิกคนนี้",
+    "renameTeam": "เปลี่ยนชื่อทีม",
+    "enterNewTeamName": "กรอกชื่อทีมใหม่"
   },
   "departments": {
     "manageTitle": "จัดการแผนก",
@@ -113,7 +117,8 @@
     "setHeadButton": "ตั้งหัวหน้า",
     "assignTeam": "มอบหมายทีม",
     "selectTeam": "เลือกทีม",
-    "removeTeam": "ลบทีมออกจากแผนก"
+    "removeTeam": "ลบทีมออกจากแผนก",
+    "editDepartment": "แก้ไขแผนก"
   },
   "admin": {
     "title": "จัดการผู้ใช้",
@@ -230,7 +235,11 @@
     "permSeedData": "โหลดข้อมูลตัวอย่าง",
     "permManageUsers": "จัดการผู้ใช้",
     "permChangePermissions": "เปลี่ยนสิทธิ์ผู้ใช้",
-    "permViewAuditLog": "ดูบันทึกการตรวจสอบ"
+    "permViewAuditLog": "ดูบันทึกการตรวจสอบ",
+    "changedName": "เปลี่ยนชื่อจาก \"{oldValue}\" เป็น \"{newValue}\"",
+    "renamedTeam": "เปลี่ยนชื่อทีมจาก \"{oldValue}\" เป็น \"{newValue}\"",
+    "permChangeName": "เปลี่ยนชื่อบุคลากร",
+    "permRenameTeams": "เปลี่ยนชื่อทีม"
   },
   "notifications": {
     "personCreated": "สร้างบุคคลสำเร็จ",
@@ -250,7 +259,10 @@
     "roleUpdated": "อัปเดตบทบาทผู้ใช้สำเร็จ",
     "permissionUpdated": "อัปเดตสิทธิ์สำเร็จ",
     "mockDataLoaded": "โหลดข้อมูลทดสอบสำเร็จ",
-    "dataReset": "รีเซ็ตข้อมูลทั้งหมดสำเร็จ"
+    "dataReset": "รีเซ็ตข้อมูลทั้งหมดสำเร็จ",
+    "nameUpdated": "อัปเดตชื่อสำเร็จ",
+    "teamRenamed": "เปลี่ยนชื่อทีมสำเร็จ",
+    "departmentUpdated": "อัปเดตแผนกสำเร็จ"
   },
   "tutorial": {
     "checklistTitle": "ทัวร์สาธิต",

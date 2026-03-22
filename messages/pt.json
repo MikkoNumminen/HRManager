@@ -64,7 +64,9 @@
     "changePosition": "Alterar cargo",
     "enterNewPosition": "Digite o novo cargo",
     "changeEmail": "Alterar e-mail",
-    "enterNewEmail": "Digite o novo e-mail"
+    "enterNewEmail": "Digite o novo e-mail",
+    "changeName": "Alterar nome",
+    "enterNewName": "Digite o novo nome"
   },
   "teams": {
     "manageTitle": "Gerenciar equipes",
@@ -88,7 +90,9 @@
     "removeMember": "Remover membro da equipe",
     "removeMemberButton": "Remover membro",
     "removeMemberConfirm": "Tem certeza de que deseja remover {name} da equipe?",
-    "removeMemberDefault": "este membro"
+    "removeMemberDefault": "este membro",
+    "renameTeam": "Renomear equipe",
+    "enterNewTeamName": "Digite o novo nome da equipe"
   },
   "departments": {
     "manageTitle": "Gerenciar departamentos",
@@ -113,7 +117,8 @@
     "setHeadButton": "Definir",
     "assignTeam": "Atribuir equipe",
     "selectTeam": "Selecionar equipe",
-    "removeTeam": "Remover equipe do departamento"
+    "removeTeam": "Remover equipe do departamento",
+    "editDepartment": "Editar departamento"
   },
   "admin": {
     "title": "Gestão de usuários",
@@ -230,7 +235,11 @@
     "permSeedData": "carregar dados de teste",
     "permManageUsers": "gerenciar usuários",
     "permChangePermissions": "alterar permissões de usuário",
-    "permViewAuditLog": "ver o registro de auditoria"
+    "permViewAuditLog": "ver o registro de auditoria",
+    "changedName": "Nome alterado de \"{oldValue}\" para \"{newValue}\"",
+    "renamedTeam": "Equipe renomeada de \"{oldValue}\" para \"{newValue}\"",
+    "permChangeName": "alterar nomes de pessoas",
+    "permRenameTeams": "renomear equipes"
   },
   "notifications": {
     "personCreated": "Pessoa criada com sucesso",
@@ -250,7 +259,10 @@
     "roleUpdated": "Função do usuário atualizada com sucesso",
     "permissionUpdated": "Permissão atualizada com sucesso",
     "mockDataLoaded": "Dados de teste carregados com sucesso",
-    "dataReset": "Todos os dados redefinidos com sucesso"
+    "dataReset": "Todos os dados redefinidos com sucesso",
+    "nameUpdated": "Nome atualizado com sucesso",
+    "teamRenamed": "Equipe renomeada com sucesso",
+    "departmentUpdated": "Departamento atualizado com sucesso"
   },
   "tutorial": {
     "checklistTitle": "Visita guiada",

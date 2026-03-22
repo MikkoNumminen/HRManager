@@ -64,7 +64,9 @@
     "changePosition": "Изменить должность",
     "enterNewPosition": "Введите новую должность",
     "changeEmail": "Изменить эл. почту",
-    "enterNewEmail": "Введите новую эл. почту"
+    "enterNewEmail": "Введите новую эл. почту",
+    "changeName": "Изменить имя",
+    "enterNewName": "Введите новое имя"
   },
   "teams": {
     "manageTitle": "Управление командами",
@@ -88,7 +90,9 @@
     "removeMember": "Удалить члена из команды",
     "removeMemberButton": "Удалить члена",
     "removeMemberConfirm": "Вы уверены, что хотите удалить {name} из команды?",
-    "removeMemberDefault": "этого члена"
+    "removeMemberDefault": "этого члена",
+    "renameTeam": "Переименовать команду",
+    "enterNewTeamName": "Введите новое название команды"
   },
   "departments": {
     "manageTitle": "Управление отделами",
@@ -113,7 +117,8 @@
     "setHeadButton": "Назначить",
     "assignTeam": "Назначить команду",
     "selectTeam": "Выбрать команду",
-    "removeTeam": "Удалить команду из отдела"
+    "removeTeam": "Удалить команду из отдела",
+    "editDepartment": "Редактировать отдел"
   },
   "admin": {
     "title": "Управление пользователями",
@@ -230,7 +235,11 @@
     "permSeedData": "загружать тестовые данные",
     "permManageUsers": "управлять пользователями",
     "permChangePermissions": "изменять права пользователей",
-    "permViewAuditLog": "просматривать журнал аудита"
+    "permViewAuditLog": "просматривать журнал аудита",
+    "changedName": "Имя изменено с «{oldValue}» на «{newValue}»",
+    "renamedTeam": "Команда переименована с «{oldValue}» на «{newValue}»",
+    "permChangeName": "изменять имена сотрудников",
+    "permRenameTeams": "переименовывать команды"
   },
   "notifications": {
     "personCreated": "Сотрудник успешно создан",
@@ -250,7 +259,10 @@
     "roleUpdated": "Роль пользователя успешно обновлена",
     "permissionUpdated": "Разрешение успешно обновлено",
     "mockDataLoaded": "Тестовые данные успешно загружены",
-    "dataReset": "Все данные успешно сброшены"
+    "dataReset": "Все данные успешно сброшены",
+    "nameUpdated": "Имя успешно обновлено",
+    "teamRenamed": "Команда успешно переименована",
+    "departmentUpdated": "Отдел успешно обновлён"
   },
   "tutorial": {
     "checklistTitle": "Обзор демо",

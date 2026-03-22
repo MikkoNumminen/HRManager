@@ -64,7 +64,9 @@
     "changePosition": "पद बदलें",
     "enterNewPosition": "नया पद दर्ज करें",
     "changeEmail": "ईमेल बदलें",
-    "enterNewEmail": "नया ईमेल दर्ज करें"
+    "enterNewEmail": "नया ईमेल दर्ज करें",
+    "changeName": "नाम बदलें",
+    "enterNewName": "नया नाम दर्ज करें"
   },
   "teams": {
     "manageTitle": "टीमों का प्रबंधन",
@@ -88,7 +90,9 @@
     "removeMember": "टीम से सदस्य हटाएँ",
     "removeMemberButton": "सदस्य हटाएँ",
     "removeMemberConfirm": "क्या आप {name} को टीम से हटाना चाहते हैं?",
-    "removeMemberDefault": "इस सदस्य को"
+    "removeMemberDefault": "इस सदस्य को",
+    "renameTeam": "टीम का नाम बदलें",
+    "enterNewTeamName": "नया टीम नाम दर्ज करें"
   },
   "departments": {
     "manageTitle": "विभागों का प्रबंधन",
@@ -113,7 +117,8 @@
     "setHeadButton": "प्रमुख सेट करें",
     "assignTeam": "टीम असाइन करें",
     "selectTeam": "टीम चुनें",
-    "removeTeam": "विभाग से टीम हटाएँ"
+    "removeTeam": "विभाग से टीम हटाएँ",
+    "editDepartment": "विभाग संपादित करें"
   },
   "admin": {
     "title": "उपयोगकर्ता प्रबंधन",
@@ -230,7 +235,11 @@
     "permSeedData": "नमूना डेटा लोड करना",
     "permManageUsers": "उपयोगकर्ता प्रबंधित करना",
     "permChangePermissions": "उपयोगकर्ता अनुमतियाँ बदलना",
-    "permViewAuditLog": "ऑडिट लॉग देखना"
+    "permViewAuditLog": "ऑडिट लॉग देखना",
+    "changedName": "नाम \"{oldValue}\" से \"{newValue}\" में बदला गया",
+    "renamedTeam": "टीम का नाम \"{oldValue}\" से \"{newValue}\" में बदला गया",
+    "permChangeName": "व्यक्तियों के नाम बदलना",
+    "permRenameTeams": "टीमों के नाम बदलना"
   },
   "notifications": {
     "personCreated": "व्यक्ति सफलतापूर्वक बनाया गया",
@@ -250,7 +259,10 @@
     "roleUpdated": "उपयोगकर्ता भूमिका सफलतापूर्वक अपडेट की गई",
     "permissionUpdated": "अनुमति सफलतापूर्वक अपडेट की गई",
     "mockDataLoaded": "परीक्षण डेटा सफलतापूर्वक लोड किया गया",
-    "dataReset": "सभी डेटा सफलतापूर्वक रीसेट किया गया"
+    "dataReset": "सभी डेटा सफलतापूर्वक रीसेट किया गया",
+    "nameUpdated": "नाम सफलतापूर्वक अपडेट किया गया",
+    "teamRenamed": "टीम का नाम सफलतापूर्वक बदला गया",
+    "departmentUpdated": "विभाग सफलतापूर्वक अपडेट किया गया"
   },
   "tutorial": {
     "checklistTitle": "डेमो टूर",

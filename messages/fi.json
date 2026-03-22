@@ -64,7 +64,9 @@
     "changePosition": "Vaihda tehtävänimike",
     "enterNewPosition": "Syötä uusi tehtävänimike",
     "changeEmail": "Vaihda sähköposti",
-    "enterNewEmail": "Syötä uusi sähköposti"
+    "enterNewEmail": "Syötä uusi sähköposti",
+    "changeName": "Vaihda nimi",
+    "enterNewName": "Syötä uusi nimi"
   },
   "teams": {
     "manageTitle": "Hallitse tiimejä",
@@ -88,7 +90,9 @@
     "removeMember": "Poista jäsen tiimistä",
     "removeMemberButton": "Poista jäsen",
     "removeMemberConfirm": "Haluatko varmasti poistaa jäsenen {name} tiimistä?",
-    "removeMemberDefault": "tämän jäsenen"
+    "removeMemberDefault": "tämän jäsenen",
+    "renameTeam": "Nimeä tiimi uudelleen",
+    "enterNewTeamName": "Syötä uusi tiimin nimi"
   },
   "departments": {
     "manageTitle": "Hallitse osastoja",
@@ -113,7 +117,8 @@
     "setHeadButton": "Aseta johtaja",
     "assignTeam": "Määritä tiimi",
     "selectTeam": "Valitse tiimi",
-    "removeTeam": "Poista tiimi osastolta"
+    "removeTeam": "Poista tiimi osastolta",
+    "editDepartment": "Muokkaa osastoa"
   },
   "admin": {
     "title": "Käyttäjähallinta",
@@ -230,7 +235,11 @@
     "permSeedData": "ladata esimerkkitiedot",
     "permManageUsers": "hallita käyttäjiä",
     "permChangePermissions": "muokata käyttöoikeuksia",
-    "permViewAuditLog": "nähdä tapahtumaloki"
+    "permViewAuditLog": "nähdä tapahtumaloki",
+    "changedName": "Nimi vaihdettu: \"{oldValue}\" → \"{newValue}\"",
+    "renamedTeam": "Tiimi nimetty uudelleen: \"{oldValue}\" → \"{newValue}\"",
+    "permChangeName": "vaihtaa henkilöiden nimiä",
+    "permRenameTeams": "nimetä tiimejä uudelleen"
   },
   "notifications": {
     "personCreated": "Henkilö luotu onnistuneesti",
@@ -250,7 +259,10 @@
     "roleUpdated": "Käyttäjärooli päivitetty onnistuneesti",
     "permissionUpdated": "Käyttöoikeus päivitetty onnistuneesti",
     "mockDataLoaded": "Testidatan lataus onnistui",
-    "dataReset": "Kaikki tiedot nollattu onnistuneesti"
+    "dataReset": "Kaikki tiedot nollattu onnistuneesti",
+    "nameUpdated": "Nimi päivitetty onnistuneesti",
+    "teamRenamed": "Tiimi nimetty uudelleen onnistuneesti",
+    "departmentUpdated": "Osasto päivitetty onnistuneesti"
   },
   "tutorial": {
     "checklistTitle": "Demokierros",

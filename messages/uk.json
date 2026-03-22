@@ -64,7 +64,9 @@
     "changePosition": "Змінити посаду",
     "enterNewPosition": "Введіть нову посаду",
     "changeEmail": "Змінити електронну пошту",
-    "enterNewEmail": "Введіть нову електронну пошту"
+    "enterNewEmail": "Введіть нову електронну пошту",
+    "changeName": "Змінити ім'я",
+    "enterNewName": "Введіть нове ім'я"
   },
   "teams": {
     "manageTitle": "Управління командами",
@@ -88,7 +90,9 @@
     "removeMember": "Видалити учасника з команди",
     "removeMemberButton": "Видалити учасника",
     "removeMemberConfirm": "Ви впевнені, що хочете видалити {name} з команди?",
-    "removeMemberDefault": "цього учасника"
+    "removeMemberDefault": "цього учасника",
+    "renameTeam": "Перейменувати команду",
+    "enterNewTeamName": "Введіть нову назву команди"
   },
   "departments": {
     "manageTitle": "Управління відділами",
@@ -113,7 +117,8 @@
     "setHeadButton": "Призначити керівника",
     "assignTeam": "Призначити команду",
     "selectTeam": "Обрати команду",
-    "removeTeam": "Видалити команду з відділу"
+    "removeTeam": "Видалити команду з відділу",
+    "editDepartment": "Редагувати відділ"
   },
   "admin": {
     "title": "Керування користувачами",
@@ -230,7 +235,11 @@
     "permSeedData": "завантажувати тестові дані",
     "permManageUsers": "керувати користувачами",
     "permChangePermissions": "змінювати дозволи користувачів",
-    "permViewAuditLog": "переглядати журнал аудиту"
+    "permViewAuditLog": "переглядати журнал аудиту",
+    "changedName": "Змінено ім'я з \"{oldValue}\" на \"{newValue}\"",
+    "renamedTeam": "Перейменовано команду з \"{oldValue}\" на \"{newValue}\"",
+    "permChangeName": "змінювати імена співробітників",
+    "permRenameTeams": "перейменовувати команди"
   },
   "notifications": {
     "personCreated": "Особу успішно створено",
@@ -250,7 +259,10 @@
     "roleUpdated": "Роль користувача успішно оновлено",
     "permissionUpdated": "Дозвіл успішно оновлено",
     "mockDataLoaded": "Тестові дані успішно завантажено",
-    "dataReset": "Усі дані успішно скинуто"
+    "dataReset": "Усі дані успішно скинуто",
+    "nameUpdated": "Ім'я успішно оновлено",
+    "teamRenamed": "Команду успішно перейменовано",
+    "departmentUpdated": "Відділ успішно оновлено"
   },
   "tutorial": {
     "checklistTitle": "Огляд демо",

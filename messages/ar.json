@@ -64,7 +64,9 @@
     "changePosition": "تغيير المنصب",
     "enterNewPosition": "أدخل المنصب الجديد",
     "changeEmail": "تغيير البريد الإلكتروني",
-    "enterNewEmail": "أدخل البريد الإلكتروني الجديد"
+    "enterNewEmail": "أدخل البريد الإلكتروني الجديد",
+    "changeName": "تغيير الاسم",
+    "enterNewName": "أدخل الاسم الجديد"
   },
   "teams": {
     "manageTitle": "إدارة الفرق",
@@ -88,7 +90,9 @@
     "removeMember": "إزالة عضو من الفريق",
     "removeMemberButton": "إزالة عضو",
     "removeMemberConfirm": "هل أنت متأكد من إزالة {name} من الفريق؟",
-    "removeMemberDefault": "هذا العضو"
+    "removeMemberDefault": "هذا العضو",
+    "renameTeam": "إعادة تسمية الفريق",
+    "enterNewTeamName": "أدخل اسم الفريق الجديد"
   },
   "departments": {
     "manageTitle": "إدارة الأقسام",
@@ -113,7 +117,8 @@
     "setHeadButton": "تعيين الرئيس",
     "assignTeam": "تعيين فريق",
     "selectTeam": "اختيار فريق",
-    "removeTeam": "إزالة فريق من القسم"
+    "removeTeam": "إزالة فريق من القسم",
+    "editDepartment": "تعديل القسم"
   },
   "admin": {
     "title": "إدارة المستخدمين",
@@ -230,7 +235,11 @@
     "permSeedData": "تحميل بيانات تجريبية",
     "permManageUsers": "إدارة المستخدمين",
     "permChangePermissions": "تغيير صلاحيات المستخدمين",
-    "permViewAuditLog": "عرض سجل التدقيق"
+    "permViewAuditLog": "عرض سجل التدقيق",
+    "changedName": "تم تغيير الاسم من \"{oldValue}\" إلى \"{newValue}\"",
+    "renamedTeam": "تمت إعادة تسمية الفريق من \"{oldValue}\" إلى \"{newValue}\"",
+    "permChangeName": "تغيير أسماء الأشخاص",
+    "permRenameTeams": "إعادة تسمية الفرق"
   },
   "notifications": {
     "personCreated": "تم إنشاء الشخص بنجاح",
@@ -250,7 +259,10 @@
     "roleUpdated": "تم تحديث دور المستخدم بنجاح",
     "permissionUpdated": "تم تحديث الإذن بنجاح",
     "mockDataLoaded": "تم تحميل البيانات التجريبية بنجاح",
-    "dataReset": "تم إعادة تعيين جميع البيانات بنجاح"
+    "dataReset": "تم إعادة تعيين جميع البيانات بنجاح",
+    "nameUpdated": "تم تحديث الاسم بنجاح",
+    "teamRenamed": "تمت إعادة تسمية الفريق بنجاح",
+    "departmentUpdated": "تم تحديث القسم بنجاح"
   },
   "tutorial": {
     "checklistTitle": "جولة تعريفية",

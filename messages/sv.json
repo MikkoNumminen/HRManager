@@ -64,7 +64,9 @@
     "changePosition": "Ändra befattning",
     "enterNewPosition": "Ange ny befattning",
     "changeEmail": "Ändra e-post",
-    "enterNewEmail": "Ange ny e-post"
+    "enterNewEmail": "Ange ny e-post",
+    "changeName": "Ändra namn",
+    "enterNewName": "Ange nytt namn"
   },
   "teams": {
     "manageTitle": "Hantera team",
@@ -88,7 +90,9 @@
     "removeMember": "Ta bort medlem från team",
     "removeMemberButton": "Ta bort medlem",
     "removeMemberConfirm": "Är du säker på att du vill ta bort {name} från teamet?",
-    "removeMemberDefault": "denna medlem"
+    "removeMemberDefault": "denna medlem",
+    "renameTeam": "Byt namn på team",
+    "enterNewTeamName": "Ange nytt teamnamn"
   },
   "departments": {
     "manageTitle": "Hantera avdelningar",
@@ -113,7 +117,8 @@
     "setHeadButton": "Sätt chef",
     "assignTeam": "Tilldela team",
     "selectTeam": "Välj team",
-    "removeTeam": "Ta bort team från avdelning"
+    "removeTeam": "Ta bort team från avdelning",
+    "editDepartment": "Redigera avdelning"
   },
   "admin": {
     "title": "Användarhantering",
@@ -230,7 +235,11 @@
     "permSeedData": "ladda testdata",
     "permManageUsers": "hantera användare",
     "permChangePermissions": "ändra användarbehörigheter",
-    "permViewAuditLog": "visa händelseloggen"
+    "permViewAuditLog": "visa händelseloggen",
+    "changedName": "Ändrade namn från \"{oldValue}\" till \"{newValue}\"",
+    "renamedTeam": "Bytte namn på team från \"{oldValue}\" till \"{newValue}\"",
+    "permChangeName": "ändra personers namn",
+    "permRenameTeams": "byta namn på team"
   },
   "notifications": {
     "personCreated": "Person skapad",
@@ -250,7 +259,10 @@
     "roleUpdated": "Användarroll uppdaterad",
     "permissionUpdated": "Behörighet uppdaterad",
     "mockDataLoaded": "Testdata laddad",
-    "dataReset": "All data återställd"
+    "dataReset": "All data återställd",
+    "nameUpdated": "Namn uppdaterat",
+    "teamRenamed": "Teamnamn ändrat",
+    "departmentUpdated": "Avdelning uppdaterad"
   },
   "tutorial": {
     "checklistTitle": "Demoguide",

@@ -64,7 +64,9 @@
     "changePosition": "Position ändern",
     "enterNewPosition": "Neue Position eingeben",
     "changeEmail": "E-Mail ändern",
-    "enterNewEmail": "Neue E-Mail eingeben"
+    "enterNewEmail": "Neue E-Mail eingeben",
+    "changeName": "Name ändern",
+    "enterNewName": "Neuen Namen eingeben"
   },
   "teams": {
     "manageTitle": "Teams verwalten",
@@ -88,7 +90,9 @@
     "removeMember": "Mitglied aus Team entfernen",
     "removeMemberButton": "Mitglied entfernen",
     "removeMemberConfirm": "Sind Sie sicher, dass Sie {name} aus dem Team entfernen möchten?",
-    "removeMemberDefault": "dieses Mitglied"
+    "removeMemberDefault": "dieses Mitglied",
+    "renameTeam": "Team umbenennen",
+    "enterNewTeamName": "Neuen Teamnamen eingeben"
   },
   "departments": {
     "manageTitle": "Abteilungen verwalten",
@@ -113,7 +117,8 @@
     "setHeadButton": "Leiter festlegen",
     "assignTeam": "Team zuweisen",
     "selectTeam": "Team auswählen",
-    "removeTeam": "Team von Abteilung entfernen"
+    "removeTeam": "Team von Abteilung entfernen",
+    "editDepartment": "Abteilung bearbeiten"
   },
   "admin": {
     "title": "Benutzerverwaltung",
@@ -230,7 +235,11 @@
     "permSeedData": "Testdaten laden",
     "permManageUsers": "Benutzer verwalten",
     "permChangePermissions": "Benutzerberechtigungen ändern",
-    "permViewAuditLog": "Protokoll anzeigen"
+    "permViewAuditLog": "Protokoll anzeigen",
+    "changedName": "Name geändert von \"{oldValue}\" zu \"{newValue}\"",
+    "renamedTeam": "Team umbenannt von \"{oldValue}\" zu \"{newValue}\"",
+    "permChangeName": "Namen von Personen ändern",
+    "permRenameTeams": "Teams umbenennen"
   },
   "notifications": {
     "personCreated": "Person erfolgreich erstellt",
@@ -250,7 +259,10 @@
     "roleUpdated": "Benutzerrolle erfolgreich aktualisiert",
     "permissionUpdated": "Berechtigung erfolgreich aktualisiert",
     "mockDataLoaded": "Testdaten erfolgreich geladen",
-    "dataReset": "Alle Daten erfolgreich zurückgesetzt"
+    "dataReset": "Alle Daten erfolgreich zurückgesetzt",
+    "nameUpdated": "Name erfolgreich aktualisiert",
+    "teamRenamed": "Team erfolgreich umbenannt",
+    "departmentUpdated": "Abteilung erfolgreich aktualisiert"
   },
   "tutorial": {
     "checklistTitle": "Demo-Rundgang",

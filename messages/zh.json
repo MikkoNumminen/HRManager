@@ -64,7 +64,9 @@
     "changePosition": "更改职位",
     "enterNewPosition": "输入新职位",
     "changeEmail": "更改邮箱",
-    "enterNewEmail": "输入新邮箱"
+    "enterNewEmail": "输入新邮箱",
+    "changeName": "更改姓名",
+    "enterNewName": "输入新姓名"
   },
   "teams": {
     "manageTitle": "团队管理",
@@ -88,7 +90,9 @@
     "removeMember": "从团队移除成员",
     "removeMemberButton": "移除成员",
     "removeMemberConfirm": "确定要将{name}从团队中移除吗？",
-    "removeMemberDefault": "该成员"
+    "removeMemberDefault": "该成员",
+    "renameTeam": "重命名团队",
+    "enterNewTeamName": "输入新团队名称"
   },
   "departments": {
     "manageTitle": "部门管理",
@@ -113,7 +117,8 @@
     "setHeadButton": "设置负责人",
     "assignTeam": "分配团队",
     "selectTeam": "选择团队",
-    "removeTeam": "从部门移除团队"
+    "removeTeam": "从部门移除团队",
+    "editDepartment": "编辑部门"
   },
   "admin": {
     "title": "用户管理",
@@ -230,7 +235,11 @@
     "permSeedData": "加载示例数据",
     "permManageUsers": "管理用户",
     "permChangePermissions": "更改用户权限",
-    "permViewAuditLog": "查看审计日志"
+    "permViewAuditLog": "查看审计日志",
+    "changedName": "姓名从\"{oldValue}\"更改为\"{newValue}\"",
+    "renamedTeam": "团队从\"{oldValue}\"重命名为\"{newValue}\"",
+    "permChangeName": "更改人员姓名",
+    "permRenameTeams": "重命名团队"
   },
   "notifications": {
     "personCreated": "人员创建成功",
@@ -250,7 +259,10 @@
     "roleUpdated": "用户角色更新成功",
     "permissionUpdated": "权限更新成功",
     "mockDataLoaded": "测试数据加载成功",
-    "dataReset": "所有数据重置成功"
+    "dataReset": "所有数据重置成功",
+    "nameUpdated": "姓名更新成功",
+    "teamRenamed": "团队重命名成功",
+    "departmentUpdated": "部门更新成功"
   },
   "tutorial": {
     "checklistTitle": "演示导览",

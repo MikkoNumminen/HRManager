@@ -64,7 +64,9 @@
     "changePosition": "Zmień stanowisko",
     "enterNewPosition": "Wprowadź nowe stanowisko",
     "changeEmail": "Zmień e-mail",
-    "enterNewEmail": "Wprowadź nowy e-mail"
+    "enterNewEmail": "Wprowadź nowy e-mail",
+    "changeName": "Zmień imię",
+    "enterNewName": "Wprowadź nowe imię"
   },
   "teams": {
     "manageTitle": "Zarządzaj zespołami",
@@ -88,7 +90,9 @@
     "removeMember": "Usuń członka z zespołu",
     "removeMemberButton": "Usuń członka",
     "removeMemberConfirm": "Czy na pewno chcesz usunąć {name} z zespołu?",
-    "removeMemberDefault": "tego członka"
+    "removeMemberDefault": "tego członka",
+    "renameTeam": "Zmień nazwę zespołu",
+    "enterNewTeamName": "Wprowadź nową nazwę zespołu"
   },
   "departments": {
     "manageTitle": "Zarządzaj działami",
@@ -113,7 +117,8 @@
     "setHeadButton": "Ustaw kierownika",
     "assignTeam": "Przypisz zespół",
     "selectTeam": "Wybierz zespół",
-    "removeTeam": "Usuń zespół z działu"
+    "removeTeam": "Usuń zespół z działu",
+    "editDepartment": "Edytuj dział"
   },
   "admin": {
     "title": "Zarządzanie użytkownikami",
@@ -230,7 +235,11 @@
     "permSeedData": "ładować dane testowe",
     "permManageUsers": "zarządzać użytkownikami",
     "permChangePermissions": "zmieniać uprawnienia użytkowników",
-    "permViewAuditLog": "przeglądać dziennik audytu"
+    "permViewAuditLog": "przeglądać dziennik audytu",
+    "changedName": "Zmieniono imię z \"{oldValue}\" na \"{newValue}\"",
+    "renamedTeam": "Zmieniono nazwę zespołu z \"{oldValue}\" na \"{newValue}\"",
+    "permChangeName": "zmieniać imiona osób",
+    "permRenameTeams": "zmieniać nazwy zespołów"
   },
   "notifications": {
     "personCreated": "Osoba utworzona pomyślnie",
@@ -250,7 +259,10 @@
     "roleUpdated": "Rola użytkownika zaktualizowana pomyślnie",
     "permissionUpdated": "Uprawnienie zaktualizowane pomyślnie",
     "mockDataLoaded": "Dane testowe załadowane pomyślnie",
-    "dataReset": "Wszystkie dane zresetowane pomyślnie"
+    "dataReset": "Wszystkie dane zresetowane pomyślnie",
+    "nameUpdated": "Imię zaktualizowane pomyślnie",
+    "teamRenamed": "Nazwa zespołu zmieniona pomyślnie",
+    "departmentUpdated": "Dział zaktualizowany pomyślnie"
   },
   "tutorial": {
     "checklistTitle": "Przewodnik demo",
