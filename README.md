@@ -1,6 +1,6 @@
 # HRManager
 
-A production-grade HR management system with granular RBAC, dashboard analytics, audit logging, rate limiting, CSP + security headers, AI-powered i18n across 18 languages, mobile-first responsive design, and 1120 tests (1086 unit/integration + 34 E2E) at 99.5% line coverage.
+A production-grade HR management system with granular RBAC, dashboard analytics, audit logging, rate limiting, CSP + security headers, AI-powered i18n across 18 languages, mobile-first responsive design, and 1189 tests (1155 unit/integration + 34 E2E) at 99.4% line coverage.
 
 [![CI](https://github.com/MikkoNumminen/HRManager/actions/workflows/ci.yml/badge.svg)](https://github.com/MikkoNumminen/HRManager/actions/workflows/ci.yml)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)
@@ -30,14 +30,15 @@ A production-grade HR management system with granular RBAC, dashboard analytics,
 - **Dashboard analytics** — KPI cards, bar chart (members per team), pie chart (teams per department), line chart (organization growth), and recent activity feed powered by MUI X Charts; permission-gated via `dashboard:view`
 - **Optimistic updates** — React 19 `useOptimistic` on all create actions; new items appear in the table instantly before the server responds, then seamlessly merge with real data on revalidation
 - **Mobile-first responsive design** — card-based layouts for mobile (< 900px), collapsible filters, responsive form buttons (stack vertically on mobile), hamburger menu with navigation drawer, shared responsive style tokens via `muiStyles.ts`
-- **1120 tests (1086 unit/integration + 34 E2E), 99.5% line coverage** — Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, rate limiting, auth route handlers, CSP proxy, audit logging, style tokens, dashboard analytics, optimistic UI, demo session isolation, all 45 UI components tested against real PostgreSQL, plus Playwright E2E covering full user flows
-- **Demo session isolation** — each "Try Demo" click creates a private data sandbox with pre-seeded org data (9 people, 5 teams, 4 departments); sessions auto-expire after 24 hours of inactivity; no cross-session data leakage
+- **1189 tests (1155 unit/integration + 34 E2E), 99.4% line coverage** — Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, rate limiting, auth route handlers, CSP proxy, audit logging, style tokens, dashboard analytics, optimistic UI, demo session isolation, all 46 UI components tested against real PostgreSQL, plus Playwright E2E covering full user flows
+- **User profile page** — edit display name, set custom profile picture via URL, view role badge, join date, and read-only permissions summary grouped by domain; accessible from TopBar menu on both desktop and mobile
+- **Demo session isolation** — each "Try Demo" click creates a private data sandbox with pre-seeded org data (6 people, 3 teams, 2 departments); sessions auto-expire after 24 hours of inactivity; no cross-session data leakage
 - **Granular RBAC** — 4 roles, 24 permission keys, per-user grant/deny overrides with three-state toggles (deny / role default / grant), and "kick out" user removal with confirmation dialog
 - **Soft deletes** — `deletedAt` column on Person, Team, Department, and TeamMember with partial unique indexes; split into production scope (`WHERE sessionId IS NULL`) and demo scope (`WHERE sessionId IS NOT NULL`) for multi-tenant uniqueness; cascade soft-deletes for team memberships and FK nulling for manager/head references; preserves full audit history
 - **Immutable audit trail** — every mutation logged with before/after JSON snapshots inside the same `$transaction` for atomicity; permission denials and rate limit hits also logged as security events
 - **18 languages** — next-intl with cookie persistence, Accept-Language detection, and an AI-powered translation pipeline using parallel Claude Code agents
 - **Gamified demo tour** — 8-step tutorial with DOM-aware navigation hints, spotlight overlays, confetti celebrations, and auto-detection of task completion
-- **Snackbar notifications** — global success/error toasts via React context + MUI Snackbar; consistent feedback across all 15 form actions
+- **Snackbar notifications** — global success/error toasts via React context + MUI Snackbar; consistent feedback across all 17 form actions
 - **Accessibility (WCAG)** — semantic landmarks, skip-to-content link, ARIA labels on dialogs and controls, `role="alert"` on all error messages, keyboard-navigable table rows, `scope="col"` on all table headers, info tooltips with `cursor: "help"` on non-obvious column headers
 - **6 visual themes** — CSS custom properties with FOUC-preventing inline script; instant switching without re-render
 - **Content-Security-Policy** — nonce-based CSP via Next.js 16 proxy with per-request nonce generation; Emotion/MUI style injection, FOUC prevention script, and OAuth avatar domains whitelisted; plus X-Frame-Options, X-Content-Type-Options, Referrer-Policy, and Permissions-Policy on all routes
@@ -88,6 +89,7 @@ graph LR
 - **Auth** in `auth.ts` — JWT strategy with permission-enriched tokens; automatic superuser bootstrapping; `permissionsVersion`-based stale permission detection
 - **RBAC** in `permissions.ts` — resolution: superuser (all) → user override → role default
 - **Demo isolation** in `demoSession.ts` — each demo login creates a `DemoSession` with a UUID; all entity tables carry a nullable `sessionId` column; queries and mutations filter by `sessionId` (`null` = real user, UUID = demo sandbox); stale sessions cleaned up after 24h
+- **Profile** in `/profile` — authenticated users can edit their display name, set a custom profile picture URL, and view their effective permissions; changes are audit-logged
 - **Forms** — React 19 `useActionState` with `action=` prop, no `onSubmit`; `useOptimistic` for instant table updates on create; success/error feedback via global snackbar; responsive button layout (stacked on mobile, inline on desktop)
 - **Responsive** — mobile-first via MUI breakpoints (`xs`/`sm`/`md`); dual-render pattern (table + card views) with CSS display toggles; shared tokens in `muiStyles.ts`
 - **Themes** — CSS custom properties injected before hydration; 6 palettes switchable at runtime
@@ -112,10 +114,10 @@ Individual permissions can be overridden per-user — e.g. granting `person:crea
 
 | Layer            | Tests    |
 | ---------------- | -------- |
-| Zod schemas      | 85       |
-| Prisma queries   | 51       |
-| Server actions   | 137      |
-| Auth callbacks   | 31       |
+| Zod schemas      | 95       |
+| Prisma queries   | 60       |
+| Server actions   | 158      |
+| Auth callbacks   | 32       |
 | Audit logging    | 10       |
 | Rate limiting    | 18       |
 | Auth route       | 5        |
@@ -126,16 +128,16 @@ Individual permissions can be overridden per-user — e.g. granting `person:crea
 | Theme config     | 12       |
 | Tutorial config  | 26       |
 | i18n             | 14       |
-| UI components    | 600      |
+| UI components    | 628      |
 | E2E (Playwright) | 34       |
-| **Total**        | **1120** |
+| **Total**        | **1189** |
 
 ```
-Statements : 99.11%    Branches : 94.95%
-Functions  : 98.6%     Lines    : 99.49%
+Statements : 98.99%    Branches : 95.02%
+Functions  : 97.76%    Lines    : 99.39%
 ```
 
-Server-side tests run against a real PostgreSQL test database. Client-side tests cover all 45 components including dashboard charts, optimistic create wrappers, permission toggles, audit log filtering, mobile card views, tutorial system, snackbar notifications, theme switching, and language selection. Playwright E2E tests run against a production build covering authentication, CRUD for all entities, admin/audit access, guest access control, theme/language persistence, and snackbar lifecycle.
+Server-side tests run against a real PostgreSQL test database. Client-side tests cover all 46 components including dashboard charts, optimistic create wrappers, permission toggles, audit log filtering, mobile card views, tutorial system, snackbar notifications, theme switching, language selection, and profile editor. Playwright E2E tests run against a production build covering authentication, CRUD for all entities, admin/audit access, guest access control, theme/language persistence, and snackbar lifecycle.
 
 ---
 
