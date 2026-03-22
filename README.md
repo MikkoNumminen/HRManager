@@ -1,6 +1,6 @@
 # HRManager
 
-A production-grade HR management system with granular RBAC, dashboard analytics, audit logging, rate limiting, CSP + security headers, AI-powered i18n across 18 languages, and 1047 tests (1013 unit/integration + 34 E2E) at 99.5% line coverage.
+A production-grade HR management system with granular RBAC, dashboard analytics, audit logging, rate limiting, CSP + security headers, AI-powered i18n across 18 languages, mobile-first responsive design, and 1084 tests (1050 unit/integration + 34 E2E) at 99.5% line coverage.
 
 [![CI](https://github.com/MikkoNumminen/HRManager/actions/workflows/ci.yml/badge.svg)](https://github.com/MikkoNumminen/HRManager/actions/workflows/ci.yml)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)
@@ -29,7 +29,8 @@ A production-grade HR management system with granular RBAC, dashboard analytics,
 
 - **Dashboard analytics** — KPI cards, bar chart (members per team), pie chart (teams per department), line chart (organization growth), and recent activity feed powered by MUI X Charts; permission-gated via `dashboard:view`
 - **Optimistic updates** — React 19 `useOptimistic` on all create actions; new items appear in the table instantly before the server responds, then seamlessly merge with real data on revalidation
-- **1047 tests (1013 unit/integration + 34 E2E), 99.4% line coverage** — Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, rate limiting, auth route handlers, CSP proxy, audit logging, dashboard analytics, optimistic UI, all 45 UI components tested against real PostgreSQL, plus Playwright E2E covering full user flows
+- **Mobile-first responsive design** — card-based layouts for mobile (< 900px), collapsible filters, responsive form buttons (stack vertically on mobile), hamburger menu with navigation drawer, shared responsive style tokens via `muiStyles.ts`
+- **1084 tests (1050 unit/integration + 34 E2E), 99.5% line coverage** — Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, rate limiting, auth route handlers, CSP proxy, audit logging, style tokens, dashboard analytics, optimistic UI, all 45 UI components tested against real PostgreSQL, plus Playwright E2E covering full user flows
 - **Granular RBAC** — 4 roles, 24 permission keys, per-user grant/deny overrides with three-state toggles (deny / role default / grant), and "kick out" user removal with confirmation dialog
 - **Soft deletes** — `deletedAt` column on Person, Team, Department, and TeamMember with partial unique indexes (`WHERE deletedAt IS NULL`); cascade soft-deletes for team memberships and FK nulling for manager/head references; preserves full audit history
 - **Immutable audit trail** — every mutation logged with before/after JSON snapshots inside the same `$transaction` for atomicity; permission denials and rate limit hits also logged as security events
@@ -84,7 +85,8 @@ graph LR
 - **Types** in `schemas.ts` — Zod schemas with `z.infer` exports, used everywhere
 - **Auth** in `auth.ts` — JWT strategy with permission-enriched tokens; automatic superuser bootstrapping; `permissionsVersion`-based stale permission detection
 - **RBAC** in `permissions.ts` — resolution: superuser (all) → user override → role default
-- **Forms** — React 19 `useActionState` with `action=` prop, no `onSubmit`; `useOptimistic` for instant table updates on create; success/error feedback via global snackbar
+- **Forms** — React 19 `useActionState` with `action=` prop, no `onSubmit`; `useOptimistic` for instant table updates on create; success/error feedback via global snackbar; responsive button layout (stacked on mobile, inline on desktop)
+- **Responsive** — mobile-first via MUI breakpoints (`xs`/`sm`/`md`); dual-render pattern (table + card views) with CSS display toggles; shared tokens in `muiStyles.ts`
 - **Themes** — CSS custom properties injected before hydration; 6 palettes switchable at runtime
 - **i18n** — 18 locale files synced against `en.json` via custom audit tooling
 
@@ -116,16 +118,20 @@ Individual permissions can be overridden per-user — e.g. granting `person:crea
 | Auth route       | 5        |
 | CSP proxy        | 20       |
 | RBAC logic       | 28       |
-| UI components    | 640      |
+| Style tokens     | 37       |
+| Theme config     | 12       |
+| Tutorial config  | 26       |
+| i18n             | 14       |
+| UI components    | 587      |
 | E2E (Playwright) | 34       |
-| **Total**        | **1047** |
+| **Total**        | **1084** |
 
 ```
-Statements : 98.95%    Branches : 94.84%
+Statements : 99.08%    Branches : 94.84%
 Functions  : 98.81%    Lines    : 99.48%
 ```
 
-Server-side tests run against a real PostgreSQL test database. Client-side tests cover all 45 components including dashboard charts, optimistic create wrappers, permission toggles, audit log filtering, tutorial system, snackbar notifications, theme switching, and language selection. Playwright E2E tests run against a production build covering authentication, CRUD for all entities, admin/audit access, guest access control, theme/language persistence, and snackbar lifecycle.
+Server-side tests run against a real PostgreSQL test database. Client-side tests cover all 45 components including dashboard charts, optimistic create wrappers, permission toggles, audit log filtering, mobile card views, tutorial system, snackbar notifications, theme switching, and language selection. Playwright E2E tests run against a production build covering authentication, CRUD for all entities, admin/audit access, guest access control, theme/language persistence, and snackbar lifecycle.
 
 ---
 

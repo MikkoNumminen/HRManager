@@ -6,18 +6,12 @@ In Progress items must show the owner: `[worktree-name]` or `[main]`.
 
 **NOTE:** 3 Claude instances run in parallel. Always re-read TODO.md before presenting tasks. Maintain this list carefully — other Claudes depend on it.
 
+**⚠️ RULE: NEVER start working on a task without FIRST moving it to "In Progress" with your `[worktree-name]` or `[main]` tag. Re-read this file BEFORE starting any work. If a task already has an owner tag, DO NOT work on it — pick something else or wait.**
+
 ## In Progress
 
-- 🔴 Mobile-first redesign `[main]`
-  - [x] TopBar: hamburger menu + drawer for mobile navigation
-  - [x] Tables: card/list view on mobile (< sm breakpoint)
-  - [x] Forms: full-width inputs, responsive button layout
-  - [x] AuditLogViewer: collapsible filters, card view for entries
-  - [x] Layout: responsive container + manage page padding
-  - [x] muiStyles.ts: add mobile-first responsive tokens
-  - [ ] Tests for new responsive behavior
-  - [ ] Update README.md and CLAUDE.md
+- 🔴 Demo session isolation — per-session data instead of shared DB `[snackbar-notifications]`
 
 ## Backlog
 
-- 🔴 Demo session isolation — per-session data instead of shared DB
+- 🟡 Rethink demo user role & permissions — after session isolation, demo = complete separate instance with full superuser access (data is sandboxed, no restrictions needed)
