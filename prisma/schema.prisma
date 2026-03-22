@@ -13,6 +13,7 @@ model Person {
   name      String
   position  String?
   email     String?
+  sessionId String?
   deletedAt DateTime?
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
@@ -21,6 +22,7 @@ model Person {
   headOfDepartments Department[]
 
   @@index([deletedAt])
+  @@index([sessionId])
 }
 
 model Department {
@@ -29,12 +31,14 @@ model Department {
   description String?
   headId      String?
   head        Person?   @relation(fields: [headId], references: [id], onDelete: SetNull)
+  sessionId   String?
   deletedAt   DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   teams       Team[]
 
   @@index([deletedAt])
+  @@index([sessionId])
 }
 
 model Team {
@@ -44,18 +48,21 @@ model Team {
   departmentId  String?
   manager       Person?     @relation(fields: [teamManagerId], references: [id], onDelete: SetNull)
   department    Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  sessionId     String?
   deletedAt     DateTime?
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
   members       TeamMember[]
 
   @@index([deletedAt])
+  @@index([sessionId])
 }
 
 model TeamMember {
   id        String    @id @default(uuid())
   personId  String
   teamId    String
+  sessionId String?
   deletedAt DateTime?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -65,6 +72,7 @@ model TeamMember {
 
   @@unique([personId, teamId])
   @@index([deletedAt])
+  @@index([sessionId])
 }
 
 model User {
@@ -77,6 +85,7 @@ model User {
   createdAt          DateTime         @default(now())
   updatedAt          DateTime         @updatedAt
   permissions        UserPermission[]
+  demoSessions       DemoSession[]
 }
 
 model Permission {
@@ -119,6 +128,7 @@ model AuditLog {
   entityId   String?
   before     String?
   after      String?
+  sessionId  String?
   createdAt  DateTime @default(now())
 
   @@index([userId])
@@ -126,4 +136,16 @@ model AuditLog {
   @@index([action])
   @@index([entityType])
   @@index([createdAt])
+  @@index([sessionId])
+}
+
+model DemoSession {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  lastActiveAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([lastActiveAt])
 }
