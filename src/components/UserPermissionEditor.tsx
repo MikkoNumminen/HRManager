@@ -21,7 +21,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { useActionState, useState, useTransition } from "react";
+import { useActionState, useMemo, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { completeTutorialStep } from "@/tutorialConfig";
@@ -132,14 +132,18 @@ export default function UserPermissionEditor({
     return `${domain}:${action}`;
   };
 
-  const groupedKeys = allPermissionKeys.reduce(
-    (acc, key) => {
-      const [domain] = key.split(":");
-      if (!acc[domain]) acc[domain] = [];
-      acc[domain].push(key);
-      return acc;
-    },
-    {} as Record<string, string[]>,
+  const groupedKeys = useMemo(
+    () =>
+      allPermissionKeys.reduce(
+        (acc, key) => {
+          const [domain] = key.split(":");
+          if (!acc[domain]) acc[domain] = [];
+          acc[domain].push(key);
+          return acc;
+        },
+        {} as Record<string, string[]>,
+      ),
+    [allPermissionKeys],
   );
 
   return (

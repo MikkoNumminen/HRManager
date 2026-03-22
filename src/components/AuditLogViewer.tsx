@@ -20,6 +20,7 @@ import {
 } from "@mui/material";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { useMemo, useCallback } from "react";
 import { colors } from "@/muiStyles";
 import { AuditLog } from "@/schemas";
 
@@ -70,174 +71,181 @@ export default function AuditLogViewer({
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const entityTypeLabels: Record<string, string> = {
-    person: t("typePerson"),
-    team: t("typeTeam"),
-    teamMember: t("typeTeamMember"),
-    department: t("typeDepartment"),
-    user: t("typeUser"),
-    userPermission: t("typePermission"),
-  };
+  const entityTypeLabels: Record<string, string> = useMemo(
+    () => ({
+      person: t("typePerson"),
+      team: t("typeTeam"),
+      teamMember: t("typeTeamMember"),
+      department: t("typeDepartment"),
+      user: t("typeUser"),
+      userPermission: t("typePermission"),
+    }),
+    [t],
+  );
 
-  const actionLabels: Record<string, string> = {
-    create: t("actionCreate"),
-    update: t("actionUpdate"),
-    delete: t("actionDelete"),
-    kickout: t("actionKickout"),
-    seed: t("actionSeed"),
-    reset: t("actionReset"),
-  };
+  const actionLabels: Record<string, string> = useMemo(
+    () => ({
+      create: t("actionCreate"),
+      update: t("actionUpdate"),
+      delete: t("actionDelete"),
+      kickout: t("actionKickout"),
+      seed: t("actionSeed"),
+      reset: t("actionReset"),
+    }),
+    [t],
+  );
 
-  const permissionLabels: Record<string, string> = {
-    "person:create": t("permCreatePeople"),
-    "person:delete": t("permDeletePeople"),
-    "person:update_name": t("permChangeName"),
-    "person:update_position": t("permChangePosition"),
-    "person:update_email": t("permChangeEmail"),
-    "person:read": t("permViewPeople"),
-    "team:create": t("permCreateTeams"),
-    "team:delete": t("permDeleteTeams"),
-    "team:update_name": t("permRenameTeams"),
-    "team:update_manager": t("permChangeManager"),
-    "team:add_member": t("permAddMembers"),
-    "team:remove_member": t("permRemoveMembers"),
-    "team:read": t("permViewTeams"),
-    "department:create": t("permCreateDepartments"),
-    "department:delete": t("permDeleteDepartments"),
-    "department:update": t("permUpdateDepartments"),
-    "department:assign_team": t("permAssignTeams"),
-    "department:read": t("permViewDepartments"),
-    "data:reset": t("permResetData"),
-    "data:seed": t("permSeedData"),
-    "admin:manage_users": t("permManageUsers"),
-    "admin:assign_permissions": t("permChangePermissions"),
-    "admin:view_audit_log": t("permViewAuditLog"),
-  };
+  const permissionLabels: Record<string, string> = useMemo(
+    () => ({
+      "person:create": t("permCreatePeople"),
+      "person:delete": t("permDeletePeople"),
+      "person:update_name": t("permChangeName"),
+      "person:update_position": t("permChangePosition"),
+      "person:update_email": t("permChangeEmail"),
+      "person:read": t("permViewPeople"),
+      "team:create": t("permCreateTeams"),
+      "team:delete": t("permDeleteTeams"),
+      "team:update_name": t("permRenameTeams"),
+      "team:update_manager": t("permChangeManager"),
+      "team:add_member": t("permAddMembers"),
+      "team:remove_member": t("permRemoveMembers"),
+      "team:read": t("permViewTeams"),
+      "department:create": t("permCreateDepartments"),
+      "department:delete": t("permDeleteDepartments"),
+      "department:update": t("permUpdateDepartments"),
+      "department:assign_team": t("permAssignTeams"),
+      "department:read": t("permViewDepartments"),
+      "data:reset": t("permResetData"),
+      "data:seed": t("permSeedData"),
+      "admin:manage_users": t("permManageUsers"),
+      "admin:assign_permissions": t("permChangePermissions"),
+      "admin:view_audit_log": t("permViewAuditLog"),
+    }),
+    [t],
+  );
 
-  const describeChanges = (
-    action: string,
-    entityType: string,
-    before: string | null,
-    after: string | null,
-  ): string => {
-    try {
-      const b = before ? JSON.parse(before) : null;
-      const a = after ? JSON.parse(after) : null;
-      const unknown = tc("unknown");
+  const describeChanges = useCallback(
+    (action: string, entityType: string, before: string | null, after: string | null): string => {
+      try {
+        const b = before ? JSON.parse(before) : null;
+        const a = after ? JSON.parse(after) : null;
+        const unknown = tc("unknown");
 
-      const resolveTarget = (): string => {
-        const email = a?.targetEmail ?? b?.targetEmail;
-        if (!email) return unknown;
-        return userNames[email] ?? email;
-      };
+        const resolveTarget = (): string => {
+          const email = a?.targetEmail ?? b?.targetEmail;
+          if (!email) return unknown;
+          return userNames[email] ?? email;
+        };
 
-      if (action === "create") {
-        if (entityType === "person") return t("addedPerson", { name: a?.name ?? unknown });
-        if (entityType === "team") return t("createdTeam", { name: a?.teamName ?? unknown });
-        if (entityType === "teamMember") return t("addedMember");
-        if (entityType === "department")
-          return t("createdDepartment", { name: a?.name ?? unknown });
-        return t("newRecord");
-      }
-
-      if (action === "delete") {
-        if (entityType === "person")
-          return t("removedPerson", { name: b?.name ?? unknown, email: b?.email ?? "" });
-        if (entityType === "team") return t("deletedTeam", { name: b?.teamName ?? unknown });
-        if (entityType === "teamMember") return t("removedMember");
-        if (entityType === "department")
-          return t("deletedDepartment", { name: b?.name ?? unknown });
-        if (entityType === "userPermission") {
-          const key = b?.permissionKey ?? "";
-          const label = permissionLabels[key] ?? key;
-          const target = resolveTarget();
-          return t("resetPermission", { target, label });
+        if (action === "create") {
+          if (entityType === "person") return t("addedPerson", { name: a?.name ?? unknown });
+          if (entityType === "team") return t("createdTeam", { name: a?.teamName ?? unknown });
+          if (entityType === "teamMember") return t("addedMember");
+          if (entityType === "department")
+            return t("createdDepartment", { name: a?.name ?? unknown });
+          return t("newRecord");
         }
-        return t("recordDeleted");
-      }
 
-      if (action === "kickout") {
-        if (entityType === "user") {
-          return t("kickedOutUser", {
-            name: b?.name ?? unknown,
-            email: b?.email ?? "",
-            role: b?.role ?? "",
+        if (action === "delete") {
+          if (entityType === "person")
+            return t("removedPerson", { name: b?.name ?? unknown, email: b?.email ?? "" });
+          if (entityType === "team") return t("deletedTeam", { name: b?.teamName ?? unknown });
+          if (entityType === "teamMember") return t("removedMember");
+          if (entityType === "department")
+            return t("deletedDepartment", { name: b?.name ?? unknown });
+          if (entityType === "userPermission") {
+            const key = b?.permissionKey ?? "";
+            const label = permissionLabels[key] ?? key;
+            const target = resolveTarget();
+            return t("resetPermission", { target, label });
+          }
+          return t("recordDeleted");
+        }
+
+        if (action === "kickout") {
+          if (entityType === "user") {
+            return t("kickedOutUser", {
+              name: b?.name ?? unknown,
+              email: b?.email ?? "",
+              role: b?.role ?? "",
+            });
+          }
+          return t("recordDeleted");
+        }
+
+        if (action === "update") {
+          if (entityType === "person") {
+            if (a?.name !== undefined && b?.name !== a.name)
+              return t("changedName", { oldValue: b?.name ?? "", newValue: a?.name ?? "" });
+            if (a?.position !== undefined && b?.position !== a.position)
+              return t("changedPosition", {
+                oldValue: b?.position ?? "",
+                newValue: a?.position ?? "",
+              });
+            if (a?.email !== undefined && b?.email !== a.email)
+              return t("changedEmail", { oldValue: b?.email ?? "", newValue: a?.email ?? "" });
+            return t("updatedPerson");
+          }
+          if (entityType === "team") {
+            if (a?.teamName !== undefined && b?.teamName !== a.teamName)
+              return t("renamedTeam", { oldValue: b?.teamName ?? "", newValue: a?.teamName ?? "" });
+            if (a?.departmentId !== undefined) {
+              if (a.departmentId === null) return t("removedTeamFromDept");
+              return t("assignedTeamToDept");
+            }
+            if (a?.teamManagerId !== undefined) {
+              if (a.teamManagerId === null) return t("removedManager");
+              return t("changedManager");
+            }
+            return t("updatedTeam");
+          }
+          if (entityType === "department") {
+            if (a?.headId !== undefined) {
+              if (a.headId === null) return t("removedHead");
+              return t("changedHead");
+            }
+            if (a?.name !== undefined && b?.name !== a.name)
+              return t("renamedDepartment", { oldValue: b?.name ?? "", newValue: a?.name ?? "" });
+            return t("updatedDepartment");
+          }
+          if (entityType === "user") {
+            const target = resolveTarget();
+            return t("changedRole", { target, oldValue: b?.role ?? "", newValue: a?.role ?? "" });
+          }
+          if (entityType === "userPermission") {
+            const granted = a?.granted;
+            const key = a?.permissionKey ?? "";
+            const label = permissionLabels[key] ?? key;
+            const target = resolveTarget();
+            return granted
+              ? t("grantedPermission", { target, label })
+              : t("revokedPermission", { target, label });
+          }
+          return t("recordUpdated");
+        }
+
+        if (action === "seed") {
+          return b?.clearExisting || a?.clearExisting ? t("seedReplaced") : t("seedKept");
+        }
+
+        if (action === "reset") {
+          const persons = b?.personCount ?? b?.persons ?? 0;
+          const teams = b?.teamCount ?? b?.teams ?? 0;
+          const departments = b?.departmentCount ?? b?.departments ?? 0;
+          return t("clearedData", {
+            persons: String(persons),
+            teams: String(teams),
+            departments: String(departments),
           });
         }
-        return t("recordDeleted");
-      }
 
-      if (action === "update") {
-        if (entityType === "person") {
-          if (a?.name !== undefined && b?.name !== a.name)
-            return t("changedName", { oldValue: b?.name ?? "", newValue: a?.name ?? "" });
-          if (a?.position !== undefined && b?.position !== a.position)
-            return t("changedPosition", {
-              oldValue: b?.position ?? "",
-              newValue: a?.position ?? "",
-            });
-          if (a?.email !== undefined && b?.email !== a.email)
-            return t("changedEmail", { oldValue: b?.email ?? "", newValue: a?.email ?? "" });
-          return t("updatedPerson");
-        }
-        if (entityType === "team") {
-          if (a?.teamName !== undefined && b?.teamName !== a.teamName)
-            return t("renamedTeam", { oldValue: b?.teamName ?? "", newValue: a?.teamName ?? "" });
-          if (a?.departmentId !== undefined) {
-            if (a.departmentId === null) return t("removedTeamFromDept");
-            return t("assignedTeamToDept");
-          }
-          if (a?.teamManagerId !== undefined) {
-            if (a.teamManagerId === null) return t("removedManager");
-            return t("changedManager");
-          }
-          return t("updatedTeam");
-        }
-        if (entityType === "department") {
-          if (a?.headId !== undefined) {
-            if (a.headId === null) return t("removedHead");
-            return t("changedHead");
-          }
-          if (a?.name !== undefined && b?.name !== a.name)
-            return t("renamedDepartment", { oldValue: b?.name ?? "", newValue: a?.name ?? "" });
-          return t("updatedDepartment");
-        }
-        if (entityType === "user") {
-          const target = resolveTarget();
-          return t("changedRole", { target, oldValue: b?.role ?? "", newValue: a?.role ?? "" });
-        }
-        if (entityType === "userPermission") {
-          const granted = a?.granted;
-          const key = a?.permissionKey ?? "";
-          const label = permissionLabels[key] ?? key;
-          const target = resolveTarget();
-          return granted
-            ? t("grantedPermission", { target, label })
-            : t("revokedPermission", { target, label });
-        }
-        return t("recordUpdated");
+        return tc("dash");
+      } catch {
+        return before ?? after ?? tc("dash");
       }
-
-      if (action === "seed") {
-        return b?.clearExisting || a?.clearExisting ? t("seedReplaced") : t("seedKept");
-      }
-
-      if (action === "reset") {
-        const persons = b?.personCount ?? b?.persons ?? 0;
-        const teams = b?.teamCount ?? b?.teams ?? 0;
-        const departments = b?.departmentCount ?? b?.departments ?? 0;
-        return t("clearedData", {
-          persons: String(persons),
-          teams: String(teams),
-          departments: String(departments),
-        });
-      }
-
-      return tc("dash");
-    } catch {
-      return before ?? after ?? tc("dash");
-    }
-  };
+    },
+    [t, tc, permissionLabels, userNames],
+  );
 
   const updateFilter = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());
