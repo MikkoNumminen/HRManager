@@ -1,6 +1,6 @@
 # HRManager
 
-A production-grade HR management system with granular RBAC, audit logging, rate limiting, security headers, AI-powered i18n across 18 languages, and 899 tests (865 unit/integration + 34 E2E) at 99.7% line coverage.
+A production-grade HR management system with granular RBAC, dashboard analytics, audit logging, rate limiting, security headers, AI-powered i18n across 18 languages, and 944 tests (910 unit/integration + 34 E2E) at 99.7% line coverage.
 
 [![CI](https://github.com/MikkoNumminen/HRManager/actions/workflows/ci.yml/badge.svg)](https://github.com/MikkoNumminen/HRManager/actions/workflows/ci.yml)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)
@@ -27,8 +27,9 @@ A production-grade HR management system with granular RBAC, audit logging, rate 
 
 ## Highlights
 
-- **899 tests (865 unit/integration + 34 E2E), 99.7% line coverage** — Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, rate limiting, audit logging, all 42 UI components tested against real PostgreSQL, plus Playwright E2E covering full user flows
-- **Granular RBAC** — 4 roles, 23 permission keys, per-user grant/deny overrides with three-state toggles (deny / role default / grant), and "kick out" user removal with confirmation dialog
+- **Dashboard analytics** — KPI cards, bar chart (members per team), pie chart (teams per department), line chart (organization growth), and recent activity feed powered by MUI X Charts; permission-gated via `dashboard:view`
+- **944 tests (910 unit/integration + 34 E2E), 99.7% line coverage** — Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, rate limiting, audit logging, dashboard analytics, all 42 UI components tested against real PostgreSQL, plus Playwright E2E covering full user flows
+- **Granular RBAC** — 4 roles, 24 permission keys, per-user grant/deny overrides with three-state toggles (deny / role default / grant), and "kick out" user removal with confirmation dialog
 - **Immutable audit trail** — every mutation logged with before/after JSON snapshots inside the same `$transaction` for atomicity
 - **18 languages** — next-intl with cookie persistence, Accept-Language detection, and an AI-powered translation pipeline using parallel Claude Code agents
 - **Gamified demo tour** — 8-step tutorial with DOM-aware navigation hints, spotlight overlays, confetti celebrations, and auto-detection of task completion
@@ -46,7 +47,7 @@ A production-grade HR management system with granular RBAC, audit logging, rate 
 | Layer      | Technology                                            |
 | ---------- | ----------------------------------------------------- |
 | Framework  | Next.js 16 (App Router, Server Components)            |
-| UI         | React 19 + MUI v7                                     |
+| UI         | React 19 + MUI v7 + MUI X Charts                      |
 | Language   | TypeScript 5.9                                        |
 | ORM        | Prisma 6 (`relationLoadStrategy: 'join'`)             |
 | Database   | PostgreSQL (Vercel Postgres / Neon in production)     |
@@ -88,12 +89,12 @@ graph LR
 
 ## RBAC
 
-| Role          | Access                                           |
-| ------------- | ------------------------------------------------ |
-| Superuser     | All permissions (immutable)                      |
-| Administrator | All CRUD + audit log (no admin UI or data reset) |
-| User          | Read-only                                        |
-| Guest         | Read-only (unauthenticated)                      |
+| Role          | Access                                                       |
+| ------------- | ------------------------------------------------------------ |
+| Superuser     | All permissions (immutable)                                  |
+| Administrator | All CRUD + dashboard + audit log (no admin UI or data reset) |
+| User          | Read-only                                                    |
+| Guest         | Read-only (unauthenticated)                                  |
 
 Individual permissions can be overridden per-user — e.g. granting `person:create` to a user, or denying `team:delete` from an administrator.
 
@@ -103,23 +104,23 @@ Individual permissions can be overridden per-user — e.g. granting `person:crea
 
 | Layer            | Tests   |
 | ---------------- | ------- |
-| Zod schemas      | 71      |
-| Prisma queries   | 40      |
-| Server actions   | 137     |
+| Zod schemas      | 85      |
+| Prisma queries   | 48      |
+| Server actions   | 134     |
 | Auth callbacks   | 25      |
 | Audit logging    | 6       |
 | Rate limiting    | 13      |
 | RBAC logic       | 28      |
-| UI components    | 545     |
+| UI components    | 571     |
 | E2E (Playwright) | 34      |
-| **Total**        | **899** |
+| **Total**        | **944** |
 
 ```
-Statements : 99.07%    Branches : 95.65%
-Functions  : 99.15%    Lines    : 99.73%
+Statements : 99.11%    Branches : 95.44%
+Functions  : 99.20%    Lines    : 99.69%
 ```
 
-Server-side tests run against a real PostgreSQL test database. Client-side tests cover all 42 components including permission toggles, audit log filtering, tutorial system, snackbar notifications, theme switching, and language selection. Playwright E2E tests run against a production build covering authentication, CRUD for all entities, admin/audit access, guest access control, theme/language persistence, and snackbar lifecycle.
+Server-side tests run against a real PostgreSQL test database. Client-side tests cover all 42 components including dashboard charts, permission toggles, audit log filtering, tutorial system, snackbar notifications, theme switching, and language selection. Playwright E2E tests run against a production build covering authentication, CRUD for all entities, admin/audit access, guest access control, theme/language persistence, and snackbar lifecycle.
 
 ---
 
