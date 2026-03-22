@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { requirePermission, seedPermissions } from "@/permissions";
 import { logAudit } from "@/auditLog";
 import { rateLimit } from "@/rateLimit";
+import { getDemoSessionId } from "@/demoSession";
 import {
   MAX_NAME_LENGTH,
   MAX_EMAIL_LENGTH,
@@ -42,9 +43,10 @@ export async function createPerson(data: FormData) {
     throw new Error("Invalid email format");
   }
 
+  const sessionId = await getDemoSessionId();
   await prisma.$transaction(async (tx) => {
     const existingPerson = await tx.person.findFirst({
-      where: { email, deletedAt: null },
+      where: { email, deletedAt: null, sessionId },
     });
     if (existingPerson) {
       throw new Error("A person with this email already exists");
@@ -55,6 +57,7 @@ export async function createPerson(data: FormData) {
         name: name.trim(),
         position: null,
         email: email.trim(),
+        sessionId,
       },
     });
     await logAudit({
@@ -222,9 +225,10 @@ export async function updateEmail(data: FormData) {
     throw new Error("Invalid email format");
   }
 
+  const sessionId = await getDemoSessionId();
   await prisma.$transaction(async (tx) => {
     const existingPerson = await tx.person.findFirst({
-      where: { email: newEmail, deletedAt: null },
+      where: { email: newEmail, deletedAt: null, sessionId },
     });
     if (existingPerson && existingPerson.id !== personID) {
       throw new Error("A person with this email already exists");
@@ -265,6 +269,7 @@ export async function addManager(data: FormData) {
   teamIDs.forEach((id) => validateUUID(id, "teamID"));
   validateUUID(personID, "personID");
 
+  const sessionId = await getDemoSessionId();
   await prisma.$transaction(async (tx) => {
     const person = await tx.person.findUnique({ where: { id: personID } });
     if (!person) {
@@ -296,6 +301,7 @@ export async function addManager(data: FormData) {
         data: {
           personId: personID,
           teamId: teamIDs[0],
+          sessionId,
         },
       });
       await logAudit({
@@ -340,6 +346,7 @@ export async function addMember(data: FormData) {
   validateUUID(teamID, "teamID");
   validateUUID(personID, "personID");
 
+  const sessionId = await getDemoSessionId();
   await prisma.$transaction(async (tx) => {
     const existingMember = await tx.teamMember.findFirst({
       where: { personId: personID, teamId: teamID },
@@ -361,6 +368,7 @@ export async function addMember(data: FormData) {
         data: {
           personId: personID,
           teamId: teamID,
+          sessionId,
         },
       });
     }
@@ -387,11 +395,13 @@ export async function createTeam(data: FormData) {
     throw new Error(`Name must be ${MAX_NAME_LENGTH} characters or less`);
   }
 
+  const sessionId = await getDemoSessionId();
   await prisma.$transaction(async (tx) => {
     const team = await tx.team.create({
       data: {
         teamName: name.trim(),
         teamManagerId: null,
+        sessionId,
       },
     });
     await logAudit({
@@ -563,11 +573,13 @@ export async function createDepartment(data: FormData) {
     throw new Error(`Description must be ${MAX_DESCRIPTION_LENGTH} characters or less`);
   }
 
+  const sessionId = await getDemoSessionId();
   await prisma.$transaction(async (tx) => {
     const department = await tx.department.create({
       data: {
         name: name.trim(),
         description,
+        sessionId,
       },
     });
     await logAudit({
@@ -786,17 +798,19 @@ export async function removeTeamFromDepartment(data: FormData) {
 export async function resetAll() {
   await requirePermission("data:reset");
   await rateLimit("resetAll");
+  const sessionId = await getDemoSessionId();
   await prisma.$transaction(async (tx) => {
+    const sessionWhere = { sessionId };
     const counts = {
-      teamMembers: await tx.teamMember.count(),
-      teams: await tx.team.count(),
-      departments: await tx.department.count(),
-      persons: await tx.person.count(),
+      teamMembers: await tx.teamMember.count({ where: sessionWhere }),
+      teams: await tx.team.count({ where: sessionWhere }),
+      departments: await tx.department.count({ where: sessionWhere }),
+      persons: await tx.person.count({ where: sessionWhere }),
     };
-    await tx.teamMember.deleteMany();
-    await tx.team.deleteMany();
-    await tx.department.deleteMany();
-    await tx.person.deleteMany();
+    await tx.teamMember.deleteMany({ where: sessionWhere });
+    await tx.team.deleteMany({ where: sessionWhere });
+    await tx.department.deleteMany({ where: sessionWhere });
+    await tx.person.deleteMany({ where: sessionWhere });
     await logAudit({
       action: "reset",
       entityType: "person",
@@ -813,12 +827,14 @@ export async function resetAll() {
 export async function seedMockData(clearExisting: boolean = true) {
   await requirePermission("data:seed");
   await rateLimit("seedMockData");
+  const sessionId = await getDemoSessionId();
+  const sessionWhere = { sessionId };
   await prisma.$transaction(async (prisma) => {
     if (clearExisting) {
-      await prisma.teamMember.deleteMany();
-      await prisma.team.deleteMany();
-      await prisma.department.deleteMany();
-      await prisma.person.deleteMany();
+      await prisma.teamMember.deleteMany({ where: sessionWhere });
+      await prisma.team.deleteMany({ where: sessionWhere });
+      await prisma.department.deleteMany({ where: sessionWhere });
+      await prisma.person.deleteMany({ where: sessionWhere });
     }
 
     // Upsert persons — find existing by email or create new
@@ -833,9 +849,9 @@ export async function seedMockData(clearExisting: boolean = true) {
     const persons = [];
     for (const p of personSeeds) {
       const existing = await prisma.person.findFirst({
-        where: { email: p.email, deletedAt: null },
+        where: { email: p.email, deletedAt: null, sessionId },
       });
-      const person = existing ?? (await prisma.person.create({ data: p }));
+      const person = existing ?? (await prisma.person.create({ data: { ...p, sessionId } }));
       persons.push(person);
     }
     const [alice, bob, carol, dave, eve, frank] = persons;
@@ -849,9 +865,9 @@ export async function seedMockData(clearExisting: boolean = true) {
     const teams = [];
     for (const t of teamSeeds) {
       const existing = await prisma.team.findFirst({
-        where: { teamName: t.teamName, deletedAt: null },
+        where: { teamName: t.teamName, deletedAt: null, sessionId },
       });
-      const team = existing ?? (await prisma.team.create({ data: t }));
+      const team = existing ?? (await prisma.team.create({ data: { ...t, sessionId } }));
       teams.push(team);
     }
     const [engineering, design, platform] = teams;
@@ -871,7 +887,7 @@ export async function seedMockData(clearExisting: boolean = true) {
         where: { personId: m.personId, teamId: m.teamId, deletedAt: null },
       });
       if (!existing) {
-        await prisma.teamMember.create({ data: m });
+        await prisma.teamMember.create({ data: { ...m, sessionId } });
       }
     }
 
@@ -892,16 +908,16 @@ export async function seedMockData(clearExisting: boolean = true) {
     ];
     for (const d of departmentSeeds) {
       const existingDept = await prisma.department.findFirst({
-        where: { name: d.name, deletedAt: null },
+        where: { name: d.name, deletedAt: null, sessionId },
       });
       const dept =
         existingDept ??
         (await prisma.department.create({
-          data: { name: d.name, description: d.description, headId: d.headId },
+          data: { name: d.name, description: d.description, headId: d.headId, sessionId },
         }));
       for (const teamName of d.teamNames) {
         await prisma.team.updateMany({
-          where: { teamName, departmentId: null },
+          where: { teamName, departmentId: null, sessionId },
           data: { departmentId: dept.id },
         });
       }

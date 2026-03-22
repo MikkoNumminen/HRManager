@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/db";
 import { auth } from "@/auth";
+import { getDemoSessionId } from "@/demoSession";
 
 export type AuditAction =
   | "create"
@@ -46,6 +47,7 @@ export async function logAudit({
   tx,
 }: AuditLogParams): Promise<void> {
   const user = await getSessionUser();
+  const sessionId = await getDemoSessionId();
   const client = tx ?? prisma;
 
   await client.auditLog.create({
@@ -57,12 +59,14 @@ export async function logAudit({
       entityId: entityId ?? null,
       before: before !== undefined ? JSON.stringify(before) : null,
       after: after !== undefined ? JSON.stringify(after) : null,
+      sessionId,
     },
   });
 }
 
 export async function logPermissionDenial(permissionKey: string): Promise<void> {
   const user = await getSessionUser();
+  const sessionId = await getDemoSessionId();
   await prisma.auditLog.create({
     data: {
       userId: user?.id ?? null,
@@ -72,6 +76,7 @@ export async function logPermissionDenial(permissionKey: string): Promise<void> 
       entityId: null,
       before: null,
       after: JSON.stringify({ permissionKey }),
+      sessionId,
     },
   });
 }
