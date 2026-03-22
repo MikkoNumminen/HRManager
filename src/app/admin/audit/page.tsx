@@ -1,7 +1,7 @@
 import { Box, Typography } from "@mui/material";
 import TopBar from "@/components/TopBar";
 import AuditLogViewer from "@/components/AuditLogViewer";
-import { colors } from "@/muiStyles";
+import { pageContainerStyles } from "@/muiStyles";
 import { getAuditLogs, getAuditLogUserEmails } from "@/queries";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
@@ -118,14 +118,7 @@ export default async function AuditLogPage({
   return (
     <>
       <TopBar title={t("auditTitle")} backHref="/admin" permissions={permissions} />
-      <Box
-        data-tutorial="audit-log"
-        sx={{
-          border: `1px solid ${colors.slate300}`,
-          borderRadius: "4px",
-          padding: { xs: "12px", sm: "20px" },
-        }}
-      >
+      <Box data-tutorial="audit-log" sx={pageContainerStyles}>
         <Typography variant="h6" mb={1}>
           {t("auditHeading")}
         </Typography>

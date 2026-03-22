@@ -69,7 +69,7 @@ export default async function RootLayout({
                       sx={{
                         maxWidth: "1280px",
                         mx: "auto",
-                        px: { xs: 1, sm: 2, md: 3 },
+                        px: { xs: 1.5, sm: 2, md: 3 },
                         pt: 2,
                         pb: 2,
                       }}

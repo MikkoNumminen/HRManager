@@ -2,7 +2,7 @@ import { Box, Typography } from "@mui/material";
 import AddTeamForm from "@/components/AddTeam";
 import EditableTeamsTable from "@/components/EditableTeamsTable";
 import TopBar from "@/components/TopBar";
-import { colors } from "@/muiStyles";
+import { pageContainerStyles } from "@/muiStyles";
 import { getTeams } from "@/queries";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
@@ -29,14 +29,7 @@ export default async function ManageTeamsPage() {
     <>
       <TopBar title={t("manageTitle")} backHref="/" permissions={permissions} />
       {permissions["team:create"] && <AddTeamForm />}
-      <Box
-        data-tutorial="teams-table"
-        sx={{
-          border: `1px solid ${colors.slate300}`,
-          borderRadius: "4px",
-          padding: { xs: "12px", sm: "20px" },
-        }}
-      >
+      <Box data-tutorial="teams-table" sx={pageContainerStyles}>
         <Typography variant="h6" mb={1}>
           {t("heading")}
         </Typography>

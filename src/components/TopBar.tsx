@@ -107,8 +107,8 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
           borderRadius: "4px",
           border: `1px solid ${colors.slate300}`,
           ...(backHref && {
-            ml: { xs: "-40px", sm: "-48px" },
-            width: { xs: "calc(100% + 40px)", sm: "calc(100% + 48px)" },
+            ml: { xs: "-44px", sm: "-48px" },
+            width: { xs: "calc(100% + 44px)", sm: "calc(100% + 48px)" },
           }),
         }}
         elevation={0}
@@ -116,7 +116,7 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
         <Toolbar
           sx={{
             position: "relative",
-            ...(backHref && { pl: { xs: "52px", sm: "64px" } }),
+            ...(backHref && { pl: { xs: "56px", sm: "64px" } }),
           }}
         >
           {backHref && (

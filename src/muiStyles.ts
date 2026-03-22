@@ -156,6 +156,12 @@ export const formButtonContainerStyles = {
   justifyContent: "flex-end",
 };
 
+export const pageContainerStyles = {
+  border: `1px solid ${colors.slate300}`,
+  borderRadius: "4px",
+  padding: { xs: "12px", sm: "20px" },
+};
+
 export const boxStyles = {
   flex: "1",
   padding: { xs: "16px", sm: "20px" },

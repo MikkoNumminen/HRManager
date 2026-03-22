@@ -2,7 +2,7 @@ import { Box, Typography } from "@mui/material";
 import PersonTable from "@/components/EditablePersonsTable";
 import AddPersonForm from "@/components/AddPeople";
 import TopBar from "@/components/TopBar";
-import { colors } from "@/muiStyles";
+import { pageContainerStyles } from "@/muiStyles";
 import { getPersons } from "@/queries";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
@@ -28,13 +28,7 @@ export default async function ManagePersonsPage() {
     <>
       <TopBar title={t("manageTitle")} backHref="/" permissions={permissions} />
       {permissions["person:create"] && <AddPersonForm />}
-      <Box
-        sx={{
-          border: `1px solid ${colors.slate300}`,
-          borderRadius: "4px",
-          padding: { xs: "12px", sm: "20px" },
-        }}
-      >
+      <Box sx={pageContainerStyles}>
         <Typography variant="h6" mb={1}>
           {t("heading")}
         </Typography>

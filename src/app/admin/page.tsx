@@ -1,7 +1,7 @@
 import { Box, Typography } from "@mui/material";
 import TopBar from "@/components/TopBar";
 import UserManagementTable from "@/components/UserManagementTable";
-import { colors } from "@/muiStyles";
+import { pageContainerStyles } from "@/muiStyles";
 import { getUsers } from "@/queries";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
@@ -23,14 +23,7 @@ export default async function AdminPage() {
   return (
     <>
       <TopBar title={t("title")} backHref="/" permissions={permissions} />
-      <Box
-        data-tutorial="users-table"
-        sx={{
-          border: `1px solid ${colors.slate300}`,
-          borderRadius: "4px",
-          padding: { xs: "12px", sm: "20px" },
-        }}
-      >
+      <Box data-tutorial="users-table" sx={pageContainerStyles}>
         <Typography variant="h6" mb={1}>
           {t("heading")}
         </Typography>
