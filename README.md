@@ -153,6 +153,17 @@ npm run i18n:translate  # auto-translate via Claude Haiku API (requires ANTHROPI
 
 ---
 
+## Autonomous agents
+
+| Agent                | Trigger                           | What it does                                                                                |
+| -------------------- | --------------------------------- | ------------------------------------------------------------------------------------------- |
+| **CI auto-fix**      | CI fails on `main`                | Downloads failure logs, runs Claude Code to analyze and fix errors, creates a PR for review |
+| **i18n translation** | Manual (`npm run i18n:translate`) | Audits 17 locale files against `en.json`, translates missing keys via Claude API            |
+
+Both agents use the `anthropics/claude-code-action` or Claude API for intelligence, with restricted tool access for safety. The CI auto-fix agent (`autofix.yml`) prevents infinite loops by skipping branches it created. Fix PRs are never auto-merged — a human must review and approve.
+
+---
+
 ## Getting started
 
 ### Docker (recommended)

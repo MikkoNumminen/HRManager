@@ -11,21 +11,21 @@ This is a **portfolio / showcase project**. The goal is to demonstrate technical
 
 ## Tech stack
 
-| Layer      | Technology                                                     |
-| ---------- | -------------------------------------------------------------- |
-| Framework  | Next.js 16 (App Router, Server Components)                     |
-| UI         | React 19 + MUI v7 — dark theme throughout, no Tailwind         |
-| Language   | TypeScript 5.9                                                 |
-| ORM        | Prisma 6 (`relationLoadStrategy: 'join'`)                      |
-| Database   | PostgreSQL (local dev + Vercel Postgres / Neon in production)  |
-| Validation | Zod 4                                                          |
-| Auth       | NextAuth v5 (JWT strategy, Google + GitHub OAuth + demo login) |
-| i18n       | next-intl, 18 locales, AI-powered translation pipeline         |
-| Testing    | Jest 30 + React Testing Library                                |
-| CI/CD      | GitHub Actions (lint, format, test, build on every push)       |
-| Linting    | ESLint 9 (flat config)                                         |
-| Formatting | Prettier 3 (`printWidth: 100`, double quotes, trailing commas) |
-| Deployment | Vercel with Vercel Postgres (Neon serverless PostgreSQL)       |
+| Layer      | Technology                                                                |
+| ---------- | ------------------------------------------------------------------------- |
+| Framework  | Next.js 16 (App Router, Server Components)                                |
+| UI         | React 19 + MUI v7 — dark theme throughout, no Tailwind                    |
+| Language   | TypeScript 5.9                                                            |
+| ORM        | Prisma 6 (`relationLoadStrategy: 'join'`)                                 |
+| Database   | PostgreSQL (local dev + Vercel Postgres / Neon in production)             |
+| Validation | Zod 4                                                                     |
+| Auth       | NextAuth v5 (JWT strategy, Google + GitHub OAuth + demo login)            |
+| i18n       | next-intl, 18 locales, AI-powered translation pipeline                    |
+| Testing    | Jest 30 + React Testing Library                                           |
+| CI/CD      | GitHub Actions (lint, format, test, build on every push) + auto-fix agent |
+| Linting    | ESLint 9 (flat config)                                                    |
+| Formatting | Prettier 3 (`printWidth: 100`, double quotes, trailing commas)            |
+| Deployment | Vercel with Vercel Postgres (Neon serverless PostgreSQL)                  |
 
 ## Architecture
 
@@ -49,6 +49,13 @@ This is a **portfolio / showcase project**. The goal is to demonstrate technical
 - **Entity existence checks** — server actions verify that referenced entities (persons, teams, departments) exist inside the transaction before FK assignments to prevent dangling references.
 - **JWT permission freshness** — `auth.ts` uses a `permissionsVersion` column on User to detect stale JWT permissions efficiently. Only performs a full permission re-fetch when the version changes, avoiding unnecessary DB load.
 - **Transaction nesting** — never nest `$transaction` calls. In `seedMockData`, separate transactions run sequentially (main data → cleanup → `seedPermissions()` → user creation) to avoid deadlock.
+
+## Autonomous agents
+
+Two autonomous agents run in CI/CD:
+
+- **CI auto-fix agent** (`.github/workflows/autofix.yml`) — triggers on CI failure on `main` via `workflow_run`. Uses `anthropics/claude-code-action` to download failure logs, analyze errors, and create a fix PR. Restricted tool access (`Edit`, `Write`, `Read`, `Glob`, `Grep`, `Bash(git:*)`, `Bash(npm:*)`, `Bash(npx:*)`). Prevents infinite loops by skipping `autofix/` branches. Requires `ANTHROPIC_API_KEY` GitHub secret.
+- **i18n translation agent** (`scripts/i18n-sync.ts`) — audits 17 locale files against `en.json`, translates missing keys via Claude API. Run manually via `npm run i18n:translate` or via parallel Claude Code subagents during development.
 
 ## File structure
 
@@ -86,6 +93,10 @@ scripts/
 └── i18n-sync.ts      # i18n audit and translation pipeline
 docs/
 └── architecture.md   # Mermaid diagrams (data model, request flow, RBAC, auth)
+.github/
+└── workflows/
+    ├── ci.yml            # CI pipeline (lint, format, test, build)
+    └── autofix.yml       # Auto-fix agent (triggers on CI failure)
 Dockerfile            # Multi-stage build (deps → build → production)
 docker-compose.yml    # PostgreSQL 17 + app with health checks
 .dockerignore         # Excludes node_modules, .next, .git, etc.
