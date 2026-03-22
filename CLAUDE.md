@@ -73,6 +73,8 @@ prisma/
 └── schema.prisma     # Data model (PostgreSQL)
 scripts/
 └── i18n-sync.ts      # i18n audit and translation pipeline
+docs/
+└── architecture.md   # Mermaid diagrams (data model, request flow, RBAC, auth)
 Dockerfile            # Multi-stage build (deps → build → production)
 docker-compose.yml    # PostgreSQL 17 + app with health checks
 .dockerignore         # Excludes node_modules, .next, .git, etc.

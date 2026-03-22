@@ -57,10 +57,20 @@ A production-grade HR management system with granular RBAC, audit logging, AI-po
 
 ## Architecture
 
-```
-Server Components (data fetching) → Client Components (rendering, UI state)
-Server Actions ($transaction)     → Prisma → PostgreSQL
-                                  → logAudit() (same transaction)
+> Full diagrams (data model, request flow, RBAC resolution, server action lifecycle, auth flow) in [`docs/architecture.md`](docs/architecture.md).
+
+```mermaid
+graph LR
+    Browser -->|HTTP| Next["Next.js App Router"]
+    Next -->|Server Component| SC["Page (async)"]
+    SC -->|read| Q["queries.ts"]
+    SC -->|props| CC["Client Component"]
+    CC -->|action=| SA["serverActions.ts"]
+    SA -->|$transaction| Prisma
+    SA -->|logAudit| Audit["auditLog.ts"]
+    Audit -->|same tx| Prisma
+    Q --> Prisma
+    Prisma --> PG[(PostgreSQL)]
 ```
 
 - **Reads** in `queries.ts` — Zod-validated, no `"use server"`
