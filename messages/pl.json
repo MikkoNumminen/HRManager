@@ -247,12 +247,12 @@
     "renamedTeam": "Zmieniono nazwę zespołu z \"{oldValue}\" na \"{newValue}\"",
     "permChangeName": "zmieniać imiona osób",
     "permRenameTeams": "zmieniać nazwy zespołów",
-    "actionPermissionDenied": "Permission Denied",
-    "actionRateLimited": "Rate Limited",
-    "typeAuth": "Auth",
-    "typeSecurity": "Security",
-    "permissionDenied": "Permission denied: {key}",
-    "rateLimited": "Rate limit exceeded for action: {action}"
+    "actionPermissionDenied": "Odmowa dostępu",
+    "actionRateLimited": "Limit przekroczony",
+    "typeAuth": "Uwierzytelnianie",
+    "typeSecurity": "Bezpieczeństwo",
+    "permissionDenied": "Odmowa dostępu: {key}",
+    "rateLimited": "Przekroczono limit żądań dla akcji: {action}"
   },
   "notifications": {
     "personCreated": "Osoba utworzona pomyślnie",

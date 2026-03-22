@@ -247,12 +247,12 @@
     "renamedTeam": "Team umbenannt von \"{oldValue}\" zu \"{newValue}\"",
     "permChangeName": "Namen von Personen ändern",
     "permRenameTeams": "Teams umbenennen",
-    "actionPermissionDenied": "Permission Denied",
-    "actionRateLimited": "Rate Limited",
-    "typeAuth": "Auth",
-    "typeSecurity": "Security",
-    "permissionDenied": "Permission denied: {key}",
-    "rateLimited": "Rate limit exceeded for action: {action}"
+    "actionPermissionDenied": "Zugriff verweigert",
+    "actionRateLimited": "Ratenbegrenzung",
+    "typeAuth": "Authentifizierung",
+    "typeSecurity": "Sicherheit",
+    "permissionDenied": "Zugriff verweigert: {key}",
+    "rateLimited": "Ratenbegrenzung überschritten für Aktion: {action}"
   },
   "notifications": {
     "personCreated": "Person erfolgreich erstellt",

@@ -247,12 +247,12 @@
     "renamedTeam": "团队从\"{oldValue}\"重命名为\"{newValue}\"",
     "permChangeName": "更改人员姓名",
     "permRenameTeams": "重命名团队",
-    "actionPermissionDenied": "Permission Denied",
-    "actionRateLimited": "Rate Limited",
-    "typeAuth": "Auth",
-    "typeSecurity": "Security",
-    "permissionDenied": "Permission denied: {key}",
-    "rateLimited": "Rate limit exceeded for action: {action}"
+    "actionPermissionDenied": "权限被拒绝",
+    "actionRateLimited": "速率限制",
+    "typeAuth": "认证",
+    "typeSecurity": "安全",
+    "permissionDenied": "权限被拒绝: {key}",
+    "rateLimited": "操作超出速率限制: {action}"
   },
   "notifications": {
     "personCreated": "人员创建成功",

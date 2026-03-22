@@ -247,12 +247,12 @@
     "renamedTeam": "Перейменовано команду з \"{oldValue}\" на \"{newValue}\"",
     "permChangeName": "змінювати імена співробітників",
     "permRenameTeams": "перейменовувати команди",
-    "actionPermissionDenied": "Permission Denied",
-    "actionRateLimited": "Rate Limited",
-    "typeAuth": "Auth",
-    "typeSecurity": "Security",
-    "permissionDenied": "Permission denied: {key}",
-    "rateLimited": "Rate limit exceeded for action: {action}"
+    "actionPermissionDenied": "Доступ заборонено",
+    "actionRateLimited": "Ліміт перевищено",
+    "typeAuth": "Автентифікація",
+    "typeSecurity": "Безпека",
+    "permissionDenied": "Доступ заборонено: {key}",
+    "rateLimited": "Перевищено ліміт запитів для дії: {action}"
   },
   "notifications": {
     "personCreated": "Особу успішно створено",

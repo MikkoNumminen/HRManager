@@ -247,12 +247,12 @@
     "renamedTeam": "टीम का नाम \"{oldValue}\" से \"{newValue}\" में बदला गया",
     "permChangeName": "व्यक्तियों के नाम बदलना",
     "permRenameTeams": "टीमों के नाम बदलना",
-    "actionPermissionDenied": "Permission Denied",
-    "actionRateLimited": "Rate Limited",
-    "typeAuth": "Auth",
-    "typeSecurity": "Security",
-    "permissionDenied": "Permission denied: {key}",
-    "rateLimited": "Rate limit exceeded for action: {action}"
+    "actionPermissionDenied": "अनुमति अस्वीकृत",
+    "actionRateLimited": "दर सीमा पार",
+    "typeAuth": "प्रमाणीकरण",
+    "typeSecurity": "सुरक्षा",
+    "permissionDenied": "अनुमति अस्वीकृत: {key}",
+    "rateLimited": "कार्रवाई के लिए दर सीमा पार: {action}"
   },
   "notifications": {
     "personCreated": "व्यक्ति सफलतापूर्वक बनाया गया",

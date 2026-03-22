@@ -247,12 +247,12 @@
     "renamedTeam": "Bytte namn på team från \"{oldValue}\" till \"{newValue}\"",
     "permChangeName": "ändra personers namn",
     "permRenameTeams": "byta namn på team",
-    "actionPermissionDenied": "Permission Denied",
-    "actionRateLimited": "Rate Limited",
-    "typeAuth": "Auth",
-    "typeSecurity": "Security",
-    "permissionDenied": "Permission denied: {key}",
-    "rateLimited": "Rate limit exceeded for action: {action}"
+    "actionPermissionDenied": "Åtkomst nekad",
+    "actionRateLimited": "Hastighetsbegränsad",
+    "typeAuth": "Autentisering",
+    "typeSecurity": "Säkerhet",
+    "permissionDenied": "Åtkomst nekad: {key}",
+    "rateLimited": "Hastighetsgräns överskriden för åtgärd: {action}"
   },
   "notifications": {
     "personCreated": "Person skapad",

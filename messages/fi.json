@@ -247,12 +247,12 @@
     "renamedTeam": "Tiimi nimetty uudelleen: \"{oldValue}\" → \"{newValue}\"",
     "permChangeName": "vaihtaa henkilöiden nimiä",
     "permRenameTeams": "nimetä tiimejä uudelleen",
-    "actionPermissionDenied": "Permission Denied",
-    "actionRateLimited": "Rate Limited",
-    "typeAuth": "Auth",
-    "typeSecurity": "Security",
-    "permissionDenied": "Permission denied: {key}",
-    "rateLimited": "Rate limit exceeded for action: {action}"
+    "actionPermissionDenied": "Käyttö estetty",
+    "actionRateLimited": "Pyyntöraja ylitetty",
+    "typeAuth": "Todennus",
+    "typeSecurity": "Turvallisuus",
+    "permissionDenied": "Käyttö estetty: {key}",
+    "rateLimited": "Pyyntöraja ylitetty toiminnolle: {action}"
   },
   "notifications": {
     "personCreated": "Henkilö luotu onnistuneesti",

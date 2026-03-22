@@ -247,12 +247,12 @@
     "renamedTeam": "Timu imebadilishwa jina kutoka \"{oldValue}\" hadi \"{newValue}\"",
     "permChangeName": "kubadilisha majina ya watu",
     "permRenameTeams": "kubadilisha majina ya timu",
-    "actionPermissionDenied": "Permission Denied",
-    "actionRateLimited": "Rate Limited",
-    "typeAuth": "Auth",
-    "typeSecurity": "Security",
-    "permissionDenied": "Permission denied: {key}",
-    "rateLimited": "Rate limit exceeded for action: {action}"
+    "actionPermissionDenied": "Ruhusa Imekataliwa",
+    "actionRateLimited": "Kikomo Kimezidi",
+    "typeAuth": "Uthibitishaji",
+    "typeSecurity": "Usalama",
+    "permissionDenied": "Ruhusa imekataliwa: {key}",
+    "rateLimited": "Kikomo cha maombi kimezidishwa kwa kitendo: {action}"
   },
   "notifications": {
     "personCreated": "Mtu ameundwa kwa mafanikio",

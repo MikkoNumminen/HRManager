@@ -247,12 +247,12 @@
     "renamedTeam": "팀 이름을 \"{oldValue}\"에서 \"{newValue}\"(으)로 변경했습니다",
     "permChangeName": "인원 이름 변경",
     "permRenameTeams": "팀 이름 변경",
-    "actionPermissionDenied": "Permission Denied",
-    "actionRateLimited": "Rate Limited",
-    "typeAuth": "Auth",
-    "typeSecurity": "Security",
-    "permissionDenied": "Permission denied: {key}",
-    "rateLimited": "Rate limit exceeded for action: {action}"
+    "actionPermissionDenied": "권한 거부",
+    "actionRateLimited": "속도 제한",
+    "typeAuth": "인증",
+    "typeSecurity": "보안",
+    "permissionDenied": "권한이 거부되었습니다: {key}",
+    "rateLimited": "작업에 대한 속도 제한 초과: {action}"
   },
   "notifications": {
     "personCreated": "직원이 생성되었습니다",

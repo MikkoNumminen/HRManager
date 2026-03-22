@@ -247,12 +247,12 @@
     "renamedTeam": "تمت إعادة تسمية الفريق من \"{oldValue}\" إلى \"{newValue}\"",
     "permChangeName": "تغيير أسماء الأشخاص",
     "permRenameTeams": "إعادة تسمية الفرق",
-    "actionPermissionDenied": "Permission Denied",
-    "actionRateLimited": "Rate Limited",
-    "typeAuth": "Auth",
-    "typeSecurity": "Security",
-    "permissionDenied": "Permission denied: {key}",
-    "rateLimited": "Rate limit exceeded for action: {action}"
+    "actionPermissionDenied": "رفض الإذن",
+    "actionRateLimited": "تم تجاوز الحد",
+    "typeAuth": "المصادقة",
+    "typeSecurity": "الأمان",
+    "permissionDenied": "تم رفض الإذن: {key}",
+    "rateLimited": "تم تجاوز حد الطلبات للإجراء: {action}"
   },
   "notifications": {
     "personCreated": "تم إنشاء الشخص بنجاح",

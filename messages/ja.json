@@ -247,12 +247,12 @@
     "renamedTeam": "チーム名を「{oldValue}」から「{newValue}」に変更しました",
     "permChangeName": "人員の名前変更",
     "permRenameTeams": "チーム名の変更",
-    "actionPermissionDenied": "Permission Denied",
-    "actionRateLimited": "Rate Limited",
-    "typeAuth": "Auth",
-    "typeSecurity": "Security",
-    "permissionDenied": "Permission denied: {key}",
-    "rateLimited": "Rate limit exceeded for action: {action}"
+    "actionPermissionDenied": "権限拒否",
+    "actionRateLimited": "レート制限",
+    "typeAuth": "認証",
+    "typeSecurity": "セキュリティ",
+    "permissionDenied": "権限が拒否されました: {key}",
+    "rateLimited": "アクションのレート制限を超えました: {action}"
   },
   "notifications": {
     "personCreated": "担当者を作成しました",

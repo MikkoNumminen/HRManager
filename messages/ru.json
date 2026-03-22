@@ -247,12 +247,12 @@
     "renamedTeam": "Команда переименована с «{oldValue}» на «{newValue}»",
     "permChangeName": "изменять имена сотрудников",
     "permRenameTeams": "переименовывать команды",
-    "actionPermissionDenied": "Permission Denied",
-    "actionRateLimited": "Rate Limited",
-    "typeAuth": "Auth",
-    "typeSecurity": "Security",
-    "permissionDenied": "Permission denied: {key}",
-    "rateLimited": "Rate limit exceeded for action: {action}"
+    "actionPermissionDenied": "Доступ запрещён",
+    "actionRateLimited": "Превышен лимит",
+    "typeAuth": "Аутентификация",
+    "typeSecurity": "Безопасность",
+    "permissionDenied": "Доступ запрещён: {key}",
+    "rateLimited": "Превышен лимит запросов для действия: {action}"
   },
   "notifications": {
     "personCreated": "Сотрудник успешно создан",

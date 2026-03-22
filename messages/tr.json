@@ -247,12 +247,12 @@
     "renamedTeam": "Ekip \"{oldValue}\" yerine \"{newValue}\" olarak yeniden adlandırıldı",
     "permChangeName": "kişilerin adlarını değiştirmek",
     "permRenameTeams": "ekipleri yeniden adlandırmak",
-    "actionPermissionDenied": "Permission Denied",
-    "actionRateLimited": "Rate Limited",
-    "typeAuth": "Auth",
-    "typeSecurity": "Security",
-    "permissionDenied": "Permission denied: {key}",
-    "rateLimited": "Rate limit exceeded for action: {action}"
+    "actionPermissionDenied": "İzin reddedildi",
+    "actionRateLimited": "Hız sınırı aşıldı",
+    "typeAuth": "Kimlik doğrulama",
+    "typeSecurity": "Güvenlik",
+    "permissionDenied": "İzin reddedildi: {key}",
+    "rateLimited": "İşlem için hız sınırı aşıldı: {action}"
   },
   "notifications": {
     "personCreated": "Kişi başarıyla oluşturuldu",

@@ -247,12 +247,12 @@
     "renamedTeam": "เปลี่ยนชื่อทีมจาก \"{oldValue}\" เป็น \"{newValue}\"",
     "permChangeName": "เปลี่ยนชื่อบุคลากร",
     "permRenameTeams": "เปลี่ยนชื่อทีม",
-    "actionPermissionDenied": "Permission Denied",
-    "actionRateLimited": "Rate Limited",
-    "typeAuth": "Auth",
-    "typeSecurity": "Security",
-    "permissionDenied": "Permission denied: {key}",
-    "rateLimited": "Rate limit exceeded for action: {action}"
+    "actionPermissionDenied": "ไม่มีสิทธิ์",
+    "actionRateLimited": "เกินขีดจำกัด",
+    "typeAuth": "การยืนยันตัวตน",
+    "typeSecurity": "ความปลอดภัย",
+    "permissionDenied": "ไม่มีสิทธิ์: {key}",
+    "rateLimited": "เกินขีดจำกัดคำขอสำหรับการดำเนินการ: {action}"
   },
   "notifications": {
     "personCreated": "สร้างบุคคลสำเร็จ",
