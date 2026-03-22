@@ -36,7 +36,7 @@ npm-debug.log*
 .npm
 *.tgz
 
-# Local database (legacy SQLite files)
+# Legacy SQLite files (project migrated to PostgreSQL)
 prisma/dev.db
 prisma/dev.db-journal
 prisma/**/test.db

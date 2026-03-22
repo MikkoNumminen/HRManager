@@ -17,7 +17,7 @@ This is a **portfolio / showcase project**. The goal is to demonstrate technical
 | UI         | React 19 + MUI v7 — dark theme throughout, no Tailwind         |
 | Language   | TypeScript 5.9                                                 |
 | ORM        | Prisma 6 (`relationLoadStrategy: 'join'`)                      |
-| Database   | PostgreSQL (local dev + Vercel Postgres in production)         |
+| Database   | PostgreSQL (local dev + Vercel Postgres / Neon in production)  |
 | Validation | Zod 4                                                          |
 | Auth       | NextAuth v5 (JWT strategy, Google + GitHub OAuth)              |
 | Testing    | Jest 30 + React Testing Library                                |
