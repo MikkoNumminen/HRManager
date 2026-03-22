@@ -11,6 +11,7 @@ A production-grade HR management system with granular RBAC, audit logging, AI-po
 ![Zod](https://img.shields.io/badge/Zod-4-3E67B1?style=flat-square&logo=zod)
 ![Jest](https://img.shields.io/badge/Tested_with-Jest_30-C21325?style=flat-square&logo=jest)
 ![Prettier](https://img.shields.io/badge/Formatted_with-Prettier-F7B93E?style=flat-square&logo=prettier)
+![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=flat-square&logo=docker)
 
 ### **[Try the live demo](https://hr-manager-pearl.vercel.app)** — click "Try Demo" to sign in instantly, no account required.
 
@@ -34,6 +35,7 @@ A production-grade HR management system with granular RBAC, audit logging, AI-po
 - **Snackbar notifications** — global success/error toasts via React context + MUI Snackbar; consistent feedback across all 15 form actions
 - **Accessibility (WCAG)** — semantic landmarks, skip-to-content link, ARIA labels on dialogs and controls, `role="alert"` on all error messages, keyboard-navigable table rows, `scope="col"` on all table headers
 - **6 visual themes** — CSS custom properties with FOUC-preventing inline script; instant switching without re-render
+- **Docker-ready** — `docker compose up` for a fully working local environment with PostgreSQL, auto-migration, and demo login
 
 ---
 
@@ -121,6 +123,16 @@ npm run i18n:translate  # auto-translate via Claude Haiku API (requires ANTHROPI
 ---
 
 ## Getting started
+
+### Docker (recommended)
+
+```bash
+docker compose up             # starts PostgreSQL + app at localhost:3000
+```
+
+That's it. The container runs migrations automatically and the demo login works out of the box — no OAuth setup required. To add Google/GitHub OAuth, create a `.env` file with your credentials (see below).
+
+### Manual setup
 
 ```bash
 npm install                   # install dependencies

@@ -25,7 +25,7 @@ This is a **portfolio / showcase project**. The goal is to demonstrate technical
 | CI/CD      | GitHub Actions (lint, format, test, build on every push)       |
 | Linting    | ESLint 9 (flat config)                                         |
 | Formatting | Prettier 3 (`printWidth: 100`, double quotes, trailing commas) |
-| Deployment | Vercel with Vercel Postgres (Neon serverless PostgreSQL)        |
+| Deployment | Vercel with Vercel Postgres (Neon serverless PostgreSQL)       |
 
 ## Architecture
 
@@ -73,6 +73,9 @@ prisma/
 └── schema.prisma     # Data model (PostgreSQL)
 scripts/
 └── i18n-sync.ts      # i18n audit and translation pipeline
+Dockerfile            # Multi-stage build (deps → build → production)
+docker-compose.yml    # PostgreSQL 17 + app with health checks
+.dockerignore         # Excludes node_modules, .next, .git, etc.
 ```
 
 ## Data model
@@ -112,6 +115,10 @@ scripts/
 - Always add a comment above each test explaining what it does in plain, simple language ("Barney style").
 - **Every new schema, component, or module must have corresponding tests.** Never leave new code untested — if you add it, you test it.
 - **Always aim for 100% coverage.** The project currently has 100% line and function coverage — maintain this. Add tests for every branch, edge case, error fallback, and interaction. If a new line or function is added, it must be covered. This is a portfolio project; comprehensive test coverage is a strength, not over-engineering.
+
+## Docker
+
+`docker compose up` starts PostgreSQL 17 + the app at `localhost:3000`. The container runs `prisma migrate deploy` on startup. `next.config.mjs` uses `output: "standalone"` for optimized Docker images. The Dockerfile is a multi-stage build: deps → build → production (node:22-alpine). OAuth credentials are optional — the demo login works without them.
 
 ## Deployment
 
