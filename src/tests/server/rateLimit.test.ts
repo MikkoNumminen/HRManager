@@ -162,6 +162,17 @@ test("RateLimitError has correct name and message", () => {
   expect(error).toBeInstanceOf(Error);
 });
 
+// Uses user-based identifier when auth() returns a session with user.id
+test("uses user-based identifier for authenticated users", async () => {
+  const { auth } = require("@/auth");
+  auth.mockReturnValueOnce({ user: { id: "user-abc-123" } });
+
+  await rateLimit("testAction");
+
+  const record = await testPrisma.rateLimit.findFirst();
+  expect(record?.identifier).toBe("user:user-abc-123");
+});
+
 // cleanupExpiredRateLimits removes old records and returns the count
 test("cleanupExpiredRateLimits removes expired records", async () => {
   // Create an expired record (2 minutes ago)

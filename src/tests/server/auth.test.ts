@@ -195,6 +195,53 @@ describe("auth.ts callbacks", () => {
       expect(cleared.permissions).toBeUndefined();
     });
 
+    // Does a full refresh when permissionsVersion changes in the database.
+    test("refreshes permissions when permissionsVersion changes", async () => {
+      const user = await testPrisma.user.create({
+        data: { email: "refresh@example.com", name: "Refresh", role: "user" },
+      });
+      // Simulate a token with an outdated permissionsVersion
+      const token = {
+        email: "refresh@example.com",
+        userId: user.id,
+        role: "user",
+        permissions: { "person:read": false },
+        permissionsVersion: user.permissionsVersion,
+      };
+      // Bump permissionsVersion in the DB to simulate a permission change
+      await testPrisma.user.update({
+        where: { id: user.id },
+        data: { permissionsVersion: { increment: 1 } },
+      });
+      const result = await callbacks.jwt({ token, trigger: undefined });
+      // Should have re-fetched permissions — the old override should be replaced
+      expect(result.permissionsVersion).toBe(user.permissionsVersion + 1);
+      expect(result.permissions).toBeDefined();
+      expect(typeof result.permissions).toBe("object");
+    });
+
+    // Does a full refresh when role changes in the database.
+    test("refreshes permissions when role changes in database", async () => {
+      const user = await testPrisma.user.create({
+        data: { email: "rolechange@example.com", name: "RoleChange", role: "user" },
+      });
+      const token = {
+        email: "rolechange@example.com",
+        userId: user.id,
+        role: "user",
+        permissions: {},
+        permissionsVersion: user.permissionsVersion,
+      };
+      // Change role in DB
+      await testPrisma.user.update({
+        where: { id: user.id },
+        data: { role: "administrator" },
+      });
+      const result = await callbacks.jwt({ token, trigger: undefined });
+      expect(result.role).toBe("administrator");
+      expect(result.permissions).toBeDefined();
+    });
+
     // Includes permission overrides when user has custom permissions.
     test("includes permission overrides in resolved permissions", async () => {
       const user = await testPrisma.user.create({

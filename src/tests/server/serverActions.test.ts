@@ -487,6 +487,12 @@ describe("createTeam", () => {
   test("throws on whitespace-only name", async () => {
     await expect(createTeam(formData({ name: "   " }))).rejects.toThrow("Invalid Name");
   });
+
+  // Team names have a length limit to prevent abuse.
+  test("throws when team name exceeds max length", async () => {
+    const longName = "A".repeat(256);
+    await expect(createTeam(formData({ name: longName }))).rejects.toThrow("characters or less");
+  });
 });
 
 describe("updateTeamName", () => {
@@ -530,6 +536,22 @@ describe("updateTeamName", () => {
     await expect(updateTeamName(formData({ teamID: team.teamId, name: "" }))).rejects.toThrow(
       "New team name is missing",
     );
+  });
+
+  // Team names have a length limit.
+  test("throws when new name exceeds max length", async () => {
+    const team = await testPrisma.team.create({ data: { teamName: "Eng" } });
+    const longName = "A".repeat(256);
+    await expect(updateTeamName(formData({ teamID: team.teamId, name: longName }))).rejects.toThrow(
+      "characters or less",
+    );
+  });
+
+  // Can't rename a team that doesn't exist.
+  test("throws when team does not exist", async () => {
+    await expect(
+      updateTeamName(formData({ teamID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", name: "New" })),
+    ).rejects.toThrow("Team not found");
   });
 });
 
@@ -668,6 +690,32 @@ describe("addManager", () => {
     await expect(addManager(formData({ teamID: "bad", personID: "bad" }))).rejects.toThrow(
       "Invalid",
     );
+  });
+
+  // Can't assign a manager that doesn't exist in the person table.
+  test("throws when person does not exist", async () => {
+    const team = await testPrisma.team.create({ data: { teamName: "Team A" } });
+    await expect(
+      addManager(
+        formData({
+          teamID: team.teamId,
+          personID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+        }),
+      ),
+    ).rejects.toThrow("Person not found");
+  });
+
+  // Can't assign a manager to a team that doesn't exist.
+  test("throws when team does not exist", async () => {
+    const person = await testPrisma.person.create({ data: { name: "Alice" } });
+    await expect(
+      addManager(
+        formData({
+          teamID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+          personID: person.id,
+        }),
+      ),
+    ).rejects.toThrow("Team not found");
   });
 });
 
@@ -1301,6 +1349,22 @@ describe("createDepartment", () => {
   test("throws on missing name", async () => {
     await expect(createDepartment(formData({}))).rejects.toThrow("Invalid Name");
   });
+
+  // Department names have a length limit.
+  test("throws when name exceeds max length", async () => {
+    const longName = "A".repeat(256);
+    await expect(createDepartment(formData({ name: longName }))).rejects.toThrow(
+      "characters or less",
+    );
+  });
+
+  // Department descriptions have a length limit.
+  test("throws when description exceeds max length", async () => {
+    const longDesc = "A".repeat(1001);
+    await expect(
+      createDepartment(formData({ name: "Eng", description: longDesc })),
+    ).rejects.toThrow("characters or less");
+  });
 });
 
 describe("removeDepartment", () => {
@@ -1369,6 +1433,33 @@ describe("updateDepartment", () => {
       "No departmentID provided",
     );
   });
+
+  // Department names have a length limit.
+  test("throws when name exceeds max length", async () => {
+    const dept = await testPrisma.department.create({ data: { name: "Eng" } });
+    const longName = "A".repeat(256);
+    await expect(
+      updateDepartment(formData({ departmentID: dept.id, name: longName })),
+    ).rejects.toThrow("characters or less");
+  });
+
+  // Department descriptions have a length limit.
+  test("throws when description exceeds max length", async () => {
+    const dept = await testPrisma.department.create({ data: { name: "Eng" } });
+    const longDesc = "A".repeat(1001);
+    await expect(
+      updateDepartment(formData({ departmentID: dept.id, name: "Eng", description: longDesc })),
+    ).rejects.toThrow("characters or less");
+  });
+
+  // Can't update a department that doesn't exist.
+  test("throws when department does not exist", async () => {
+    await expect(
+      updateDepartment(
+        formData({ departmentID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", name: "New" }),
+      ),
+    ).rejects.toThrow("Department not found");
+  });
 });
 
 describe("updateDepartmentHead", () => {
@@ -1405,6 +1496,32 @@ describe("updateDepartmentHead", () => {
   test("throws on missing departmentID", async () => {
     await expect(updateDepartmentHead(formData({}))).rejects.toThrow("No departmentID provided");
   });
+
+  // Can't set a non-existent person as department head.
+  test("throws when person does not exist", async () => {
+    const dept = await testPrisma.department.create({ data: { name: "Eng" } });
+    await expect(
+      updateDepartmentHead(
+        formData({
+          departmentID: dept.id,
+          personID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+        }),
+      ),
+    ).rejects.toThrow("Person not found");
+  });
+
+  // Can't update head of a department that doesn't exist.
+  test("throws when department does not exist", async () => {
+    const person = await testPrisma.person.create({ data: { name: "Alice" } });
+    await expect(
+      updateDepartmentHead(
+        formData({
+          departmentID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+          personID: person.id,
+        }),
+      ),
+    ).rejects.toThrow("Department not found");
+  });
 });
 
 describe("assignTeamToDepartment", () => {
@@ -1437,6 +1554,32 @@ describe("assignTeamToDepartment", () => {
       assignTeamToDepartment(formData({ departmentID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" })),
     ).rejects.toThrow("No teamID provided");
   });
+
+  // Can't assign a team to a department that doesn't exist.
+  test("throws when department does not exist", async () => {
+    const team = await testPrisma.team.create({ data: { teamName: "Platform" } });
+    await expect(
+      assignTeamToDepartment(
+        formData({
+          departmentID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+          teamID: team.teamId,
+        }),
+      ),
+    ).rejects.toThrow("Department not found");
+  });
+
+  // Can't assign a non-existent team to a department.
+  test("throws when team does not exist", async () => {
+    const dept = await testPrisma.department.create({ data: { name: "Eng" } });
+    await expect(
+      assignTeamToDepartment(
+        formData({
+          departmentID: dept.id,
+          teamID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+        }),
+      ),
+    ).rejects.toThrow("Team not found");
+  });
 });
 
 describe("removeTeamFromDepartment", () => {
@@ -1461,6 +1604,13 @@ describe("removeTeamFromDepartment", () => {
   // Throws when teamID is missing.
   test("throws on missing teamID", async () => {
     await expect(removeTeamFromDepartment(formData({}))).rejects.toThrow("No teamID provided");
+  });
+
+  // Can't remove a team that doesn't exist from a department.
+  test("throws when team does not exist", async () => {
+    await expect(
+      removeTeamFromDepartment(formData({ teamID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" })),
+    ).rejects.toThrow("Team not found");
   });
 });
 
