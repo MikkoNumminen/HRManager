@@ -23,6 +23,12 @@ jest.mock("@/db", () => ({
   prisma: require("./testDb").testPrisma,
 }));
 
+// Mock demo session helpers — authorize() calls these but we test them separately
+jest.mock("@/demoSession", () => ({
+  seedDemoData: jest.fn(() => Promise.resolve()),
+  cleanupStaleDemoSessions: jest.fn(() => Promise.resolve(0)),
+}));
+
 // Import auth.ts to trigger NextAuth() and capture the config
 import "@/auth";
 
@@ -311,6 +317,30 @@ describe("auth.ts callbacks", () => {
     });
   });
 
+  describe("jwt callback — demoSessionId", () => {
+    // Persists demoSessionId from user on signIn trigger.
+    test("persists demoSessionId from user on signIn", async () => {
+      await testPrisma.user.create({
+        data: { email: "demo@hrmanager.app", name: "Demo", role: "superuser" },
+      });
+      const token = { email: "demo@hrmanager.app" };
+      const user = { demoSessionId: "demo-sess-123" };
+      const result = await callbacks.jwt({ token, trigger: "signIn", user });
+      expect(result.demoSessionId).toBe("demo-sess-123");
+    });
+
+    // Does not set demoSessionId when user has none (OAuth user).
+    test("does not set demoSessionId for non-demo user", async () => {
+      await testPrisma.user.create({
+        data: { email: "oauth@example.com", name: "OAuth", role: "user" },
+      });
+      const token = { email: "oauth@example.com" };
+      const user = {};
+      const result = await callbacks.jwt({ token, trigger: "signIn", user });
+      expect(result.demoSessionId).toBeUndefined();
+    });
+  });
+
   describe("session callback", () => {
     // Copies userId from token to session.
     test("copies userId from token to session", async () => {
@@ -344,6 +374,22 @@ describe("auth.ts callbacks", () => {
       expect(result.user.id).toBeUndefined();
       expect(result.user.role).toBeUndefined();
       expect(result.user.permissions).toBeUndefined();
+    });
+
+    // Copies demoSessionId from token to session.
+    test("copies demoSessionId from token to session", async () => {
+      const session = { user: {} } as Record<string, Record<string, unknown>>;
+      const token = { userId: "abc", role: "superuser", permissions: {}, demoSessionId: "ds-1" };
+      const result = await callbacks.session({ session, token });
+      expect(result.user.demoSessionId).toBe("ds-1");
+    });
+
+    // Does not set demoSessionId when token has none.
+    test("does not set demoSessionId when token has none", async () => {
+      const session = { user: {} } as Record<string, Record<string, unknown>>;
+      const token = { userId: "abc", role: "user", permissions: {} };
+      const result = await callbacks.session({ session, token });
+      expect(result.user.demoSessionId).toBeUndefined();
     });
   });
 
@@ -391,6 +437,38 @@ describe("auth.ts callbacks", () => {
       expect(result.id).toBeDefined();
       expect(result.email).toBe("demo@hrmanager.app");
       expect(result.name).toBe("Demo User");
+    });
+
+    // Creates a DemoSession row and returns its ID.
+    test("creates a DemoSession and returns demoSessionId", async () => {
+      const result = await credentialsProvider.authorize();
+      expect(result.demoSessionId).toBeDefined();
+
+      const session = await testPrisma.demoSession.findUnique({
+        where: { id: result.demoSessionId },
+      });
+      expect(session).not.toBeNull();
+      expect(session!.userId).toBe(result.id);
+    });
+
+    // Calls seedDemoData with the new session ID.
+    test("calls seedDemoData with the new session ID", async () => {
+      const { seedDemoData } = require("@/demoSession") as { seedDemoData: jest.Mock };
+      seedDemoData.mockClear();
+
+      const result = await credentialsProvider.authorize();
+      expect(seedDemoData).toHaveBeenCalledWith(result.demoSessionId);
+    });
+
+    // Calls cleanupStaleDemoSessions in the background.
+    test("calls cleanupStaleDemoSessions", async () => {
+      const { cleanupStaleDemoSessions } = require("@/demoSession") as {
+        cleanupStaleDemoSessions: jest.Mock;
+      };
+      cleanupStaleDemoSessions.mockClear();
+
+      await credentialsProvider.authorize();
+      expect(cleanupStaleDemoSessions).toHaveBeenCalled();
     });
   });
 });
