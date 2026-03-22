@@ -54,9 +54,9 @@ describe("DashboardKPICards", () => {
 
   // Renders four card containers.
   test("renders four card containers", () => {
-    const { container } = render(<DashboardKPICards {...defaultProps} />);
-    // Each card has an h4 for the value
-    const headings = container.querySelectorAll("h4");
+    render(<DashboardKPICards {...defaultProps} />);
+    // Each KPI card renders its value as a heading
+    const headings = screen.getAllByRole("heading", { level: 4 });
     expect(headings).toHaveLength(4);
   });
 });
