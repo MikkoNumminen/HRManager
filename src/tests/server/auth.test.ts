@@ -242,6 +242,58 @@ describe("auth.ts callbacks", () => {
       expect(result.permissions).toBeDefined();
     });
 
+    // Re-fetches permission overrides when role changes via lightweight path.
+    test("refreshes overrides via lightweight path when role changes", async () => {
+      const user = await testPrisma.user.create({
+        data: { email: "lwrefresh@example.com", name: "LWRefresh", role: "user" },
+      });
+      const perm = await testPrisma.permission.upsert({
+        where: { key: "person:create" },
+        update: {},
+        create: { key: "person:create", description: "Create person" },
+      });
+      await testPrisma.userPermission.create({
+        data: { userId: user.id, permissionId: perm.id, granted: true },
+      });
+      const token = {
+        email: "lwrefresh@example.com",
+        userId: user.id,
+        role: "user",
+        permissions: {},
+        permissionsVersion: user.permissionsVersion,
+      };
+      // Change role in DB to trigger lightweight path mismatch
+      await testPrisma.user.update({
+        where: { id: user.id },
+        data: { role: "administrator" },
+      });
+      const result = await callbacks.jwt({ token, trigger: undefined });
+      expect(result.role).toBe("administrator");
+      // The permission override should be included after the full refresh
+      expect(result.permissions["person:create"]).toBe(true);
+    });
+
+    // Clears token when user is kicked out and detected via lightweight path.
+    test("clears token via lightweight path when user is deleted", async () => {
+      const user = await testPrisma.user.create({
+        data: { email: "lwkick@example.com", name: "LWKick", role: "user" },
+      });
+      const token = {
+        email: "lwkick@example.com",
+        userId: user.id,
+        role: "user",
+        permissions: { "person:read": true },
+        permissionsVersion: user.permissionsVersion,
+      };
+      // Delete the user
+      await testPrisma.user.delete({ where: { id: user.id } });
+      // Lightweight path should detect missing user and clear token
+      const result = await callbacks.jwt({ token, trigger: undefined });
+      expect(result.userId).toBeUndefined();
+      expect(result.role).toBeUndefined();
+      expect(result.permissions).toBeUndefined();
+    });
+
     // Includes permission overrides when user has custom permissions.
     test("includes permission overrides in resolved permissions", async () => {
       const user = await testPrisma.user.create({

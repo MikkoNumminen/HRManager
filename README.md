@@ -1,6 +1,6 @@
 # HRManager
 
-A production-grade HR management system with granular RBAC, audit logging, rate limiting, security headers, AI-powered i18n across 18 languages, and 897 tests (863 unit/integration + 34 E2E) at 99.7% line coverage.
+A production-grade HR management system with granular RBAC, audit logging, rate limiting, security headers, AI-powered i18n across 18 languages, and 899 tests (865 unit/integration + 34 E2E) at 99.7% line coverage.
 
 [![CI](https://github.com/MikkoNumminen/HRManager/actions/workflows/ci.yml/badge.svg)](https://github.com/MikkoNumminen/HRManager/actions/workflows/ci.yml)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)
@@ -27,7 +27,7 @@ A production-grade HR management system with granular RBAC, audit logging, rate 
 
 ## Highlights
 
-- **897 tests (863 unit/integration + 34 E2E), 99.7% line coverage** — Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, rate limiting, audit logging, all 42 UI components tested against real PostgreSQL, plus Playwright E2E covering full user flows
+- **899 tests (865 unit/integration + 34 E2E), 99.7% line coverage** — Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, rate limiting, audit logging, all 42 UI components tested against real PostgreSQL, plus Playwright E2E covering full user flows
 - **Granular RBAC** — 4 roles, 23 permission keys, per-user grant/deny overrides with three-state toggles (deny / role default / grant), and "kick out" user removal with confirmation dialog
 - **Immutable audit trail** — every mutation logged with before/after JSON snapshots inside the same `$transaction` for atomicity
 - **18 languages** — next-intl with cookie persistence, Accept-Language detection, and an AI-powered translation pipeline using parallel Claude Code agents
@@ -106,13 +106,13 @@ Individual permissions can be overridden per-user — e.g. granting `person:crea
 | Zod schemas      | 71      |
 | Prisma queries   | 40      |
 | Server actions   | 137     |
-| Auth callbacks   | 23      |
+| Auth callbacks   | 25      |
 | Audit logging    | 6       |
 | Rate limiting    | 13      |
 | RBAC logic       | 28      |
 | UI components    | 545     |
 | E2E (Playwright) | 34      |
-| **Total**        | **897** |
+| **Total**        | **899** |
 
 ```
 Statements : 99.07%    Branches : 95.65%
