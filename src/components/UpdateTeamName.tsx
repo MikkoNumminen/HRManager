@@ -40,7 +40,11 @@ const UpdateTeamNameForm: React.FC<{ teamID: string; currentName: string }> = ({
   return (
     <Box component="form" action={formAction} sx={formStyles}>
       <Typography variant="h6">{t("renameTeam")}</Typography>
-      {state.error && <Typography color="error">{state.error}</Typography>}
+      {state.error && (
+        <Typography color="error" role="alert">
+          {state.error}
+        </Typography>
+      )}
       <input type="hidden" name="teamID" value={teamID} />
       <Tooltip title={tc("required")} placement="right" arrow>
         <TextField

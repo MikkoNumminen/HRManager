@@ -40,7 +40,11 @@ const UpdatePersonNameForm: React.FC<{ personID: string; currentName: string }> 
   return (
     <Box component="form" action={formAction} sx={formStyles}>
       <Typography variant="h6">{t("changeName")}</Typography>
-      {state.error && <Typography color="error">{state.error}</Typography>}
+      {state.error && (
+        <Typography color="error" role="alert">
+          {state.error}
+        </Typography>
+      )}
       <input type="hidden" name="personID" value={personID} />
       <Tooltip title={tc("required")} placement="right" arrow>
         <TextField

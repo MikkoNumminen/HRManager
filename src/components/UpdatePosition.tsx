@@ -49,7 +49,7 @@ const UpdatePositionForm: React.FC<{ personID: string; currentPosition?: string 
       <Tooltip title={tc("required")} placement="right" arrow>
         <TextField
           label={t("enterNewPosition")}
-          name="name"
+          name="position"
           size="small"
           value={newPosition}
           onChange={(e) => setNewPosition(e.target.value)}

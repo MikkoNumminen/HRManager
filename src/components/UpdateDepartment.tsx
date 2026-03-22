@@ -40,7 +40,11 @@ const UpdateDepartmentForm: React.FC<{
   return (
     <Box component="form" action={formAction} sx={formStyles}>
       <Typography variant="h6">{t("editDepartment")}</Typography>
-      {state.error && <Typography color="error">{state.error}</Typography>}
+      {state.error && (
+        <Typography color="error" role="alert">
+          {state.error}
+        </Typography>
+      )}
       <input type="hidden" name="departmentID" value={departmentID} />
       <Tooltip title={tc("required")} placement="right" arrow>
         <TextField

@@ -51,7 +51,7 @@ const UpdateEmailForm: React.FC<{ personID: string; currentEmail?: string }> = (
       <Tooltip title={tc("requiredEmail")} placement="right" arrow>
         <TextField
           label={t("enterNewEmail")}
-          name="name"
+          name="email"
           type="email"
           size="small"
           value={newEmail}
