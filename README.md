@@ -45,7 +45,7 @@ A production-grade HR management system with granular RBAC, audit logging, AI-po
 | UI         | React 19 + MUI v7                                     |
 | Language   | TypeScript 5.9                                        |
 | ORM        | Prisma 6 (`relationLoadStrategy: 'join'`)             |
-| Database   | PostgreSQL (Vercel Postgres in production)            |
+| Database   | PostgreSQL (Vercel Postgres / Neon in production)     |
 | Validation | Zod 4                                                 |
 | Auth       | NextAuth v5 (JWT, Google + GitHub OAuth + demo login) |
 | Testing    | Jest 30 + React Testing Library                       |
@@ -99,11 +99,11 @@ Individual permissions can be overridden per-user — e.g. granting `person:crea
 | **Total**      | **806** |
 
 ```
-Statements : 99.09%    Branches : 95.64%
-Functions  : 99.68%    Lines    : 99.73%
+Statements : 99.08%    Branches : 95.57%
+Functions  : 99.70%    Lines    : 99.76%
 ```
 
-Server-side tests run against a real PostgreSQL test database. Client-side tests cover all 39 components including permission toggles, audit log filtering, tutorial system, snackbar notifications, theme switching, and language selection.
+Server-side tests run against a real PostgreSQL test database. Client-side tests cover all 42 components including permission toggles, audit log filtering, tutorial system, snackbar notifications, theme switching, and language selection.
 
 ---
 

@@ -2,7 +2,7 @@
 
 ## Project overview
 
-A full-stack HR management system for managing employees and teams.
+A full-stack HR management system for managing employees, teams, and departments.
 Built with Next.js 16 (App Router), React 19, MUI v7, Prisma 6, Zod 4, TypeScript 5.9, Jest 30.
 
 This is a **portfolio / showcase project**. The goal is to demonstrate technical depth and breadth, not to ship the leanest possible product. Features are intentionally built to production-grade complexity (e.g. granular per-user RBAC instead of simple role checks) to showcase what the developer can build. When in doubt, favour the more thorough implementation.
@@ -19,10 +19,13 @@ This is a **portfolio / showcase project**. The goal is to demonstrate technical
 | ORM        | Prisma 6 (`relationLoadStrategy: 'join'`)                      |
 | Database   | PostgreSQL (local dev + Vercel Postgres / Neon in production)  |
 | Validation | Zod 4                                                          |
-| Auth       | NextAuth v5 (JWT strategy, Google + GitHub OAuth)              |
+| Auth       | NextAuth v5 (JWT strategy, Google + GitHub OAuth + demo login) |
+| i18n       | next-intl, 18 locales, AI-powered translation pipeline         |
 | Testing    | Jest 30 + React Testing Library                                |
+| CI/CD      | GitHub Actions (lint, format, test, build on every push)       |
 | Linting    | ESLint 9 (flat config)                                         |
 | Formatting | Prettier 3 (`printWidth: 100`, double quotes, trailing commas) |
+| Deployment | Vercel with Vercel Postgres (Neon serverless PostgreSQL)        |
 
 ## Architecture
 
@@ -48,11 +51,12 @@ src/
 │   ├── api/auth/[...nextauth]/  # NextAuth route handler
 │   ├── admin/                   # User management (superuser-protected)
 │   │   └── audit/               # Audit log viewer (permission-protected)
-│   ├── manageDepartments/        # Department management (permission-protected)
+│   ├── manageDepartments/       # Department management (permission-protected)
 │   ├── managePersons/           # Person management (permission-protected)
 │   └── manageTeams/             # Team management (permission-protected)
-├── components/       # Reusable MUI client components
-├── tests/            # Jest tests
+├── components/       # Reusable MUI client components (42 components)
+├── i18n/             # next-intl configuration (actions, config, request)
+├── tests/            # Jest tests (806 tests)
 ├── types/            # TypeScript module augmentations (next-auth.d.ts)
 ├── auditLog.ts       # Audit logging helper (logAudit)
 ├── auth.ts           # NextAuth v5 configuration + RBAC callbacks
@@ -61,9 +65,14 @@ src/
 ├── permissions.ts    # RBAC: role defaults, permission resolution, guards
 ├── queries.ts        # Read-only data fetching
 ├── schemas.ts        # Zod schemas and inferred types
-└── serverActions.ts  # Mutation server actions
+├── serverActions.ts  # Mutation server actions
+├── themeConfig.ts    # 6 visual themes (CSS custom properties)
+└── tutorialConfig.ts # Gamified demo tour (8-step tutorial)
+messages/             # 18 locale JSON files (en, fi, de, fr, es, ...)
 prisma/
-└── schema.prisma     # Data model
+└── schema.prisma     # Data model (PostgreSQL)
+scripts/
+└── i18n-sync.ts      # i18n audit and translation pipeline
 ```
 
 ## Data model
@@ -73,7 +82,7 @@ prisma/
 - **Department** — name, optional description, optional head (FK to Person, SetNull). Teams assigned via Team.departmentId.
 - **TeamMember** — join table between Person and Team, cascade delete on removal.
 - **User** — authenticated identity (email, name, image, role). Linked to NextAuth OAuth.
-- **Permission** — catalog of 21 granular permission keys (e.g. `person:create`, `team:delete`, `department:assign_team`).
+- **Permission** — catalog of 23 granular permission keys (e.g. `person:create`, `team:delete`, `department:assign_team`).
 - **UserPermission** — per-user permission overrides (grant/deny) with role-default fallback.
 - **AuditLog** — immutable log of all mutations: who, what action, which entity, before/after JSON snapshots. No FK to User so logs survive user deletion.
 
