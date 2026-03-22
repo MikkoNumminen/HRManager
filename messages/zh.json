@@ -37,7 +37,8 @@
     "keepExisting": "保留现有",
     "replaceAll": "全部替换",
     "language": "语言",
-    "theme": "主题"
+    "theme": "主题",
+    "dashboard": "仪表板"
   },
   "home": {
     "title": "人力资源管理系统",
@@ -160,6 +161,21 @@
     "kickOutDescription": "从系统中移除此用户。他们将失去所有访问权限和权限覆盖。",
     "kickOutConfirm": "确定要踢出{name}吗？他们将失去访问权限和所有权限覆盖。"
   },
+  "dashboard": {
+    "title": "仪表板",
+    "persons": "人员",
+    "teams": "团队",
+    "departments": "部门",
+    "users": "用户",
+    "membersPerTeam": "每个团队的成员",
+    "teamsPerDepartment": "每个部门的团队",
+    "organizationGrowth": "组织增长",
+    "recentActivity": "最近活动",
+    "members": "成员",
+    "noData": "暂无数据",
+    "noActivity": "暂无最近活动",
+    "system": "系统"
+  },
   "audit": {
     "filterUser": "用户",
     "filterAction": "操作",
@@ -252,7 +268,8 @@
     "typeAuth": "认证",
     "typeSecurity": "安全",
     "permissionDenied": "权限被拒绝: {key}",
-    "rateLimited": "操作超出速率限制: {action}"
+    "rateLimited": "操作超出速率限制: {action}",
+    "permViewDashboard": "查看仪表板"
   },
   "notifications": {
     "personCreated": "人员创建成功",

@@ -264,6 +264,44 @@ describe("TopBar", () => {
     expect(link).toHaveAttribute("href", "/admin/audit");
   });
 
+  // Shows "Dashboard" menu item when user has dashboard:view permission.
+  test("shows Dashboard link when user has dashboard permission", () => {
+    mockUseSession.mockReturnValue({
+      data: {
+        user: {
+          name: "Alice",
+          email: "a@b.com",
+          image: null,
+          permissions: { "dashboard:view": true },
+        },
+      },
+      status: "authenticated",
+    });
+    render(<TopBar title="Home" />);
+    fireEvent.click(screen.getByLabelText("User menu"));
+    expect(screen.getByText("Dashboard")).toBeInTheDocument();
+    const link = screen.getByText("Dashboard").closest("a");
+    expect(link).toHaveAttribute("href", "/dashboard");
+  });
+
+  // Hides "Dashboard" menu item when user lacks dashboard:view permission.
+  test("hides Dashboard link when user lacks permission", () => {
+    mockUseSession.mockReturnValue({
+      data: {
+        user: {
+          name: "Alice",
+          email: "a@b.com",
+          image: null,
+          permissions: { "dashboard:view": false },
+        },
+      },
+      status: "authenticated",
+    });
+    render(<TopBar title="Home" />);
+    fireEvent.click(screen.getByLabelText("User menu"));
+    expect(screen.queryByText("Dashboard")).not.toBeInTheDocument();
+  });
+
   // Hides "Audit Log" menu item when user lacks the permission
   test("hides Audit Log link when user lacks permission", () => {
     mockUseSession.mockReturnValue({
@@ -564,5 +602,255 @@ describe("TopBar", () => {
     fireEvent.click(screen.getByText("Sign out"));
     expect(signOut).toHaveBeenCalled();
     expect(localStorage.getItem(STORAGE_KEY)).not.toBeNull();
+  });
+
+  // --- Mobile drawer tests ---
+
+  // Shows the hamburger menu button for mobile navigation
+  test("renders hamburger menu button", () => {
+    render(<TopBar title="Home" />);
+    expect(screen.getByLabelText("Menu")).toBeInTheDocument();
+  });
+
+  // Clicking the hamburger button opens the mobile drawer
+  test("opens drawer when hamburger button is clicked", () => {
+    mockUseSession.mockReturnValue({
+      data: { user: { name: "Alice Smith", email: "alice@example.com", image: null } },
+      status: "authenticated",
+    });
+    render(<TopBar title="Home" />);
+    fireEvent.click(screen.getByLabelText("Menu"));
+    // Drawer shows a presentation role element
+    expect(screen.getByTestId("mobile-drawer")).toBeInTheDocument();
+  });
+
+  // Mobile drawer shows user name and email when authenticated
+  test("drawer shows user info when authenticated", () => {
+    mockUseSession.mockReturnValue({
+      data: { user: { name: "Alice Smith", email: "alice@example.com", image: null } },
+      status: "authenticated",
+    });
+    render(<TopBar title="Home" />);
+    fireEvent.click(screen.getByLabelText("Menu"));
+    const presentation = screen.getByTestId("mobile-drawer");
+    expect(presentation).toHaveTextContent("Alice Smith");
+    expect(presentation).toHaveTextContent("alice@example.com");
+  });
+
+  // Mobile drawer shows navigation links when user has permissions
+  test("drawer shows navigation links with permissions", () => {
+    mockUseSession.mockReturnValue({
+      data: {
+        user: {
+          name: "Alice",
+          email: "a@b.com",
+          image: null,
+          permissions: {
+            "admin:manage_users": true,
+            "admin:view_audit_log": true,
+            "dashboard:view": true,
+          },
+        },
+      },
+      status: "authenticated",
+    });
+    render(<TopBar title="Home" />);
+    fireEvent.click(screen.getByLabelText("Menu"));
+    const presentation = screen.getByTestId("mobile-drawer");
+    // All three nav links appear in the drawer
+    const userMgmtLinks = presentation.querySelectorAll('a[href="/admin"]');
+    expect(userMgmtLinks.length).toBeGreaterThanOrEqual(1);
+    const auditLinks = presentation.querySelectorAll('a[href="/admin/audit"]');
+    expect(auditLinks.length).toBeGreaterThanOrEqual(1);
+    const dashboardLinks = presentation.querySelectorAll('a[href="/dashboard"]');
+    expect(dashboardLinks.length).toBeGreaterThanOrEqual(1);
+  });
+
+  // Mobile drawer hides navigation links when user lacks permissions
+  test("drawer hides navigation links without permissions", () => {
+    mockUseSession.mockReturnValue({
+      data: {
+        user: {
+          name: "Alice",
+          email: "a@b.com",
+          image: null,
+          permissions: {
+            "admin:manage_users": false,
+            "admin:view_audit_log": false,
+            "dashboard:view": false,
+          },
+        },
+      },
+      status: "authenticated",
+    });
+    render(<TopBar title="Home" />);
+    fireEvent.click(screen.getByLabelText("Menu"));
+    const presentation = screen.getByTestId("mobile-drawer");
+    expect(presentation.querySelectorAll('a[href="/admin"]')).toHaveLength(0);
+    expect(presentation.querySelectorAll('a[href="/admin/audit"]')).toHaveLength(0);
+    expect(presentation.querySelectorAll('a[href="/dashboard"]')).toHaveLength(0);
+  });
+
+  // Mobile drawer shows Load Mock Data and Reset All Data when permitted
+  test("drawer shows data actions when permitted", () => {
+    mockUseSession.mockReturnValue({
+      data: { user: { name: "Alice", email: "a@b.com", image: null } },
+      status: "authenticated",
+    });
+    const permissions = { "data:seed": true, "data:reset": true } as never;
+    render(<TopBar title="Home" permissions={permissions} />);
+    fireEvent.click(screen.getByLabelText("Menu"));
+    const presentation = screen.getByTestId("mobile-drawer");
+    expect(presentation).toHaveTextContent("Load Mock Data");
+    expect(presentation).toHaveTextContent("Reset All Data");
+  });
+
+  // Mobile drawer hides data actions when not permitted
+  test("drawer hides data actions when not permitted", () => {
+    mockUseSession.mockReturnValue({
+      data: { user: { name: "Alice", email: "a@b.com", image: null } },
+      status: "authenticated",
+    });
+    render(<TopBar title="Home" />);
+    fireEvent.click(screen.getByLabelText("Menu"));
+    const presentation = screen.getByTestId("mobile-drawer");
+    expect(presentation).not.toHaveTextContent("Load Mock Data");
+    expect(presentation).not.toHaveTextContent("Reset All Data");
+  });
+
+  // Clicking Load Mock Data in the drawer opens the seed dialog
+  test("drawer Load Mock Data opens seed dialog", () => {
+    mockUseSession.mockReturnValue({
+      data: { user: { name: "Alice", email: "a@b.com", image: null } },
+      status: "authenticated",
+    });
+    const permissions = { "data:seed": true } as never;
+    render(<TopBar title="Home" permissions={permissions} />);
+    fireEvent.click(screen.getByLabelText("Menu"));
+    const presentation = screen.getByTestId("mobile-drawer");
+    const loadMockBtn = Array.from(presentation.querySelectorAll("span")).find(
+      (el) => el.textContent === "Load Mock Data",
+    )!;
+    fireEvent.click(loadMockBtn.closest("div[role='button']") ?? loadMockBtn);
+    expect(screen.getByText("Keep Existing")).toBeInTheDocument();
+    expect(screen.getByText("Replace All")).toBeInTheDocument();
+  });
+
+  // Clicking Reset All Data in the drawer opens the reset dialog
+  test("drawer Reset All Data opens reset dialog", () => {
+    mockUseSession.mockReturnValue({
+      data: { user: { name: "Alice", email: "a@b.com", image: null } },
+      status: "authenticated",
+    });
+    const permissions = { "data:reset": true } as never;
+    render(<TopBar title="Home" permissions={permissions} />);
+    fireEvent.click(screen.getByLabelText("Menu"));
+    const presentation = screen.getByTestId("mobile-drawer");
+    const resetBtn = Array.from(presentation.querySelectorAll("span")).find(
+      (el) => el.textContent === "Reset All Data",
+    )!;
+    fireEvent.click(resetBtn.closest("div[role='button']") ?? resetBtn);
+    expect(
+      screen.getByText(
+        "Are you sure you want to delete all persons and teams? This action cannot be undone.",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  // Clicking Sign out in the drawer calls signOut and clears demo localStorage
+  test("drawer sign out works for demo user", () => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(["view_employees"]));
+    mockUseSession.mockReturnValue({
+      data: { user: { name: "Demo", email: "demo@hrmanager.app", image: null } },
+      status: "authenticated",
+    });
+    render(<TopBar title="Home" />);
+    fireEvent.click(screen.getByLabelText("Menu"));
+    const presentation = screen.getByTestId("mobile-drawer");
+    const signOutBtn = Array.from(presentation.querySelectorAll("span")).find(
+      (el) => el.textContent === "Sign out",
+    )!;
+    fireEvent.click(signOutBtn.closest("div[role='button']") ?? signOutBtn);
+    expect(signOut).toHaveBeenCalled();
+    expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
+  });
+
+  // Mobile drawer shows Try Demo and Sign In buttons when unauthenticated
+  test("drawer shows auth buttons when unauthenticated", () => {
+    render(<TopBar title="Home" />);
+    fireEvent.click(screen.getByLabelText("Menu"));
+    const presentation = screen.getByTestId("mobile-drawer");
+    expect(presentation).toHaveTextContent("Try Demo");
+    expect(presentation).toHaveTextContent("Sign in");
+  });
+
+  // Clicking Try Demo in the drawer calls signIn("demo")
+  test("drawer Try Demo calls signIn with demo", () => {
+    render(<TopBar title="Home" />);
+    fireEvent.click(screen.getByLabelText("Menu"));
+    const presentation = screen.getByTestId("mobile-drawer");
+    const tryDemoBtn = Array.from(presentation.querySelectorAll("button")).find(
+      (el) => el.textContent === "Try Demo",
+    )!;
+    fireEvent.click(tryDemoBtn);
+    expect(signIn).toHaveBeenCalledWith("demo");
+  });
+
+  // Clicking Sign in in the drawer calls signIn without arguments
+  test("drawer Sign in calls signIn without arguments", () => {
+    render(<TopBar title="Home" />);
+    fireEvent.click(screen.getByLabelText("Menu"));
+    const presentation = screen.getByTestId("mobile-drawer");
+    const signInBtn = Array.from(presentation.querySelectorAll("button")).find(
+      (el) => el.textContent === "Sign in",
+    )!;
+    fireEvent.click(signInBtn);
+    expect(signIn).toHaveBeenCalledWith();
+  });
+
+  // Clicking the drawer backdrop closes the drawer without error
+  test("drawer onClose callback runs without error", () => {
+    mockUseSession.mockReturnValue({
+      data: { user: { name: "Alice", email: "a@b.com", image: null } },
+      status: "authenticated",
+    });
+    const { baseElement } = render(<TopBar title="Home" />);
+    fireEvent.click(screen.getByLabelText("Menu"));
+    expect(screen.getByTestId("mobile-drawer")).toBeInTheDocument();
+    // MUI Drawer renders a backdrop — clicking it triggers onClose
+    const backdrops = baseElement.querySelectorAll(".MuiBackdrop-root");
+    const drawerBackdrop = backdrops[backdrops.length - 1] as HTMLElement;
+    expect(() => fireEvent.click(drawerBackdrop)).not.toThrow();
+  });
+
+  // Drawer does not show user info section when unauthenticated
+  test("drawer does not show user info when unauthenticated", () => {
+    render(<TopBar title="Home" />);
+    fireEvent.click(screen.getByLabelText("Menu"));
+    const presentation = screen.getByTestId("mobile-drawer");
+    // Should not have the avatar/user info section
+    expect(presentation).not.toHaveTextContent("Alice");
+    // But should have Sign in buttons
+    expect(presentation).toHaveTextContent("Sign in");
+  });
+
+  // Drawer navigation link closes the drawer (via onClick handler)
+  test("drawer navigation link click runs without error", () => {
+    mockUseSession.mockReturnValue({
+      data: {
+        user: {
+          name: "Alice",
+          email: "a@b.com",
+          image: null,
+          permissions: { "admin:manage_users": true },
+        },
+      },
+      status: "authenticated",
+    });
+    render(<TopBar title="Home" />);
+    fireEvent.click(screen.getByLabelText("Menu"));
+    const presentation = screen.getByTestId("mobile-drawer");
+    const navLink = presentation.querySelector('a[href="/admin"]') as HTMLElement;
+    expect(() => fireEvent.click(navLink)).not.toThrow();
   });
 });

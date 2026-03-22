@@ -37,7 +37,8 @@
     "keepExisting": "เก็บข้อมูลเดิม",
     "replaceAll": "แทนที่ทั้งหมด",
     "language": "ภาษา",
-    "theme": "ธีม"
+    "theme": "ธีม",
+    "dashboard": "แดชบอร์ด"
   },
   "home": {
     "title": "ระบบจัดการทรัพยากรบุคคล",
@@ -160,6 +161,21 @@
     "kickOutDescription": "ลบผู้ใช้นี้ออกจากระบบ พวกเขาจะสูญเสียสิทธิ์การเข้าถึงทั้งหมดและการแทนที่สิทธิ์",
     "kickOutConfirm": "คุณแน่ใจหรือไม่ว่าต้องการไล่ {name} ออก? พวกเขาจะสูญเสียสิทธิ์การเข้าถึงและการแทนที่สิทธิ์ทั้งหมด"
   },
+  "dashboard": {
+    "title": "แดชบอร์ด",
+    "persons": "บุคลากร",
+    "teams": "ทีม",
+    "departments": "แผนก",
+    "users": "ผู้ใช้",
+    "membersPerTeam": "สมาชิกต่อทีม",
+    "teamsPerDepartment": "ทีมต่อแผนก",
+    "organizationGrowth": "การเติบโตขององค์กร",
+    "recentActivity": "กิจกรรมล่าสุด",
+    "members": "สมาชิก",
+    "noData": "ไม่มีข้อมูล",
+    "noActivity": "ไม่มีกิจกรรมล่าสุด",
+    "system": "ระบบ"
+  },
   "audit": {
     "filterUser": "ผู้ใช้",
     "filterAction": "การดำเนินการ",
@@ -252,7 +268,8 @@
     "typeAuth": "การยืนยันตัวตน",
     "typeSecurity": "ความปลอดภัย",
     "permissionDenied": "ไม่มีสิทธิ์: {key}",
-    "rateLimited": "เกินขีดจำกัดคำขอสำหรับการดำเนินการ: {action}"
+    "rateLimited": "เกินขีดจำกัดคำขอสำหรับการดำเนินการ: {action}",
+    "permViewDashboard": "ดูแดชบอร์ด"
   },
   "notifications": {
     "personCreated": "สร้างบุคคลสำเร็จ",

@@ -39,7 +39,7 @@ This is a **portfolio / showcase project**. The goal is to demonstrate technical
 - **Info tooltips**: Use MUI `Tooltip` with `arrow` and `cursor: "help"` on column headers or labels that may not be self-explanatory. Keep tooltip text concise but informative. Apply this consistently across all data tables and editor views.
 - **Auth** is configured in `auth.ts` (NextAuth v5). Three providers: Google OAuth, GitHub OAuth, and a Credentials-based demo login (`id: "demo"`) that creates/reuses a `demo@hrmanager.app` user with administrator role. Protected routes use `auth()` + `redirect("/")` in Server Components. Client components use `useSession` via `SessionProvider` wrapper in layout.
 - **Guest mode**: unauthenticated users see read-only minimal views (MUI Chips) of Persons, Departments, and Teams on the main page. Manage routes (`/managePersons`, `/manageDepartments`, `/manageTeams`) redirect to `/`.
-- **TopBar** — the user avatar dropdown menu contains: User Management, Audit Log (permission-gated), Load Mock Data, Reset All Data (permission-gated), and Sign Out. The `permissions` prop must be passed on every page so all menu items are available everywhere.
+- **TopBar** — the user avatar dropdown menu contains: Dashboard (permission-gated), User Management, Audit Log (permission-gated), Load Mock Data, Reset All Data (permission-gated), and Sign Out. The `permissions` prop must be passed on every page so all menu items are available everywhere.
 - **Client-heavy rendering**: Keep the server thin — it handles only data fetching, auth, and validation. All rendering logic, UI state, filtering, sorting, and heavy computation belong in Client Components so the server stays lightweight and responsive. Security-sensitive logic (auth checks, input sanitization, access control, database queries) must always remain server-side — never trust the client for authorization or data integrity.
 - **Content-Security-Policy** — `proxy.ts` (Next.js 16 proxy, formerly middleware) generates a per-request nonce and sets a strict CSP header. The nonce is passed to `layout.tsx` via `x-nonce` request header and forwarded to `AppRouterCacheProvider` (Emotion cache) and the FOUC prevention `<script>`. `style-src 'unsafe-inline'` is required for Emotion/MUI runtime style injection. Also sets X-Frame-Options DENY, X-Content-Type-Options nosniff, Referrer-Policy strict-origin-when-cross-origin, and Permissions-Policy on all routes.
 - **Rate limiting** — `rateLimit.ts` provides a PostgreSQL-based sliding window rate limiter. Server actions use `rateLimit()` (30 req/min, user-based for authenticated, IP fallback). Auth endpoints use `rateLimitAuth()` (10 req/min, IP-only — can't call `auth()` during sign-in). The NextAuth POST handler in `route.ts` wraps with `rateLimitAuth()`, returning 429 JSON on limit; GET requests (session/CSRF) are unthrottled. Uses a `RateLimit` table with upsert — no external services. `cleanupExpiredRateLimits()` removes stale records.
@@ -56,12 +56,13 @@ src/
 │   ├── api/auth/[...nextauth]/  # NextAuth route handler
 │   ├── admin/                   # User management (superuser-protected)
 │   │   └── audit/               # Audit log viewer (permission-protected)
+│   ├── dashboard/               # Dashboard analytics (permission-protected)
 │   ├── manageDepartments/       # Department management (permission-protected)
 │   ├── managePersons/           # Person management (permission-protected)
 │   └── manageTeams/             # Team management (permission-protected)
-├── components/       # Reusable MUI client components (42 components)
+├── components/       # Reusable MUI client components (42 components, incl. dashboard)
 ├── i18n/             # next-intl configuration (actions, config, request)
-├── tests/            # Jest tests (899 tests)
+├── tests/            # Jest tests (910 tests)
 ├── types/            # TypeScript module augmentations (next-auth.d.ts)
 ├── auditLog.ts       # Audit logging helper (logAudit)
 ├── auth.ts           # NextAuth v5 configuration + RBAC callbacks
@@ -95,7 +96,7 @@ docker-compose.yml    # PostgreSQL 17 + app with health checks
 - **TeamMember** — join table between Person and Team. Soft-deleted via `deletedAt`; re-adding a soft-deleted member restores the record.
 - All four entity models use **partial unique indexes** (`WHERE deletedAt IS NULL`) so soft-deleted records retain original values without blocking new active records.
 - **User** — authenticated identity (email, name, image, role). Linked to NextAuth OAuth.
-- **Permission** — catalog of 23 granular permission keys (e.g. `person:create`, `team:delete`, `department:assign_team`).
+- **Permission** — catalog of 24 granular permission keys (e.g. `person:create`, `team:delete`, `dashboard:view`).
 - **UserPermission** — per-user permission overrides (grant/deny) with role-default fallback.
 - **AuditLog** — immutable log of all mutations: who, what action, which entity, before/after JSON snapshots. No FK to User so logs survive user deletion.
 - **RateLimit** — sliding window rate limit counters per identifier (IP) and action. Auto-cleaned on window expiry.

@@ -6,12 +6,15 @@ import {
   UserSchema,
   AuditLogSchema,
   AuditLogFilterSchema,
+  DashboardMetricsSchema,
+  DashboardRecentActivitySchema,
   Person,
   CombinedTeam,
   Department,
   AppUser,
   AuditLog,
   AuditLogFilter,
+  DashboardMetrics,
 } from "./schemas";
 import { resolvePermissions, PERMISSION_KEYS, hasPermission } from "@/permissions";
 
@@ -163,6 +166,89 @@ export async function getAuditLogs(
     logs: logs.map((log) => AuditLogSchema.parse(log)),
     total,
   };
+}
+
+export async function getDashboardMetrics(): Promise<DashboardMetrics> {
+  const [totalPersons, totalTeams, totalDepartments, totalUsers] = await Promise.all([
+    prisma.person.count(),
+    prisma.team.count(),
+    prisma.department.count(),
+    prisma.user.count(),
+  ]);
+
+  const teamsWithMembers = await prisma.team.findMany({
+    select: { teamName: true, _count: { select: { members: true } } },
+    orderBy: { teamName: "asc" },
+  });
+  const teamSizes = teamsWithMembers.map((t) => ({
+    teamName: t.teamName,
+    memberCount: t._count.members,
+  }));
+
+  const departmentsWithTeams = await prisma.department.findMany({
+    select: { name: true, _count: { select: { teams: true } } },
+    orderBy: { name: "asc" },
+  });
+  const departmentSizes = departmentsWithTeams.map((d) => ({
+    departmentName: d.name,
+    teamCount: d._count.teams,
+  }));
+
+  const [persons, teams, departments] = await Promise.all([
+    prisma.person.findMany({ select: { createdAt: true }, orderBy: { createdAt: "asc" } }),
+    prisma.team.findMany({ select: { createdAt: true }, orderBy: { createdAt: "asc" } }),
+    prisma.department.findMany({ select: { createdAt: true }, orderBy: { createdAt: "asc" } }),
+  ]);
+
+  const growthMap = new Map<string, { persons: number; teams: number; departments: number }>();
+  for (const p of persons) {
+    const key = p.createdAt.toISOString().slice(0, 10);
+    const entry = growthMap.get(key) ?? { persons: 0, teams: 0, departments: 0 };
+    entry.persons++;
+    growthMap.set(key, entry);
+  }
+  for (const t of teams) {
+    const key = t.createdAt.toISOString().slice(0, 10);
+    const entry = growthMap.get(key) ?? { persons: 0, teams: 0, departments: 0 };
+    entry.teams++;
+    growthMap.set(key, entry);
+  }
+  for (const d of departments) {
+    const key = d.createdAt.toISOString().slice(0, 10);
+    const entry = growthMap.get(key) ?? { persons: 0, teams: 0, departments: 0 };
+    entry.departments++;
+    growthMap.set(key, entry);
+  }
+
+  const sortedDates = [...growthMap.keys()].sort();
+  let cumPersons = 0,
+    cumTeams = 0,
+    cumDepts = 0;
+  const growthTimeline = sortedDates.map((date) => {
+    const entry = growthMap.get(date)!;
+    cumPersons += entry.persons;
+    cumTeams += entry.teams;
+    cumDepts += entry.departments;
+    return { date, persons: cumPersons, teams: cumTeams, departments: cumDepts };
+  });
+
+  const recentLogs = await prisma.auditLog.findMany({
+    select: { action: true, entityType: true, userEmail: true, createdAt: true },
+    orderBy: { createdAt: "desc" },
+    take: 10,
+  });
+  const recentActivity = recentLogs.map((log) => DashboardRecentActivitySchema.parse(log));
+
+  return DashboardMetricsSchema.parse({
+    totalPersons,
+    totalTeams,
+    totalDepartments,
+    totalUsers,
+    teamSizes,
+    departmentSizes,
+    growthTimeline,
+    recentActivity,
+  });
 }
 
 export async function getAuditLogUserEmails(): Promise<string[]> {

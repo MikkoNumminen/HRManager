@@ -8,18 +8,18 @@ In Progress items must show the owner: `[worktree-name]` or `[main]`.
 
 - 🔴 Add dashboard page with MUI charts `[dashboard]`
 
-- 🔴 Soft deletes — preserve historical audit trail on cascaded deletions `[snackbar-notifications]`
-  - [ ] Add deletedAt column to Person, Team, Department, TeamMember + migration
-  - [ ] Update all queries.ts to filter deletedAt: null
-  - [ ] Update delete server actions to set deletedAt instead of DELETE
-  - [ ] Handle cascade soft-deletes (Person → TeamMember rows)
-  - [ ] Handle FK nulling (soft-deleted person as manager/head)
-  - [ ] Update Zod schemas with optional deletedAt
-  - [ ] Update tests + add soft-delete tests
+
+- 🔴 Mobile-first redesign `[main]`
+  - [ ] TopBar: hamburger menu + drawer for mobile navigation
+  - [ ] Tables: card/list view on mobile (< sm breakpoint)
+  - [ ] Forms: full-width inputs, responsive button layout
+  - [ ] AuditLogViewer: collapsible filters, card view for entries
+  - [ ] Layout: responsive container + manage page padding
+  - [ ] muiStyles.ts: add mobile-first responsive tokens
+  - [ ] Tests for new responsive behavior
   - [ ] Update README.md and CLAUDE.md
 
 ## Backlog
 
 - 🟡 Optimistic updates
 - 🔴 Demo session isolation — per-session data instead of shared DB
-- 🔴 Mobile-first redesign

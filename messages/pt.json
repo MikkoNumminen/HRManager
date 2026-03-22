@@ -37,7 +37,8 @@
     "keepExisting": "Manter existentes",
     "replaceAll": "Substituir tudo",
     "language": "Idioma",
-    "theme": "Tema"
+    "theme": "Tema",
+    "dashboard": "Painel"
   },
   "home": {
     "title": "Sistema de Gestão de Recursos Humanos",
@@ -160,6 +161,21 @@
     "kickOutDescription": "Remover este utilizador do sistema. Perderá todos os acessos e substituições de permissões.",
     "kickOutConfirm": "Tem a certeza de que quer expulsar {name}? Perderá os acessos e todas as substituições de permissões."
   },
+  "dashboard": {
+    "title": "Painel",
+    "persons": "Pessoas",
+    "teams": "Equipes",
+    "departments": "Departamentos",
+    "users": "Usuários",
+    "membersPerTeam": "Membros por equipe",
+    "teamsPerDepartment": "Equipes por departamento",
+    "organizationGrowth": "Crescimento organizacional",
+    "recentActivity": "Atividade recente",
+    "members": "Membros",
+    "noData": "Nenhum dado disponível",
+    "noActivity": "Nenhuma atividade recente",
+    "system": "Sistema"
+  },
   "audit": {
     "filterUser": "Usuário",
     "filterAction": "Ação",
@@ -252,7 +268,8 @@
     "typeAuth": "Autenticação",
     "typeSecurity": "Segurança",
     "permissionDenied": "Permissão negada: {key}",
-    "rateLimited": "Limite de requisições excedido para a ação: {action}"
+    "rateLimited": "Limite de requisições excedido para a ação: {action}",
+    "permViewDashboard": "ver o painel"
   },
   "notifications": {
     "personCreated": "Pessoa criada com sucesso",

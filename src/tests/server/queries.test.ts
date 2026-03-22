@@ -27,6 +27,7 @@ import {
   getAllPermissionKeys,
   getAuditLogs,
   getAuditLogUserEmails,
+  getDashboardMetrics,
 } from "@/queries";
 
 describe("getPersons", () => {
@@ -608,6 +609,164 @@ describe("getDepartments", () => {
     await testPrisma.department.create({ data: { name: "Ops" } });
     const result = await getDepartments();
     expect(result[0].description).toBeNull();
+  });
+});
+
+describe("getDashboardMetrics", () => {
+  beforeEach(async () => {
+    await cleanDb();
+  });
+
+  // Returns zero counts when the database is empty.
+  test("returns zero counts when database is empty", async () => {
+    const metrics = await getDashboardMetrics();
+    expect(metrics.totalPersons).toBe(0);
+    expect(metrics.totalTeams).toBe(0);
+    expect(metrics.totalDepartments).toBe(0);
+    expect(metrics.totalUsers).toBe(0);
+    expect(metrics.teamSizes).toEqual([]);
+    expect(metrics.departmentSizes).toEqual([]);
+    expect(metrics.growthTimeline).toEqual([]);
+    expect(metrics.recentActivity).toEqual([]);
+  });
+
+  // Returns correct counts for persons, teams, departments, and users.
+  test("returns correct entity counts", async () => {
+    await testPrisma.person.createMany({
+      data: [
+        { name: "Alice", email: "a@test.com" },
+        { name: "Bob", email: "b@test.com" },
+        { name: "Charlie", email: "c@test.com" },
+      ],
+    });
+    await testPrisma.team.createMany({
+      data: [{ teamName: "Alpha" }, { teamName: "Beta" }],
+    });
+    await testPrisma.department.create({ data: { name: "Engineering" } });
+    await testPrisma.user.createMany({
+      data: [
+        { email: "u1@test.com", name: "U1", role: "user" },
+        { email: "u2@test.com", name: "U2", role: "administrator" },
+      ],
+    });
+
+    const metrics = await getDashboardMetrics();
+    expect(metrics.totalPersons).toBe(3);
+    expect(metrics.totalTeams).toBe(2);
+    expect(metrics.totalDepartments).toBe(1);
+    expect(metrics.totalUsers).toBe(2);
+  });
+
+  // Returns team member counts sorted by team name.
+  test("returns team sizes with member counts", async () => {
+    const person1 = await testPrisma.person.create({
+      data: { name: "Alice", email: "a@test.com" },
+    });
+    const person2 = await testPrisma.person.create({
+      data: { name: "Bob", email: "b@test.com" },
+    });
+    const team = await testPrisma.team.create({ data: { teamName: "Alpha" } });
+    await testPrisma.teamMember.createMany({
+      data: [
+        { personId: person1.id, teamId: team.teamId },
+        { personId: person2.id, teamId: team.teamId },
+      ],
+    });
+    await testPrisma.team.create({ data: { teamName: "Beta" } });
+
+    const metrics = await getDashboardMetrics();
+    expect(metrics.teamSizes).toEqual([
+      { teamName: "Alpha", memberCount: 2 },
+      { teamName: "Beta", memberCount: 0 },
+    ]);
+  });
+
+  // Returns department team counts sorted by department name.
+  test("returns department sizes with team counts", async () => {
+    const dept = await testPrisma.department.create({ data: { name: "Engineering" } });
+    await testPrisma.team.create({ data: { teamName: "Platform", departmentId: dept.id } });
+    await testPrisma.team.create({ data: { teamName: "Frontend", departmentId: dept.id } });
+    await testPrisma.department.create({ data: { name: "Marketing" } });
+
+    const metrics = await getDashboardMetrics();
+    expect(metrics.departmentSizes).toEqual([
+      { departmentName: "Engineering", teamCount: 2 },
+      { departmentName: "Marketing", teamCount: 0 },
+    ]);
+  });
+
+  // Returns cumulative growth timeline grouped by creation date.
+  test("returns cumulative growth timeline", async () => {
+    await testPrisma.person.create({
+      data: { name: "A", email: "a@test.com", createdAt: new Date("2026-01-15T10:00:00Z") },
+    });
+    await testPrisma.person.create({
+      data: { name: "B", email: "b@test.com", createdAt: new Date("2026-01-15T14:00:00Z") },
+    });
+    await testPrisma.person.create({
+      data: { name: "C", email: "c@test.com", createdAt: new Date("2026-02-10T10:00:00Z") },
+    });
+    await testPrisma.team.create({
+      data: { teamName: "Alpha", createdAt: new Date("2026-01-15T10:00:00Z") },
+    });
+    await testPrisma.department.create({
+      data: { name: "Eng", createdAt: new Date("2026-02-10T10:00:00Z") },
+    });
+
+    const metrics = await getDashboardMetrics();
+    expect(metrics.growthTimeline).toHaveLength(2);
+    expect(metrics.growthTimeline[0]).toEqual({
+      date: "2026-01-15",
+      persons: 2,
+      teams: 1,
+      departments: 0,
+    });
+    expect(metrics.growthTimeline[1]).toEqual({
+      date: "2026-02-10",
+      persons: 3,
+      teams: 1,
+      departments: 1,
+    });
+  });
+
+  // Returns recent audit log activity (max 10 entries, newest first).
+  test("returns recent activity from audit log", async () => {
+    for (let i = 0; i < 12; i++) {
+      await testPrisma.auditLog.create({
+        data: {
+          action: "create",
+          entityType: "person",
+          userEmail: `user${i}@test.com`,
+          createdAt: new Date(`2026-03-${String(i + 1).padStart(2, "0")}`),
+        },
+      });
+    }
+
+    const metrics = await getDashboardMetrics();
+    expect(metrics.recentActivity).toHaveLength(10);
+    // Newest first
+    expect(metrics.recentActivity[0].userEmail).toBe("user11@test.com");
+    expect(metrics.recentActivity[9].userEmail).toBe("user2@test.com");
+  });
+
+  // Recent activity includes null userEmail for system actions.
+  test("includes null userEmail in recent activity", async () => {
+    await testPrisma.auditLog.create({
+      data: { action: "seed", entityType: "person", userEmail: null },
+    });
+
+    const metrics = await getDashboardMetrics();
+    expect(metrics.recentActivity).toHaveLength(1);
+    expect(metrics.recentActivity[0].userEmail).toBeNull();
+    expect(metrics.recentActivity[0].action).toBe("seed");
+  });
+
+  // Returns empty recent activity when no audit logs exist.
+  test("returns empty recent activity when no logs", async () => {
+    await testPrisma.person.create({ data: { name: "A", email: "a@test.com" } });
+
+    const metrics = await getDashboardMetrics();
+    expect(metrics.recentActivity).toEqual([]);
   });
 });
 

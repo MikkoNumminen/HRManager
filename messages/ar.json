@@ -37,7 +37,8 @@
     "keepExisting": "الاحتفاظ بالحالية",
     "replaceAll": "استبدال الكل",
     "language": "اللغة",
-    "theme": "السمة"
+    "theme": "السمة",
+    "dashboard": "لوحة المعلومات"
   },
   "home": {
     "title": "نظام إدارة الموارد البشرية",
@@ -160,6 +161,21 @@
     "kickOutDescription": "إزالة هذا المستخدم من النظام. سيفقد جميع صلاحيات الوصول وتجاوزات الأذونات.",
     "kickOutConfirm": "هل أنت متأكد من طرد {name}؟ سيفقد صلاحيات الوصول وجميع تجاوزات الأذونات."
   },
+  "dashboard": {
+    "title": "لوحة المعلومات",
+    "persons": "الأشخاص",
+    "teams": "الفرق",
+    "departments": "الأقسام",
+    "users": "المستخدمون",
+    "membersPerTeam": "الأعضاء لكل فريق",
+    "teamsPerDepartment": "الفرق لكل قسم",
+    "organizationGrowth": "نمو المنظمة",
+    "recentActivity": "النشاط الأخير",
+    "members": "الأعضاء",
+    "noData": "لا تتوفر بيانات",
+    "noActivity": "لا يوجد نشاط حديث",
+    "system": "النظام"
+  },
   "audit": {
     "filterUser": "المستخدم",
     "filterAction": "الإجراء",
@@ -252,7 +268,8 @@
     "typeAuth": "المصادقة",
     "typeSecurity": "الأمان",
     "permissionDenied": "تم رفض الإذن: {key}",
-    "rateLimited": "تم تجاوز حد الطلبات للإجراء: {action}"
+    "rateLimited": "تم تجاوز حد الطلبات للإجراء: {action}",
+    "permViewDashboard": "عرض لوحة المعلومات"
   },
   "notifications": {
     "personCreated": "تم إنشاء الشخص بنجاح",

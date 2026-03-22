@@ -37,7 +37,8 @@
     "keepExisting": "Сохранить",
     "replaceAll": "Заменить всё",
     "language": "Язык",
-    "theme": "Тема"
+    "theme": "Тема",
+    "dashboard": "Панель"
   },
   "home": {
     "title": "Система управления персоналом",
@@ -160,6 +161,21 @@
     "kickOutDescription": "Удалить этого пользователя из системы. Все права доступа и переопределения разрешений будут потеряны.",
     "kickOutConfirm": "Вы уверены, что хотите исключить {name}? Все права доступа и переопределения разрешений будут потеряны."
   },
+  "dashboard": {
+    "title": "Панель",
+    "persons": "Сотрудники",
+    "teams": "Команды",
+    "departments": "Отделы",
+    "users": "Пользователи",
+    "membersPerTeam": "Участники по командам",
+    "teamsPerDepartment": "Команды по отделам",
+    "organizationGrowth": "Рост организации",
+    "recentActivity": "Последняя активность",
+    "members": "Участники",
+    "noData": "Нет данных",
+    "noActivity": "Нет недавней активности",
+    "system": "Система"
+  },
   "audit": {
     "filterUser": "Пользователь",
     "filterAction": "Действие",
@@ -252,7 +268,8 @@
     "typeAuth": "Аутентификация",
     "typeSecurity": "Безопасность",
     "permissionDenied": "Доступ запрещён: {key}",
-    "rateLimited": "Превышен лимит запросов для действия: {action}"
+    "rateLimited": "Превышен лимит запросов для действия: {action}",
+    "permViewDashboard": "просмотр панели"
   },
   "notifications": {
     "personCreated": "Сотрудник успешно создан",

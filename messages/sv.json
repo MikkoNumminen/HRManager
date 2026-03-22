@@ -37,7 +37,8 @@
     "keepExisting": "Behåll befintlig",
     "replaceAll": "Ersätt allt",
     "language": "Språk",
-    "theme": "Tema"
+    "theme": "Tema",
+    "dashboard": "Instrumentpanel"
   },
   "home": {
     "title": "Personalhanteringssystem",
@@ -160,6 +161,21 @@
     "kickOutDescription": "Ta bort denna användare från systemet. De förlorar all åtkomst och behörighetsöverskridanden.",
     "kickOutConfirm": "Är du säker på att du vill sparka ut {name}? De förlorar åtkomst och alla behörighetsöverskridanden."
   },
+  "dashboard": {
+    "title": "Instrumentpanel",
+    "persons": "Personer",
+    "teams": "Team",
+    "departments": "Avdelningar",
+    "users": "Användare",
+    "membersPerTeam": "Medlemmar per team",
+    "teamsPerDepartment": "Team per avdelning",
+    "organizationGrowth": "Organisationstillväxt",
+    "recentActivity": "Senaste aktivitet",
+    "members": "Medlemmar",
+    "noData": "Inga data tillgängliga",
+    "noActivity": "Ingen senaste aktivitet",
+    "system": "Systemet"
+  },
   "audit": {
     "filterUser": "Användare",
     "filterAction": "Åtgärd",
@@ -173,8 +189,8 @@
     "actionKickout": "Utsparkning",
     "actionSeed": "Testdata",
     "actionReset": "Rensa",
-    "typePerson": "Person",
-    "typeTeam": "Team",
+    "typePerson": "Anställd",
+    "typeTeam": "Lag",
     "typeTeamMember": "Teammedlem",
     "typeDepartment": "Avdelning",
     "typeUser": "Användare",
@@ -190,7 +206,7 @@
     "tooltipType": "Typen av resurs som påverkades",
     "tooltipChanges": "Vad som ändrades — visar före och efter värden för uppdateringar",
     "noEntries": "Inga händelser hittades",
-    "system": "System",
+    "system": "Systemet",
     "addedPerson": "Lade till en ny person: {name}",
     "createdTeam": "Skapade ett nytt team: {name}",
     "addedMember": "Lade till en medlem i ett team",
@@ -252,7 +268,8 @@
     "typeAuth": "Autentisering",
     "typeSecurity": "Säkerhet",
     "permissionDenied": "Åtkomst nekad: {key}",
-    "rateLimited": "Hastighetsgräns överskriden för åtgärd: {action}"
+    "rateLimited": "Hastighetsgräns överskriden för åtgärd: {action}",
+    "permViewDashboard": "visa instrumentpanelen"
   },
   "notifications": {
     "personCreated": "Person skapad",

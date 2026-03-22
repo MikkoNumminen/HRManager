@@ -37,7 +37,8 @@
     "keepExisting": "Зберегти наявні",
     "replaceAll": "Замінити все",
     "language": "Мова",
-    "theme": "Тема"
+    "theme": "Тема",
+    "dashboard": "Панель"
   },
   "home": {
     "title": "Система управління персоналом",
@@ -160,6 +161,21 @@
     "kickOutDescription": "Видалити цього користувача із системи. Усі права доступу та перевизначення дозволів будуть втрачені.",
     "kickOutConfirm": "Ви впевнені, що хочете виключити {name}? Усі права доступу та перевизначення дозволів будуть втрачені."
   },
+  "dashboard": {
+    "title": "Панель",
+    "persons": "Працівники",
+    "teams": "Команди",
+    "departments": "Відділи",
+    "users": "Користувачі",
+    "membersPerTeam": "Учасники за командами",
+    "teamsPerDepartment": "Команди за відділами",
+    "organizationGrowth": "Зростання організації",
+    "recentActivity": "Остання активність",
+    "members": "Учасники",
+    "noData": "Немає даних",
+    "noActivity": "Немає нещодавньої активності",
+    "system": "Система"
+  },
   "audit": {
     "filterUser": "Користувач",
     "filterAction": "Дія",
@@ -252,7 +268,8 @@
     "typeAuth": "Автентифікація",
     "typeSecurity": "Безпека",
     "permissionDenied": "Доступ заборонено: {key}",
-    "rateLimited": "Перевищено ліміт запитів для дії: {action}"
+    "rateLimited": "Перевищено ліміт запитів для дії: {action}",
+    "permViewDashboard": "переглянути панель"
   },
   "notifications": {
     "personCreated": "Особу успішно створено",

@@ -37,7 +37,8 @@
     "keepExisting": "Säilytä nykyiset",
     "replaceAll": "Korvaa kaikki",
     "language": "Kieli",
-    "theme": "Teema"
+    "theme": "Teema",
+    "dashboard": "Kojelauta"
   },
   "home": {
     "title": "Henkilöstöhallintajärjestelmä",
@@ -160,6 +161,21 @@
     "kickOutDescription": "Poista tämä käyttäjä järjestelmästä. He menettävät kaikki käyttöoikeudet ja ohitukset.",
     "kickOutConfirm": "Haluatko varmasti poistaa käyttäjän {name}? He menettävät käyttöoikeutensa ja kaikki ohitukset."
   },
+  "dashboard": {
+    "title": "Kojelauta",
+    "persons": "Henkilöt",
+    "teams": "Tiimit",
+    "departments": "Osastot",
+    "users": "Käyttäjät",
+    "membersPerTeam": "Jäsenet per tiimi",
+    "teamsPerDepartment": "Tiimit per osasto",
+    "organizationGrowth": "Organisaation kasvu",
+    "recentActivity": "Viimeaikainen toiminta",
+    "members": "Jäsenet",
+    "noData": "Ei tietoja saatavilla",
+    "noActivity": "Ei viimeaikaista toimintaa",
+    "system": "Järjestelmä"
+  },
   "audit": {
     "filterUser": "Käyttäjä",
     "filterAction": "Toiminto",
@@ -252,7 +268,8 @@
     "typeAuth": "Todennus",
     "typeSecurity": "Turvallisuus",
     "permissionDenied": "Käyttö estetty: {key}",
-    "rateLimited": "Pyyntöraja ylitetty toiminnolle: {action}"
+    "rateLimited": "Pyyntöraja ylitetty toiminnolle: {action}",
+    "permViewDashboard": "nähdä kojelaudan"
   },
   "notifications": {
     "personCreated": "Henkilö luotu onnistuneesti",

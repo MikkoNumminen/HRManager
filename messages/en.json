@@ -37,7 +37,9 @@
     "keepExisting": "Keep Existing",
     "replaceAll": "Replace All",
     "language": "Language",
-    "theme": "Theme"
+    "theme": "Theme",
+    "dashboard": "Dashboard",
+    "menu": "Menu"
   },
   "home": {
     "title": "Human Resources Management System",
@@ -160,6 +162,21 @@
     "kickOutDescription": "Remove this user from the system. They will lose all access and permission overrides.",
     "kickOutConfirm": "Are you sure you want to kick out {name}? They will lose access and all permission overrides."
   },
+  "dashboard": {
+    "title": "Dashboard",
+    "persons": "Persons",
+    "teams": "Teams",
+    "departments": "Departments",
+    "users": "Users",
+    "membersPerTeam": "Members per Team",
+    "teamsPerDepartment": "Teams per Department",
+    "organizationGrowth": "Organization Growth",
+    "recentActivity": "Recent Activity",
+    "members": "Members",
+    "noData": "No data available",
+    "noActivity": "No recent activity",
+    "system": "System"
+  },
   "audit": {
     "filterUser": "User",
     "filterAction": "Action",
@@ -252,7 +269,8 @@
     "permSeedData": "load mock data",
     "permManageUsers": "manage users",
     "permChangePermissions": "change user permissions",
-    "permViewAuditLog": "view the audit log"
+    "permViewAuditLog": "view the audit log",
+    "permViewDashboard": "view the dashboard"
   },
   "notifications": {
     "personCreated": "Person created successfully",

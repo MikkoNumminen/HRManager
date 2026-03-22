@@ -37,7 +37,8 @@
     "keepExisting": "기존 유지",
     "replaceAll": "전체 교체",
     "language": "언어",
-    "theme": "테마"
+    "theme": "테마",
+    "dashboard": "대시보드"
   },
   "home": {
     "title": "인사 관리 시스템",
@@ -160,6 +161,21 @@
     "kickOutDescription": "이 사용자를 시스템에서 제거합니다. 모든 접근 권한과 권한 재정의가 삭제됩니다.",
     "kickOutConfirm": "{name}을(를) 추방하시겠습니까? 접근 권한과 모든 권한 재정의가 삭제됩니다."
   },
+  "dashboard": {
+    "title": "대시보드",
+    "persons": "인원",
+    "teams": "팀",
+    "departments": "부서",
+    "users": "사용자",
+    "membersPerTeam": "팀별 구성원",
+    "teamsPerDepartment": "부서별 팀",
+    "organizationGrowth": "조직 성장",
+    "recentActivity": "최근 활동",
+    "members": "구성원",
+    "noData": "데이터 없음",
+    "noActivity": "최근 활동 없음",
+    "system": "시스템"
+  },
   "audit": {
     "filterUser": "사용자",
     "filterAction": "작업",
@@ -252,7 +268,8 @@
     "typeAuth": "인증",
     "typeSecurity": "보안",
     "permissionDenied": "권한이 거부되었습니다: {key}",
-    "rateLimited": "작업에 대한 속도 제한 초과: {action}"
+    "rateLimited": "작업에 대한 속도 제한 초과: {action}",
+    "permViewDashboard": "대시보드 보기"
   },
   "notifications": {
     "personCreated": "직원이 생성되었습니다",

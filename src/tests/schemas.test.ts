@@ -10,6 +10,11 @@ import {
   AuditLogFilterSchema,
   AuditActionSchema,
   AuditEntityTypeSchema,
+  DashboardTeamSizeSchema,
+  DashboardDepartmentSizeSchema,
+  DashboardGrowthPointSchema,
+  DashboardRecentActivitySchema,
+  DashboardMetricsSchema,
 } from "@/schemas";
 
 const VALID_UUID = "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11";
@@ -548,5 +553,155 @@ describe("DepartmentSchema", () => {
   test("rejects invalid team inside teams array", () => {
     const dept = { ...validDepartment, teams: [{ teamId: "bad", teamName: "X" }] };
     expect(() => DepartmentSchema.parse(dept)).toThrow();
+  });
+});
+
+describe("DashboardTeamSizeSchema", () => {
+  // Accepts a valid team size entry.
+  test("accepts valid team size", () => {
+    const result = DashboardTeamSizeSchema.parse({ teamName: "Alpha", memberCount: 5 });
+    expect(result.teamName).toBe("Alpha");
+    expect(result.memberCount).toBe(5);
+  });
+
+  // Rejects missing teamName.
+  test("rejects missing teamName", () => {
+    expect(() => DashboardTeamSizeSchema.parse({ memberCount: 3 })).toThrow();
+  });
+
+  // Rejects non-integer memberCount.
+  test("rejects non-integer memberCount", () => {
+    expect(() => DashboardTeamSizeSchema.parse({ teamName: "A", memberCount: 2.5 })).toThrow();
+  });
+});
+
+describe("DashboardDepartmentSizeSchema", () => {
+  // Accepts a valid department size entry.
+  test("accepts valid department size", () => {
+    const result = DashboardDepartmentSizeSchema.parse({
+      departmentName: "Engineering",
+      teamCount: 3,
+    });
+    expect(result.departmentName).toBe("Engineering");
+    expect(result.teamCount).toBe(3);
+  });
+
+  // Rejects missing departmentName.
+  test("rejects missing departmentName", () => {
+    expect(() => DashboardDepartmentSizeSchema.parse({ teamCount: 1 })).toThrow();
+  });
+});
+
+describe("DashboardGrowthPointSchema", () => {
+  // Accepts a valid growth point.
+  test("accepts valid growth point", () => {
+    const result = DashboardGrowthPointSchema.parse({
+      date: "2026-01-15",
+      persons: 10,
+      teams: 3,
+      departments: 2,
+    });
+    expect(result.date).toBe("2026-01-15");
+    expect(result.persons).toBe(10);
+  });
+
+  // Rejects non-integer values.
+  test("rejects non-integer persons", () => {
+    expect(() =>
+      DashboardGrowthPointSchema.parse({
+        date: "2026-01-15",
+        persons: 1.5,
+        teams: 1,
+        departments: 1,
+      }),
+    ).toThrow();
+  });
+});
+
+describe("DashboardRecentActivitySchema", () => {
+  // Accepts a valid activity entry.
+  test("accepts valid activity entry", () => {
+    const result = DashboardRecentActivitySchema.parse({
+      action: "create",
+      entityType: "person",
+      userEmail: "admin@example.com",
+      createdAt: NOW,
+    });
+    expect(result.action).toBe("create");
+    expect(result.entityType).toBe("person");
+  });
+
+  // Accepts null userEmail.
+  test("accepts null userEmail", () => {
+    const result = DashboardRecentActivitySchema.parse({
+      action: "seed",
+      entityType: "person",
+      userEmail: null,
+      createdAt: NOW,
+    });
+    expect(result.userEmail).toBeNull();
+  });
+
+  // Rejects invalid action.
+  test("rejects invalid action", () => {
+    expect(() =>
+      DashboardRecentActivitySchema.parse({
+        action: "explode",
+        entityType: "person",
+        userEmail: null,
+        createdAt: NOW,
+      }),
+    ).toThrow();
+  });
+});
+
+describe("DashboardMetricsSchema", () => {
+  const validMetrics = {
+    totalPersons: 10,
+    totalTeams: 3,
+    totalDepartments: 2,
+    totalUsers: 5,
+    teamSizes: [{ teamName: "Alpha", memberCount: 4 }],
+    departmentSizes: [{ departmentName: "Eng", teamCount: 2 }],
+    growthTimeline: [{ date: "2026-01-15", persons: 5, teams: 2, departments: 1 }],
+    recentActivity: [
+      {
+        action: "create" as const,
+        entityType: "person" as const,
+        userEmail: "a@b.com",
+        createdAt: NOW,
+      },
+    ],
+  };
+
+  // Accepts a fully valid dashboard metrics object.
+  test("accepts valid dashboard metrics", () => {
+    const result = DashboardMetricsSchema.parse(validMetrics);
+    expect(result.totalPersons).toBe(10);
+    expect(result.teamSizes).toHaveLength(1);
+    expect(result.recentActivity).toHaveLength(1);
+  });
+
+  // Accepts empty arrays for all list fields.
+  test("accepts empty arrays", () => {
+    const result = DashboardMetricsSchema.parse({
+      ...validMetrics,
+      teamSizes: [],
+      departmentSizes: [],
+      growthTimeline: [],
+      recentActivity: [],
+    });
+    expect(result.teamSizes).toEqual([]);
+  });
+
+  // Rejects missing required count fields.
+  test("rejects missing totalPersons", () => {
+    const { totalPersons: _, ...metrics } = validMetrics;
+    expect(() => DashboardMetricsSchema.parse(metrics)).toThrow();
+  });
+
+  // Rejects non-integer counts.
+  test("rejects non-integer totalTeams", () => {
+    expect(() => DashboardMetricsSchema.parse({ ...validMetrics, totalTeams: 2.5 })).toThrow();
   });
 });
