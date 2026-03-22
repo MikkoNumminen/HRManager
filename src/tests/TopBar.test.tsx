@@ -264,6 +264,44 @@ describe("TopBar", () => {
     expect(link).toHaveAttribute("href", "/admin/audit");
   });
 
+  // Shows "Dashboard" menu item when user has dashboard:view permission.
+  test("shows Dashboard link when user has dashboard permission", () => {
+    mockUseSession.mockReturnValue({
+      data: {
+        user: {
+          name: "Alice",
+          email: "a@b.com",
+          image: null,
+          permissions: { "dashboard:view": true },
+        },
+      },
+      status: "authenticated",
+    });
+    render(<TopBar title="Home" />);
+    fireEvent.click(screen.getByLabelText("User menu"));
+    expect(screen.getByText("Dashboard")).toBeInTheDocument();
+    const link = screen.getByText("Dashboard").closest("a");
+    expect(link).toHaveAttribute("href", "/dashboard");
+  });
+
+  // Hides "Dashboard" menu item when user lacks dashboard:view permission.
+  test("hides Dashboard link when user lacks permission", () => {
+    mockUseSession.mockReturnValue({
+      data: {
+        user: {
+          name: "Alice",
+          email: "a@b.com",
+          image: null,
+          permissions: { "dashboard:view": false },
+        },
+      },
+      status: "authenticated",
+    });
+    render(<TopBar title="Home" />);
+    fireEvent.click(screen.getByLabelText("User menu"));
+    expect(screen.queryByText("Dashboard")).not.toBeInTheDocument();
+  });
+
   // Hides "Audit Log" menu item when user lacks the permission
   test("hides Audit Log link when user lacks permission", () => {
     mockUseSession.mockReturnValue({
