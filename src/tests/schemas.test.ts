@@ -5,6 +5,7 @@ import {
   DepartmentSchema,
   DepartmentTeamSchema,
   UserSchema,
+  UserProfileSchema,
   PermissionsSchema,
   AuditLogSchema,
   AuditLogFilterSchema,
@@ -15,6 +16,7 @@ import {
   DashboardGrowthPointSchema,
   DashboardRecentActivitySchema,
   DashboardMetricsSchema,
+  MAX_URL_LENGTH,
 } from "@/schemas";
 
 const VALID_UUID = "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11";
@@ -703,5 +705,73 @@ describe("DashboardMetricsSchema", () => {
   // Rejects non-integer counts.
   test("rejects non-integer totalTeams", () => {
     expect(() => DashboardMetricsSchema.parse({ ...validMetrics, totalTeams: 2.5 })).toThrow();
+  });
+});
+
+describe("UserProfileSchema", () => {
+  const validProfile = {
+    id: VALID_UUID,
+    email: "alice@example.com",
+    name: "Alice",
+    image: "https://example.com/avatar.jpg",
+    role: "administrator" as const,
+    createdAt: NOW,
+    updatedAt: NOW,
+    resolvedPermissions: { "person:create": true, "person:read": false },
+  };
+
+  // Accepts a complete, valid user profile.
+  test("accepts a fully valid profile", () => {
+    expect(() => UserProfileSchema.parse(validProfile)).not.toThrow();
+  });
+
+  // Name and image can both be null (OAuth user without name, no custom avatar).
+  test("accepts null name and null image", () => {
+    const profile = { ...validProfile, name: null, image: null };
+    const result = UserProfileSchema.parse(profile);
+    expect(result.name).toBeNull();
+    expect(result.image).toBeNull();
+  });
+
+  // All four roles are accepted.
+  test("accepts all four valid roles", () => {
+    for (const role of ["superuser", "administrator", "user", "guest"]) {
+      expect(() => UserProfileSchema.parse({ ...validProfile, role })).not.toThrow();
+    }
+  });
+
+  // Made-up roles like "moderator" should fail.
+  test("rejects invalid role", () => {
+    expect(() => UserProfileSchema.parse({ ...validProfile, role: "moderator" })).toThrow();
+  });
+
+  // resolvedPermissions must be a record of string → boolean.
+  test("rejects non-boolean values in resolvedPermissions", () => {
+    expect(() =>
+      UserProfileSchema.parse({ ...validProfile, resolvedPermissions: { key: "yes" } }),
+    ).toThrow();
+  });
+
+  // Empty permissions record is fine (guest with no permissions).
+  test("accepts empty resolvedPermissions", () => {
+    const result = UserProfileSchema.parse({ ...validProfile, resolvedPermissions: {} });
+    expect(result.resolvedPermissions).toEqual({});
+  });
+
+  // Invalid UUID for id should fail.
+  test("rejects invalid UUID for id", () => {
+    expect(() => UserProfileSchema.parse({ ...validProfile, id: "not-a-uuid" })).toThrow();
+  });
+
+  // Invalid email format should fail.
+  test("rejects invalid email", () => {
+    expect(() => UserProfileSchema.parse({ ...validProfile, email: "not-email" })).toThrow();
+  });
+});
+
+describe("MAX_URL_LENGTH", () => {
+  // The URL max length constant should be 2048 characters (standard browser URL limit).
+  test("is 2048", () => {
+    expect(MAX_URL_LENGTH).toBe(2048);
   });
 });

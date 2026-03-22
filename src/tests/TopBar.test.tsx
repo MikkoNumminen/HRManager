@@ -853,4 +853,47 @@ describe("TopBar", () => {
     const navLink = presentation.querySelector('a[href="/admin"]') as HTMLElement;
     expect(() => fireEvent.click(navLink)).not.toThrow();
   });
+
+  // Shows "Profile" link in desktop menu when user is authenticated (no permission needed).
+  test("shows Profile link in desktop menu when authenticated", () => {
+    mockUseSession.mockReturnValue({
+      data: { user: { name: "Alice Smith", email: "alice@example.com", image: null } },
+      status: "authenticated",
+    });
+    render(<TopBar title="Home" />);
+    fireEvent.click(screen.getByLabelText("User menu"));
+    expect(screen.getByText("Profile")).toBeInTheDocument();
+    const link = screen.getByText("Profile").closest("a");
+    expect(link).toHaveAttribute("href", "/profile");
+  });
+
+  // Profile link should not be visible when unauthenticated (no user menu at all).
+  test("does not show Profile link when unauthenticated", () => {
+    render(<TopBar title="Home" />);
+    expect(screen.queryByText("Profile")).not.toBeInTheDocument();
+  });
+
+  // Shows "Profile" link in mobile drawer when user is authenticated.
+  test("shows Profile link in mobile drawer when authenticated", () => {
+    mockUseSession.mockReturnValue({
+      data: {
+        user: { name: "Alice", email: "a@b.com", image: null },
+      },
+      status: "authenticated",
+    });
+    render(<TopBar title="Home" />);
+    fireEvent.click(screen.getByLabelText("Menu"));
+    const drawer = screen.getByTestId("mobile-drawer");
+    const profileLink = drawer.querySelector('a[href="/profile"]');
+    expect(profileLink).toBeInTheDocument();
+  });
+
+  // Mobile drawer should not show Profile link when unauthenticated.
+  test("does not show Profile link in mobile drawer when unauthenticated", () => {
+    render(<TopBar title="Home" />);
+    fireEvent.click(screen.getByLabelText("Menu"));
+    const drawer = screen.getByTestId("mobile-drawer");
+    const profileLink = drawer.querySelector('a[href="/profile"]');
+    expect(profileLink).not.toBeInTheDocument();
+  });
 });

@@ -70,7 +70,11 @@ import {
   updateUserRole,
   updateUserPermission,
   kickOutUser,
+  updateProfileName,
+  updateProfileImage,
 } from "@/serverActions";
+
+const { auth } = require("@/auth");
 
 // Helper to build FormData — server actions receive form submissions,
 // so we simulate that by packing key-value pairs into a FormData object.
@@ -1721,5 +1725,254 @@ describe("kickOutUser", () => {
   // Throws when userId is not a valid UUID format.
   test("throws on invalid UUID", async () => {
     await expect(kickOutUser(formData({ userId: "not-a-uuid" }))).rejects.toThrow();
+  });
+});
+
+describe("updateProfileName", () => {
+  beforeEach(async () => {
+    await cleanDb();
+  });
+  afterAll(async () => {
+    await cleanDb();
+    await testPrisma.$disconnect();
+  });
+
+  // The happy path: update the display name for the logged-in user.
+  test("updates the user's display name", async () => {
+    const user = await testPrisma.user.create({
+      data: { email: "alice@test.com", name: "Alice", role: "user" },
+    });
+    auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
+    await updateProfileName(formData({ name: "Alice Smith" }));
+    const updated = await testPrisma.user.findUnique({ where: { id: user.id } });
+    expect(updated!.name).toBe("Alice Smith");
+  });
+
+  // Trims whitespace from the name before saving.
+  test("trims whitespace from name", async () => {
+    const user = await testPrisma.user.create({
+      data: { email: "bob@test.com", name: "Bob", role: "user" },
+    });
+    auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
+    await updateProfileName(formData({ name: "  Bob Williams  " }));
+    const updated = await testPrisma.user.findUnique({ where: { id: user.id } });
+    expect(updated!.name).toBe("Bob Williams");
+  });
+
+  // An empty name should be rejected — display name is required.
+  test("throws on empty name", async () => {
+    const user = await testPrisma.user.create({
+      data: { email: "alice@test.com", name: "Alice", role: "user" },
+    });
+    auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
+    await expect(updateProfileName(formData({ name: "" }))).rejects.toThrow("Name is required");
+  });
+
+  // A whitespace-only name should also be rejected.
+  test("throws on whitespace-only name", async () => {
+    const user = await testPrisma.user.create({
+      data: { email: "alice@test.com", name: "Alice", role: "user" },
+    });
+    auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
+    await expect(updateProfileName(formData({ name: "   " }))).rejects.toThrow("Name is required");
+  });
+
+  // Names over the max length (255 chars) should be rejected.
+  test("throws on name exceeding max length", async () => {
+    const user = await testPrisma.user.create({
+      data: { email: "alice@test.com", name: "Alice", role: "user" },
+    });
+    auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
+    const longName = "A".repeat(256);
+    await expect(updateProfileName(formData({ name: longName }))).rejects.toThrow(
+      "characters or less",
+    );
+  });
+
+  // Unauthenticated users can't update a profile — no session, no go.
+  test("throws when not authenticated", async () => {
+    auth.mockResolvedValueOnce(null);
+    await expect(updateProfileName(formData({ name: "Hacker" }))).rejects.toThrow(
+      "Not authenticated",
+    );
+  });
+
+  // Session with missing user id should also fail.
+  test("throws when session has no user id", async () => {
+    auth.mockResolvedValueOnce({ user: { email: "alice@test.com" } });
+    await expect(updateProfileName(formData({ name: "Alice" }))).rejects.toThrow(
+      "Not authenticated",
+    );
+  });
+
+  // If the user has been deleted between session creation and profile update, fail gracefully.
+  test("throws when user not found in database", async () => {
+    auth.mockResolvedValueOnce({
+      user: { id: "00000000-0000-0000-0000-000000000000", email: "ghost@test.com" },
+    });
+    await expect(updateProfileName(formData({ name: "Ghost" }))).rejects.toThrow("User not found");
+  });
+
+  // Missing name field in form data should be rejected.
+  test("throws when name field is missing from form data", async () => {
+    const user = await testPrisma.user.create({
+      data: { email: "alice@test.com", name: "Alice", role: "user" },
+    });
+    auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
+    await expect(updateProfileName(formData({}))).rejects.toThrow("Name is required");
+  });
+});
+
+describe("updateProfileImage", () => {
+  beforeEach(async () => {
+    await cleanDb();
+  });
+  afterAll(async () => {
+    await cleanDb();
+    await testPrisma.$disconnect();
+  });
+
+  // Set a custom profile picture URL and verify it saved.
+  test("sets a custom profile image URL", async () => {
+    const user = await testPrisma.user.create({
+      data: { email: "alice@test.com", name: "Alice", role: "user" },
+    });
+    auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
+    await updateProfileImage(formData({ image: "https://example.com/avatar.jpg" }));
+    const updated = await testPrisma.user.findUnique({ where: { id: user.id } });
+    expect(updated!.image).toBe("https://example.com/avatar.jpg");
+  });
+
+  // Sending an empty string clears the custom image (reverts to OAuth avatar).
+  test("clears the image when empty string is sent", async () => {
+    const user = await testPrisma.user.create({
+      data: {
+        email: "alice@test.com",
+        name: "Alice",
+        image: "https://old.com/pic.jpg",
+        role: "user",
+      },
+    });
+    auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
+    await updateProfileImage(formData({ image: "" }));
+    const updated = await testPrisma.user.findUnique({ where: { id: user.id } });
+    expect(updated!.image).toBeNull();
+  });
+
+  // Whitespace-only should also clear the image.
+  test("clears the image when whitespace-only string is sent", async () => {
+    const user = await testPrisma.user.create({
+      data: {
+        email: "alice@test.com",
+        name: "Alice",
+        image: "https://old.com/pic.jpg",
+        role: "user",
+      },
+    });
+    auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
+    await updateProfileImage(formData({ image: "   " }));
+    const updated = await testPrisma.user.findUnique({ where: { id: user.id } });
+    expect(updated!.image).toBeNull();
+  });
+
+  // Trims whitespace from the URL before saving.
+  test("trims whitespace from image URL", async () => {
+    const user = await testPrisma.user.create({
+      data: { email: "alice@test.com", name: "Alice", role: "user" },
+    });
+    auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
+    await updateProfileImage(formData({ image: "  https://example.com/pic.png  " }));
+    const updated = await testPrisma.user.findUnique({ where: { id: user.id } });
+    expect(updated!.image).toBe("https://example.com/pic.png");
+  });
+
+  // Only http and https URLs are allowed — no javascript: or ftp: schemes.
+  test("rejects non-http/https protocols", async () => {
+    const user = await testPrisma.user.create({
+      data: { email: "alice@test.com", name: "Alice", role: "user" },
+    });
+    auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
+    await expect(updateProfileImage(formData({ image: "javascript:alert(1)" }))).rejects.toThrow(
+      "protocol",
+    );
+  });
+
+  // ftp URLs should also be rejected.
+  test("rejects ftp URLs", async () => {
+    const user = await testPrisma.user.create({
+      data: { email: "alice@test.com", name: "Alice", role: "user" },
+    });
+    auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
+    await expect(
+      updateProfileImage(formData({ image: "ftp://example.com/pic.jpg" })),
+    ).rejects.toThrow("protocol");
+  });
+
+  // Completely invalid URLs that can't be parsed should be rejected.
+  test("rejects invalid URL format", async () => {
+    const user = await testPrisma.user.create({
+      data: { email: "alice@test.com", name: "Alice", role: "user" },
+    });
+    auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
+    await expect(updateProfileImage(formData({ image: "not a url" }))).rejects.toThrow(
+      "Invalid URL format",
+    );
+  });
+
+  // URLs over the max length (2048 chars) should be rejected.
+  test("rejects URL exceeding max length", async () => {
+    const user = await testPrisma.user.create({
+      data: { email: "alice@test.com", name: "Alice", role: "user" },
+    });
+    auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
+    const longUrl = "https://example.com/" + "a".repeat(2040);
+    await expect(updateProfileImage(formData({ image: longUrl }))).rejects.toThrow(
+      "characters or less",
+    );
+  });
+
+  // Unauthenticated users can't change profile pictures.
+  test("throws when not authenticated", async () => {
+    auth.mockResolvedValueOnce(null);
+    await expect(
+      updateProfileImage(formData({ image: "https://example.com/pic.jpg" })),
+    ).rejects.toThrow("Not authenticated");
+  });
+
+  // If the user was deleted after login, fail gracefully.
+  test("throws when user not found in database", async () => {
+    auth.mockResolvedValueOnce({
+      user: { id: "00000000-0000-0000-0000-000000000000", email: "ghost@test.com" },
+    });
+    await expect(
+      updateProfileImage(formData({ image: "https://example.com/pic.jpg" })),
+    ).rejects.toThrow("User not found");
+  });
+
+  // http URLs (not just https) should be accepted.
+  test("accepts http URLs", async () => {
+    const user = await testPrisma.user.create({
+      data: { email: "alice@test.com", name: "Alice", role: "user" },
+    });
+    auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
+    await updateProfileImage(formData({ image: "http://example.com/pic.jpg" }));
+    const updated = await testPrisma.user.findUnique({ where: { id: user.id } });
+    expect(updated!.image).toBe("http://example.com/pic.jpg");
+  });
+
+  // Missing image field should clear the image (treat as empty string).
+  test("clears image when image field is missing from form data", async () => {
+    const user = await testPrisma.user.create({
+      data: {
+        email: "alice@test.com",
+        name: "Alice",
+        image: "https://old.com/pic.jpg",
+        role: "user",
+      },
+    });
+    auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
+    await updateProfileImage(formData({}));
+    const updated = await testPrisma.user.findUnique({ where: { id: user.id } });
+    expect(updated!.image).toBeNull();
   });
 });

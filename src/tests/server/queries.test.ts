@@ -35,7 +35,10 @@ import {
   getAuditLogs,
   getAuditLogUserEmails,
   getDashboardMetrics,
+  getProfile,
 } from "@/queries";
+
+const { auth } = require("@/auth");
 
 describe("getPersons", () => {
   beforeEach(async () => {
@@ -832,5 +835,110 @@ describe("audit log permission checks", () => {
   test("getAuditLogUserEmails throws when permission is denied", async () => {
     hasPermission.mockResolvedValueOnce(false);
     await expect(getAuditLogUserEmails()).rejects.toThrow("Permission denied");
+  });
+});
+
+describe("getProfile", () => {
+  beforeEach(async () => {
+    await cleanDb();
+  });
+  afterAll(async () => {
+    await cleanDb();
+    await testPrisma.$disconnect();
+  });
+
+  // Returns the full profile for an authenticated user with resolved permissions.
+  test("returns user profile with resolved permissions", async () => {
+    const user = await testPrisma.user.create({
+      data: { email: "alice@test.com", name: "Alice", role: "user" },
+    });
+    auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
+    const profile = await getProfile();
+    expect(profile).not.toBeNull();
+    expect(profile!.email).toBe("alice@test.com");
+    expect(profile!.name).toBe("Alice");
+    expect(profile!.role).toBe("user");
+    expect(profile!.resolvedPermissions).toBeDefined();
+    expect(typeof profile!.resolvedPermissions["person:read"]).toBe("boolean");
+  });
+
+  // Returns null when no session exists (unauthenticated).
+  test("returns null when not authenticated", async () => {
+    auth.mockResolvedValueOnce(null);
+    const profile = await getProfile();
+    expect(profile).toBeNull();
+  });
+
+  // Returns null when session has no email.
+  test("returns null when session has no email", async () => {
+    auth.mockResolvedValueOnce({ user: { id: "some-id" } });
+    const profile = await getProfile();
+    expect(profile).toBeNull();
+  });
+
+  // Returns null when the user has been deleted from the database.
+  test("returns null when user not found in database", async () => {
+    auth.mockResolvedValueOnce({ user: { email: "deleted@test.com" } });
+    const profile = await getProfile();
+    expect(profile).toBeNull();
+  });
+
+  // Profile includes correct role-based default permissions for a user role.
+  test("includes correct default permissions for user role", async () => {
+    const user = await testPrisma.user.create({
+      data: { email: "basic@test.com", name: "Basic User", role: "user" },
+    });
+    auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
+    const profile = await getProfile();
+    expect(profile!.resolvedPermissions["person:read"]).toBe(true);
+    expect(profile!.resolvedPermissions["person:create"]).toBe(false);
+  });
+
+  // Profile includes correct permissions for an administrator.
+  test("includes correct permissions for administrator role", async () => {
+    const user = await testPrisma.user.create({
+      data: { email: "admin@test.com", name: "Admin", role: "administrator" },
+    });
+    auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
+    const profile = await getProfile();
+    expect(profile!.resolvedPermissions["person:create"]).toBe(true);
+    expect(profile!.resolvedPermissions["dashboard:view"]).toBe(true);
+  });
+
+  // Superuser gets all permissions enabled.
+  test("superuser gets all permissions granted", async () => {
+    const user = await testPrisma.user.create({
+      data: { email: "super@test.com", name: "Super", role: "superuser" },
+    });
+    auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
+    const profile = await getProfile();
+    const allTrue = Object.values(profile!.resolvedPermissions).every((v) => v === true);
+    expect(allTrue).toBe(true);
+  });
+
+  // Returns createdAt and updatedAt as Date objects.
+  test("returns date fields as Date instances", async () => {
+    const user = await testPrisma.user.create({
+      data: { email: "alice@test.com", name: "Alice", role: "user" },
+    });
+    auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
+    const profile = await getProfile();
+    expect(profile!.createdAt).toBeInstanceOf(Date);
+    expect(profile!.updatedAt).toBeInstanceOf(Date);
+  });
+
+  // Image field is included in the profile (can be null or a URL string).
+  test("includes image field", async () => {
+    const user = await testPrisma.user.create({
+      data: {
+        email: "alice@test.com",
+        name: "Alice",
+        role: "user",
+        image: "https://example.com/pic.jpg",
+      },
+    });
+    auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
+    const profile = await getProfile();
+    expect(profile!.image).toBe("https://example.com/pic.jpg");
   });
 });
