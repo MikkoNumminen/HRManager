@@ -1,0 +1,111 @@
+name: Auto-fix CI failures
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+
+jobs:
+  autofix:
+    # Only run on main branch failures, never on PR failures (security)
+    if: >
+      github.event.workflow_run.conclusion == 'failure' &&
+      github.event.workflow_run.head_branch == 'main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: read
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: hrmanager_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/hrmanager_test
+      DIRECT_URL: postgresql://postgres:postgres@localhost:5432/hrmanager_test
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Download CI failure logs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh run view ${{ github.event.workflow_run.id }} --log-failed 2>&1 | tail -300 > /tmp/ci-errors.log
+
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Fix errors with Claude Code
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          claude -p "The CI pipeline for this project failed. Here are the error logs:
+
+          $(cat /tmp/ci-errors.log)
+
+          Analyze the errors and make the minimal fixes needed. After fixing, run 'npm run format' to ensure formatting is correct, then run 'npm run test:all' to verify the fix works.
+
+          Only fix what is broken — do not refactor, add features, or make unnecessary changes." \
+            --allowedTools "Edit,Write,Bash,Read,Glob,Grep"
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create fix PR
+        if: steps.changes.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BRANCH="autofix/ci-$(date +%Y%m%d-%H%M%S)"
+          git config user.name "claude-code[bot]"
+          git config user.email "claude-code[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add -A
+          git commit -m "fix: auto-fix CI errors from run #${{ github.event.workflow_run.run_number }}"
+          git push origin "$BRANCH"
+          gh pr create \
+            --title "fix: auto-fix CI errors from run #${{ github.event.workflow_run.run_number }}" \
+            --body "$(cat <<EOF
+          ## Auto-fix PR
+
+          CI run [#${{ github.event.workflow_run.run_number }}](${{ github.event.workflow_run.html_url }}) failed.
+
+          Claude Code analyzed the error logs and applied this fix automatically.
+
+          **Review carefully before merging.**
+
+          🤖 Generated with [Claude Code](https://claude.com/claude-code)
+          EOF
+          )"
