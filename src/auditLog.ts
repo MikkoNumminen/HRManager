@@ -33,7 +33,8 @@ interface AuditLogParams {
 
 async function getSessionUser(): Promise<{ id?: string; email?: string } | null> {
   const session = await auth();
-  return session?.user ?? null;
+  if (!session?.user) return null;
+  return { id: session.user.id, email: session.user.email ?? undefined };
 }
 
 export async function logAudit({
