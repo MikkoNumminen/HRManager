@@ -39,17 +39,17 @@ describe("OptimisticDepartments", () => {
     expect(screen.queryByText("Add Department")).not.toBeInTheDocument();
   });
 
-  // Displays the heading and table data from server props.
+  // Displays the heading and table data from server props (both desktop + mobile views).
   test("renders the departments table with provided data", () => {
     render(<OptimisticDepartments departments={mockDepartments} canCreate={false} />);
     expect(screen.getByText("Departments")).toBeInTheDocument();
-    expect(screen.getByText("Engineering")).toBeInTheDocument();
+    expect(screen.getAllByText("Engineering").length).toBeGreaterThanOrEqual(1);
   });
 
   // Shows empty state when there are no departments.
   test("renders empty table when departments array is empty", () => {
     render(<OptimisticDepartments departments={[]} canCreate={false} />);
-    expect(screen.getByText("No Departments Available")).toBeInTheDocument();
+    expect(screen.getAllByText("No Departments Available").length).toBeGreaterThanOrEqual(1);
   });
 
   // Renders multiple departments in the table.
@@ -68,8 +68,8 @@ describe("OptimisticDepartments", () => {
       },
     ];
     render(<OptimisticDepartments departments={departments} canCreate={false} />);
-    expect(screen.getByText("Engineering")).toBeInTheDocument();
-    expect(screen.getByText("Marketing")).toBeInTheDocument();
+    expect(screen.getAllByText("Engineering").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Marketing").length).toBeGreaterThanOrEqual(1);
   });
 
   // Submitting the form optimistically adds the new department to the table
@@ -88,7 +88,7 @@ describe("OptimisticDepartments", () => {
     fireEvent.click(screen.getByRole("button", { name: /Create/i }));
 
     await waitFor(() => {
-      expect(screen.getByText("New Dept")).toBeInTheDocument();
+      expect(screen.getAllByText("New Dept").length).toBeGreaterThanOrEqual(1);
     });
 
     resolveCreate();

@@ -40,17 +40,17 @@ describe("OptimisticTeams", () => {
     expect(screen.queryByText("Add Team")).not.toBeInTheDocument();
   });
 
-  // Displays the heading and table data from server props.
+  // Displays the heading and table data from server props (both desktop + mobile views).
   test("renders the teams table with provided data", () => {
     render(<OptimisticTeams teams={mockTeams} canCreate={false} />);
     expect(screen.getByText("Teams")).toBeInTheDocument();
-    expect(screen.getByText("Engineering")).toBeInTheDocument();
+    expect(screen.getAllByText("Engineering").length).toBeGreaterThanOrEqual(1);
   });
 
   // Shows empty state when there are no teams.
   test("renders empty table when teams array is empty", () => {
     render(<OptimisticTeams teams={[]} canCreate={false} />);
-    expect(screen.getByText("No Teams Available")).toBeInTheDocument();
+    expect(screen.getAllByText("No Teams Available").length).toBeGreaterThanOrEqual(1);
   });
 
   // Renders multiple teams in the table.
@@ -70,8 +70,8 @@ describe("OptimisticTeams", () => {
       },
     ];
     render(<OptimisticTeams teams={teams} canCreate={false} />);
-    expect(screen.getByText("Engineering")).toBeInTheDocument();
-    expect(screen.getByText("Design")).toBeInTheDocument();
+    expect(screen.getAllByText("Engineering").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Design").length).toBeGreaterThanOrEqual(1);
   });
 
   // Submitting the form optimistically adds the new team to the table
@@ -90,7 +90,7 @@ describe("OptimisticTeams", () => {
     fireEvent.click(screen.getByRole("button", { name: /Create/i }));
 
     await waitFor(() => {
-      expect(screen.getByText("New Team")).toBeInTheDocument();
+      expect(screen.getAllByText("New Team").length).toBeGreaterThanOrEqual(1);
     });
 
     resolveCreate();

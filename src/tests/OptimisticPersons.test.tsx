@@ -37,17 +37,17 @@ describe("OptimisticPersons", () => {
     expect(screen.queryByText("Add Person")).not.toBeInTheDocument();
   });
 
-  // Displays the heading and table data from server props.
+  // Displays the heading and table data from server props (both desktop + mobile views).
   test("renders the person table with provided data", () => {
     render(<OptimisticPersons persons={mockPersons} canCreate={false} />);
     expect(screen.getByText("Persons")).toBeInTheDocument();
-    expect(screen.getByText("Alice")).toBeInTheDocument();
+    expect(screen.getAllByText("Alice").length).toBeGreaterThanOrEqual(1);
   });
 
   // Shows empty state when there are no persons.
   test("renders empty table when persons array is empty", () => {
     render(<OptimisticPersons persons={[]} canCreate={false} />);
-    expect(screen.getByText("No Persons Available")).toBeInTheDocument();
+    expect(screen.getAllByText("No Persons Available").length).toBeGreaterThanOrEqual(1);
   });
 
   // Renders multiple persons in the table.
@@ -64,8 +64,8 @@ describe("OptimisticPersons", () => {
       },
     ];
     render(<OptimisticPersons persons={persons} canCreate={false} />);
-    expect(screen.getByText("Alice")).toBeInTheDocument();
-    expect(screen.getByText("Bob")).toBeInTheDocument();
+    expect(screen.getAllByText("Alice").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Bob").length).toBeGreaterThanOrEqual(1);
   });
 
   // Submitting the form optimistically adds the new person to the table
@@ -87,7 +87,7 @@ describe("OptimisticPersons", () => {
     fireEvent.click(screen.getByRole("button", { name: /Create/i }));
 
     await waitFor(() => {
-      expect(screen.getByText("New Person")).toBeInTheDocument();
+      expect(screen.getAllByText("New Person").length).toBeGreaterThanOrEqual(1);
     });
 
     resolveCreate();

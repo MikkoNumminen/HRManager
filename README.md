@@ -1,6 +1,6 @@
 # HRManager
 
-A production-grade HR management system with granular RBAC, dashboard analytics, audit logging, rate limiting, CSP + security headers, AI-powered i18n across 18 languages, and 1012 tests (978 unit/integration + 34 E2E) at 99.4% line coverage.
+A production-grade HR management system with granular RBAC, dashboard analytics, audit logging, rate limiting, CSP + security headers, AI-powered i18n across 18 languages, and 1047 tests (1013 unit/integration + 34 E2E) at 99.5% line coverage.
 
 [![CI](https://github.com/MikkoNumminen/HRManager/actions/workflows/ci.yml/badge.svg)](https://github.com/MikkoNumminen/HRManager/actions/workflows/ci.yml)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)
@@ -29,7 +29,7 @@ A production-grade HR management system with granular RBAC, dashboard analytics,
 
 - **Dashboard analytics** — KPI cards, bar chart (members per team), pie chart (teams per department), line chart (organization growth), and recent activity feed powered by MUI X Charts; permission-gated via `dashboard:view`
 - **Optimistic updates** — React 19 `useOptimistic` on all create actions; new items appear in the table instantly before the server responds, then seamlessly merge with real data on revalidation
-- **1012 tests (978 unit/integration + 34 E2E), 99.4% line coverage** — Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, rate limiting, auth route handlers, CSP proxy, audit logging, dashboard analytics, optimistic UI, all 45 UI components tested against real PostgreSQL, plus Playwright E2E covering full user flows
+- **1047 tests (1013 unit/integration + 34 E2E), 99.4% line coverage** — Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, rate limiting, auth route handlers, CSP proxy, audit logging, dashboard analytics, optimistic UI, all 45 UI components tested against real PostgreSQL, plus Playwright E2E covering full user flows
 - **Granular RBAC** — 4 roles, 24 permission keys, per-user grant/deny overrides with three-state toggles (deny / role default / grant), and "kick out" user removal with confirmation dialog
 - **Soft deletes** — `deletedAt` column on Person, Team, Department, and TeamMember with partial unique indexes (`WHERE deletedAt IS NULL`); cascade soft-deletes for team memberships and FK nulling for manager/head references; preserves full audit history
 - **Immutable audit trail** — every mutation logged with before/after JSON snapshots inside the same `$transaction` for atomicity; permission denials and rate limit hits also logged as security events
@@ -116,13 +116,13 @@ Individual permissions can be overridden per-user — e.g. granting `person:crea
 | Auth route       | 5        |
 | CSP proxy        | 20       |
 | RBAC logic       | 28       |
-| UI components    | 605      |
+| UI components    | 640      |
 | E2E (Playwright) | 34       |
-| **Total**        | **1012** |
+| **Total**        | **1047** |
 
 ```
-Statements : 98.85%    Branches : 94.56%
-Functions  : 98.76%    Lines    : 99.37%
+Statements : 98.95%    Branches : 94.84%
+Functions  : 98.81%    Lines    : 99.48%
 ```
 
 Server-side tests run against a real PostgreSQL test database. Client-side tests cover all 45 components including dashboard charts, optimistic create wrappers, permission toggles, audit log filtering, tutorial system, snackbar notifications, theme switching, and language selection. Playwright E2E tests run against a production build covering authentication, CRUD for all entities, admin/audit access, guest access control, theme/language persistence, and snackbar lifecycle.
