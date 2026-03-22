@@ -16,7 +16,11 @@ import { useSnackbar } from "./SnackbarProvider";
 
 type FormState = { error: string | null; success: boolean };
 
-const AddTeamForm: React.FC = () => {
+interface AddTeamFormProps {
+  onOptimisticAdd?: (teamName: string) => void;
+}
+
+const AddTeamForm: React.FC<AddTeamFormProps> = ({ onOptimisticAdd }) => {
   const t = useTranslations("teams");
   const tc = useTranslations("common");
   const tn = useTranslations("notifications");
@@ -27,6 +31,7 @@ const AddTeamForm: React.FC = () => {
   const [state, formAction, isPending] = useActionState(
     async (_prev: FormState, formData: FormData): Promise<FormState> => {
       try {
+        onOptimisticAdd?.(formData.get("name") as string);
         completeTutorialStep("create_team");
         await createTeam(formData);
         showSnackbar(tn("teamCreated"));

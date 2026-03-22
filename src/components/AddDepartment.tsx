@@ -16,7 +16,11 @@ import { useSnackbar } from "./SnackbarProvider";
 
 type FormState = { error: string | null; success: boolean };
 
-const AddDepartmentForm: React.FC = () => {
+interface AddDepartmentFormProps {
+  onOptimisticAdd?: (name: string, description: string) => void;
+}
+
+const AddDepartmentForm: React.FC<AddDepartmentFormProps> = ({ onOptimisticAdd }) => {
   const t = useTranslations("departments");
   const tc = useTranslations("common");
   const tn = useTranslations("notifications");
@@ -28,6 +32,10 @@ const AddDepartmentForm: React.FC = () => {
   const [state, formAction, isPending] = useActionState(
     async (_prev: FormState, formData: FormData): Promise<FormState> => {
       try {
+        onOptimisticAdd?.(
+          formData.get("name") as string,
+          (formData.get("description") as string) || "",
+        );
         completeTutorialStep("create_department");
         await createDepartment(formData);
         showSnackbar(tn("departmentCreated"));

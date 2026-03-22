@@ -1,8 +1,5 @@
-import { Box, Typography } from "@mui/material";
-import AddDepartmentForm from "@/components/AddDepartment";
-import EditableDepartmentsTable from "@/components/EditableDepartmentsTable";
 import TopBar from "@/components/TopBar";
-import { pageContainerStyles } from "@/muiStyles";
+import OptimisticDepartments from "@/components/OptimisticDepartments";
 import { getDepartments } from "@/queries";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
@@ -27,13 +24,10 @@ export default async function ManageDepartmentsPage() {
   return (
     <>
       <TopBar title={t("manageTitle")} backHref="/" permissions={permissions} />
-      {permissions["department:create"] && <AddDepartmentForm />}
-      <Box data-tutorial="departments-table" sx={pageContainerStyles}>
-        <Typography variant="h6" mb={1}>
-          {t("heading")}
-        </Typography>
-        <EditableDepartmentsTable departments={departments} />
-      </Box>
+      <OptimisticDepartments
+        departments={departments}
+        canCreate={permissions["department:create"]}
+      />
     </>
   );
 }
