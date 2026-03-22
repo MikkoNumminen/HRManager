@@ -829,9 +829,6 @@ export async function seedMockData(clearExisting: boolean = true) {
       { name: "Dave Martinez", position: "Backend Developer", email: "dave@example.com" },
       { name: "Eve Thompson", position: "QA Engineer", email: "eve@example.com" },
       { name: "Frank Lee", position: "Product Owner", email: "frank@example.com" },
-      { name: "Grace Park", position: "DevOps Lead", email: "grace@example.com" },
-      { name: "Henry Chen", position: "Data Analyst", email: "henry@example.com" },
-      { name: "Ivy Santos", position: "HR Coordinator", email: "ivy@example.com" },
     ];
     const persons = [];
     for (const p of personSeeds) {
@@ -841,15 +838,13 @@ export async function seedMockData(clearExisting: boolean = true) {
       const person = existing ?? (await prisma.person.create({ data: p }));
       persons.push(person);
     }
-    const [alice, bob, carol, dave, eve, frank, grace, henry, ivy] = persons;
+    const [alice, bob, carol, dave, eve, frank] = persons;
 
     // Upsert teams — find existing by name or create new
     const teamSeeds = [
       { teamName: "Engineering", teamManagerId: alice.id },
       { teamName: "Design", teamManagerId: carol.id },
-      { teamName: "Platform", teamManagerId: grace.id },
-      { teamName: "Data Analytics", teamManagerId: henry.id },
-      { teamName: "People & Culture", teamManagerId: ivy.id },
+      { teamName: "Platform", teamManagerId: dave.id },
     ];
     const teams = [];
     for (const t of teamSeeds) {
@@ -859,20 +854,17 @@ export async function seedMockData(clearExisting: boolean = true) {
       const team = existing ?? (await prisma.team.create({ data: t }));
       teams.push(team);
     }
-    const [engineering, design, platform, dataAnalytics, peopleCulture] = teams;
+    const [engineering, design, platform] = teams;
 
     // Add members — skip if already a member
     const memberships = [
       { personId: alice.id, teamId: engineering.teamId },
       { personId: bob.id, teamId: engineering.teamId },
-      { personId: dave.id, teamId: engineering.teamId },
       { personId: eve.id, teamId: engineering.teamId },
       { personId: carol.id, teamId: design.teamId },
       { personId: frank.id, teamId: design.teamId },
-      { personId: grace.id, teamId: platform.teamId },
       { personId: dave.id, teamId: platform.teamId },
-      { personId: henry.id, teamId: dataAnalytics.teamId },
-      { personId: ivy.id, teamId: peopleCulture.teamId },
+      { personId: bob.id, teamId: platform.teamId },
     ];
     for (const m of memberships) {
       const existing = await prisma.teamMember.findFirst({
@@ -896,18 +888,6 @@ export async function seedMockData(clearExisting: boolean = true) {
         description: "Product management, UX, and design",
         headId: frank.id,
         teamNames: ["Design"],
-      },
-      {
-        name: "Data",
-        description: "Analytics, reporting, and data engineering",
-        headId: henry.id,
-        teamNames: ["Data Analytics"],
-      },
-      {
-        name: "Human Resources",
-        description: "People operations and talent management",
-        headId: ivy.id,
-        teamNames: ["People & Culture"],
       },
     ];
     for (const d of departmentSeeds) {
