@@ -1,6 +1,6 @@
 # HRManager
 
-A production-grade HR management system with granular RBAC, dashboard analytics, audit logging, rate limiting, CSP + security headers, AI-powered i18n across 18 languages, mobile-first responsive design, and 1084 tests (1050 unit/integration + 34 E2E) at 99.5% line coverage.
+A production-grade HR management system with granular RBAC, dashboard analytics, audit logging, rate limiting, CSP + security headers, AI-powered i18n across 18 languages, mobile-first responsive design, and 1103 tests (1069 unit/integration + 34 E2E) at 99.5% line coverage.
 
 [![CI](https://github.com/MikkoNumminen/HRManager/actions/workflows/ci.yml/badge.svg)](https://github.com/MikkoNumminen/HRManager/actions/workflows/ci.yml)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)
@@ -13,7 +13,7 @@ A production-grade HR management system with granular RBAC, dashboard analytics,
 ![Prettier](https://img.shields.io/badge/Formatted_with-Prettier-F7B93E?style=flat-square&logo=prettier)
 ![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=flat-square&logo=docker)
 
-### **[Try the live demo](https://hr-manager-pearl.vercel.app)** — click "Try Demo" to sign in instantly, no account required.
+### **[Try the live demo](https://hr-manager-pearl.vercel.app)** — click "Try Demo" to sign in instantly with your own isolated data sandbox, no account required.
 
 <p align="center">
   <img src="docs/screenshots/overview.png" alt="Dashboard overview" width="100%">
@@ -30,7 +30,8 @@ A production-grade HR management system with granular RBAC, dashboard analytics,
 - **Dashboard analytics** — KPI cards, bar chart (members per team), pie chart (teams per department), line chart (organization growth), and recent activity feed powered by MUI X Charts; permission-gated via `dashboard:view`
 - **Optimistic updates** — React 19 `useOptimistic` on all create actions; new items appear in the table instantly before the server responds, then seamlessly merge with real data on revalidation
 - **Mobile-first responsive design** — card-based layouts for mobile (< 900px), collapsible filters, responsive form buttons (stack vertically on mobile), hamburger menu with navigation drawer, shared responsive style tokens via `muiStyles.ts`
-- **1084 tests (1050 unit/integration + 34 E2E), 99.5% line coverage** — Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, rate limiting, auth route handlers, CSP proxy, audit logging, style tokens, dashboard analytics, optimistic UI, all 45 UI components tested against real PostgreSQL, plus Playwright E2E covering full user flows
+- **1103 tests (1069 unit/integration + 34 E2E), 99.5% line coverage** — Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, rate limiting, auth route handlers, CSP proxy, audit logging, style tokens, dashboard analytics, optimistic UI, demo session isolation, all 45 UI components tested against real PostgreSQL, plus Playwright E2E covering full user flows
+- **Demo session isolation** — each "Try Demo" click creates a private data sandbox with pre-seeded org data (9 people, 5 teams, 4 departments); sessions auto-expire after 24 hours of inactivity; no cross-session data leakage
 - **Granular RBAC** — 4 roles, 24 permission keys, per-user grant/deny overrides with three-state toggles (deny / role default / grant), and "kick out" user removal with confirmation dialog
 - **Soft deletes** — `deletedAt` column on Person, Team, Department, and TeamMember with partial unique indexes (`WHERE deletedAt IS NULL`); cascade soft-deletes for team memberships and FK nulling for manager/head references; preserves full audit history
 - **Immutable audit trail** — every mutation logged with before/after JSON snapshots inside the same `$transaction` for atomicity; permission denials and rate limit hits also logged as security events
@@ -85,6 +86,7 @@ graph LR
 - **Types** in `schemas.ts` — Zod schemas with `z.infer` exports, used everywhere
 - **Auth** in `auth.ts` — JWT strategy with permission-enriched tokens; automatic superuser bootstrapping; `permissionsVersion`-based stale permission detection
 - **RBAC** in `permissions.ts` — resolution: superuser (all) → user override → role default
+- **Demo isolation** in `demoSession.ts` — each demo login creates a `DemoSession` with a UUID; all entity tables carry a nullable `sessionId` column; queries and mutations filter by `sessionId` (`null` = real user, UUID = demo sandbox); stale sessions cleaned up after 24h
 - **Forms** — React 19 `useActionState` with `action=` prop, no `onSubmit`; `useOptimistic` for instant table updates on create; success/error feedback via global snackbar; responsive button layout (stacked on mobile, inline on desktop)
 - **Responsive** — mobile-first via MUI breakpoints (`xs`/`sm`/`md`); dual-render pattern (table + card views) with CSS display toggles; shared tokens in `muiStyles.ts`
 - **Themes** — CSS custom properties injected before hydration; 6 palettes switchable at runtime
@@ -112,19 +114,20 @@ Individual permissions can be overridden per-user — e.g. granting `person:crea
 | Zod schemas      | 85       |
 | Prisma queries   | 48       |
 | Server actions   | 134      |
-| Auth callbacks   | 25       |
+| Auth callbacks   | 31       |
 | Audit logging    | 10       |
 | Rate limiting    | 18       |
 | Auth route       | 5        |
 | CSP proxy        | 20       |
 | RBAC logic       | 28       |
 | Style tokens     | 37       |
+| Demo session     | 12       |
 | Theme config     | 12       |
 | Tutorial config  | 26       |
 | i18n             | 14       |
 | UI components    | 587      |
 | E2E (Playwright) | 34       |
-| **Total**        | **1084** |
+| **Total**        | **1103** |
 
 ```
 Statements : 99.08%    Branches : 94.84%

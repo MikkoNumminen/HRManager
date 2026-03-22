@@ -37,7 +37,8 @@ This is a **portfolio / showcase project**. The goal is to demonstrate technical
 - Types are derived from Zod schemas in `schemas.ts` via `z.infer` — `Person`, `CombinedTeam`, `Department`, `AppUser`, `AuditLog`, `Permissions`. Do not create duplicate interfaces in components.
 - MUI style tokens and component styles are centralized in `muiStyles.ts`.
 - **Info tooltips**: Use MUI `Tooltip` with `arrow` and `cursor: "help"` on column headers or labels that may not be self-explanatory. Keep tooltip text concise but informative. Apply this consistently across all data tables and editor views.
-- **Auth** is configured in `auth.ts` (NextAuth v5). Three providers: Google OAuth, GitHub OAuth, and a Credentials-based demo login (`id: "demo"`) that creates/reuses a `demo@hrmanager.app` user with administrator role. Protected routes use `auth()` + `redirect("/")` in Server Components. Client components use `useSession` via `SessionProvider` wrapper in layout.
+- **Auth** is configured in `auth.ts` (NextAuth v5). Three providers: Google OAuth, GitHub OAuth, and a Credentials-based demo login (`id: "demo"`) that creates/reuses a `demo@hrmanager.app` user with superuser role. Protected routes use `auth()` + `redirect("/")` in Server Components. Client components use `useSession` via `SessionProvider` wrapper in layout.
+- **Demo session isolation** — each demo login creates a `DemoSession` row and stores its UUID in the JWT as `demoSessionId`. All entity tables (Person, Team, Department, TeamMember, AuditLog) carry a nullable `sessionId` column. Queries and mutations filter by `sessionId`: `null` = real OAuth user data, UUID = demo sandbox. `seedDemoData()` populates the sandbox on login. `cleanupStaleDemoSessions()` removes sessions inactive > 24h, called opportunistically during login. Helper: `getDemoSessionId()` in `demoSession.ts`.
 - **Guest mode**: unauthenticated users see read-only minimal views (MUI Chips) of Persons, Departments, and Teams on the main page. Manage routes (`/managePersons`, `/manageDepartments`, `/manageTeams`) redirect to `/`.
 - **TopBar** — dual layout: desktop shows user avatar dropdown menu; mobile shows hamburger button with a full-height navigation drawer. Menu contains: Dashboard (permission-gated), User Management, Audit Log (permission-gated), Load Mock Data, Reset All Data (permission-gated), and Sign Out. The `permissions` prop must be passed on every page so all menu items are available everywhere.
 - **Mobile-first responsive** — MUI breakpoints (`xs`/`sm`/`md`). Tables use dual-render pattern: both desktop table and mobile card views are in the DOM, CSS `display` toggles visibility at `md` breakpoint. Form buttons stack vertically on mobile via `formButtonContainerStyles`. Page containers use `pageContainerStyles` for responsive padding. AuditLogViewer has collapsible filters on mobile. All responsive tokens are centralized in `muiStyles.ts`.
@@ -63,11 +64,12 @@ src/
 │   └── manageTeams/             # Team management (permission-protected)
 ├── components/       # Reusable MUI client components (45 components)
 ├── i18n/             # next-intl configuration (actions, config, request)
-├── tests/            # Jest tests (1050 tests)
+├── tests/            # Jest tests (1069 tests)
 ├── types/            # TypeScript module augmentations (next-auth.d.ts)
 ├── auditLog.ts       # Audit logging helper (logAudit)
 ├── auth.ts           # NextAuth v5 configuration + RBAC callbacks
 ├── db.ts             # Prisma singleton
+├── demoSession.ts    # Demo session isolation (seed, cleanup, session ID helper)
 ├── muiStyles.ts      # Centralised MUI style tokens
 ├── permissions.ts    # RBAC: role defaults, permission resolution, guards
 ├── proxy.ts          # CSP + security headers (nonce-based, per-request)
@@ -99,8 +101,9 @@ docker-compose.yml    # PostgreSQL 17 + app with health checks
 - **User** — authenticated identity (email, name, image, role). Linked to NextAuth OAuth.
 - **Permission** — catalog of 24 granular permission keys (e.g. `person:create`, `team:delete`, `dashboard:view`).
 - **UserPermission** — per-user permission overrides (grant/deny) with role-default fallback.
-- **AuditLog** — immutable log of all mutations: who, what action, which entity, before/after JSON snapshots. No FK to User so logs survive user deletion.
+- **AuditLog** — immutable log of all mutations: who, what action, which entity, before/after JSON snapshots. No FK to User so logs survive user deletion. Carries `sessionId` for demo isolation.
 - **RateLimit** — sliding window rate limit counters per identifier (IP) and action. Auto-cleaned on window expiry.
+- **DemoSession** — tracks active demo sessions. `userId` FK to User, `lastActiveAt` for staleness detection. Data entities (Person, Team, Department, TeamMember) carry a nullable `sessionId` that references DemoSession.id for sandbox isolation.
 
 ## Task tracking
 
