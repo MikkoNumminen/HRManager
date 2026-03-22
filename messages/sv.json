@@ -38,7 +38,8 @@
     "replaceAll": "Ersätt allt",
     "language": "Språk",
     "theme": "Tema",
-    "dashboard": "Instrumentpanel"
+    "dashboard": "Instrumentpanel",
+    "menu": "Meny"
   },
   "home": {
     "title": "Personalhanteringssystem",

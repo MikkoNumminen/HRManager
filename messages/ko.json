@@ -38,7 +38,8 @@
     "replaceAll": "전체 교체",
     "language": "언어",
     "theme": "테마",
-    "dashboard": "대시보드"
+    "dashboard": "대시보드",
+    "menu": "메뉴"
   },
   "home": {
     "title": "인사 관리 시스템",

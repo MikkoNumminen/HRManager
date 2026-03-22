@@ -38,7 +38,8 @@
     "replaceAll": "全部替换",
     "language": "语言",
     "theme": "主题",
-    "dashboard": "仪表板"
+    "dashboard": "仪表板",
+    "menu": "菜单"
   },
   "home": {
     "title": "人力资源管理系统",

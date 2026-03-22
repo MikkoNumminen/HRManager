@@ -38,7 +38,8 @@
     "replaceAll": "Zastąp wszystko",
     "language": "Język",
     "theme": "Motyw",
-    "dashboard": "Panel"
+    "dashboard": "Panel",
+    "menu": "Menu"
   },
   "home": {
     "title": "System Zarządzania Zasobami Ludzkimi",

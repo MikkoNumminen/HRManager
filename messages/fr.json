@@ -38,7 +38,8 @@
     "replaceAll": "Tout remplacer",
     "language": "Langue",
     "theme": "Thème",
-    "dashboard": "Tableau de bord"
+    "dashboard": "Tableau de bord",
+    "menu": "Menu"
   },
   "home": {
     "title": "Système de gestion des ressources humaines",

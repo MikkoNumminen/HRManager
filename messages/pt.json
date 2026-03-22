@@ -38,7 +38,8 @@
     "replaceAll": "Substituir tudo",
     "language": "Idioma",
     "theme": "Tema",
-    "dashboard": "Painel"
+    "dashboard": "Painel",
+    "menu": "Menu"
   },
   "home": {
     "title": "Sistema de Gestão de Recursos Humanos",

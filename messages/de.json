@@ -38,7 +38,8 @@
     "replaceAll": "Alles ersetzen",
     "language": "Sprache",
     "theme": "Thema",
-    "dashboard": "Übersicht"
+    "dashboard": "Übersicht",
+    "menu": "Menü"
   },
   "home": {
     "title": "Personalverwaltungssystem",

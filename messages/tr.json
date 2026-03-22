@@ -38,7 +38,8 @@
     "replaceAll": "Tümünü değiştir",
     "language": "Dil",
     "theme": "Tema",
-    "dashboard": "Gösterge Paneli"
+    "dashboard": "Gösterge Paneli",
+    "menu": "Menü"
   },
   "home": {
     "title": "İnsan Kaynakları Yönetim Sistemi",

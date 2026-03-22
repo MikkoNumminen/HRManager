@@ -38,7 +38,8 @@
     "replaceAll": "Korvaa kaikki",
     "language": "Kieli",
     "theme": "Teema",
-    "dashboard": "Kojelauta"
+    "dashboard": "Kojelauta",
+    "menu": "Valikko"
   },
   "home": {
     "title": "Henkilöstöhallintajärjestelmä",
