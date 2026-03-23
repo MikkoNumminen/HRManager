@@ -18,6 +18,7 @@ import {
   EmailSchema,
 } from "@/schemas";
 import { parseCSV, generateCSV, validatePersonImportRows } from "@/csvUtils";
+import { getTranslations } from "next-intl/server";
 
 /** Server actions return ActionResult so error messages survive Next.js production sanitization. */
 export type ActionResult = { error: string } | undefined;
@@ -28,7 +29,9 @@ async function safe(fn: () => Promise<void>): Promise<ActionResult> {
   } catch (error) {
     // Re-throw Next.js internal errors (redirect, notFound) so they work normally
     if (error && typeof error === "object" && "digest" in error) throw error;
-    return { error: error instanceof Error ? error.message : "An unexpected error occurred" };
+    if (error instanceof Error) return { error: error.message };
+    const tErr = await getTranslations("errors");
+    return { error: tErr("unexpectedError") };
   }
 }
 
@@ -42,25 +45,26 @@ function validateUUID(value: string, fieldName: string): void {
 
 export async function createPerson(data: FormData): Promise<ActionResult> {
   return safe(async () => {
+    const t = await getTranslations("errors");
     await requirePermission("person:create");
     await rateLimit("createPerson");
     const name = data.get("name")?.valueOf();
     if (typeof name !== "string" || name.trim().length === 0) {
-      throw new Error("Invalid Name");
+      throw new Error(t("invalidName"));
     }
     if (name.trim().length > MAX_NAME_LENGTH) {
-      throw new Error(`Name must be ${MAX_NAME_LENGTH} characters or less`);
+      throw new Error(t("nameTooLong", { max: MAX_NAME_LENGTH }));
     }
 
     const email = data.get("email")?.valueOf();
     if (typeof email !== "string" || email.trim().length === 0) {
-      throw new Error("Email is required");
+      throw new Error(t("emailRequired"));
     }
     if (email.trim().length > MAX_EMAIL_LENGTH) {
-      throw new Error(`Email must be ${MAX_EMAIL_LENGTH} characters or less`);
+      throw new Error(t("emailTooLong", { max: MAX_EMAIL_LENGTH }));
     }
     if (!EmailSchema.safeParse(email).success) {
-      throw new Error("Invalid email format");
+      throw new Error(t("invalidEmailFormat"));
     }
 
     const sessionId = await getDemoSessionId();
@@ -71,7 +75,7 @@ export async function createPerson(data: FormData): Promise<ActionResult> {
         where: { email, deletedAt: null, sessionId },
       });
       if (existingPerson) {
-        throw new Error("A person with this email already exists");
+        throw new Error(t("emailAlreadyExists"));
       }
 
       const person = await tx.person.create({
@@ -98,11 +102,12 @@ export async function createPerson(data: FormData): Promise<ActionResult> {
 
 export async function removePerson(data: FormData): Promise<ActionResult> {
   return safe(async () => {
+    const t = await getTranslations("errors");
     await requirePermission("person:delete");
     await rateLimit("removePerson");
     const personIDs = data.getAll("personID").filter((v): v is string => typeof v === "string");
     if (personIDs.length === 0) {
-      throw new Error("No personID selected");
+      throw new Error(t("noPersonSelected"));
     }
     personIDs.forEach((id) => validateUUID(id, "personID"));
 
@@ -159,20 +164,21 @@ export async function removePerson(data: FormData): Promise<ActionResult> {
 
 export async function updatePersonName(data: FormData): Promise<ActionResult> {
   return safe(async () => {
+    const t = await getTranslations("errors");
     await requirePermission("person:update_name");
     await rateLimit("updatePersonName");
     const personID = data.get("personID")?.toString();
     if (!personID) {
-      throw new Error("No personID provided");
+      throw new Error(t("noPersonProvided"));
     }
     validateUUID(personID, "personID");
 
     const newName = data.get("name")?.toString().trim();
     if (!newName) {
-      throw new Error("New name is missing");
+      throw new Error(t("newNameRequired"));
     }
     if (newName.length > MAX_NAME_LENGTH) {
-      throw new Error(`Name must be ${MAX_NAME_LENGTH} characters or less`);
+      throw new Error(t("nameTooLong", { max: MAX_NAME_LENGTH }));
     }
 
     const sessionId = await getDemoSessionId();
@@ -183,7 +189,7 @@ export async function updatePersonName(data: FormData): Promise<ActionResult> {
         where: { id: personID, sessionId },
       });
       if (!personBefore) {
-        throw new Error("Person not found");
+        throw new Error(t("personNotFound"));
       }
       await tx.person.updateMany({
         where: { id: personID, sessionId },
@@ -206,20 +212,21 @@ export async function updatePersonName(data: FormData): Promise<ActionResult> {
 
 export async function updatePosition(data: FormData): Promise<ActionResult> {
   return safe(async () => {
+    const t = await getTranslations("errors");
     await requirePermission("person:update_position");
     await rateLimit("updatePosition");
     const personID = data.get("personID")?.toString();
     if (!personID) {
-      throw new Error("No personID provided");
+      throw new Error(t("noPersonProvided"));
     }
     validateUUID(personID, "personID");
 
     const newPosition = (data.get("position") ?? data.get("name"))?.toString().trim();
     if (!newPosition) {
-      throw new Error("New position is missing");
+      throw new Error(t("positionRequired"));
     }
     if (newPosition.length > MAX_POSITION_LENGTH) {
-      throw new Error(`Position must be ${MAX_POSITION_LENGTH} characters or less`);
+      throw new Error(t("positionTooLong", { max: MAX_POSITION_LENGTH }));
     }
 
     const sessionId = await getDemoSessionId();
@@ -230,7 +237,7 @@ export async function updatePosition(data: FormData): Promise<ActionResult> {
         where: { id: personID, sessionId },
       });
       if (!personBefore) {
-        throw new Error("Person not found");
+        throw new Error(t("personNotFound"));
       }
       await tx.person.updateMany({
         where: { id: personID, sessionId },
@@ -253,23 +260,24 @@ export async function updatePosition(data: FormData): Promise<ActionResult> {
 
 export async function updateEmail(data: FormData): Promise<ActionResult> {
   return safe(async () => {
+    const t = await getTranslations("errors");
     await requirePermission("person:update_email");
     await rateLimit("updateEmail");
     const personID = data.get("personID")?.toString();
     if (!personID) {
-      throw new Error("No personID selected");
+      throw new Error(t("noPersonSelected"));
     }
     validateUUID(personID, "personID");
 
     const newEmail = (data.get("email") ?? data.get("name"))?.toString().trim();
     if (!newEmail) {
-      throw new Error("New Email is missing");
+      throw new Error(t("newEmailRequired"));
     }
     if (newEmail.length > MAX_EMAIL_LENGTH) {
-      throw new Error(`Email must be ${MAX_EMAIL_LENGTH} characters or less`);
+      throw new Error(t("emailTooLong", { max: MAX_EMAIL_LENGTH }));
     }
     if (!EmailSchema.safeParse(newEmail).success) {
-      throw new Error("Invalid email format");
+      throw new Error(t("invalidEmailFormat"));
     }
 
     const sessionId = await getDemoSessionId();
@@ -280,14 +288,14 @@ export async function updateEmail(data: FormData): Promise<ActionResult> {
         where: { email: newEmail, deletedAt: null, sessionId },
       });
       if (existingPerson && existingPerson.id !== personID) {
-        throw new Error("A person with this email already exists");
+        throw new Error(t("emailAlreadyExists"));
       }
 
       const personBefore = await tx.person.findFirst({
         where: { id: personID, sessionId },
       });
       if (!personBefore) {
-        throw new Error("Person not found");
+        throw new Error(t("personNotFound"));
       }
       await tx.person.updateMany({
         where: { id: personID, sessionId },
@@ -309,16 +317,17 @@ export async function updateEmail(data: FormData): Promise<ActionResult> {
 
 export async function addManager(data: FormData): Promise<ActionResult> {
   return safe(async () => {
+    const t = await getTranslations("errors");
     await requirePermission("team:update_manager");
     await rateLimit("addManager");
     const teamIDs = data.getAll("teamID").filter((v): v is string => typeof v === "string");
     const personID = data.get("personID")?.toString();
 
     if (teamIDs.length === 0) {
-      throw new Error("No teamID selected");
+      throw new Error(t("noTeamSelected"));
     }
     if (!personID) {
-      throw new Error("No personID provided");
+      throw new Error(t("noPersonProvided"));
     }
     teamIDs.forEach((id) => validateUUID(id, "teamID"));
     validateUUID(personID, "personID");
@@ -329,13 +338,13 @@ export async function addManager(data: FormData): Promise<ActionResult> {
     await prisma.$transaction(async (tx) => {
       const person = await tx.person.findFirst({ where: { id: personID, sessionId } });
       if (!person) {
-        throw new Error("Person not found");
+        throw new Error(t("personNotFound"));
       }
 
       for (const teamID of teamIDs) {
         const teamBefore = await tx.team.findFirst({ where: { teamId: teamID, sessionId } });
         if (!teamBefore) {
-          throw new Error("Team not found");
+          throw new Error(t("teamNotFound"));
         }
         await tx.team.updateMany({
           where: { teamId: teamID, sessionId },
@@ -394,16 +403,17 @@ export async function addManager(data: FormData): Promise<ActionResult> {
 
 export async function addMember(data: FormData): Promise<ActionResult> {
   return safe(async () => {
+    const t = await getTranslations("errors");
     await requirePermission("team:add_member");
     await rateLimit("addMember");
     const teamID = data.get("teamID")?.toString();
     const personID = data.get("personID")?.toString();
 
     if (!teamID) {
-      throw new Error("No teamID selected");
+      throw new Error(t("noTeamSelected"));
     }
     if (!personID) {
-      throw new Error("No personID selected");
+      throw new Error(t("noPersonSelected"));
     }
     validateUUID(teamID, "teamID");
     validateUUID(personID, "personID");
@@ -417,7 +427,7 @@ export async function addMember(data: FormData): Promise<ActionResult> {
       });
 
       if (existingMember && !existingMember.deletedAt) {
-        throw new Error("Person is already a member of the team");
+        throw new Error(t("alreadyMember"));
       }
 
       let member;
@@ -452,14 +462,15 @@ export async function addMember(data: FormData): Promise<ActionResult> {
 
 export async function createTeam(data: FormData): Promise<ActionResult> {
   return safe(async () => {
+    const t = await getTranslations("errors");
     await requirePermission("team:create");
     await rateLimit("createTeam");
     const name = data.get("name")?.valueOf();
     if (typeof name !== "string" || name.trim().length === 0) {
-      throw new Error("Invalid Name");
+      throw new Error(t("invalidName"));
     }
     if (name.trim().length > MAX_NAME_LENGTH) {
-      throw new Error(`Name must be ${MAX_NAME_LENGTH} characters or less`);
+      throw new Error(t("nameTooLong", { max: MAX_NAME_LENGTH }));
     }
 
     const sessionId = await getDemoSessionId();
@@ -489,20 +500,21 @@ export async function createTeam(data: FormData): Promise<ActionResult> {
 
 export async function updateTeamName(data: FormData): Promise<ActionResult> {
   return safe(async () => {
+    const t = await getTranslations("errors");
     await requirePermission("team:update_name");
     await rateLimit("updateTeamName");
     const teamID = data.get("teamID")?.toString();
     if (!teamID) {
-      throw new Error("No teamID provided");
+      throw new Error(t("noTeamProvided"));
     }
     validateUUID(teamID, "teamID");
 
     const newName = data.get("name")?.toString().trim();
     if (!newName) {
-      throw new Error("New team name is missing");
+      throw new Error(t("teamNameRequired"));
     }
     if (newName.length > MAX_NAME_LENGTH) {
-      throw new Error(`Name must be ${MAX_NAME_LENGTH} characters or less`);
+      throw new Error(t("nameTooLong", { max: MAX_NAME_LENGTH }));
     }
 
     const sessionId = await getDemoSessionId();
@@ -511,7 +523,7 @@ export async function updateTeamName(data: FormData): Promise<ActionResult> {
     await prisma.$transaction(async (tx) => {
       const teamBefore = await tx.team.findFirst({ where: { teamId: teamID, sessionId } });
       if (!teamBefore) {
-        throw new Error("Team not found");
+        throw new Error(t("teamNotFound"));
       }
       await tx.team.updateMany({
         where: { teamId: teamID, sessionId },
@@ -534,11 +546,12 @@ export async function updateTeamName(data: FormData): Promise<ActionResult> {
 
 export async function removeTeam(data: FormData): Promise<ActionResult> {
   return safe(async () => {
+    const t = await getTranslations("errors");
     await requirePermission("team:delete");
     await rateLimit("removeTeam");
     const teamIDs = data.getAll("teamID").filter((v): v is string => typeof v === "string");
     if (teamIDs.length === 0) {
-      throw new Error("No teamID selected");
+      throw new Error(t("noTeamSelected"));
     }
     teamIDs.forEach((id) => validateUUID(id, "teamID"));
 
@@ -582,16 +595,17 @@ export async function removeTeam(data: FormData): Promise<ActionResult> {
 
 export async function removeMember(data: FormData): Promise<ActionResult> {
   return safe(async () => {
+    const t = await getTranslations("errors");
     await requirePermission("team:remove_member");
     await rateLimit("removeMember");
     const teamID = data.get("teamID")?.toString();
     const personID = data.get("personID")?.toString();
 
     if (!teamID) {
-      throw new Error("No teamID selected");
+      throw new Error(t("noTeamSelected"));
     }
     if (!personID) {
-      throw new Error("No personID selected");
+      throw new Error(t("noPersonSelected"));
     }
     validateUUID(teamID, "teamID");
     validateUUID(personID, "personID");
@@ -610,7 +624,7 @@ export async function removeMember(data: FormData): Promise<ActionResult> {
       });
 
       if (!existingMember) {
-        throw new Error("Person is not a member of the team");
+        throw new Error(t("notMember"));
       }
 
       await tx.teamMember.update({
@@ -649,19 +663,20 @@ export async function removeMember(data: FormData): Promise<ActionResult> {
 
 export async function createDepartment(data: FormData): Promise<ActionResult> {
   return safe(async () => {
+    const t = await getTranslations("errors");
     await requirePermission("department:create");
     await rateLimit("createDepartment");
     const name = data.get("name")?.valueOf();
     if (typeof name !== "string" || name.trim().length === 0) {
-      throw new Error("Invalid Name");
+      throw new Error(t("invalidName"));
     }
     if (name.trim().length > MAX_NAME_LENGTH) {
-      throw new Error(`Name must be ${MAX_NAME_LENGTH} characters or less`);
+      throw new Error(t("nameTooLong", { max: MAX_NAME_LENGTH }));
     }
 
     const description = data.get("description")?.toString().trim() || null;
     if (description && description.length > MAX_DESCRIPTION_LENGTH) {
-      throw new Error(`Description must be ${MAX_DESCRIPTION_LENGTH} characters or less`);
+      throw new Error(t("descriptionTooLong", { max: MAX_DESCRIPTION_LENGTH }));
     }
 
     const sessionId = await getDemoSessionId();
@@ -691,13 +706,14 @@ export async function createDepartment(data: FormData): Promise<ActionResult> {
 
 export async function removeDepartment(data: FormData): Promise<ActionResult> {
   return safe(async () => {
+    const t = await getTranslations("errors");
     await requirePermission("department:delete");
     await rateLimit("removeDepartment");
     const departmentIDs = data
       .getAll("departmentID")
       .filter((v): v is string => typeof v === "string");
     if (departmentIDs.length === 0) {
-      throw new Error("No departmentID selected");
+      throw new Error(t("noDepartmentSelected"));
     }
     departmentIDs.forEach((id) => validateUUID(id, "departmentID"));
 
@@ -742,25 +758,26 @@ export async function removeDepartment(data: FormData): Promise<ActionResult> {
 
 export async function updateDepartment(data: FormData): Promise<ActionResult> {
   return safe(async () => {
+    const t = await getTranslations("errors");
     await requirePermission("department:update");
     await rateLimit("updateDepartment");
     const departmentID = data.get("departmentID")?.toString();
     if (!departmentID) {
-      throw new Error("No departmentID provided");
+      throw new Error(t("noDepartmentProvided"));
     }
     validateUUID(departmentID, "departmentID");
 
     const name = data.get("name")?.toString().trim();
     if (!name) {
-      throw new Error("Department name is required");
+      throw new Error(t("departmentNameRequired"));
     }
     if (name.length > MAX_NAME_LENGTH) {
-      throw new Error(`Name must be ${MAX_NAME_LENGTH} characters or less`);
+      throw new Error(t("nameTooLong", { max: MAX_NAME_LENGTH }));
     }
 
     const description = data.get("description")?.toString().trim() || null;
     if (description && description.length > MAX_DESCRIPTION_LENGTH) {
-      throw new Error(`Description must be ${MAX_DESCRIPTION_LENGTH} characters or less`);
+      throw new Error(t("descriptionTooLong", { max: MAX_DESCRIPTION_LENGTH }));
     }
 
     const sessionId = await getDemoSessionId();
@@ -769,7 +786,7 @@ export async function updateDepartment(data: FormData): Promise<ActionResult> {
     await prisma.$transaction(async (tx) => {
       const deptBefore = await tx.department.findFirst({ where: { id: departmentID, sessionId } });
       if (!deptBefore) {
-        throw new Error("Department not found");
+        throw new Error(t("departmentNotFound"));
       }
       await tx.department.updateMany({
         where: { id: departmentID, sessionId },
@@ -792,13 +809,14 @@ export async function updateDepartment(data: FormData): Promise<ActionResult> {
 
 export async function updateDepartmentHead(data: FormData): Promise<ActionResult> {
   return safe(async () => {
+    const t = await getTranslations("errors");
     await requirePermission("department:update");
     await rateLimit("updateDepartmentHead");
     const departmentID = data.get("departmentID")?.toString();
     const personID = data.get("personID")?.toString() || null;
 
     if (!departmentID) {
-      throw new Error("No departmentID provided");
+      throw new Error(t("noDepartmentProvided"));
     }
     validateUUID(departmentID, "departmentID");
     if (personID) validateUUID(personID, "personID");
@@ -810,12 +828,12 @@ export async function updateDepartmentHead(data: FormData): Promise<ActionResult
       if (personID) {
         const person = await tx.person.findFirst({ where: { id: personID, sessionId } });
         if (!person) {
-          throw new Error("Person not found");
+          throw new Error(t("personNotFound"));
         }
       }
       const deptBefore = await tx.department.findFirst({ where: { id: departmentID, sessionId } });
       if (!deptBefore) {
-        throw new Error("Department not found");
+        throw new Error(t("departmentNotFound"));
       }
       await tx.department.updateMany({
         where: { id: departmentID, sessionId },
@@ -839,13 +857,14 @@ export async function updateDepartmentHead(data: FormData): Promise<ActionResult
 
 export async function assignTeamToDepartment(data: FormData): Promise<ActionResult> {
   return safe(async () => {
+    const t = await getTranslations("errors");
     await requirePermission("department:assign_team");
     await rateLimit("assignTeamToDepartment");
     const departmentID = data.get("departmentID")?.toString();
     const teamID = data.get("teamID")?.toString();
 
-    if (!departmentID) throw new Error("No departmentID provided");
-    if (!teamID) throw new Error("No teamID provided");
+    if (!departmentID) throw new Error(t("noDepartmentProvided"));
+    if (!teamID) throw new Error(t("noTeamProvided"));
     validateUUID(departmentID, "departmentID");
     validateUUID(teamID, "teamID");
 
@@ -855,11 +874,11 @@ export async function assignTeamToDepartment(data: FormData): Promise<ActionResu
     await prisma.$transaction(async (tx) => {
       const department = await tx.department.findFirst({ where: { id: departmentID, sessionId } });
       if (!department) {
-        throw new Error("Department not found");
+        throw new Error(t("departmentNotFound"));
       }
       const teamBefore = await tx.team.findFirst({ where: { teamId: teamID, sessionId } });
       if (!teamBefore) {
-        throw new Error("Team not found");
+        throw new Error(t("teamNotFound"));
       }
       await tx.team.updateMany({
         where: { teamId: teamID, sessionId },
@@ -884,11 +903,12 @@ export async function assignTeamToDepartment(data: FormData): Promise<ActionResu
 
 export async function removeTeamFromDepartment(data: FormData): Promise<ActionResult> {
   return safe(async () => {
+    const t = await getTranslations("errors");
     await requirePermission("department:assign_team");
     await rateLimit("removeTeamFromDepartment");
     const teamID = data.get("teamID")?.toString();
 
-    if (!teamID) throw new Error("No teamID provided");
+    if (!teamID) throw new Error(t("noTeamProvided"));
     validateUUID(teamID, "teamID");
 
     const sessionId = await getDemoSessionId();
@@ -897,7 +917,7 @@ export async function removeTeamFromDepartment(data: FormData): Promise<ActionRe
     await prisma.$transaction(async (tx) => {
       const teamBefore = await tx.team.findFirst({ where: { teamId: teamID, sessionId } });
       if (!teamBefore) {
-        throw new Error("Team not found");
+        throw new Error(t("teamNotFound"));
       }
       await tx.team.updateMany({
         where: { teamId: teamID, sessionId },
@@ -1141,14 +1161,15 @@ export async function initializePermissions() {
 
 export async function updateUserRole(data: FormData): Promise<ActionResult> {
   return safe(async () => {
+    const t = await getTranslations("errors");
     await requirePermission("admin:manage_users");
     await rateLimit("updateUserRole");
 
     const userId = data.get("userId")?.toString();
     const newRole = data.get("role")?.toString();
 
-    if (!userId) throw new Error("No userId provided");
-    if (!newRole) throw new Error("No role provided");
+    if (!userId) throw new Error(t("noUserProvided"));
+    if (!newRole) throw new Error(t("noRoleProvided"));
     validateUUID(userId, "userId");
 
     const demoSessionId = await getDemoSessionId();
@@ -1156,13 +1177,13 @@ export async function updateUserRole(data: FormData): Promise<ActionResult> {
       ? ["superuser", "administrator", "user", "guest"]
       : ["administrator", "user", "guest"];
     if (!validRoles.includes(newRole)) {
-      throw new Error("Invalid role. Cannot assign superuser role through the UI.");
+      throw new Error(t("invalidRole"));
     }
 
     const targetUser = await prisma.user.findUnique({ where: { id: userId } });
-    if (!targetUser) throw new Error("User not found");
+    if (!targetUser) throw new Error(t("userNotFound"));
     if (!demoSessionId && targetUser.role === "superuser") {
-      throw new Error("Cannot change the superuser's role");
+      throw new Error(t("cannotChangeSuperuserRole"));
     }
 
     const ctx = await captureAuditContext();
@@ -1188,6 +1209,7 @@ export async function updateUserRole(data: FormData): Promise<ActionResult> {
 
 export async function updateUserPermission(data: FormData): Promise<ActionResult> {
   return safe(async () => {
+    const t = await getTranslations("errors");
     await requirePermission("admin:assign_permissions");
     await rateLimit("updateUserPermission");
 
@@ -1195,20 +1217,20 @@ export async function updateUserPermission(data: FormData): Promise<ActionResult
     const permissionKey = data.get("permissionKey")?.toString();
     const action = data.get("action")?.toString();
 
-    if (!userId) throw new Error("No userId provided");
-    if (!permissionKey) throw new Error("No permissionKey provided");
-    if (!action) throw new Error("No action provided");
+    if (!userId) throw new Error(t("noUserProvided"));
+    if (!permissionKey) throw new Error(t("noPermissionProvided"));
+    if (!action) throw new Error(t("noActionProvided"));
     validateUUID(userId, "userId");
 
     const demoSessionId = await getDemoSessionId();
     const targetUser = await prisma.user.findUnique({ where: { id: userId } });
-    if (!targetUser) throw new Error("User not found");
+    if (!targetUser) throw new Error(t("userNotFound"));
     if (!demoSessionId && targetUser.role === "superuser") {
-      throw new Error("Cannot modify superuser permissions");
+      throw new Error(t("cannotModifySuperuserPermissions"));
     }
 
     const permission = await prisma.permission.findUnique({ where: { key: permissionKey } });
-    if (!permission) throw new Error("Permission not found");
+    if (!permission) throw new Error(t("permissionNotFound"));
 
     const ctx = await captureAuditContext();
     const auditEntries: DeferredAuditEntry[] = [];
@@ -1257,28 +1279,29 @@ export async function updateUserPermission(data: FormData): Promise<ActionResult
 
 export async function kickOutUser(data: FormData): Promise<ActionResult> {
   return safe(async () => {
+    const t = await getTranslations("errors");
     await requirePermission("admin:manage_users");
     await rateLimit("kickOutUser");
 
     const userId = data.get("userId")?.toString();
-    if (!userId) throw new Error("No userId provided");
+    if (!userId) throw new Error(t("noUserProvided"));
     validateUUID(userId, "userId");
 
     const session = await auth();
     const demoSessionId = await getDemoSessionId();
 
     const targetUser = await prisma.user.findUnique({ where: { id: userId } });
-    if (!targetUser) throw new Error("User not found");
+    if (!targetUser) throw new Error(t("userNotFound"));
     if (targetUser.role === "superuser") {
-      throw new Error("Cannot kick out the superuser");
+      throw new Error(t("cannotKickSuperuser"));
     }
     // Demo sessions can only kick the demo user — prevent deleting real OAuth users
     if (demoSessionId && targetUser.email !== "demo@hrmanager.app") {
-      throw new Error("Demo sessions cannot manage real users");
+      throw new Error(t("demoCannotManageUsers"));
     }
     // Prevent self-kick — deleting your own user orphans the session
     if (session?.user?.id === userId) {
-      throw new Error("Cannot kick yourself out");
+      throw new Error(t("cannotKickYourself"));
     }
 
     const ctx = await captureAuditContext();
@@ -1301,18 +1324,19 @@ export async function kickOutUser(data: FormData): Promise<ActionResult> {
 
 export async function updateProfileName(data: FormData): Promise<ActionResult> {
   return safe(async () => {
+    const t = await getTranslations("errors");
     const session = await auth();
-    if (!session?.user?.id) throw new Error("Not authenticated");
+    if (!session?.user?.id) throw new Error(t("notAuthenticated"));
     await rateLimit("updateProfileName");
 
     const name = data.get("name")?.toString();
-    if (!name || name.trim().length === 0) throw new Error("Name is required");
+    if (!name || name.trim().length === 0) throw new Error(t("nameRequired"));
     if (name.trim().length > MAX_NAME_LENGTH) {
-      throw new Error(`Name must be ${MAX_NAME_LENGTH} characters or less`);
+      throw new Error(t("nameTooLong", { max: MAX_NAME_LENGTH }));
     }
 
     const user = await prisma.user.findUnique({ where: { id: session.user.id } });
-    if (!user) throw new Error("User not found");
+    if (!user) throw new Error(t("userNotFound"));
 
     const ctx = await captureAuditContext();
     const auditEntries: DeferredAuditEntry[] = [];
@@ -1338,8 +1362,9 @@ export async function updateProfileName(data: FormData): Promise<ActionResult> {
 
 export async function updateProfileImage(data: FormData): Promise<ActionResult> {
   return safe(async () => {
+    const t = await getTranslations("errors");
     const session = await auth();
-    if (!session?.user?.id) throw new Error("Not authenticated");
+    if (!session?.user?.id) throw new Error(t("notAuthenticated"));
     await rateLimit("updateProfileImage");
 
     const image = data.get("image")?.toString() ?? "";
@@ -1347,21 +1372,21 @@ export async function updateProfileImage(data: FormData): Promise<ActionResult> 
 
     if (trimmed.length > 0) {
       if (trimmed.length > MAX_URL_LENGTH) {
-        throw new Error(`URL must be ${MAX_URL_LENGTH} characters or less`);
+        throw new Error(t("urlTooLong", { max: MAX_URL_LENGTH }));
       }
+      let parsedUrl: URL | null = null;
       try {
-        const url = new URL(trimmed);
-        if (!["http:", "https:"].includes(url.protocol)) {
-          throw new Error("URL must use http or https protocol");
-        }
-      } catch (e) {
-        if (e instanceof Error && e.message.includes("protocol")) throw e;
-        throw new Error("Invalid URL format");
+        parsedUrl = new URL(trimmed);
+      } catch {
+        throw new Error(t("invalidUrlFormat"));
+      }
+      if (!["http:", "https:"].includes(parsedUrl.protocol)) {
+        throw new Error(t("invalidUrlProtocol"));
       }
     }
 
     const user = await prisma.user.findUnique({ where: { id: session.user.id } });
-    if (!user) throw new Error("User not found");
+    if (!user) throw new Error(t("userNotFound"));
 
     const newImage = trimmed.length > 0 ? trimmed : null;
 
@@ -1399,26 +1424,27 @@ export async function importPersonsCsv(
 ): Promise<{ error?: string; result?: ImportResult }> {
   await requirePermission("data:import");
   await rateLimit("importPersonsCsv");
+  const t = await getTranslations("errors");
 
   const file = data.get("file");
   if (!(file instanceof File) || file.size === 0) {
-    return { error: "Please select a CSV file" };
+    return { error: t("csvNoFile") };
   }
   if (!file.name.endsWith(".csv")) {
-    return { error: "File must be a .csv file" };
+    return { error: t("csvNotCsvFile") };
   }
   if (file.size > MAX_IMPORT_FILE_SIZE) {
-    return { error: "File exceeds 1 MB limit" };
+    return { error: t("csvFileTooLarge") };
   }
 
   const text = await file.text();
   const rows = parseCSV(text);
 
   if (rows.length <= 1) {
-    return { error: "CSV file is empty or contains only headers" };
+    return { error: t("csvEmpty") };
   }
   if (rows.length - 1 > MAX_IMPORT_ROWS) {
-    return { error: `Maximum ${MAX_IMPORT_ROWS} rows per import` };
+    return { error: t("csvTooManyRows", { max: MAX_IMPORT_ROWS }) };
   }
 
   const sessionId = await getDemoSessionId();

@@ -23,7 +23,7 @@ import {
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useMemo, useCallback, useState } from "react";
+import { memo, useMemo, useCallback, useState } from "react";
 import { colors, mobileCardStyles } from "@/muiStyles";
 import { AuditLog } from "@/schemas";
 
@@ -64,7 +64,7 @@ interface AuditLogViewerProps {
   };
 }
 
-export default function AuditLogViewer({
+function AuditLogViewer({
   logs,
   total,
   currentPage,
@@ -583,3 +583,5 @@ export default function AuditLogViewer({
     </>
   );
 }
+
+export default memo(AuditLogViewer);

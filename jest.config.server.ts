@@ -13,6 +13,7 @@ const config: Config = {
   setupFiles: ["<rootDir>/src/tests/server/loadEnv.ts"],
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
+    "^next-intl/server$": "<rootDir>/src/tests/mocks/next-intl-server.ts",
   },
   // Prisma 7 ships ESM — transform its .mjs files so Jest (CJS) can parse them
   transformIgnorePatterns: ["node_modules/(?!(@prisma/client)/)"],

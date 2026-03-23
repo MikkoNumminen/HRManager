@@ -1,5 +1,6 @@
 "use client";
 
+import { memo, useCallback } from "react";
 import { Box, Typography, Chip } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { PieChart } from "@mui/x-charts/PieChart";
@@ -42,7 +43,7 @@ const ACTION_COLORS: Record<string, string> = {
   reset: "warning",
 };
 
-export default function DashboardCharts({
+function DashboardCharts({
   teamSizes,
   departmentSizes,
   growthTimeline,
@@ -51,28 +52,34 @@ export default function DashboardCharts({
   const t = useTranslations("dashboard");
   const ta = useTranslations("audit");
 
-  const actionLabel = (action: string) => {
-    const key = `action${action.charAt(0).toUpperCase() + action.slice(1)}` as
-      | "actionCreate"
-      | "actionUpdate"
-      | "actionDelete"
-      | "actionSeed"
-      | "actionKickout"
-      | "actionReset";
-    return ta(key);
-  };
+  const actionLabel = useCallback(
+    (action: string) => {
+      const key = `action${action.charAt(0).toUpperCase() + action.slice(1)}` as
+        | "actionCreate"
+        | "actionUpdate"
+        | "actionDelete"
+        | "actionSeed"
+        | "actionKickout"
+        | "actionReset";
+      return ta(key);
+    },
+    [ta],
+  );
 
-  const entityLabel = (type: string) => {
-    const map: Record<string, string> = {
-      person: ta("typePerson"),
-      team: ta("typeTeam"),
-      teamMember: ta("typeTeamMember"),
-      department: ta("typeDepartment"),
-      user: ta("typeUser"),
-      userPermission: ta("typePermission"),
-    };
-    return map[type] ?? type;
-  };
+  const entityLabel = useCallback(
+    (type: string) => {
+      const map: Record<string, string> = {
+        person: ta("typePerson"),
+        team: ta("typeTeam"),
+        teamMember: ta("typeTeamMember"),
+        department: ta("typeDepartment"),
+        user: ta("typeUser"),
+        userPermission: ta("typePermission"),
+      };
+      return map[type] ?? type;
+    },
+    [ta],
+  );
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
@@ -228,3 +235,5 @@ export default function DashboardCharts({
     </Box>
   );
 }
+
+export default memo(DashboardCharts);
