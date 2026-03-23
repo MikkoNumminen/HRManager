@@ -30,7 +30,7 @@ export default function GlobalError({
         An unexpected error occurred
       </Typography>
       {error.digest && (
-        <Typography variant="caption" sx={{ color: colors.slate500 }}>
+        <Typography variant="caption" sx={{ color: colors.slate400 }}>
           Reference: {error.digest}
         </Typography>
       )}
