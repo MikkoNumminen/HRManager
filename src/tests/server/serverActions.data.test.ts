@@ -37,6 +37,29 @@ jest.mock("@/auditLog", () => ({
   deferAuditLog: jest.fn(),
 }));
 
+// Mock @/mongoDb — exportAuditLogsCsv now reads from MongoDB instead of PostgreSQL.
+// We store fake log entries here so tests can populate and query them.
+let mockAuditLogs: Array<Record<string, unknown>> = [];
+jest.mock("@/mongoDb", () => ({
+  getAuditLogCollection: () => ({
+    find: (query: Record<string, unknown>) => {
+      // Filter by sessionId if provided
+      const filtered =
+        query?.sessionId !== undefined
+          ? mockAuditLogs.filter((l) => l.sessionId === query.sessionId)
+          : mockAuditLogs;
+      return {
+        sort: () => ({
+          limit: () => ({
+            toArray: () => Promise.resolve(filtered),
+          }),
+        }),
+      };
+    },
+    deleteMany: jest.fn().mockResolvedValue({ deletedCount: 0 }),
+  }),
+}));
+
 // Mock rate limiting — rateLimit uses next/headers which doesn't exist in tests.
 // Rate limiting behavior is tested separately in rateLimit.test.ts.
 jest.mock("@/rateLimit", () => ({
@@ -594,20 +617,24 @@ describe("exportDepartmentsCsv", () => {
 });
 
 describe("exportAuditLogsCsv", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => {
+    mockAuditLogs = [];
+  });
 
   // Exports audit logs with headers
   test("exports audit logs as CSV with headers", async () => {
-    await testPrisma.auditLog.create({
-      data: {
+    mockAuditLogs = [
+      {
         action: "create",
         entityType: "person",
         entityId: "abc-123",
         userEmail: "alice@test.com",
         after: '{"name":"Alice"}',
+        before: null,
+        createdAt: new Date("2026-01-15"),
+        sessionId: null,
       },
-    });
+    ];
 
     const csv = await exportAuditLogsCsv();
     expect(csv).toContain("timestamp,userEmail,action,entityType,entityId,before,after");
@@ -623,24 +650,30 @@ describe("exportAuditLogsCsv", () => {
     expect(lines).toHaveLength(1);
   });
 
-  // Exports multiple logs ordered by timestamp descending
+  // Exports multiple logs in correct order (mock already returns them sorted)
   test("exports logs in descending order", async () => {
-    await testPrisma.auditLog.create({
-      data: {
-        action: "create",
-        entityType: "person",
-        userEmail: "first@test.com",
-        createdAt: new Date("2026-01-01"),
-      },
-    });
-    await testPrisma.auditLog.create({
-      data: {
+    mockAuditLogs = [
+      {
         action: "delete",
         entityType: "team",
         userEmail: "second@test.com",
+        entityId: null,
+        before: null,
+        after: null,
         createdAt: new Date("2026-02-01"),
+        sessionId: null,
       },
-    });
+      {
+        action: "create",
+        entityType: "person",
+        userEmail: "first@test.com",
+        entityId: null,
+        before: null,
+        after: null,
+        createdAt: new Date("2026-01-01"),
+        sessionId: null,
+      },
+    ];
 
     const csv = await exportAuditLogsCsv();
     const secondIdx = csv.indexOf("second@test.com");
