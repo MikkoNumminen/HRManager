@@ -2,26 +2,11 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/db";
 import { auth } from "@/auth";
 import { getDemoSessionId } from "@/demoSession";
+import { AuditActionSchema, AuditEntityTypeSchema } from "@/schemas";
+import { z } from "zod";
 
-export type AuditAction =
-  | "create"
-  | "update"
-  | "delete"
-  | "kickout"
-  | "seed"
-  | "reset"
-  | "permission_denied"
-  | "rate_limited";
-
-export type AuditEntityType =
-  | "person"
-  | "team"
-  | "teamMember"
-  | "department"
-  | "user"
-  | "userPermission"
-  | "auth"
-  | "security";
+export type AuditAction = z.infer<typeof AuditActionSchema>;
+export type AuditEntityType = z.infer<typeof AuditEntityTypeSchema>;
 
 interface AuditLogParams {
   action: AuditAction;

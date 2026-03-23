@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/db";
 import {
   PersonSchema,
@@ -139,7 +140,7 @@ export async function getAuditLogs(
   const { userEmail, action, entityType, dateFrom, dateTo, page, pageSize } = parsed;
 
   const sessionId = await getDemoSessionId();
-  const where: Record<string, unknown> = { sessionId };
+  const where: Prisma.AuditLogWhereInput = { sessionId };
 
   if (userEmail) {
     where.userEmail = { contains: userEmail };

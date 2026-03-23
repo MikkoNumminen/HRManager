@@ -9,6 +9,7 @@ const config: Config = {
   maxWorkers: 1,
   testMatch: ["<rootDir>/src/tests/server/**/*.test.ts"],
   testPathIgnorePatterns: ["<rootDir>/.claude/"],
+  modulePathIgnorePatterns: ["<rootDir>/.claude/"],
   setupFiles: ["<rootDir>/src/tests/server/loadEnv.ts"],
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",

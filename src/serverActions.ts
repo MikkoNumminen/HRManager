@@ -81,33 +81,34 @@ export async function removePerson(data: FormData) {
   }
   personIDs.forEach((id) => validateUUID(id, "personID"));
 
+  const sessionId = await getDemoSessionId();
   const now = new Date();
   await prisma.$transaction(async (tx) => {
     const personsToDelete = await tx.person.findMany({
-      where: { id: { in: personIDs }, deletedAt: null },
+      where: { id: { in: personIDs }, deletedAt: null, sessionId },
     });
 
     // Cascade soft-delete: mark TeamMember rows as deleted
     await tx.teamMember.updateMany({
-      where: { personId: { in: personIDs }, deletedAt: null },
+      where: { personId: { in: personIDs }, deletedAt: null, sessionId },
       data: { deletedAt: now },
     });
 
     // Null FK refs: teams managed by these persons
     await tx.team.updateMany({
-      where: { teamManagerId: { in: personIDs } },
+      where: { teamManagerId: { in: personIDs }, sessionId },
       data: { teamManagerId: null },
     });
 
     // Null FK refs: departments headed by these persons
     await tx.department.updateMany({
-      where: { headId: { in: personIDs } },
+      where: { headId: { in: personIDs }, sessionId },
       data: { headId: null },
     });
 
     // Soft-delete the persons
     await tx.person.updateMany({
-      where: { id: { in: personIDs } },
+      where: { id: { in: personIDs }, sessionId },
       data: { deletedAt: now },
     });
 
@@ -144,8 +145,11 @@ export async function updatePersonName(data: FormData) {
     throw new Error(`Name must be ${MAX_NAME_LENGTH} characters or less`);
   }
 
+  const sessionId = await getDemoSessionId();
   await prisma.$transaction(async (tx) => {
-    const personBefore = await tx.person.findUnique({ where: { id: personID } });
+    const personBefore = await tx.person.findFirst({
+      where: { id: personID, sessionId },
+    });
     if (!personBefore) {
       throw new Error("Person not found");
     }
@@ -183,8 +187,11 @@ export async function updatePosition(data: FormData) {
     throw new Error(`Position must be ${MAX_POSITION_LENGTH} characters or less`);
   }
 
+  const sessionId = await getDemoSessionId();
   await prisma.$transaction(async (tx) => {
-    const personBefore = await tx.person.findUnique({ where: { id: personID } });
+    const personBefore = await tx.person.findFirst({
+      where: { id: personID, sessionId },
+    });
     if (!personBefore) {
       throw new Error("Person not found");
     }
@@ -234,7 +241,9 @@ export async function updateEmail(data: FormData) {
       throw new Error("A person with this email already exists");
     }
 
-    const personBefore = await tx.person.findUnique({ where: { id: personID } });
+    const personBefore = await tx.person.findFirst({
+      where: { id: personID, sessionId },
+    });
     if (!personBefore) {
       throw new Error("Person not found");
     }
@@ -246,7 +255,7 @@ export async function updateEmail(data: FormData) {
       action: "update",
       entityType: "person",
       entityId: personID,
-      before: { email: personBefore?.email },
+      before: { email: personBefore.email },
       after: { email: newEmail },
       tx,
     });
@@ -271,11 +280,11 @@ export async function addManager(data: FormData) {
 
   const sessionId = await getDemoSessionId();
   await prisma.$transaction(async (tx) => {
-    const person = await tx.person.findUnique({ where: { id: personID } });
+    const person = await tx.person.findFirst({ where: { id: personID, sessionId } });
     if (!person) {
       throw new Error("Person not found");
     }
-    const teamBefore = await tx.team.findUnique({ where: { teamId: teamIDs[0] } });
+    const teamBefore = await tx.team.findFirst({ where: { teamId: teamIDs[0], sessionId } });
     if (!teamBefore) {
       throw new Error("Team not found");
     }
@@ -293,7 +302,7 @@ export async function addManager(data: FormData) {
     });
 
     const existingMember = await tx.teamMember.findFirst({
-      where: { personId: personID, teamId: teamIDs[0] },
+      where: { personId: personID, teamId: teamIDs[0], sessionId },
     });
 
     if (!existingMember) {
@@ -349,7 +358,7 @@ export async function addMember(data: FormData) {
   const sessionId = await getDemoSessionId();
   await prisma.$transaction(async (tx) => {
     const existingMember = await tx.teamMember.findFirst({
-      where: { personId: personID, teamId: teamID },
+      where: { personId: personID, teamId: teamID, sessionId },
     });
 
     if (existingMember && !existingMember.deletedAt) {
@@ -433,8 +442,9 @@ export async function updateTeamName(data: FormData) {
     throw new Error(`Name must be ${MAX_NAME_LENGTH} characters or less`);
   }
 
+  const sessionId = await getDemoSessionId();
   await prisma.$transaction(async (tx) => {
-    const teamBefore = await tx.team.findUnique({ where: { teamId: teamID } });
+    const teamBefore = await tx.team.findFirst({ where: { teamId: teamID, sessionId } });
     if (!teamBefore) {
       throw new Error("Team not found");
     }
@@ -464,21 +474,22 @@ export async function removeTeam(data: FormData) {
   }
   teamIDs.forEach((id) => validateUUID(id, "teamID"));
 
+  const sessionId = await getDemoSessionId();
   const now = new Date();
   await prisma.$transaction(async (tx) => {
     const teamsToDelete = await tx.team.findMany({
-      where: { teamId: { in: teamIDs }, deletedAt: null },
+      where: { teamId: { in: teamIDs }, deletedAt: null, sessionId },
     });
 
     // Cascade soft-delete: mark TeamMember rows as deleted
     await tx.teamMember.updateMany({
-      where: { teamId: { in: teamIDs }, deletedAt: null },
+      where: { teamId: { in: teamIDs }, deletedAt: null, sessionId },
       data: { deletedAt: now },
     });
 
     // Soft-delete the teams
     await tx.team.updateMany({
-      where: { teamId: { in: teamIDs } },
+      where: { teamId: { in: teamIDs }, sessionId },
       data: { deletedAt: now },
     });
 
@@ -512,12 +523,14 @@ export async function removeMember(data: FormData) {
   validateUUID(teamID, "teamID");
   validateUUID(personID, "personID");
 
+  const sessionId = await getDemoSessionId();
   await prisma.$transaction(async (tx) => {
     const existingMember = await tx.teamMember.findFirst({
       where: {
         personId: personID,
         teamId: teamID,
         deletedAt: null,
+        sessionId,
       },
     });
 
@@ -605,21 +618,22 @@ export async function removeDepartment(data: FormData) {
   }
   departmentIDs.forEach((id) => validateUUID(id, "departmentID"));
 
+  const sessionId = await getDemoSessionId();
   const now = new Date();
   await prisma.$transaction(async (tx) => {
     const departmentsToDelete = await tx.department.findMany({
-      where: { id: { in: departmentIDs }, deletedAt: null },
+      where: { id: { in: departmentIDs }, deletedAt: null, sessionId },
     });
 
     // Null FK refs: teams assigned to these departments
     await tx.team.updateMany({
-      where: { departmentId: { in: departmentIDs } },
+      where: { departmentId: { in: departmentIDs }, sessionId },
       data: { departmentId: null },
     });
 
     // Soft-delete the departments
     await tx.department.updateMany({
-      where: { id: { in: departmentIDs } },
+      where: { id: { in: departmentIDs }, sessionId },
       data: { deletedAt: now },
     });
 
@@ -661,8 +675,9 @@ export async function updateDepartment(data: FormData) {
     throw new Error(`Description must be ${MAX_DESCRIPTION_LENGTH} characters or less`);
   }
 
+  const sessionId = await getDemoSessionId();
   await prisma.$transaction(async (tx) => {
-    const before = await tx.department.findUnique({ where: { id: departmentID } });
+    const before = await tx.department.findFirst({ where: { id: departmentID, sessionId } });
     if (!before) {
       throw new Error("Department not found");
     }
@@ -695,14 +710,15 @@ export async function updateDepartmentHead(data: FormData) {
   validateUUID(departmentID, "departmentID");
   if (personID) validateUUID(personID, "personID");
 
+  const sessionId = await getDemoSessionId();
   await prisma.$transaction(async (tx) => {
     if (personID) {
-      const person = await tx.person.findUnique({ where: { id: personID } });
+      const person = await tx.person.findFirst({ where: { id: personID, sessionId } });
       if (!person) {
         throw new Error("Person not found");
       }
     }
-    const before = await tx.department.findUnique({ where: { id: departmentID } });
+    const before = await tx.department.findFirst({ where: { id: departmentID, sessionId } });
     if (!before) {
       throw new Error("Department not found");
     }
@@ -735,12 +751,13 @@ export async function assignTeamToDepartment(data: FormData) {
   validateUUID(departmentID, "departmentID");
   validateUUID(teamID, "teamID");
 
+  const sessionId = await getDemoSessionId();
   await prisma.$transaction(async (tx) => {
-    const department = await tx.department.findUnique({ where: { id: departmentID } });
+    const department = await tx.department.findFirst({ where: { id: departmentID, sessionId } });
     if (!department) {
       throw new Error("Department not found");
     }
-    const teamBefore = await tx.team.findUnique({ where: { teamId: teamID } });
+    const teamBefore = await tx.team.findFirst({ where: { teamId: teamID, sessionId } });
     if (!teamBefore) {
       throw new Error("Team not found");
     }
@@ -771,8 +788,9 @@ export async function removeTeamFromDepartment(data: FormData) {
   if (!teamID) throw new Error("No teamID provided");
   validateUUID(teamID, "teamID");
 
+  const sessionId = await getDemoSessionId();
   await prisma.$transaction(async (tx) => {
-    const teamBefore = await tx.team.findUnique({ where: { teamId: teamID } });
+    const teamBefore = await tx.team.findFirst({ where: { teamId: teamID, sessionId } });
     if (!teamBefore) {
       throw new Error("Team not found");
     }

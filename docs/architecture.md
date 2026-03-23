@@ -99,6 +99,7 @@ erDiagram
         string entityId
         json before
         json after
+        string sessionId
         datetime createdAt
     }
 ```
