@@ -21,8 +21,15 @@ jest.mock("../serverActions", () => ({
 }));
 
 jest.mock("../components/CsvImportDialog", () => {
-  return function MockCsvImportDialog({ open }: { open: boolean }) {
-    return open ? <div data-testid="csv-import-dialog">Import Dialog</div> : null;
+  return function MockCsvImportDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+    return open ? (
+      <div data-testid="csv-import-dialog">
+        Import Dialog
+        <button data-testid="close-import-dialog" onClick={onClose}>
+          Close
+        </button>
+      </div>
+    ) : null;
   };
 });
 
@@ -215,6 +222,20 @@ describe("DataImportExport", () => {
     expect(screen.queryByTestId("csv-import-dialog")).not.toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: /Upload CSV/i }));
     expect(screen.getByTestId("csv-import-dialog")).toBeInTheDocument();
+  });
+
+  // Closing the import dialog via onClose sets it back to closed.
+  test("closes import dialog via onClose callback", async () => {
+    render(
+      <DataImportExport
+        counts={defaultCounts}
+        permissions={makePermissions({ "data:import": true })}
+      />,
+    );
+    await userEvent.click(screen.getByRole("button", { name: /Upload CSV/i }));
+    expect(screen.getByTestId("csv-import-dialog")).toBeInTheDocument();
+    await userEvent.click(screen.getByTestId("close-import-dialog"));
+    expect(screen.queryByTestId("csv-import-dialog")).not.toBeInTheDocument();
   });
 
   // Renders all export buttons with correct text

@@ -40,7 +40,15 @@ jest.mock("@/demoSession", () => ({
   getDemoSessionId: jest.fn().mockResolvedValue(null),
 }));
 
-import { logAudit, logPermissionDenial, logRateLimitHit } from "@/auditLog";
+import {
+  logAudit,
+  logPermissionDenial,
+  logRateLimitHit,
+  captureAuditContext,
+  deferAudit,
+  deferAuditLog,
+} from "@/auditLog";
+import { getDemoSessionId } from "@/demoSession";
 
 beforeAll(async () => {
   await setupTestMongo();
@@ -253,5 +261,138 @@ describe("logRateLimitHit", () => {
     );
     consoleSpy.mockRestore();
     insertSpy.mockRestore();
+  });
+});
+
+describe("captureAuditContext", () => {
+  // Returns user info and sessionId from current request context.
+  test("returns userId, userEmail, and sessionId for authenticated user", async () => {
+    mockAuth.mockResolvedValue({
+      user: { id: "user-ctx-1", email: "ctx@example.com" },
+    });
+    (getDemoSessionId as jest.Mock).mockResolvedValue("demo-session-abc");
+
+    const ctx = await captureAuditContext();
+    expect(ctx).toEqual({
+      userId: "user-ctx-1",
+      userEmail: "ctx@example.com",
+      sessionId: "demo-session-abc",
+    });
+  });
+
+  // Returns null values when no user is authenticated and no demo session.
+  test("returns nulls for unauthenticated non-demo user", async () => {
+    mockAuth.mockResolvedValue(null);
+    (getDemoSessionId as jest.Mock).mockResolvedValue(null);
+
+    const ctx = await captureAuditContext();
+    expect(ctx).toEqual({
+      userId: null,
+      userEmail: null,
+      sessionId: null,
+    });
+  });
+});
+
+describe("deferAudit", () => {
+  // Writes multiple audit entries via insertMany inside after() callback.
+  test("writes entries via insertMany after flush", async () => {
+    const entries = [
+      {
+        action: "create" as const,
+        entityType: "person" as const,
+        entityId: "p-1",
+        before: undefined,
+        after: { name: "Bob" },
+        userId: "u-1",
+        userEmail: "bob@test.com",
+        sessionId: null,
+      },
+      {
+        action: "update" as const,
+        entityType: "team" as const,
+        entityId: "t-1",
+        before: { teamName: "Old" },
+        after: { teamName: "New" },
+        userId: "u-1",
+        userEmail: "bob@test.com",
+        sessionId: null,
+      },
+    ];
+
+    deferAudit(entries);
+    await flushAfterCallbacks();
+
+    const logs = await getTestAuditLogCollection().find().toArray();
+    expect(logs).toHaveLength(2);
+    expect(logs[0].action).toBe("create");
+    expect(logs[0].entityType).toBe("person");
+    expect(logs[0].userId).toBe("u-1");
+    expect(logs[0].after).toBe('{"name":"Bob"}');
+    expect(logs[0].before).toBeNull();
+    expect(logs[1].action).toBe("update");
+    expect(logs[1].before).toBe('{"teamName":"Old"}');
+    expect(logs[1].after).toBe('{"teamName":"New"}');
+  });
+
+  // Does nothing when entries array is empty (no after() call).
+  test("does nothing for empty entries array", async () => {
+    deferAudit([]);
+    // No after() callback should have been registered
+    expect(afterCallbacks).toHaveLength(0);
+  });
+
+  // Logs error to console when insertMany fails (does not throw).
+  test("logs error to console when insertMany fails", async () => {
+    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+    const col = getTestAuditLogCollection();
+    const insertManySpy = jest
+      .spyOn(col, "insertMany")
+      .mockRejectedValueOnce(new Error("insertMany failed"));
+
+    deferAudit([
+      {
+        action: "delete" as const,
+        entityType: "person" as const,
+        userId: null,
+        userEmail: null,
+        sessionId: null,
+      },
+    ]);
+    await flushAfterCallbacks();
+
+    expect(consoleSpy).toHaveBeenCalledWith(
+      "[audit] Failed to write deferred audit entries:",
+      expect.any(Error),
+    );
+    consoleSpy.mockRestore();
+    insertManySpy.mockRestore();
+  });
+});
+
+describe("deferAuditLog", () => {
+  // Captures context and defers a single audit entry (convenience wrapper).
+  test("captures context and defers single entry", async () => {
+    mockAuth.mockResolvedValue({
+      user: { id: "user-defer", email: "defer@test.com" },
+    });
+    (getDemoSessionId as jest.Mock).mockResolvedValue("sess-xyz");
+
+    await deferAuditLog({
+      action: "create",
+      entityType: "department",
+      entityId: "dept-1",
+      after: { name: "Engineering" },
+    });
+    await flushAfterCallbacks();
+
+    const logs = await getTestAuditLogCollection().find().toArray();
+    expect(logs).toHaveLength(1);
+    expect(logs[0].userId).toBe("user-defer");
+    expect(logs[0].userEmail).toBe("defer@test.com");
+    expect(logs[0].sessionId).toBe("sess-xyz");
+    expect(logs[0].action).toBe("create");
+    expect(logs[0].entityType).toBe("department");
+    expect(logs[0].after).toBe('{"name":"Engineering"}');
   });
 });

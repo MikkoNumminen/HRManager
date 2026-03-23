@@ -542,6 +542,36 @@ describe("UserPermissionEditor", () => {
     });
   });
 
+  // Cancelling the kick out dialog closes it without calling kickOutUser.
+  test("cancelling kick out dialog closes it", async () => {
+    render(
+      <UserPermissionEditor
+        user={baseUser}
+        allPermissionKeys={allKeys}
+        roleDefaults={roleDefaults}
+        canAssignPermissions={true}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: /Kick Out/i }));
+    // Dialog should be open
+    expect(
+      screen.getByText(
+        "Are you sure you want to kick out Alice? They will lose access and all permission overrides.",
+      ),
+    ).toBeInTheDocument();
+    // Click Cancel to close
+    fireEvent.click(screen.getByRole("button", { name: /Cancel/i }));
+    // MUI Dialog has a transition — wait for it to close
+    await waitFor(() => {
+      expect(
+        screen.queryByText(
+          "Are you sure you want to kick out Alice? They will lose access and all permission overrides.",
+        ),
+      ).not.toBeInTheDocument();
+    });
+    expect(kickOutUser).not.toHaveBeenCalled();
+  });
+
   // Uses email as display name for kick out confirm when user name is null
   test("kick out confirm dialog uses email when name is null", () => {
     const nullNameUser = { ...baseUser, name: null as string | null };

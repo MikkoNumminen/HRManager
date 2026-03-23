@@ -266,6 +266,16 @@ describe("ProfileEditor", () => {
     expect(screen.getByText(/2025/)).toBeInTheDocument();
   });
 
+  // Clicking "Remove Image" clears the image URL value to empty string.
+  test("clicking Remove Image clears the image URL input", () => {
+    const profile = { ...baseProfile, image: "https://example.com/avatar.jpg" };
+    render(<ProfileEditor profile={profile} />);
+    const imageInput = screen.getByLabelText("Image URL");
+    expect(imageInput).toHaveValue("https://example.com/avatar.jpg");
+    fireEvent.click(screen.getByRole("button", { name: /Remove Image/i }));
+    expect(imageInput).toHaveValue("");
+  });
+
   // Error messages have the alert role for accessibility.
   test("error messages have role=alert", async () => {
     (updateProfileName as jest.Mock).mockRejectedValue(new Error("Bad name"));
