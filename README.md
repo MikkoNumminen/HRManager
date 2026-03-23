@@ -7,7 +7,7 @@ A production-grade HR management system with granular RBAC, dashboard analytics,
 ![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat-square&logo=typescript)
 ![MUI](https://img.shields.io/badge/MUI-7-007FFF?style=flat-square&logo=mui)
-![Prisma](https://img.shields.io/badge/Prisma-6-2D3748?style=flat-square&logo=prisma)
+![Prisma](https://img.shields.io/badge/Prisma-7-2D3748?style=flat-square&logo=prisma)
 ![Zod](https://img.shields.io/badge/Zod-4-3E67B1?style=flat-square&logo=zod)
 ![Jest](https://img.shields.io/badge/Tested_with-Jest_30-C21325?style=flat-square&logo=jest)
 ![Prettier](https://img.shields.io/badge/Formatted_with-Prettier-F7B93E?style=flat-square&logo=prettier)
@@ -55,7 +55,7 @@ A production-grade HR management system with granular RBAC, dashboard analytics,
 | Framework  | Next.js 16 (App Router, Server Components)                     |
 | UI         | React 19 + MUI v7 + MUI X Charts                               |
 | Language   | TypeScript 5.9                                                 |
-| ORM        | Prisma 6 (`relationLoadStrategy: 'join'`)                      |
+| ORM        | Prisma 7 (driver adapters, `prisma.config.ts`)                      |
 | Database   | PostgreSQL (Vercel Postgres / Neon in production)              |
 | Validation | Zod 4                                                          |
 | Auth       | NextAuth v5 (JWT, Google + GitHub OAuth + demo login)          |

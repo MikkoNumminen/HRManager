@@ -3,7 +3,7 @@
 ## Project overview
 
 A full-stack HR management system for managing employees, teams, and departments.
-Built with Next.js 16 (App Router), React 19, MUI v7, Prisma 6, Zod 4, TypeScript 5.9, Jest 30.
+Built with Next.js 16 (App Router), React 19, MUI v7, Prisma 7, Zod 4, TypeScript 5.9, Jest 30.
 
 This is a **portfolio / showcase project**. The goal is to demonstrate technical depth and breadth, not to ship the leanest possible product. Features are intentionally built to production-grade complexity (e.g. granular per-user RBAC instead of simple role checks) to showcase what the developer can build. When in doubt, favour the more thorough implementation.
 
@@ -16,7 +16,7 @@ This is a **portfolio / showcase project**. The goal is to demonstrate technical
 | Framework  | Next.js 16 (App Router, Server Components)                                |
 | UI         | React 19 + MUI v7 — dark theme throughout, no Tailwind                    |
 | Language   | TypeScript 5.9                                                            |
-| ORM        | Prisma 6 (`relationLoadStrategy: 'join'`)                                 |
+| ORM        | Prisma 7 (`relationLoadStrategy: 'join'`)                                 |
 | Database   | PostgreSQL (local dev + Vercel Postgres / Neon in production)             |
 | Validation | Zod 4                                                                     |
 | Auth       | NextAuth v5 (JWT strategy, Google + GitHub OAuth + demo login)            |
