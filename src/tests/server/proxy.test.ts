@@ -31,7 +31,7 @@ describe("proxy", () => {
   it("allows unsafe-inline for style-src", () => {
     const res = proxy(makeRequest());
     const csp = res.headers.get("Content-Security-Policy")!;
-    expect(csp).toContain("style-src 'self' 'unsafe-inline'");
+    expect(csp).toMatch(/style-src 'self' 'nonce-[A-Za-z0-9+/=]+' 'unsafe-inline'/);
   });
 
   // CSP restricts images to self and OAuth avatar domains
