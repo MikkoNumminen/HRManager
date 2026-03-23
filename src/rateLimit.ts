@@ -45,25 +45,28 @@ async function checkRateLimit(
   const now = new Date();
   const windowStart = new Date(now.getTime() - WINDOW_MS);
 
-  const existing = await prisma.rateLimit.findUnique({
-    where: { identifier_action: { identifier, action } },
-  });
+  // Atomic rate limit check using raw SQL to prevent TOCTOU race conditions.
+  // A single upsert+conditional increment ensures two concurrent requests
+  // cannot both read the same count and both pass the limit check.
+  const result: { count: number }[] = await prisma.$queryRaw`
+    INSERT INTO "RateLimit" (id, identifier, action, count, "windowStart")
+    VALUES (gen_random_uuid(), ${identifier}, ${action}, 1, ${now})
+    ON CONFLICT (identifier, action) DO UPDATE SET
+      count = CASE
+        WHEN "RateLimit"."windowStart" <= ${windowStart} THEN 1
+        ELSE "RateLimit".count + 1
+      END,
+      "windowStart" = CASE
+        WHEN "RateLimit"."windowStart" <= ${windowStart} THEN ${now}
+        ELSE "RateLimit"."windowStart"
+      END
+    RETURNING count
+  `;
 
-  if (existing && existing.windowStart > windowStart) {
-    if (existing.count >= maxRequests) {
-      await logRateLimitHit(action, identifier);
-      throw new RateLimitError();
-    }
-    await prisma.rateLimit.update({
-      where: { identifier_action: { identifier, action } },
-      data: { count: { increment: 1 } },
-    });
-  } else {
-    await prisma.rateLimit.upsert({
-      where: { identifier_action: { identifier, action } },
-      update: { count: 1, windowStart: now },
-      create: { identifier, action, count: 1, windowStart: now },
-    });
+  const count = result[0]?.count ?? 1;
+  if (count > maxRequests) {
+    await logRateLimitHit(action, identifier);
+    throw new RateLimitError();
   }
 }
 

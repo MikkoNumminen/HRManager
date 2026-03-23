@@ -50,25 +50,34 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async signIn({ user }) {
       if (!user.email) return false;
 
-      const existing = await prisma.user.findUnique({
-        where: { email: user.email },
-      });
-
-      if (!existing) {
-        const userCount = await prisma.user.count();
-        const role = userCount === 0 ? "superuser" : "user";
-
-        await prisma.$transaction(async (tx) => {
-          await tx.user.create({
-            data: {
-              email: user.email!,
-              name: user.name ?? null,
-              image: user.image ?? null,
-              role,
-            },
+      // Serializable transaction prevents the TOCTOU race where two
+      // simultaneous first-time sign-ins both see count === 0 and both
+      // become superuser. Upsert handles concurrent sign-ins for the
+      // same email without unique-constraint errors.
+      await prisma.$transaction(
+        async (tx) => {
+          const existing = await tx.user.findUnique({
+            where: { email: user.email! },
           });
-        });
-      }
+
+          if (!existing) {
+            const userCount = await tx.user.count();
+            const role = userCount === 0 ? "superuser" : "user";
+
+            await tx.user.upsert({
+              where: { email: user.email! },
+              update: {},
+              create: {
+                email: user.email!,
+                name: user.name ?? null,
+                image: user.image ?? null,
+                role,
+              },
+            });
+          }
+        },
+        { isolationLevel: "Serializable" },
+      );
 
       return true;
     },
