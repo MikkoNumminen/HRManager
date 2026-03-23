@@ -601,8 +601,8 @@ describe("getAuditLogs", () => {
     });
 
     const result = await getAuditLogs({
-      dateFrom: yesterday.toISOString(),
-      dateTo: now.toISOString(),
+      dateFrom: yesterday,
+      dateTo: now,
     });
     // Should include yesterday and today entries, but not two days ago
     expect(result.logs.length).toBeGreaterThanOrEqual(2);
