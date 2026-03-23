@@ -46,7 +46,9 @@ Next.js 16 (App Router) · React 19 · MUI v7 (dark theme, no Tailwind) · TypeS
 
 ## Testing
 
-- Run `npm run test:all` after every change. Never `npm test` alone.
+- **Always run tests** (`npm run test:all`) after code changes (logic, components, actions, queries). Never `npm test` alone.
+- **Skip tests** after docs-only commits (README, CLAUDE.md, TODO.md) or formatting-only runs.
+- **Targeted tests first** — if only one file changed, run its test file first; full suite before final push.
 - Tests in `src/tests/`. Comment above each test explaining what it does.
 - Every new schema/component/module must have tests. Aim for 100% coverage.
 - Do not mock core logic — test real functionality.
