@@ -30,8 +30,8 @@ This is a **portfolio / showcase project**. The goal is to demonstrate technical
 ## Architecture
 
 - **Reads** go in `queries.ts` (no `"use server"`). Validated through Zod schemas. Dashboard metrics use Prisma Typed SQL (`prisma/sql/`) with `$queryRawTyped` for type-safe raw queries.
-- **Mutations** go in `serverActions.ts` (marked `"use server"`). Always inside `prisma.$transaction()` — even single operations. Every mutation is audit-logged via `logAudit()` from `auditLog.ts` inside the same transaction for atomicity.
-- **Audit logging** — `auditLog.ts` provides `logAudit()` which records who, what action, which entity, and before/after JSON snapshots. Uses `auth()` session for actor identity. Accepts optional `tx` param to run inside an existing transaction. No FK to User — logs survive user deletion. `logPermissionDenial()` and `logRateLimitHit()` log security events (permission denials and rate limit hits) to the same audit trail.
+- **Mutations** go in `serverActions.ts` (marked `"use server"`). Always inside `prisma.$transaction()` — even single operations. Every mutation is audit-logged via deferred `after()` writes from `auditLog.ts` for non-blocking post-response processing.
+- **Audit logging** — `auditLog.ts` provides deferred audit logging via Next.js `after()`. Pattern: `captureAuditContext()` captures user/session before or inside the transaction, audit entries are collected inside the transaction, then `deferAudit(entries)` schedules writes after the response is sent. `logAudit()` is a synchronous write for non-request contexts (tests, build-time). `deferAuditLog()` is a convenience wrapper that captures context and defers in one call. No FK to User — logs survive user deletion. `logPermissionDenial()` and `logRateLimitHit()` log security events (permission denials and rate limit hits) to the same audit trail, also deferred via `after()`.
 - Pages are async Server Components that fetch data and pass it as props to Client Components. No `useEffect` data fetching.
 - Forms use React 19's `useActionState` with `action=` prop, not `onSubmit`. Create forms use `useOptimistic` via wrapper components (`OptimisticPersons`, `OptimisticTeams`, `OptimisticDepartments`) to show new items in the table instantly before the server responds.
 - Types are derived from Zod schemas in `schemas.ts` via `z.infer` — `Person`, `CombinedTeam`, `Department`, `AppUser`, `AuditLog`, `Permissions`. Do not create duplicate interfaces in components.
@@ -70,11 +70,11 @@ src/
 │   ├── managePersons/           # Person management (permission-protected)
 │   ├── manageTeams/             # Team management (permission-protected)
 │   └── profile/                 # User profile (auth-protected)
-├── components/       # Reusable MUI client components (46 components)
+├── components/       # Reusable MUI client components (48 components)
 ├── i18n/             # next-intl configuration (actions, config, request)
-├── tests/            # Jest tests (1139 tests)
+├── tests/            # Jest tests (1257 tests)
 ├── types/            # TypeScript module augmentations (next-auth.d.ts)
-├── auditLog.ts       # Audit logging helper (logAudit)
+├── auditLog.ts       # Deferred audit logging via after() (captureAuditContext, deferAudit, logAudit)
 ├── auth.ts           # NextAuth v5 configuration + RBAC callbacks
 ├── db.ts             # Prisma singleton
 ├── demoSession.ts    # Demo session isolation (seed, cleanup, session ID helper)
@@ -153,7 +153,7 @@ Every TODO item must have a color-coded size estimate prefix: 🟢 small, 🟡 m
 - Do not mock core logic — test real functionality.
 - Always add a comment above each test explaining what it does in plain, simple language ("Barney style").
 - **Every new schema, component, or module must have corresponding tests.** Never leave new code untested — if you add it, you test it.
-- **Always aim for 100% coverage.** The project currently has 99.5% line and 99.45% function coverage — push toward 100%. Add tests for every branch, edge case, error fallback, and interaction. If a new line or function is added, it must be covered. This is a portfolio project; comprehensive test coverage is a strength, not over-engineering.
+- **Always aim for 100% coverage.** The project currently has 97.6% line and 94.6% function coverage — push toward 100%. Add tests for every branch, edge case, error fallback, and interaction. If a new line or function is added, it must be covered. This is a portfolio project; comprehensive test coverage is a strength, not over-engineering.
 
 ## Docker
 
