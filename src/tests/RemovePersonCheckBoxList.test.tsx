@@ -27,6 +27,7 @@ describe("RemovePersonCheckBoxList", () => {
   // submitted in the form to tell the server action which person to delete.
   test("radio button has correct value", () => {
     render(<RemovePersonCheckBoxList {...defaultProps} />);
+    // eslint-disable-next-line jest-dom/prefer-to-have-value -- radio inputs don't support .toHaveValue()
     expect(screen.getByRole("radio")).toHaveAttribute("value", "person-1");
   });
 

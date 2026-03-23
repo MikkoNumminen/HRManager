@@ -63,7 +63,7 @@ describe("EditablePersonsTable Component", () => {
     render(<EditablePersonsTable persons={mockPersons} />);
 
     const table = within(screen.getByTestId("table-view"));
-    const row = table.getByText("John Doe").closest("tr")!;
+    const row = table.getByRole("row", { name: /John Doe/ });
     fireEvent.click(row);
 
     expect(mockPush).toHaveBeenCalledWith("/managePersons/1");
@@ -80,10 +80,9 @@ describe("EditablePersonsTable Component", () => {
     const personsWithNull: Person[] = [{ ...mockPersons[0], position: null }];
     render(<EditablePersonsTable persons={personsWithNull} />);
 
-    const table = within(screen.getByTestId("table-view"));
-    const row = table.getByText("John Doe").closest("tr")!;
-    const cells = row.querySelectorAll("td");
-    expect(cells[1].textContent).toBe("");
+    const row = screen.getByRole("row", { name: /John Doe/ });
+    const cells = within(row).getAllByRole("cell");
+    expect(cells[1]).toHaveTextContent("");
   });
 
   // Pressing Enter on a row navigates to the person page
@@ -91,7 +90,7 @@ describe("EditablePersonsTable Component", () => {
     render(<EditablePersonsTable persons={mockPersons} />);
 
     const table = within(screen.getByTestId("table-view"));
-    const row = table.getByText("John Doe").closest("tr")!;
+    const row = table.getByRole("row", { name: /John Doe/ });
     fireEvent.keyDown(row, { key: "Enter" });
 
     expect(mockPush).toHaveBeenCalledWith("/managePersons/1");
@@ -102,7 +101,7 @@ describe("EditablePersonsTable Component", () => {
     render(<EditablePersonsTable persons={mockPersons} />);
 
     const table = within(screen.getByTestId("table-view"));
-    const row = table.getByText("Jane Smith").closest("tr")!;
+    const row = table.getByRole("row", { name: /Jane Smith/ });
     fireEvent.keyDown(row, { key: " " });
 
     expect(mockPush).toHaveBeenCalledWith("/managePersons/2");
@@ -113,7 +112,7 @@ describe("EditablePersonsTable Component", () => {
     render(<EditablePersonsTable persons={mockPersons} />);
 
     const table = within(screen.getByTestId("table-view"));
-    const row = table.getByText("John Doe").closest("tr")!;
+    const row = table.getByRole("row", { name: /John Doe/ });
     fireEvent.keyDown(row, { key: "Tab" });
 
     expect(mockPush).not.toHaveBeenCalled();
@@ -123,10 +122,9 @@ describe("EditablePersonsTable Component", () => {
     const personsWithNull: Person[] = [{ ...mockPersons[0], email: null }];
     render(<EditablePersonsTable persons={personsWithNull} />);
 
-    const table = within(screen.getByTestId("table-view"));
-    const row = table.getByText("John Doe").closest("tr")!;
-    const cells = row.querySelectorAll("td");
-    expect(cells[2].textContent).toBe("");
+    const row = screen.getByRole("row", { name: /John Doe/ });
+    const cells = within(row).getAllByRole("cell");
+    expect(cells[2]).toHaveTextContent("");
   });
 });
 

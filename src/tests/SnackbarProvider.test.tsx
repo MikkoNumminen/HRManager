@@ -1,4 +1,4 @@
-import { render, screen, act, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 
 // Unmock SnackbarProvider so we can test the real implementation
 jest.unmock("../components/SnackbarProvider");
@@ -36,71 +36,61 @@ describe("SnackbarProvider", () => {
   });
 
   // Shows success snackbar with the correct message
-  test("shows success snackbar when triggered", async () => {
+  test("shows success snackbar when triggered", () => {
     render(
       <SnackbarProvider>
         <SnackbarConsumer />
       </SnackbarProvider>,
     );
-    await act(async () => {
-      screen.getByText("Show Success").click();
-    });
+    fireEvent.click(screen.getByText("Show Success"));
     expect(screen.getByText("Success message")).toBeInTheDocument();
     expect(screen.getByRole("alert")).toBeInTheDocument();
   });
 
   // Shows error snackbar with the correct severity
-  test("shows error snackbar with error severity", async () => {
+  test("shows error snackbar with error severity", () => {
     render(
       <SnackbarProvider>
         <SnackbarConsumer />
       </SnackbarProvider>,
     );
-    await act(async () => {
-      screen.getByText("Show Error").click();
-    });
+    fireEvent.click(screen.getByText("Show Error"));
     expect(screen.getByText("Error occurred")).toBeInTheDocument();
     expect(screen.getByRole("alert")).toHaveClass("MuiAlert-filledError");
   });
 
   // Shows info snackbar with info severity
-  test("shows info snackbar with info severity", async () => {
+  test("shows info snackbar with info severity", () => {
     render(
       <SnackbarProvider>
         <SnackbarConsumer />
       </SnackbarProvider>,
     );
-    await act(async () => {
-      screen.getByText("Show Info").click();
-    });
+    fireEvent.click(screen.getByText("Show Info"));
     expect(screen.getByText("Info notice")).toBeInTheDocument();
     expect(screen.getByRole("alert")).toHaveClass("MuiAlert-filledInfo");
   });
 
   // Shows warning snackbar with warning severity
-  test("shows warning snackbar with warning severity", async () => {
+  test("shows warning snackbar with warning severity", () => {
     render(
       <SnackbarProvider>
         <SnackbarConsumer />
       </SnackbarProvider>,
     );
-    await act(async () => {
-      screen.getByText("Show Warning").click();
-    });
+    fireEvent.click(screen.getByText("Show Warning"));
     expect(screen.getByText("Warning alert")).toBeInTheDocument();
     expect(screen.getByRole("alert")).toHaveClass("MuiAlert-filledWarning");
   });
 
   // Defaults to success severity when none is specified
-  test("defaults to success severity", async () => {
+  test("defaults to success severity", () => {
     render(
       <SnackbarProvider>
         <SnackbarConsumer />
       </SnackbarProvider>,
     );
-    await act(async () => {
-      screen.getByText("Show Success").click();
-    });
+    fireEvent.click(screen.getByText("Show Success"));
     expect(screen.getByRole("alert")).toHaveClass("MuiAlert-filledSuccess");
   });
 
@@ -111,14 +101,10 @@ describe("SnackbarProvider", () => {
         <SnackbarConsumer />
       </SnackbarProvider>,
     );
-    await act(async () => {
-      screen.getByText("Show Success").click();
-    });
+    fireEvent.click(screen.getByText("Show Success"));
     expect(screen.getByText("Success message")).toBeInTheDocument();
 
-    await act(async () => {
-      screen.getByTitle("Close").click();
-    });
+    fireEvent.click(screen.getByTitle("Close"));
     await waitFor(() => {
       expect(screen.queryByText("Success message")).not.toBeInTheDocument();
     });
@@ -131,14 +117,10 @@ describe("SnackbarProvider", () => {
         <SnackbarConsumer />
       </SnackbarProvider>,
     );
-    await act(async () => {
-      screen.getByText("Show Success").click();
-    });
+    fireEvent.click(screen.getByText("Show Success"));
     expect(screen.getByText("Success message")).toBeInTheDocument();
 
-    await act(async () => {
-      screen.getByText("Show Error").click();
-    });
+    fireEvent.click(screen.getByText("Show Error"));
     await waitFor(() => {
       expect(screen.getByText("Error occurred")).toBeInTheDocument();
     });
@@ -154,8 +136,6 @@ describe("SnackbarProvider", () => {
     render(<Standalone />);
     expect(screen.getByText("Trigger")).toBeInTheDocument();
     // Clicking should not throw
-    act(() => {
-      screen.getByText("Trigger").click();
-    });
+    fireEvent.click(screen.getByText("Trigger"));
   });
 });

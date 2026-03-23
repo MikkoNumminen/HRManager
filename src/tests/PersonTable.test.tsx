@@ -60,11 +60,10 @@ describe("PersonTable Component", () => {
     ];
     render(<PersonTable persons={personsWithNulls} />);
 
-    const table = within(screen.getByTestId("table-view"));
-    const row = table.getByText("John Doe").closest("tr")!;
-    const cells = row.querySelectorAll("td");
-    expect(cells[1].textContent).toBe("");
-    expect(cells[2].textContent).toBe("");
+    const row = screen.getByRole("row", { name: /John Doe/ });
+    const cells = within(row).getAllByRole("cell");
+    expect(cells[1]).toHaveTextContent("");
+    expect(cells[2]).toHaveTextContent("");
   });
 });
 

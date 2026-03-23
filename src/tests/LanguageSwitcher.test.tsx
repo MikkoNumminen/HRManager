@@ -69,7 +69,7 @@ describe("LanguageSwitcher", () => {
   test("current locale is highlighted", async () => {
     render(<LanguageSwitcher />);
     await userEvent.click(screen.getByLabelText("Language"));
-    const englishItem = screen.getByText("English").closest("li");
+    const englishItem = screen.getByRole("menuitem", { name: /English/ });
     expect(englishItem).toHaveClass("Mui-selected");
   });
 

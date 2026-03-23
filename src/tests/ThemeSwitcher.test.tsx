@@ -63,7 +63,9 @@ describe("ThemeSwitcher", () => {
     mockCurrentTheme = "cyberpunk";
     render(<ThemeSwitcher />);
     await userEvent.click(screen.getByLabelText("Theme"));
-    const cyberpunkItem = screen.getByText(THEME_LABELS.cyberpunk).closest("li");
+    const cyberpunkItem = screen.getByRole("menuitem", {
+      name: new RegExp(THEME_LABELS.cyberpunk),
+    });
     expect(cyberpunkItem).toHaveClass("Mui-selected");
   });
 

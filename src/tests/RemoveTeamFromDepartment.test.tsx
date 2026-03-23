@@ -99,11 +99,13 @@ describe("RemoveTeamFromDepartment Component", () => {
     });
   });
 
-  // Hidden input for teamID exists.
+  // Hidden input for teamID exists and has the correct value after selecting a team.
   test("includes teamID as hidden input", () => {
     render(<RemoveTeamFromDepartmentForm currentTeams={mockTeams} />);
-    const teamInput = document.querySelector('input[name="teamID"]') as HTMLInputElement;
-    expect(teamInput).toBeTruthy();
+    fireEvent.mouseDown(screen.getByLabelText(/Select Team/i));
+    fireEvent.click(screen.getByText("Frontend"));
+    const inputs = screen.getAllByDisplayValue("team-1");
+    expect(inputs.some((el) => el.getAttribute("name") === "teamID")).toBe(true);
   });
 
   // Submit button becomes enabled after selecting a team.

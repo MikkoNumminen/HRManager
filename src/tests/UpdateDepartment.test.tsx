@@ -186,8 +186,7 @@ describe("UpdateDepartment Component", () => {
         currentDescription={currentDescription}
       />,
     );
-    const input = document.querySelector('input[name="departmentID"]') as HTMLInputElement;
-    expect(input.value).toBe(departmentID);
+    expect(screen.getByDisplayValue(departmentID)).toHaveAttribute("name", "departmentID");
   });
 
   // Handles null description gracefully (treats it as empty string).

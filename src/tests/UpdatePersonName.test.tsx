@@ -110,8 +110,7 @@ describe("UpdatePersonName Component", () => {
   // Hidden input contains the person ID.
   test("includes personID as hidden input", () => {
     render(<UpdatePersonNameForm personID={personID} currentName={currentName} />);
-    const input = document.querySelector('input[name="personID"]') as HTMLInputElement;
-    expect(input.value).toBe(personID);
+    expect(screen.getByDisplayValue(personID)).toHaveAttribute("name", "personID");
   });
 
   // Handles input change properly.

@@ -1,4 +1,4 @@
-import { render, screen, act } from "@testing-library/react";
+import { render, screen, act, fireEvent } from "@testing-library/react";
 import TutorialProvider, { useTutorial, useTutorialMaybe } from "../components/TutorialProvider";
 import { useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
@@ -147,9 +147,7 @@ describe("TutorialProvider", () => {
       </TutorialProvider>,
     );
 
-    await act(async () => {
-      screen.getByText("complete-add-person").click();
-    });
+    fireEvent.click(screen.getByText("complete-add-person"));
 
     expect(screen.getByTestId("completedCount")).toHaveTextContent("2");
     expect(screen.getByTestId("celebratingStep")).toHaveTextContent("add_person");
@@ -168,14 +166,10 @@ describe("TutorialProvider", () => {
       </TutorialProvider>,
     );
 
-    await act(async () => {
-      screen.getByText("complete-add-person").click();
-    });
+    fireEvent.click(screen.getByText("complete-add-person"));
     expect(screen.getByTestId("celebratingStep")).toHaveTextContent("add_person");
 
-    await act(async () => {
-      screen.getByText("dismiss").click();
-    });
+    fireEvent.click(screen.getByText("dismiss"));
     expect(screen.getByTestId("celebratingStep")).toHaveTextContent("none");
   });
 
@@ -195,9 +189,7 @@ describe("TutorialProvider", () => {
     // view_employees is auto-completed (1 step done)
     expect(screen.getByTestId("completedCount")).toHaveTextContent("1");
 
-    await act(async () => {
-      screen.getByText("reset").click();
-    });
+    fireEvent.click(screen.getByText("reset"));
 
     // After reset, view_employees gets auto-completed again because we're on "/"
     // but the reset itself clears everything first
@@ -217,9 +209,7 @@ describe("TutorialProvider", () => {
       </TutorialProvider>,
     );
 
-    await act(async () => {
-      screen.getByText("complete-add-person").click();
-    });
+    fireEvent.click(screen.getByText("complete-add-person"));
 
     const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
     expect(stored).toContain("add_person");
@@ -299,14 +289,10 @@ describe("TutorialProvider", () => {
       </TutorialProvider>,
     );
 
-    await act(async () => {
-      screen.getByText("complete-add-person").click();
-    });
+    fireEvent.click(screen.getByText("complete-add-person"));
     const countAfterFirst = screen.getByTestId("completedCount").textContent;
 
-    await act(async () => {
-      screen.getByText("complete-add-person").click();
-    });
+    fireEvent.click(screen.getByText("complete-add-person"));
     expect(screen.getByTestId("completedCount")).toHaveTextContent(countAfterFirst!);
   });
 

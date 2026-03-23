@@ -126,11 +126,11 @@ describe("UpdateDepartmentHead Component", () => {
   // Hidden inputs contain the department ID and selected person ID.
   test("includes departmentID and personID as hidden inputs", () => {
     render(<UpdateDepartmentHeadForm departmentID={departmentID} persons={mockPersons} />);
-    const deptInput = document.querySelector('input[name="departmentID"]') as HTMLInputElement;
-    expect(deptInput.value).toBe(departmentID);
+    expect(screen.getByDisplayValue(departmentID)).toHaveAttribute("name", "departmentID");
 
-    const personInput = document.querySelector('input[name="personID"]') as HTMLInputElement;
-    expect(personInput).toBeTruthy();
+    // Select a person to verify personID hidden input gets a value
+    fireEvent.click(screen.getByRole("button", { name: "Alice" }));
+    expect(screen.getByDisplayValue("person-1")).toHaveAttribute("name", "personID");
   });
 
   // With empty excludeIds, all persons are shown.

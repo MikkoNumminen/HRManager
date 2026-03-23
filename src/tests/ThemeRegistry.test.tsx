@@ -1,4 +1,4 @@
-import { render, screen, act } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import ThemeRegistry, { useTheme } from "../components/ThemeRegistry";
 import { THEME_STORAGE_KEY, DEFAULT_THEME } from "../themeConfig";
 
@@ -67,46 +67,38 @@ describe("ThemeRegistry", () => {
   });
 
   // setTheme updates the current theme
-  test("setTheme updates current theme", async () => {
+  test("setTheme updates current theme", () => {
     render(
       <ThemeRegistry>
         <ThemeConsumer />
       </ThemeRegistry>,
     );
-    await act(async () => {
-      screen.getByText("Switch to cyberpunk").click();
-    });
+    fireEvent.click(screen.getByText("Switch to cyberpunk"));
     expect(screen.getByTestId("current-theme")).toHaveTextContent("cyberpunk");
   });
 
   // setTheme persists to localStorage
-  test("setTheme saves to localStorage", async () => {
+  test("setTheme saves to localStorage", () => {
     render(
       <ThemeRegistry>
         <ThemeConsumer />
       </ThemeRegistry>,
     );
-    await act(async () => {
-      screen.getByText("Switch to light").click();
-    });
+    fireEvent.click(screen.getByText("Switch to light"));
     expect(localStorage.getItem(THEME_STORAGE_KEY)).toBe("light");
   });
 
   // Multiple theme switches update correctly
-  test("multiple theme switches work correctly", async () => {
+  test("multiple theme switches work correctly", () => {
     render(
       <ThemeRegistry>
         <ThemeConsumer />
       </ThemeRegistry>,
     );
-    await act(async () => {
-      screen.getByText("Switch to cyberpunk").click();
-    });
+    fireEvent.click(screen.getByText("Switch to cyberpunk"));
     expect(screen.getByTestId("current-theme")).toHaveTextContent("cyberpunk");
 
-    await act(async () => {
-      screen.getByText("Switch to light").click();
-    });
+    fireEvent.click(screen.getByText("Switch to light"));
     expect(screen.getByTestId("current-theme")).toHaveTextContent("light");
     expect(localStorage.getItem(THEME_STORAGE_KEY)).toBe("light");
   });

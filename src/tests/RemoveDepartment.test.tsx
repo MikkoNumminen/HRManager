@@ -87,8 +87,6 @@ describe("RemoveDepartment Component", () => {
   // The hidden input contains the department ID.
   test("includes departmentID as hidden input", () => {
     render(<RemoveDepartmentForm departmentID={departmentID} />);
-    const hiddenInput = document.querySelector('input[name="departmentID"]') as HTMLInputElement;
-    expect(hiddenInput).toBeTruthy();
-    expect(hiddenInput.value).toBe(departmentID);
+    expect(screen.getByDisplayValue(departmentID)).toHaveAttribute("name", "departmentID");
   });
 });

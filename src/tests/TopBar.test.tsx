@@ -1,7 +1,7 @@
 // Enable demo login so the "Try Demo" button renders in tests
 process.env.NEXT_PUBLIC_DEMO_LOGIN = "true";
 
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
 import TopBar from "../components/TopBar";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { seedMockData } from "../serverActions";
@@ -47,8 +47,7 @@ describe("TopBar", () => {
 
   test("back button links to the correct href", () => {
     render(<TopBar title="Manage Persons" backHref="/managePersons" />);
-    const link = screen.getByLabelText("Go back").closest("a");
-    expect(link).toHaveAttribute("href", "/managePersons");
+    expect(screen.getByRole("link", { name: "Go back" })).toHaveAttribute("href", "/managePersons");
   });
 
   test("shows Sign in button when unauthenticated", () => {
@@ -150,9 +149,11 @@ describe("TopBar", () => {
       });
       render(<TopBar title="Home" />);
       fireEvent.click(screen.getByLabelText("User menu"));
-      expect(screen.getByText(linkText)).toBeInTheDocument();
-      const link = screen.getByText(linkText).closest("a");
-      expect(link).toHaveAttribute("href", expectedHref);
+      expect(screen.getByText(linkText as string)).toBeInTheDocument();
+      expect(screen.getByRole("menuitem", { name: linkText as string })).toHaveAttribute(
+        "href",
+        expectedHref,
+      );
     },
   );
 
@@ -471,12 +472,13 @@ describe("TopBar", () => {
       data: { user: { name: "Alice", email: "a@b.com", image: null } },
       status: "authenticated",
     });
-    const { baseElement } = render(<TopBar title="Home" />);
+    render(<TopBar title="Home" />);
     fireEvent.click(screen.getByLabelText("User menu"));
     expect(screen.getByText("Sign out")).toBeInTheDocument();
-    // MUI Menu renders a backdrop — clicking it triggers the onClose handler
-    const backdrop = baseElement.querySelector(".MuiBackdrop-root") as HTMLElement;
-    expect(() => fireEvent.click(backdrop)).not.toThrow();
+    // Pressing Escape triggers the Menu's onClose handler
+    expect(() =>
+      fireEvent.keyDown(screen.getByRole("presentation"), { key: "Escape" }),
+    ).not.toThrow();
   });
 
   // Clicking the backdrop triggers the seed Dialog onClose callback without error.
@@ -486,14 +488,15 @@ describe("TopBar", () => {
       status: "authenticated",
     });
     const permissions = { "data:seed": true } as never;
-    const { baseElement } = render(<TopBar title="Home" permissions={permissions} />);
+    render(<TopBar title="Home" permissions={permissions} />);
     fireEvent.click(screen.getByLabelText("User menu"));
     fireEvent.click(screen.getByText("Load Mock Data"));
     expect(screen.getByText("Keep Existing")).toBeInTheDocument();
-    // MUI Dialog renders a backdrop — clicking it triggers the onClose handler
-    const backdrops = baseElement.querySelectorAll(".MuiBackdrop-root");
-    const dialogBackdrop = backdrops[backdrops.length - 1] as HTMLElement;
-    expect(() => fireEvent.click(dialogBackdrop)).not.toThrow();
+    // Pressing Escape triggers the Dialog's onClose handler
+    const presentations = screen.getAllByRole("presentation");
+    expect(() =>
+      fireEvent.keyDown(presentations[presentations.length - 1], { key: "Escape" }),
+    ).not.toThrow();
   });
 
   // Audit Log menu item click handler runs without error.
@@ -594,14 +597,11 @@ describe("TopBar", () => {
     });
     render(<TopBar title="Home" />);
     fireEvent.click(screen.getByLabelText("Menu"));
-    const presentation = screen.getByTestId("mobile-drawer");
+    const drawer = within(screen.getByTestId("mobile-drawer"));
     // All three nav links appear in the drawer
-    const userMgmtLinks = presentation.querySelectorAll('a[href="/admin"]');
-    expect(userMgmtLinks.length).toBeGreaterThanOrEqual(1);
-    const auditLinks = presentation.querySelectorAll('a[href="/admin/audit"]');
-    expect(auditLinks.length).toBeGreaterThanOrEqual(1);
-    const dashboardLinks = presentation.querySelectorAll('a[href="/dashboard"]');
-    expect(dashboardLinks.length).toBeGreaterThanOrEqual(1);
+    expect(drawer.getByRole("link", { name: /User Management/ })).toHaveAttribute("href", "/admin");
+    expect(drawer.getByRole("link", { name: /Audit Log/ })).toHaveAttribute("href", "/admin/audit");
+    expect(drawer.getByRole("link", { name: /Dashboard/ })).toHaveAttribute("href", "/dashboard");
   });
 
   // Mobile drawer hides navigation links when user lacks permissions
@@ -623,10 +623,10 @@ describe("TopBar", () => {
     });
     render(<TopBar title="Home" />);
     fireEvent.click(screen.getByLabelText("Menu"));
-    const presentation = screen.getByTestId("mobile-drawer");
-    expect(presentation.querySelectorAll('a[href="/admin"]')).toHaveLength(0);
-    expect(presentation.querySelectorAll('a[href="/admin/audit"]')).toHaveLength(0);
-    expect(presentation.querySelectorAll('a[href="/dashboard"]')).toHaveLength(0);
+    const drawer = within(screen.getByTestId("mobile-drawer"));
+    expect(drawer.queryByRole("link", { name: /User Management/ })).not.toBeInTheDocument();
+    expect(drawer.queryByRole("link", { name: /Audit Log/ })).not.toBeInTheDocument();
+    expect(drawer.queryByRole("link", { name: /Dashboard/ })).not.toBeInTheDocument();
   });
 
   // Mobile drawer shows Load Mock Data and Reset All Data when permitted
@@ -665,11 +665,8 @@ describe("TopBar", () => {
     const permissions = { "data:seed": true } as never;
     render(<TopBar title="Home" permissions={permissions} />);
     fireEvent.click(screen.getByLabelText("Menu"));
-    const presentation = screen.getByTestId("mobile-drawer");
-    const loadMockBtn = Array.from(presentation.querySelectorAll("span")).find(
-      (el) => el.textContent === "Load Mock Data",
-    )!;
-    fireEvent.click(loadMockBtn.closest("div[role='button']") ?? loadMockBtn);
+    const drawer = within(screen.getByTestId("mobile-drawer"));
+    fireEvent.click(drawer.getByText("Load Mock Data"));
     expect(screen.getByText("Keep Existing")).toBeInTheDocument();
     expect(screen.getByText("Replace All")).toBeInTheDocument();
   });
@@ -683,11 +680,8 @@ describe("TopBar", () => {
     const permissions = { "data:reset": true } as never;
     render(<TopBar title="Home" permissions={permissions} />);
     fireEvent.click(screen.getByLabelText("Menu"));
-    const presentation = screen.getByTestId("mobile-drawer");
-    const resetBtn = Array.from(presentation.querySelectorAll("span")).find(
-      (el) => el.textContent === "Reset All Data",
-    )!;
-    fireEvent.click(resetBtn.closest("div[role='button']") ?? resetBtn);
+    const drawer = within(screen.getByTestId("mobile-drawer"));
+    fireEvent.click(drawer.getByText("Reset All Data"));
     expect(
       screen.getByText(
         "Are you sure you want to delete all persons and teams? This action cannot be undone.",
@@ -704,11 +698,8 @@ describe("TopBar", () => {
     });
     render(<TopBar title="Home" />);
     fireEvent.click(screen.getByLabelText("Menu"));
-    const presentation = screen.getByTestId("mobile-drawer");
-    const signOutBtn = Array.from(presentation.querySelectorAll("span")).find(
-      (el) => el.textContent === "Sign out",
-    )!;
-    fireEvent.click(signOutBtn.closest("div[role='button']") ?? signOutBtn);
+    const drawer = within(screen.getByTestId("mobile-drawer"));
+    fireEvent.click(drawer.getByText("Sign out"));
     expect(signOut).toHaveBeenCalled();
     expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
   });
@@ -726,11 +717,8 @@ describe("TopBar", () => {
   test("drawer Try Demo calls signIn with demo", () => {
     render(<TopBar title="Home" />);
     fireEvent.click(screen.getByLabelText("Menu"));
-    const presentation = screen.getByTestId("mobile-drawer");
-    const tryDemoBtn = Array.from(presentation.querySelectorAll("button")).find(
-      (el) => el.textContent === "Try Demo",
-    )!;
-    fireEvent.click(tryDemoBtn);
+    const drawer = within(screen.getByTestId("mobile-drawer"));
+    fireEvent.click(drawer.getByRole("button", { name: /Try Demo/ }));
     expect(signIn).toHaveBeenCalledWith("demo");
   });
 
@@ -738,11 +726,8 @@ describe("TopBar", () => {
   test("drawer Sign in calls signIn without arguments", () => {
     render(<TopBar title="Home" />);
     fireEvent.click(screen.getByLabelText("Menu"));
-    const presentation = screen.getByTestId("mobile-drawer");
-    const signInBtn = Array.from(presentation.querySelectorAll("button")).find(
-      (el) => el.textContent === "Sign in",
-    )!;
-    fireEvent.click(signInBtn);
+    const drawer = within(screen.getByTestId("mobile-drawer"));
+    fireEvent.click(drawer.getByRole("button", { name: /Sign in/ }));
     expect(signIn).toHaveBeenCalledWith();
   });
 
@@ -752,13 +737,14 @@ describe("TopBar", () => {
       data: { user: { name: "Alice", email: "a@b.com", image: null } },
       status: "authenticated",
     });
-    const { baseElement } = render(<TopBar title="Home" />);
+    render(<TopBar title="Home" />);
     fireEvent.click(screen.getByLabelText("Menu"));
     expect(screen.getByTestId("mobile-drawer")).toBeInTheDocument();
-    // MUI Drawer renders a backdrop — clicking it triggers onClose
-    const backdrops = baseElement.querySelectorAll(".MuiBackdrop-root");
-    const drawerBackdrop = backdrops[backdrops.length - 1] as HTMLElement;
-    expect(() => fireEvent.click(drawerBackdrop)).not.toThrow();
+    // Pressing Escape triggers the Drawer's onClose handler
+    const presentations = screen.getAllByRole("presentation");
+    expect(() =>
+      fireEvent.keyDown(presentations[presentations.length - 1], { key: "Escape" }),
+    ).not.toThrow();
   });
 
   // Drawer does not show user info section when unauthenticated
@@ -787,8 +773,8 @@ describe("TopBar", () => {
     });
     render(<TopBar title="Home" />);
     fireEvent.click(screen.getByLabelText("Menu"));
-    const presentation = screen.getByTestId("mobile-drawer");
-    const navLink = presentation.querySelector('a[href="/admin"]') as HTMLElement;
+    const drawer = within(screen.getByTestId("mobile-drawer"));
+    const navLink = drawer.getByRole("link", { name: /User Management/ });
     expect(() => fireEvent.click(navLink)).not.toThrow();
   });
 
@@ -801,8 +787,7 @@ describe("TopBar", () => {
     render(<TopBar title="Home" />);
     fireEvent.click(screen.getByLabelText("User menu"));
     expect(screen.getByText("Profile")).toBeInTheDocument();
-    const link = screen.getByText("Profile").closest("a");
-    expect(link).toHaveAttribute("href", "/profile");
+    expect(screen.getByRole("menuitem", { name: "Profile" })).toHaveAttribute("href", "/profile");
   });
 
   // Profile link should not be visible when unauthenticated (no user menu at all).
@@ -821,18 +806,16 @@ describe("TopBar", () => {
     });
     render(<TopBar title="Home" />);
     fireEvent.click(screen.getByLabelText("Menu"));
-    const drawer = screen.getByTestId("mobile-drawer");
-    const profileLink = drawer.querySelector('a[href="/profile"]');
-    expect(profileLink).toBeInTheDocument();
+    const drawer = within(screen.getByTestId("mobile-drawer"));
+    expect(drawer.getByRole("link", { name: /Profile/ })).toHaveAttribute("href", "/profile");
   });
 
   // Mobile drawer should not show Profile link when unauthenticated.
   test("does not show Profile link in mobile drawer when unauthenticated", () => {
     render(<TopBar title="Home" />);
     fireEvent.click(screen.getByLabelText("Menu"));
-    const drawer = screen.getByTestId("mobile-drawer");
-    const profileLink = drawer.querySelector('a[href="/profile"]');
-    expect(profileLink).not.toBeInTheDocument();
+    const drawer = within(screen.getByTestId("mobile-drawer"));
+    expect(drawer.queryByRole("link", { name: /Profile/ })).not.toBeInTheDocument();
   });
 
   // Clicking Profile in the desktop menu runs onClick handler without error
@@ -895,8 +878,8 @@ describe("TopBar", () => {
     });
     render(<TopBar title="Home" />);
     fireEvent.click(screen.getByLabelText("Menu"));
-    const drawer = screen.getByTestId("mobile-drawer");
-    const profileLink = drawer.querySelector('a[href="/profile"]') as HTMLElement;
+    const drawer = within(screen.getByTestId("mobile-drawer"));
+    const profileLink = drawer.getByRole("link", { name: /Profile/ });
     expect(profileLink).toBeInTheDocument();
     // Click the Profile link — its onClick handler closes the drawer
     expect(() => fireEvent.click(profileLink)).not.toThrow();
@@ -917,8 +900,8 @@ describe("TopBar", () => {
     });
     render(<TopBar title="Home" />);
     fireEvent.click(screen.getByLabelText("Menu"));
-    const drawer = screen.getByTestId("mobile-drawer");
-    const dashboardLink = drawer.querySelector('a[href="/dashboard"]') as HTMLElement;
+    const drawer = within(screen.getByTestId("mobile-drawer"));
+    const dashboardLink = drawer.getByRole("link", { name: /Dashboard/ });
     expect(dashboardLink).toBeInTheDocument();
     expect(() => fireEvent.click(dashboardLink)).not.toThrow();
   });
@@ -938,8 +921,8 @@ describe("TopBar", () => {
     });
     render(<TopBar title="Home" />);
     fireEvent.click(screen.getByLabelText("Menu"));
-    const drawer = screen.getByTestId("mobile-drawer");
-    const auditLink = drawer.querySelector('a[href="/admin/audit"]') as HTMLElement;
+    const drawer = within(screen.getByTestId("mobile-drawer"));
+    const auditLink = drawer.getByRole("link", { name: /Audit Log/ });
     expect(auditLink).toBeInTheDocument();
     expect(() => fireEvent.click(auditLink)).not.toThrow();
   });
@@ -959,8 +942,8 @@ describe("TopBar", () => {
     const permissions = { "data:export": true } as never;
     render(<TopBar title="Home" permissions={permissions} />);
     fireEvent.click(screen.getByLabelText("Menu"));
-    const drawer = screen.getByTestId("mobile-drawer");
-    const dataLink = drawer.querySelector('a[href="/admin/data"]') as HTMLElement;
+    const drawer = within(screen.getByTestId("mobile-drawer"));
+    const dataLink = drawer.getByRole("link", { name: /Data Import/ });
     expect(dataLink).toBeInTheDocument();
     expect(() => fireEvent.click(dataLink)).not.toThrow();
   });

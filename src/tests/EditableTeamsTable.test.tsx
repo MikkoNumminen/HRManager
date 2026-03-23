@@ -77,17 +77,16 @@ describe("EditableTeamsTable Component", () => {
   test("should show empty cell when team has no members", () => {
     render(<EditableTeamsTable combinedTeams={mockCombinedTeams} />);
 
-    const table = within(screen.getByTestId("table-view"));
-    const designRow = table.getByText("Design").closest("tr")!;
-    const cells = designRow.querySelectorAll("td");
-    expect(cells[2].textContent).toBe("");
+    const designRow = screen.getByRole("row", { name: /Design/ });
+    const cells = within(designRow).getAllByRole("cell");
+    expect(cells[2]).toHaveTextContent("");
   });
 
   test("should navigate to team page on row click", () => {
     render(<EditableTeamsTable combinedTeams={mockCombinedTeams} />);
 
     const table = within(screen.getByTestId("table-view"));
-    const row = table.getByText("Development").closest("tr")!;
+    const row = table.getByRole("row", { name: /Development/ });
     fireEvent.click(row);
 
     expect(mockPush).toHaveBeenCalledWith("/manageTeams/1");
@@ -98,7 +97,7 @@ describe("EditableTeamsTable Component", () => {
     render(<EditableTeamsTable combinedTeams={mockCombinedTeams} />);
 
     const table = within(screen.getByTestId("table-view"));
-    const row = table.getByText("Development").closest("tr")!;
+    const row = table.getByRole("row", { name: /Development/ });
     fireEvent.keyDown(row, { key: "Enter" });
 
     expect(mockPush).toHaveBeenCalledWith("/manageTeams/1");
@@ -109,7 +108,7 @@ describe("EditableTeamsTable Component", () => {
     render(<EditableTeamsTable combinedTeams={mockCombinedTeams} />);
 
     const table = within(screen.getByTestId("table-view"));
-    const row = table.getByText("Design").closest("tr")!;
+    const row = table.getByRole("row", { name: /Design/ });
     fireEvent.keyDown(row, { key: " " });
 
     expect(mockPush).toHaveBeenCalledWith("/manageTeams/2");
@@ -120,7 +119,7 @@ describe("EditableTeamsTable Component", () => {
     render(<EditableTeamsTable combinedTeams={mockCombinedTeams} />);
 
     const table = within(screen.getByTestId("table-view"));
-    const row = table.getByText("Development").closest("tr")!;
+    const row = table.getByRole("row", { name: /Development/ });
     fireEvent.keyDown(row, { key: "Tab" });
 
     expect(mockPush).not.toHaveBeenCalled();

@@ -60,10 +60,9 @@ describe("DepartmentsTable Component", () => {
   test("shows dash for null description", () => {
     render(<DepartmentsTable departments={mockDepartments} />);
 
-    const table = within(screen.getByTestId("table-view"));
-    const productRow = table.getByText("Product").closest("tr")!;
-    const cells = productRow.querySelectorAll("td");
-    expect(cells[1].textContent).toBe("-");
+    const productRow = screen.getByRole("row", { name: /Product/ });
+    const cells = within(productRow).getAllByRole("cell");
+    expect(cells[1]).toHaveTextContent("-");
   });
 
   // A department with no head should show fallback text.
@@ -78,10 +77,9 @@ describe("DepartmentsTable Component", () => {
   test("shows dash for empty teams", () => {
     render(<DepartmentsTable departments={mockDepartments} />);
 
-    const table = within(screen.getByTestId("table-view"));
-    const productRow = table.getByText("Product").closest("tr")!;
-    const cells = productRow.querySelectorAll("td");
-    expect(cells[3].textContent).toBe("-");
+    const productRow = screen.getByRole("row", { name: /Product/ });
+    const cells = within(productRow).getAllByRole("cell");
+    expect(cells[3]).toHaveTextContent("-");
   });
 
   // An empty departments array should show the "No Departments Available" message.

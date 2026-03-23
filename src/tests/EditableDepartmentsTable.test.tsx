@@ -92,7 +92,7 @@ describe("EditableDepartmentsTable Component", () => {
     render(<EditableDepartmentsTable departments={mockDepartments} />);
 
     const table = within(screen.getByTestId("table-view"));
-    const row = table.getByText("Engineering").closest("tr")!;
+    const row = table.getByRole("row", { name: /Engineering/ });
     fireEvent.keyDown(row, { key: "Enter" });
 
     expect(mockPush).toHaveBeenCalledWith("/manageDepartments/dept-1");
@@ -103,7 +103,7 @@ describe("EditableDepartmentsTable Component", () => {
     render(<EditableDepartmentsTable departments={mockDepartments} />);
 
     const table = within(screen.getByTestId("table-view"));
-    const row = table.getByText("Product").closest("tr")!;
+    const row = table.getByRole("row", { name: /Product/ });
     fireEvent.keyDown(row, { key: " " });
 
     expect(mockPush).toHaveBeenCalledWith("/manageDepartments/dept-2");
@@ -114,7 +114,7 @@ describe("EditableDepartmentsTable Component", () => {
     render(<EditableDepartmentsTable departments={mockDepartments} />);
 
     const table = within(screen.getByTestId("table-view"));
-    const row = table.getByText("Engineering").closest("tr")!;
+    const row = table.getByRole("row", { name: /Engineering/ });
     fireEvent.keyDown(row, { key: "Tab" });
 
     expect(mockPush).not.toHaveBeenCalled();
@@ -132,10 +132,9 @@ describe("EditableDepartmentsTable Component", () => {
   test("shows dash for null description", () => {
     render(<EditableDepartmentsTable departments={mockDepartments} />);
 
-    const table = within(screen.getByTestId("table-view"));
-    const productRow = table.getByText("Product").closest("tr")!;
-    const cells = productRow.querySelectorAll("td");
-    expect(cells[1].textContent).toBe("-");
+    const productRow = screen.getByRole("row", { name: /Product/ });
+    const cells = within(productRow).getAllByRole("cell");
+    expect(cells[1]).toHaveTextContent("-");
   });
 
   // Teams are listed as text in the teams column.
