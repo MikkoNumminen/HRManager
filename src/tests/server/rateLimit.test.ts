@@ -1,5 +1,11 @@
 import { testPrisma } from "./testDb";
 
+// Mock next/server after() to execute callback immediately (no request scope in tests)
+jest.mock("next/server", () => ({
+  ...jest.requireActual("next/server"),
+  after: (cb: () => Promise<void>) => cb(),
+}));
+
 // Mock @/db to use the test database
 jest.mock("@/db", () => ({
   prisma: require("./testDb").testPrisma,
