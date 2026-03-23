@@ -2,6 +2,13 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/db";
 import { auth } from "@/auth";
 import {
+  dashboardCounts,
+  dashboardTeamSizes,
+  dashboardDepartmentSizes,
+  dashboardGrowthTimeline,
+  dashboardRecentActivity,
+} from "@prisma/client/sql";
+import {
   PersonSchema,
   TeamSchema,
   DepartmentSchema,
@@ -185,101 +192,41 @@ export async function getAuditLogs(
 
 export async function getDashboardMetrics(): Promise<DashboardMetrics> {
   const sessionId = await getDemoSessionId();
-  const sessionWhere = { sessionId, deletedAt: null as Date | null };
+  // Prisma Typed SQL doesn't support nullable params, but PostgreSQL
+  // IS NOT DISTINCT FROM handles null correctly at the query level
+  const sid = sessionId as string;
 
-  const [totalPersons, totalTeams, totalDepartments, totalUsers] = await Promise.all([
-    prisma.person.count({ where: sessionWhere }),
-    prisma.team.count({ where: sessionWhere }),
-    prisma.department.count({ where: sessionWhere }),
-    prisma.user.count(),
-  ]);
+  const [countsRows, teamSizes, departmentSizes, growthTimeline, recentActivityRows] =
+    await Promise.all([
+      prisma.$queryRawTyped(dashboardCounts(sid)),
+      prisma.$queryRawTyped(dashboardTeamSizes(sid)),
+      prisma.$queryRawTyped(dashboardDepartmentSizes(sid)),
+      prisma.$queryRawTyped(dashboardGrowthTimeline(sid)),
+      prisma.$queryRawTyped(dashboardRecentActivity(sid)),
+    ]);
 
-  const teamsWithMembers = await prisma.team.findMany({
-    where: sessionWhere,
-    select: { teamName: true, _count: { select: { members: { where: { sessionId } } } } },
-    orderBy: { teamName: "asc" },
-  });
-  const teamSizes = teamsWithMembers.map((t) => ({
-    teamName: t.teamName,
-    memberCount: t._count.members,
-  }));
-
-  const departmentsWithTeams = await prisma.department.findMany({
-    where: sessionWhere,
-    select: { name: true, _count: { select: { teams: { where: sessionWhere } } } },
-    orderBy: { name: "asc" },
-  });
-  const departmentSizes = departmentsWithTeams.map((d) => ({
-    departmentName: d.name,
-    teamCount: d._count.teams,
-  }));
-
-  const [persons, teams, departments] = await Promise.all([
-    prisma.person.findMany({
-      where: sessionWhere,
-      select: { createdAt: true },
-      orderBy: { createdAt: "asc" },
-    }),
-    prisma.team.findMany({
-      where: sessionWhere,
-      select: { createdAt: true },
-      orderBy: { createdAt: "asc" },
-    }),
-    prisma.department.findMany({
-      where: sessionWhere,
-      select: { createdAt: true },
-      orderBy: { createdAt: "asc" },
-    }),
-  ]);
-
-  const growthMap = new Map<string, { persons: number; teams: number; departments: number }>();
-  for (const p of persons) {
-    const key = p.createdAt.toISOString().slice(0, 10);
-    const entry = growthMap.get(key) ?? { persons: 0, teams: 0, departments: 0 };
-    entry.persons++;
-    growthMap.set(key, entry);
-  }
-  for (const t of teams) {
-    const key = t.createdAt.toISOString().slice(0, 10);
-    const entry = growthMap.get(key) ?? { persons: 0, teams: 0, departments: 0 };
-    entry.teams++;
-    growthMap.set(key, entry);
-  }
-  for (const d of departments) {
-    const key = d.createdAt.toISOString().slice(0, 10);
-    const entry = growthMap.get(key) ?? { persons: 0, teams: 0, departments: 0 };
-    entry.departments++;
-    growthMap.set(key, entry);
-  }
-
-  const sortedDates = [...growthMap.keys()].sort();
-  let cumPersons = 0,
-    cumTeams = 0,
-    cumDepts = 0;
-  const growthTimeline = sortedDates.map((date) => {
-    const entry = growthMap.get(date)!;
-    cumPersons += entry.persons;
-    cumTeams += entry.teams;
-    cumDepts += entry.departments;
-    return { date, persons: cumPersons, teams: cumTeams, departments: cumDepts };
-  });
-
-  const recentLogs = await prisma.auditLog.findMany({
-    where: { sessionId },
-    select: { action: true, entityType: true, userEmail: true, createdAt: true },
-    orderBy: { createdAt: "desc" },
-    take: 10,
-  });
-  const recentActivity = recentLogs.map((log) => DashboardRecentActivitySchema.parse(log));
+  const counts = countsRows[0];
+  const recentActivity = recentActivityRows.map((log) => DashboardRecentActivitySchema.parse(log));
 
   return DashboardMetricsSchema.parse({
-    totalPersons,
-    totalTeams,
-    totalDepartments,
-    totalUsers,
-    teamSizes,
-    departmentSizes,
-    growthTimeline,
+    totalPersons: counts?.totalPersons ?? 0,
+    totalTeams: counts?.totalTeams ?? 0,
+    totalDepartments: counts?.totalDepartments ?? 0,
+    totalUsers: counts?.totalUsers ?? 0,
+    teamSizes: teamSizes.map((t) => ({
+      teamName: t.teamName,
+      memberCount: t.memberCount ?? 0,
+    })),
+    departmentSizes: departmentSizes.map((d) => ({
+      departmentName: d.departmentName,
+      teamCount: d.teamCount ?? 0,
+    })),
+    growthTimeline: growthTimeline.map((g) => ({
+      date: g.date ?? "",
+      persons: g.persons ?? 0,
+      teams: g.teams ?? 0,
+      departments: g.departments ?? 0,
+    })),
     recentActivity,
   });
 }
