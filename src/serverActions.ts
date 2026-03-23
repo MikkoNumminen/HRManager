@@ -307,55 +307,58 @@ export async function addManager(data: FormData) {
     if (!person) {
       throw new Error("Person not found");
     }
-    const teamBefore = await tx.team.findFirst({ where: { teamId: teamIDs[0], sessionId } });
-    if (!teamBefore) {
-      throw new Error("Team not found");
-    }
-    await tx.team.update({
-      where: { teamId: teamIDs[0] },
-      data: { teamManagerId: personID },
-    });
-    auditEntries.push({
-      ...ctx,
-      action: "update",
-      entityType: "team",
-      entityId: teamIDs[0],
-      before: { teamManagerId: teamBefore?.teamManagerId },
-      after: { teamManagerId: personID },
-    });
 
-    const existingMember = await tx.teamMember.findFirst({
-      where: { personId: personID, teamId: teamIDs[0], sessionId },
-    });
-
-    if (!existingMember) {
-      const member = await tx.teamMember.create({
-        data: {
-          personId: personID,
-          teamId: teamIDs[0],
-          sessionId,
-        },
+    for (const teamID of teamIDs) {
+      const teamBefore = await tx.team.findFirst({ where: { teamId: teamID, sessionId } });
+      if (!teamBefore) {
+        throw new Error("Team not found");
+      }
+      await tx.team.update({
+        where: { teamId: teamID },
+        data: { teamManagerId: personID },
       });
       auditEntries.push({
         ...ctx,
-        action: "create",
-        entityType: "teamMember",
-        entityId: member.id,
-        after: { personId: personID, teamId: teamIDs[0] },
+        action: "update",
+        entityType: "team",
+        entityId: teamID,
+        before: { teamManagerId: teamBefore?.teamManagerId },
+        after: { teamManagerId: personID },
       });
-    } else if (existingMember.deletedAt) {
-      // Restore soft-deleted membership
-      await tx.teamMember.update({
-        where: { id: existingMember.id },
-        data: { deletedAt: null },
+
+      const existingMember = await tx.teamMember.findFirst({
+        where: { personId: personID, teamId: teamID, sessionId },
       });
-      auditEntries.push({
-        ...ctx,
-        action: "create",
-        entityType: "teamMember",
-        entityId: existingMember.id,
-        after: { personId: personID, teamId: teamIDs[0] },
-      });
+
+      if (!existingMember) {
+        const member = await tx.teamMember.create({
+          data: {
+            personId: personID,
+            teamId: teamID,
+            sessionId,
+          },
+        });
+        auditEntries.push({
+          ...ctx,
+          action: "create",
+          entityType: "teamMember",
+          entityId: member.id,
+          after: { personId: personID, teamId: teamID },
+        });
+      } else if (existingMember.deletedAt) {
+        // Restore soft-deleted membership
+        await tx.teamMember.update({
+          where: { id: existingMember.id },
+          data: { deletedAt: null },
+        });
+        auditEntries.push({
+          ...ctx,
+          action: "create",
+          entityType: "teamMember",
+          entityId: existingMember.id,
+          after: { personId: personID, teamId: teamID },
+        });
+      }
     }
   });
   deferAudit(auditEntries);
@@ -1200,10 +1203,21 @@ export async function kickOutUser(data: FormData) {
   if (!userId) throw new Error("No userId provided");
   validateUUID(userId, "userId");
 
+  const session = await auth();
+  const demoSessionId = await getDemoSessionId();
+
   const targetUser = await prisma.user.findUnique({ where: { id: userId } });
   if (!targetUser) throw new Error("User not found");
   if (targetUser.role === "superuser") {
     throw new Error("Cannot kick out the superuser");
+  }
+  // Demo sessions can only kick the demo user — prevent deleting real OAuth users
+  if (demoSessionId && targetUser.email !== "demo@hrmanager.app") {
+    throw new Error("Demo sessions cannot manage real users");
+  }
+  // Prevent self-kick — deleting your own user orphans the session
+  if (session?.user?.id === userId) {
+    throw new Error("Cannot kick yourself out");
   }
 
   const ctx = await captureAuditContext();

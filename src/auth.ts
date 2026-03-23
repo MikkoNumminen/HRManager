@@ -6,45 +6,57 @@ import { prisma } from "@/db";
 import { resolvePermissions } from "@/permissions";
 import { seedDemoData, cleanupStaleDemoSessions } from "@/demoSession";
 
+// Demo login is gated behind NEXT_PUBLIC_DEMO_LOGIN env var — disabled by default
+// in production. Set NEXT_PUBLIC_DEMO_LOGIN=true to enable the zero-credential
+// demo provider. Uses NEXT_PUBLIC_ prefix so the client can conditionally show
+// the demo login button.
+const demoProvider =
+  process.env.NEXT_PUBLIC_DEMO_LOGIN === "true"
+    ? [
+        Credentials({
+          id: "demo",
+          name: "Demo",
+          credentials: {},
+          async authorize() {
+            const demoEmail = "demo@hrmanager.app";
+            let user = await prisma.user.findUnique({ where: { email: demoEmail } });
+            if (!user) {
+              user = await prisma.user.create({
+                data: {
+                  email: demoEmail,
+                  name: "Demo User",
+                  role: "superuser",
+                },
+              });
+            } else if (user.role !== "superuser") {
+              user = await prisma.user.update({
+                where: { email: demoEmail },
+                data: { role: "superuser" },
+              });
+            }
+
+            const demoSession = await prisma.demoSession.create({
+              data: { userId: user.id },
+            });
+
+            await seedDemoData(demoSession.id);
+
+            // Clean up stale sessions in the background — don't block login
+            cleanupStaleDemoSessions().catch(() => {});
+
+            return {
+              id: user.id,
+              email: user.email,
+              name: user.name,
+              demoSessionId: demoSession.id,
+            };
+          },
+        }),
+      ]
+    : [];
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  providers: [
-    Google,
-    GitHub,
-    Credentials({
-      id: "demo",
-      name: "Demo",
-      credentials: {},
-      async authorize() {
-        const demoEmail = "demo@hrmanager.app";
-        let user = await prisma.user.findUnique({ where: { email: demoEmail } });
-        if (!user) {
-          user = await prisma.user.create({
-            data: {
-              email: demoEmail,
-              name: "Demo User",
-              role: "superuser",
-            },
-          });
-        } else if (user.role !== "superuser") {
-          user = await prisma.user.update({
-            where: { email: demoEmail },
-            data: { role: "superuser" },
-          });
-        }
-
-        const demoSession = await prisma.demoSession.create({
-          data: { userId: user.id },
-        });
-
-        await seedDemoData(demoSession.id);
-
-        // Clean up stale sessions in the background — don't block login
-        cleanupStaleDemoSessions().catch(() => {});
-
-        return { id: user.id, email: user.email, name: user.name, demoSessionId: demoSession.id };
-      },
-    }),
-  ],
+  providers: [Google, GitHub, ...demoProvider],
   session: { strategy: "jwt" },
   callbacks: {
     async signIn({ user }) {

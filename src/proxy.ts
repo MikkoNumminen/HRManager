@@ -64,11 +64,11 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Run proxy on all routes except static files and images
+  // Run proxy on all routes except static files and images.
+  // No prefetch header exclusion — all navigable routes must get security headers.
   matcher: [
     {
       source: "/((?!_next/static|_next/image|favicon\\.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
-      missing: [{ type: "header", key: "next-router-prefetch" }],
     },
   ],
 };

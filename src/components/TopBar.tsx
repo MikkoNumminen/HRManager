@@ -71,6 +71,7 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
   const canSeed = permissions?.["data:seed"];
   const canReset = permissions?.["data:reset"];
   const canDataIO = permissions?.["data:import"] || permissions?.["data:export"];
+  const demoEnabled = process.env.NEXT_PUBLIC_DEMO_LOGIN === "true";
 
   const handleSeed = (clearExisting: boolean) => {
     setSeedDialogOpen(false);
@@ -269,18 +270,20 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
               </>
             ) : (
               <Box display="flex" gap={1} flexWrap="wrap" justifyContent="flex-end">
-                <Button
-                  onClick={() => signIn("demo")}
-                  sx={{
-                    color: "#fff",
-                    backgroundColor: colors.slate600,
-                    borderRadius: "4px",
-                    px: 2,
-                    "&:hover": { backgroundColor: colors.hoverOverlay },
-                  }}
-                >
-                  {t("tryDemo")}
-                </Button>
+                {demoEnabled && (
+                  <Button
+                    onClick={() => signIn("demo")}
+                    sx={{
+                      color: "#fff",
+                      backgroundColor: colors.slate600,
+                      borderRadius: "4px",
+                      px: 2,
+                      "&:hover": { backgroundColor: colors.hoverOverlay },
+                    }}
+                  >
+                    {t("tryDemo")}
+                  </Button>
+                )}
                 <Button
                   onClick={() => signIn()}
                   sx={{
@@ -498,21 +501,23 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
             <>
               <Divider sx={{ borderColor: colors.slate300 }} />
               <Box sx={{ px: 2, py: 1.5, display: "flex", flexDirection: "column", gap: 1 }}>
-                <Button
-                  onClick={() => {
-                    setDrawerOpen(false);
-                    signIn("demo");
-                  }}
-                  fullWidth
-                  sx={{
-                    color: "#fff",
-                    backgroundColor: colors.slate600,
-                    borderRadius: "4px",
-                    "&:hover": { backgroundColor: colors.hoverOverlay },
-                  }}
-                >
-                  {t("tryDemo")}
-                </Button>
+                {demoEnabled && (
+                  <Button
+                    onClick={() => {
+                      setDrawerOpen(false);
+                      signIn("demo");
+                    }}
+                    fullWidth
+                    sx={{
+                      color: "#fff",
+                      backgroundColor: colors.slate600,
+                      borderRadius: "4px",
+                      "&:hover": { backgroundColor: colors.hoverOverlay },
+                    }}
+                  >
+                    {t("tryDemo")}
+                  </Button>
+                )}
                 <Button
                   onClick={() => {
                     setDrawerOpen(false);

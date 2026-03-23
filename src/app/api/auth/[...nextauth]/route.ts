@@ -6,8 +6,10 @@ export const { GET } = handlers;
 
 export async function POST(request: NextRequest) {
   try {
-    const action = request.nextUrl.pathname.split("/").pop() ?? "auth";
-    await rateLimitAuth(action);
+    // Use a fixed action key so all auth POST endpoints share one rate limit
+    // bucket per IP. Previously each path segment (callback, signin, etc.) got
+    // its own bucket, effectively multiplying the allowed requests.
+    await rateLimitAuth("auth-post");
   } catch (error) {
     if (error instanceof RateLimitError) {
       return NextResponse.json(

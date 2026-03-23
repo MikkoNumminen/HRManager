@@ -217,6 +217,10 @@ interface RecentActivityRow {
 }
 
 export async function getDashboardMetrics(): Promise<DashboardMetrics> {
+  const allowed = await hasPermission("dashboard:view");
+  if (!allowed) {
+    throw new Error("Permission denied");
+  }
   const sessionId = await getDemoSessionId();
 
   const [countsRows, teamSizes, departmentSizes, growthTimeline, recentActivityRows] =
@@ -365,6 +369,10 @@ export interface DataExportCounts {
 }
 
 export async function getDataExportCounts(): Promise<DataExportCounts> {
+  const allowed = await hasPermission("data:export");
+  if (!allowed) {
+    throw new Error("Permission denied");
+  }
   const sessionId = await getDemoSessionId();
   const [persons, teams, departments, auditLogs] = await Promise.all([
     prisma.person.count({ where: { deletedAt: null, sessionId } }),

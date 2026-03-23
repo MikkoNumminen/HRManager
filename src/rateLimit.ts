@@ -14,6 +14,10 @@ export class RateLimitError extends Error {
   }
 }
 
+// IMPORTANT: This function trusts x-forwarded-for and x-real-ip headers.
+// It is safe behind a trusted reverse proxy (Vercel, Cloudflare, nginx) that
+// overwrites these headers with the real client IP. If deployed without a
+// trusted proxy, attackers can spoof IPs to bypass rate limiting.
 async function getIpIdentifier(): Promise<string> {
   const headersList = await headers();
   const ip =
