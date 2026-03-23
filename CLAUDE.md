@@ -17,7 +17,7 @@ This is a **portfolio / showcase project**. The goal is to demonstrate technical
 | UI         | React 19 + MUI v7 — dark theme throughout, no Tailwind         |
 | Language   | TypeScript 5.9                                                 |
 | ORM        | Prisma 7 (driver adapters, raw SQL, `prisma.config.ts`)        |
-| Database   | PostgreSQL (local dev + Vercel Postgres / Neon in production)  |
+| Database   | PostgreSQL (relational) + MongoDB 8 (audit logs)               |
 | Validation | Zod 4                                                          |
 | Auth       | NextAuth v5 (JWT strategy, Google + GitHub OAuth + demo login) |
 | i18n       | next-intl, 18 locales, AI-powered translation pipeline         |
@@ -25,20 +25,20 @@ This is a **portfolio / showcase project**. The goal is to demonstrate technical
 | CI/CD      | GitHub Actions (lint, format, test, build on every push)       |
 | Linting    | ESLint 9 (flat config)                                         |
 | Formatting | Prettier 3 (`printWidth: 100`, double quotes, trailing commas) |
-| Deployment | Vercel with Vercel Postgres (Neon serverless PostgreSQL)       |
+| Deployment | Vercel with Vercel Postgres (Neon) + MongoDB Atlas (free tier) |
 
 ## Architecture
 
 - **Reads** go in `queries.ts` (no `"use server"`). Validated through Zod schemas. Dashboard metrics use inline `$queryRaw` with CTEs and window functions (PgBouncer-compatible unnamed parameterized queries).
 - **Mutations** go in `serverActions.ts` (marked `"use server"`). Always inside `prisma.$transaction()` — even single operations. Every mutation is audit-logged via deferred `after()` writes from `auditLog.ts` for non-blocking post-response processing.
-- **Audit logging** — `auditLog.ts` provides deferred audit logging via Next.js `after()`. Pattern: `captureAuditContext()` captures user/session before or inside the transaction, audit entries are collected inside the transaction, then `deferAudit(entries)` schedules writes after the response is sent. `logAudit()` is a synchronous write for non-request contexts (tests, build-time). `deferAuditLog()` is a convenience wrapper that captures context and defers in one call. No FK to User — logs survive user deletion. `logPermissionDenial()` and `logRateLimitHit()` log security events (permission denials and rate limit hits) to the same audit trail, also deferred via `after()`.
+- **Audit logging** — `auditLog.ts` provides deferred audit logging via Next.js `after()`, writing to **MongoDB** (not PostgreSQL). Uses native `mongodb` v7 driver via `mongoDb.ts` singleton. Pattern: `captureAuditContext()` captures user/session before or inside the transaction, audit entries are collected inside the transaction, then `deferAudit(entries)` schedules writes after the response is sent. `logAudit()` is a synchronous write for non-request contexts (tests, build-time). `deferAuditLog()` is a convenience wrapper that captures context and defers in one call. No FK to User — logs survive user deletion. `logPermissionDenial()` and `logRateLimitHit()` log security events (permission denials and rate limit hits) to the same audit trail, also deferred via `after()`. Reads in `queries.ts` use MongoDB `find`/`countDocuments`/`distinct` with typed `Filter<AuditLogDocument>` queries.
 - Pages are async Server Components that fetch data and pass it as props to Client Components. No `useEffect` data fetching.
 - Forms use React 19's `useActionState` with `action=` prop, not `onSubmit`. Create forms use `useOptimistic` via wrapper components (`OptimisticPersons`, `OptimisticTeams`, `OptimisticDepartments`) to show new items in the table instantly before the server responds.
 - Types are derived from Zod schemas in `schemas.ts` via `z.infer` — `Person`, `CombinedTeam`, `Department`, `AppUser`, `AuditLog`, `Permissions`. Do not create duplicate interfaces in components.
 - MUI style tokens and component styles are centralized in `muiStyles.ts`.
 - **Info tooltips**: Use MUI `Tooltip` with `arrow` and `cursor: "help"` on column headers or labels that may not be self-explanatory. Keep tooltip text concise but informative. Apply this consistently across all data tables and editor views.
 - **Auth** is configured in `auth.ts` (NextAuth v5). Three providers: Google OAuth, GitHub OAuth, and a Credentials-based demo login (`id: "demo"`) that creates/reuses a `demo@hrmanager.app` user with superuser role. Protected routes use `auth()` + `redirect("/")` in Server Components. Client components use `useSession` via `SessionProvider` wrapper in layout.
-- **Demo session isolation** — each demo login creates a `DemoSession` row and stores its UUID in the JWT as `demoSessionId`. All entity tables (Person, Team, Department, TeamMember, AuditLog) carry a nullable `sessionId` column. Queries and mutations filter by `sessionId`: `null` = real OAuth user data, UUID = demo sandbox. `seedDemoData()` populates the sandbox on login. `cleanupStaleDemoSessions()` removes sessions inactive > 24h, called opportunistically during login. Helper: `getDemoSessionId()` in `demoSession.ts`.
+- **Demo session isolation** — each demo login creates a `DemoSession` row and stores its UUID in the JWT as `demoSessionId`. All entity tables (Person, Team, Department, TeamMember) carry a nullable `sessionId` column; MongoDB audit logs also carry `sessionId`. Queries and mutations filter by `sessionId`: `null` = real OAuth user data, UUID = demo sandbox. `seedDemoData()` populates the sandbox on login. `cleanupStaleDemoSessions()` removes sessions inactive > 24h (deletes MongoDB audit logs first, then PG entities in a transaction). Helper: `getDemoSessionId()` in `demoSession.ts`.
 - **Guest mode**: unauthenticated users see read-only minimal views (MUI Chips) of Persons, Departments, and Teams on the main page. Manage routes (`/managePersons`, `/manageDepartments`, `/manageTeams`) redirect to `/`.
 - **TopBar** — dual layout: desktop shows user avatar dropdown menu; mobile shows hamburger button with a full-height navigation drawer. Menu contains: Dashboard (permission-gated), User Management, Audit Log (permission-gated), Data Import/Export (permission-gated), Load Mock Data, Reset All Data (permission-gated), and Sign Out. The `permissions` prop must be passed on every page so all menu items are available everywhere.
 - **Data import/export** — `csvUtils.ts` provides RFC 4180 CSV parsing/generation with no external dependencies; `admin/data/page.tsx` is a permission-gated admin page; `DataImportExport.tsx` shows export cards (persons, teams, departments, audit logs) and import section; `CsvImportDialog.tsx` provides drag-and-drop CSV upload with client-side validation preview; server actions handle import (with DB dedup) and export (with deferred audit logging). Permissions: `data:import` (superuser only), `data:export` (superuser + administrator).
@@ -72,13 +72,14 @@ src/
 │   └── profile/                 # User profile (auth-protected)
 ├── components/       # Reusable MUI client components (48 components, incl. DataImportExport + CsvImportDialog)
 ├── i18n/             # next-intl configuration (actions, config, request)
-├── tests/            # Jest tests (1282 tests)
+├── tests/            # Jest tests (1272 tests)
 ├── types/            # TypeScript module augmentations (next-auth.d.ts)
 ├── auditLog.ts       # Deferred audit logging via after() (captureAuditContext, deferAudit, logAudit)
 ├── auth.ts           # NextAuth v5 configuration + RBAC callbacks
 ├── csvUtils.ts       # RFC 4180 CSV parser/generator + person import validator
-├── db.ts             # Prisma singleton
+├── db.ts             # Prisma singleton (PostgreSQL)
 ├── demoSession.ts    # Demo session isolation (seed, cleanup, session ID helper)
+├── mongoDb.ts        # MongoDB singleton (audit logs) — native mongodb v7 driver
 ├── muiStyles.ts      # Centralised MUI style tokens
 ├── permissions.ts    # RBAC: role defaults, permission resolution, guards
 ├── proxy.ts          # CSP + security headers (nonce-based, per-request)
@@ -90,7 +91,7 @@ src/
 └── tutorialConfig.ts # Gamified demo tour (8-step tutorial)
 messages/             # 18 locale JSON files (en, fi, de, fr, es, ...)
 prisma/
-└── schema.prisma     # Data model (PostgreSQL)
+└── schema.prisma     # Data model (PostgreSQL — AuditLog moved to MongoDB)
 scripts/
 └── i18n-sync.ts      # i18n audit and translation pipeline
 docs/
@@ -100,7 +101,7 @@ docs/
     ├── ci.yml            # CI pipeline (lint, format, test, build)
     └── autofix.yml       # Auto-fix agent (triggers on CI failure)
 Dockerfile            # Multi-stage build (deps → build → production)
-docker-compose.yml    # PostgreSQL 17 + app with health checks
+docker-compose.yml    # PostgreSQL 17 + MongoDB 8 + app with health checks
 .dockerignore         # Excludes node_modules, .next, .git, etc.
 ```
 
@@ -114,7 +115,7 @@ docker-compose.yml    # PostgreSQL 17 + app with health checks
 - **User** — authenticated identity (email, name, image, role). Linked to NextAuth OAuth.
 - **Permission** — catalog of 26 granular permission keys (e.g. `person:create`, `team:delete`, `dashboard:view`, `data:import`, `data:export`).
 - **UserPermission** — per-user permission overrides (grant/deny) with role-default fallback.
-- **AuditLog** — immutable log of all mutations: who, what action, which entity, before/after JSON snapshots. No FK to User so logs survive user deletion. Carries `sessionId` for demo isolation.
+- **AuditLog** (MongoDB) — immutable log of all mutations: who, what action, which entity, before/after JSON snapshots. Stored in MongoDB as documents (not PostgreSQL). No FK to User so logs survive user deletion. Carries `sessionId` for demo isolation. Uses native `mongodb` driver with typed `AuditLogDocument` interface in `mongoDb.ts`.
 - **RateLimit** — sliding window rate limit counters per identifier (IP) and action. Auto-cleaned on window expiry.
 - **DemoSession** — tracks active demo sessions. `userId` FK to User, `lastActiveAt` for staleness detection. Data entities (Person, Team, Department, TeamMember) carry a nullable `sessionId` that references DemoSession.id for sandbox isolation.
 
@@ -157,8 +158,8 @@ Every TODO item must have a color-coded size estimate prefix: 🟢 small, 🟡 m
 
 ## Docker
 
-`docker compose up` starts PostgreSQL 17 + the app at `localhost:3000`. The container runs `prisma migrate deploy` on startup. `next.config.mjs` uses `output: "standalone"` for optimized Docker images. The Dockerfile is a multi-stage build: deps → build → production (node:22-alpine). OAuth credentials are optional — the demo login works without them.
+`docker compose up` starts PostgreSQL 17 + MongoDB 8 + the app at `localhost:3000`. The container runs `prisma migrate deploy` on startup. `next.config.mjs` uses `output: "standalone"` for optimized Docker images. The Dockerfile is a multi-stage build: deps → build → production (node:22-alpine). OAuth credentials are optional — the demo login works without them.
 
 ## Deployment
 
-Deployed on **Vercel** with **Vercel Postgres** (Neon). Build script: `prisma generate && prisma migrate deploy && next build`.
+Deployed on **Vercel** with **Vercel Postgres** (Neon) and **MongoDB Atlas** (free tier). Build script: `prisma generate && prisma migrate deploy && next build`.

@@ -12,10 +12,11 @@ In Progress items must show the owner: `[worktree-name]` or `[main]`.
 
 > 📋 **Audit research:** Items marked "(found by audit)" have detailed file:line references in memory file `project_audit_findings.md`. Read it before starting any of these tasks.
 
-- 🔴 MongoDB audit logs — migrate audit log storage from PostgreSQL to MongoDB (polyglot persistence) `[main]`
+- 🟡 MongoDB docs — update README.md, CLAUDE.md, architecture.md for polyglot persistence `[main, Mohammed]`
 
 ## Recently Completed
 
+- ✅ MongoDB audit logs — migrate audit log storage from PostgreSQL to MongoDB (polyglot persistence)
 - ✅ Data import/export — CSV import/export admin tool with 101 tests (~2h)
 - ✅ Fix after() test failures (79 tests) — PR #8 merged (15 min)
 

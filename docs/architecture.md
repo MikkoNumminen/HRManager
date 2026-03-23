@@ -13,8 +13,9 @@ graph LR
     CC -->|action=| SA["serverActions.ts"]
     SA -->|requirePermission| RBAC["permissions.ts"]
     SA -->|$transaction| Prisma
-    SA -->|logAudit| Audit["auditLog.ts"]
-    Audit -->|same tx| Prisma
+    SA -->|after()| Audit["auditLog.ts"]
+    Audit -->|deferred write| Mongo[(MongoDB)]
+    Q -->|audit reads| Mongo
     Q --> Prisma
     Prisma --> PG[(PostgreSQL)]
 ```
@@ -90,15 +91,15 @@ erDiagram
         boolean granted
     }
 
-    AuditLog {
-        uuid id PK
+    AuditLog["AuditLog (MongoDB)"] {
+        ObjectId _id PK
         string userId
         string userEmail
         string action
         string entityType
         string entityId
-        json before
-        json after
+        string before
+        string after
         string sessionId
         datetime createdAt
     }
@@ -132,7 +133,8 @@ sequenceDiagram
     participant RBAC as permissions.ts
     participant TX as prisma.$transaction
     participant AL as auditLog.ts
-    participant DB as PostgreSQL
+    participant PG as PostgreSQL
+    participant Mongo as MongoDB
 
     C->>SA: FormData via action= prop
     SA->>RBAC: requirePermission(key)
@@ -141,19 +143,20 @@ sequenceDiagram
     SA->>SA: Validate & sanitize input
     SA->>TX: Begin transaction
 
-    TX->>DB: Read before-state
-    DB-->>TX: Entity snapshot
+    TX->>PG: Read before-state
+    PG-->>TX: Entity snapshot
 
-    TX->>DB: Mutate (create/update/delete)
-    DB-->>TX: Result
-
-    TX->>AL: logAudit(before, after, tx)
-    AL->>DB: Insert AuditLog row
-    DB-->>AL: OK
+    TX->>PG: Mutate (create/update/delete)
+    PG-->>TX: Result
 
     TX-->>SA: Commit
     SA->>SA: revalidatePath()
     SA-->>C: Updated UI via React re-render
+
+    Note over SA,Mongo: Deferred via after() — non-blocking
+    SA->>AL: deferAudit(entries)
+    AL->>Mongo: insertMany(audit docs)
+    Mongo-->>AL: OK
 ```
 
 ## Auth flow
