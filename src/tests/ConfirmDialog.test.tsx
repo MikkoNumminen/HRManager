@@ -1,4 +1,5 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import ConfirmDialog from "@/components/ConfirmDialog";
 
 const defaultProps = {
@@ -32,16 +33,16 @@ describe("ConfirmDialog", () => {
   });
 
   // Clicking the Cancel button should call the onCancel handler.
-  test("calls onCancel when Cancel button is clicked", () => {
+  test("calls onCancel when Cancel button is clicked", async () => {
     render(<ConfirmDialog {...defaultProps} />);
-    fireEvent.click(screen.getByText("Cancel"));
+    await userEvent.click(screen.getByText("Cancel"));
     expect(defaultProps.onCancel).toHaveBeenCalledTimes(1);
   });
 
   // Clicking the Confirm button should call the onConfirm handler.
-  test("calls onConfirm when Confirm button is clicked", () => {
+  test("calls onConfirm when Confirm button is clicked", async () => {
     render(<ConfirmDialog {...defaultProps} />);
-    fireEvent.click(screen.getByText("Confirm"));
+    await userEvent.click(screen.getByText("Confirm"));
     expect(defaultProps.onConfirm).toHaveBeenCalledTimes(1);
   });
 

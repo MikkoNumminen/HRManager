@@ -1,4 +1,5 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import CsvImportDialog from "../components/CsvImportDialog";
 
 jest.mock("next/navigation", () => ({
@@ -51,10 +52,10 @@ describe("CsvImportDialog", () => {
   });
 
   // Calls onClose when cancel is clicked
-  test("calls onClose when cancel button is clicked", () => {
+  test("calls onClose when cancel button is clicked", async () => {
     const onClose = jest.fn();
     render(<CsvImportDialog open={true} onClose={onClose} />);
-    fireEvent.click(screen.getByRole("button", { name: /Cancel/i }));
+    await userEvent.click(screen.getByRole("button", { name: /Cancel/i }));
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
@@ -246,7 +247,7 @@ describe("CsvImportDialog", () => {
     });
 
     // Close
-    fireEvent.click(screen.getByRole("button", { name: /Cancel/i }));
+    await userEvent.click(screen.getByRole("button", { name: /Cancel/i }));
 
     // Reopen — onClose handler should have reset state
     rerender(<CsvImportDialog open={true} onClose={jest.fn()} />);
@@ -291,7 +292,7 @@ describe("CsvImportDialog", () => {
     const clickSpy = jest.spyOn(input, "click");
 
     const dropZone = screen.getByText("Drop a CSV file here or click to browse").closest("div")!;
-    fireEvent.click(dropZone);
+    await userEvent.click(dropZone);
 
     expect(clickSpy).toHaveBeenCalled();
     clickSpy.mockRestore();
@@ -323,7 +324,7 @@ describe("CsvImportDialog", () => {
       expect(screen.getByRole("button", { name: /Import/i })).toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getByRole("button", { name: /Import/i }));
+    await userEvent.click(screen.getByRole("button", { name: /Import/i }));
 
     await waitFor(() => {
       expect(mockImportPersonsCsv).toHaveBeenCalled();
@@ -348,7 +349,7 @@ describe("CsvImportDialog", () => {
       expect(screen.getByRole("button", { name: /Import/i })).toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getByRole("button", { name: /Import/i }));
+    await userEvent.click(screen.getByRole("button", { name: /Import/i }));
 
     await waitFor(() => {
       // Success state shows imported/skipped/error chips
@@ -372,7 +373,7 @@ describe("CsvImportDialog", () => {
       expect(screen.getByRole("button", { name: /Import/i })).toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getByRole("button", { name: /Import/i }));
+    await userEvent.click(screen.getByRole("button", { name: /Import/i }));
 
     await waitFor(() => {
       expect(screen.getByText("Permission denied")).toBeInTheDocument();
@@ -395,7 +396,7 @@ describe("CsvImportDialog", () => {
       expect(screen.getByRole("button", { name: /Import/i })).toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getByRole("button", { name: /Import/i }));
+    await userEvent.click(screen.getByRole("button", { name: /Import/i }));
 
     await waitFor(() => {
       expect(screen.getByRole("button", { name: /Close/i })).toBeInTheDocument();

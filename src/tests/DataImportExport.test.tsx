@@ -1,4 +1,5 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import DataImportExport from "../components/DataImportExport";
 import { Permissions } from "../schemas";
 import { DataExportCounts } from "../queries";
@@ -204,7 +205,7 @@ describe("DataImportExport", () => {
   });
 
   // Opens import dialog when upload button is clicked
-  test("opens import dialog on upload CSV click", () => {
+  test("opens import dialog on upload CSV click", async () => {
     render(
       <DataImportExport
         counts={defaultCounts}
@@ -212,7 +213,7 @@ describe("DataImportExport", () => {
       />,
     );
     expect(screen.queryByTestId("csv-import-dialog")).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: /Upload CSV/i }));
+    await userEvent.click(screen.getByRole("button", { name: /Upload CSV/i }));
     expect(screen.getByTestId("csv-import-dialog")).toBeInTheDocument();
   });
 
@@ -296,7 +297,7 @@ describe("DataImportExport", () => {
     const mocks = setupDownloadMocks();
 
     const buttons = screen.getAllByRole("button", { name: /Export/i });
-    fireEvent.click(buttons[0]); // Click persons export
+    await userEvent.click(buttons[0]); // Click persons export
 
     await waitFor(() => {
       expect(mockExportPersonsCsv).toHaveBeenCalled();
@@ -310,7 +311,7 @@ describe("DataImportExport", () => {
   });
 
   // Clicking the download template button triggers a CSV template download
-  test("download template triggers file download", () => {
+  test("download template triggers file download", async () => {
     render(
       <DataImportExport
         counts={defaultCounts}
@@ -321,7 +322,7 @@ describe("DataImportExport", () => {
     // Install download mocks AFTER render
     const mocks = setupDownloadMocks();
 
-    fireEvent.click(screen.getByRole("button", { name: /Download Template/i }));
+    await userEvent.click(screen.getByRole("button", { name: /Download Template/i }));
 
     expect(mocks.mockClick).toHaveBeenCalled();
     expect(mocks.fakeLink.download).toBe("persons_import_template.csv");
@@ -344,7 +345,7 @@ describe("DataImportExport", () => {
 
     const mocks = setupDownloadMocks();
     const buttons = screen.getAllByRole("button", { name: /Export/i });
-    fireEvent.click(buttons[1]); // Click teams export
+    await userEvent.click(buttons[1]); // Click teams export
 
     await waitFor(() => {
       expect(mockExportTeamsCsv).toHaveBeenCalled();
@@ -367,7 +368,7 @@ describe("DataImportExport", () => {
 
     const mocks = setupDownloadMocks();
     const buttons = screen.getAllByRole("button", { name: /Export/i });
-    fireEvent.click(buttons[2]); // Click departments export
+    await userEvent.click(buttons[2]); // Click departments export
 
     await waitFor(() => {
       expect(mockExportDepartmentsCsv).toHaveBeenCalled();
@@ -390,7 +391,7 @@ describe("DataImportExport", () => {
 
     const mocks = setupDownloadMocks();
     const buttons = screen.getAllByRole("button", { name: /Export/i });
-    fireEvent.click(buttons[3]); // Click audit logs export
+    await userEvent.click(buttons[3]); // Click audit logs export
 
     await waitFor(() => {
       expect(mockExportAuditLogsCsv).toHaveBeenCalled();

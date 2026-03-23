@@ -84,10 +84,7 @@ describe("getPersons", () => {
     await cleanDb();
   });
 
-  afterAll(async () => {
-    await cleanDb();
-    await testPrisma.$disconnect();
-  });
+  afterAll(() => cleanDb());
 
   // An empty database should give back an empty list, not an error.
   test("returns empty array when no persons exist", async () => {
@@ -146,10 +143,7 @@ describe("getTeams", () => {
     await cleanDb();
   });
 
-  afterAll(async () => {
-    await cleanDb();
-    await testPrisma.$disconnect();
-  });
+  afterAll(() => cleanDb());
 
   // No teams in the database? You get an empty list, not a crash.
   test("returns empty array when no teams exist", async () => {
@@ -290,10 +284,7 @@ describe("getUsers", () => {
     await cleanDb();
   });
 
-  afterAll(async () => {
-    await cleanDb();
-    await testPrisma.$disconnect();
-  });
+  afterAll(() => cleanDb());
 
   // An empty user table should return an empty list.
   test("returns empty array when no users exist", async () => {
@@ -376,10 +367,7 @@ describe("getUserById", () => {
     await cleanDb();
   });
 
-  afterAll(async () => {
-    await cleanDb();
-    await testPrisma.$disconnect();
-  });
+  afterAll(() => cleanDb());
 
   // Look up a user by ID and get back their data plus resolved permissions.
   test("returns user with overrides and resolved permissions", async () => {
@@ -1023,10 +1011,7 @@ describe("getDataExportCounts", () => {
     hasPermission.mockResolvedValue(true);
   });
 
-  afterAll(async () => {
-    await cleanDb();
-    await testPrisma.$disconnect();
-  });
+  afterAll(() => cleanDb());
 
   // Returns entity counts for persons, teams, departments, and audit logs.
   test("returns correct entity counts when authorized", async () => {
@@ -1064,10 +1049,7 @@ describe("getProfile", () => {
   beforeEach(async () => {
     await cleanDb();
   });
-  afterAll(async () => {
-    await cleanDb();
-    await testPrisma.$disconnect();
-  });
+  afterAll(() => cleanDb());
 
   // Returns the full profile for an authenticated user with resolved permissions.
   test("returns user profile with resolved permissions", async () => {
@@ -1164,3 +1146,5 @@ describe("getProfile", () => {
     expect(profile!.image).toBe("https://example.com/pic.jpg");
   });
 });
+
+afterAll(() => testPrisma.$disconnect());

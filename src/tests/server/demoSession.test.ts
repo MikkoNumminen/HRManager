@@ -1,5 +1,11 @@
 import { testPrisma, cleanDb } from "./testDb";
 
+// Use the test database for all Prisma operations — prevents demoSession.ts from
+// opening a separate production prisma connection that would never be disconnected.
+jest.mock("@/db", () => ({
+  prisma: require("./testDb").testPrisma,
+}));
+
 // Mock auth to return null (non-demo user) by default
 jest.mock("../../auth", () => ({
   auth: jest.fn(() => Promise.resolve(null)),

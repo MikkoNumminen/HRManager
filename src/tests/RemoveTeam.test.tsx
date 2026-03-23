@@ -1,4 +1,5 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import RemoveTeamForm from "../components/RemoveTeam";
 import { removeTeam } from "../serverActions";
 
@@ -18,16 +19,16 @@ describe("RemoveTeam Component", () => {
     expect(screen.getByRole("button", { name: /Remove/i })).not.toBeDisabled();
   });
 
-  test("opens confirmation dialog when remove is clicked", () => {
+  test("opens confirmation dialog when remove is clicked", async () => {
     render(<RemoveTeamForm teamID={teamID} />);
-    fireEvent.click(screen.getByRole("button", { name: /Remove/i }));
+    await userEvent.click(screen.getByRole("button", { name: /Remove/i }));
     expect(screen.getByText(/Are you sure you want to remove this team/)).toBeInTheDocument();
   });
 
   test("closes dialog when cancel is clicked", async () => {
     render(<RemoveTeamForm teamID={teamID} />);
-    fireEvent.click(screen.getByRole("button", { name: /Remove/i }));
-    fireEvent.click(screen.getByRole("button", { name: /Cancel/i }));
+    await userEvent.click(screen.getByRole("button", { name: /Remove/i }));
+    await userEvent.click(screen.getByRole("button", { name: /Cancel/i }));
     await waitFor(() => {
       expect(
         screen.queryByText(/Are you sure you want to remove this team/),
@@ -39,8 +40,8 @@ describe("RemoveTeam Component", () => {
     const mockedRemoveTeam = removeTeam as jest.MockedFunction<typeof removeTeam>;
     render(<RemoveTeamForm teamID={teamID} />);
 
-    fireEvent.click(screen.getByRole("button", { name: /^Remove$/i }));
-    fireEvent.click(screen.getByRole("button", { name: /^Remove$/i }));
+    await userEvent.click(screen.getByRole("button", { name: /^Remove$/i }));
+    await userEvent.click(screen.getByRole("button", { name: /^Remove$/i }));
 
     await waitFor(() => {
       expect(mockedRemoveTeam).toHaveBeenCalledWith(expect.any(FormData));
@@ -52,8 +53,8 @@ describe("RemoveTeam Component", () => {
     (removeTeam as jest.MockedFunction<typeof removeTeam>).mockRejectedValue("string error");
     render(<RemoveTeamForm teamID={teamID} />);
 
-    fireEvent.click(screen.getByRole("button", { name: /^Remove$/i }));
-    fireEvent.click(screen.getByRole("button", { name: /^Remove$/i }));
+    await userEvent.click(screen.getByRole("button", { name: /^Remove$/i }));
+    await userEvent.click(screen.getByRole("button", { name: /^Remove$/i }));
 
     await waitFor(() => {
       expect(screen.getByText("An error occurred")).toBeInTheDocument();
@@ -66,8 +67,8 @@ describe("RemoveTeam Component", () => {
     );
     render(<RemoveTeamForm teamID={teamID} />);
 
-    fireEvent.click(screen.getByRole("button", { name: /^Remove$/i }));
-    fireEvent.click(screen.getByRole("button", { name: /^Remove$/i }));
+    await userEvent.click(screen.getByRole("button", { name: /^Remove$/i }));
+    await userEvent.click(screen.getByRole("button", { name: /^Remove$/i }));
 
     await waitFor(() => {
       expect(screen.getByText("Removal failed")).toBeInTheDocument();

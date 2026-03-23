@@ -1,4 +1,5 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import AddDepartmentForm from "../components/AddDepartment";
 import { createDepartment } from "../serverActions";
 
@@ -24,20 +25,18 @@ describe("AddDepartment Component", () => {
   });
 
   // Submit button is enabled when name is filled.
-  test("submit button is enabled when name is filled", () => {
+  test("submit button is enabled when name is filled", async () => {
     render(<AddDepartmentForm />);
-    fireEvent.change(screen.getByLabelText(/Enter Department Name/i), {
-      target: { value: "Engineering" },
-    });
+    await userEvent.clear(screen.getByLabelText(/Enter Department Name/i));
+    await userEvent.type(screen.getByLabelText(/Enter Department Name/i), "Engineering");
     expect(screen.getByRole("button", { name: /Create/i })).not.toBeDisabled();
   });
 
   // Submit button is disabled when name is only whitespace.
-  test("submit button is disabled for whitespace-only name", () => {
+  test("submit button is disabled for whitespace-only name", async () => {
     render(<AddDepartmentForm />);
-    fireEvent.change(screen.getByLabelText(/Enter Department Name/i), {
-      target: { value: "   " },
-    });
+    await userEvent.clear(screen.getByLabelText(/Enter Department Name/i));
+    await userEvent.type(screen.getByLabelText(/Enter Department Name/i), "   ");
     expect(screen.getByRole("button", { name: /Create/i })).toBeDisabled();
   });
 
@@ -52,10 +51,9 @@ describe("AddDepartment Component", () => {
     (createDepartment as jest.Mock).mockResolvedValue(undefined);
     render(<AddDepartmentForm />);
 
-    fireEvent.change(screen.getByLabelText(/Enter Department Name/i), {
-      target: { value: "Engineering" },
-    });
-    fireEvent.click(screen.getByRole("button", { name: /Create/i }));
+    await userEvent.clear(screen.getByLabelText(/Enter Department Name/i));
+    await userEvent.type(screen.getByLabelText(/Enter Department Name/i), "Engineering");
+    await userEvent.click(screen.getByRole("button", { name: /Create/i }));
 
     await waitFor(() => {
       expect(createDepartment).toHaveBeenCalledWith(expect.any(FormData));
@@ -67,10 +65,9 @@ describe("AddDepartment Component", () => {
     (createDepartment as jest.Mock).mockRejectedValue(new Error("Name already in use"));
     render(<AddDepartmentForm />);
 
-    fireEvent.change(screen.getByLabelText(/Enter Department Name/i), {
-      target: { value: "Engineering" },
-    });
-    fireEvent.click(screen.getByRole("button", { name: /Create/i }));
+    await userEvent.clear(screen.getByLabelText(/Enter Department Name/i));
+    await userEvent.type(screen.getByLabelText(/Enter Department Name/i), "Engineering");
+    await userEvent.click(screen.getByRole("button", { name: /Create/i }));
 
     await waitFor(() => {
       expect(screen.getByText("Name already in use")).toBeInTheDocument();
@@ -82,10 +79,9 @@ describe("AddDepartment Component", () => {
     (createDepartment as jest.Mock).mockRejectedValue("string error");
     render(<AddDepartmentForm />);
 
-    fireEvent.change(screen.getByLabelText(/Enter Department Name/i), {
-      target: { value: "Engineering" },
-    });
-    fireEvent.click(screen.getByRole("button", { name: /Create/i }));
+    await userEvent.clear(screen.getByLabelText(/Enter Department Name/i));
+    await userEvent.type(screen.getByLabelText(/Enter Department Name/i), "Engineering");
+    await userEvent.click(screen.getByRole("button", { name: /Create/i }));
 
     await waitFor(() => {
       expect(screen.getByText("An error occurred")).toBeInTheDocument();
@@ -99,10 +95,9 @@ describe("AddDepartment Component", () => {
     (createDepartment as jest.Mock).mockResolvedValue(undefined);
     render(<AddDepartmentForm />);
 
-    fireEvent.change(screen.getByLabelText(/Enter Department Name/i), {
-      target: { value: "Engineering" },
-    });
-    fireEvent.click(screen.getByRole("button", { name: /Create/i }));
+    await userEvent.clear(screen.getByLabelText(/Enter Department Name/i));
+    await userEvent.type(screen.getByLabelText(/Enter Department Name/i), "Engineering");
+    await userEvent.click(screen.getByRole("button", { name: /Create/i }));
 
     await waitFor(() => {
       expect(showSnackbar).toHaveBeenCalledWith("Department created successfully");
@@ -117,9 +112,11 @@ describe("AddDepartment Component", () => {
     const nameInput = screen.getByLabelText(/Enter Department Name/i);
     const descInput = screen.getByLabelText(/Description/i);
 
-    fireEvent.change(nameInput, { target: { value: "Engineering" } });
-    fireEvent.change(descInput, { target: { value: "Dev team" } });
-    fireEvent.click(screen.getByRole("button", { name: /Create/i }));
+    await userEvent.clear(nameInput);
+    await userEvent.type(nameInput, "Engineering");
+    await userEvent.clear(descInput);
+    await userEvent.type(descInput, "Dev team");
+    await userEvent.click(screen.getByRole("button", { name: /Create/i }));
 
     await waitFor(() => {
       expect(nameInput).toHaveValue("");

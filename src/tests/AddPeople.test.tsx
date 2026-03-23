@@ -1,4 +1,5 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import AddPersonForm from "../components/AddPeople";
 import { createPerson } from "../serverActions";
 
@@ -16,33 +17,28 @@ describe("AddPerson Component", () => {
     expect(screen.getByRole("button", { name: /Create/i })).toBeDisabled();
   });
 
-  test("submit button is disabled when only name is filled", () => {
+  test("submit button is disabled when only name is filled", async () => {
     render(<AddPersonForm />);
-    fireEvent.change(screen.getByLabelText(/Enter Name/i), {
-      target: { value: "John" },
-    });
+    await userEvent.clear(screen.getByLabelText(/Enter Name/i));
+    await userEvent.type(screen.getByLabelText(/Enter Name/i), "John");
     expect(screen.getByRole("button", { name: /Create/i })).toBeDisabled();
   });
 
-  test("submit button is disabled when email is invalid format", () => {
+  test("submit button is disabled when email is invalid format", async () => {
     render(<AddPersonForm />);
-    fireEvent.change(screen.getByLabelText(/Enter Name/i), {
-      target: { value: "John" },
-    });
-    fireEvent.change(screen.getByLabelText(/Enter Email/i), {
-      target: { value: "notanemail" },
-    });
+    await userEvent.clear(screen.getByLabelText(/Enter Name/i));
+    await userEvent.type(screen.getByLabelText(/Enter Name/i), "John");
+    await userEvent.clear(screen.getByLabelText(/Enter Email/i));
+    await userEvent.type(screen.getByLabelText(/Enter Email/i), "notanemail");
     expect(screen.getByRole("button", { name: /Create/i })).toBeDisabled();
   });
 
-  test("submit button is enabled when name and valid email are filled", () => {
+  test("submit button is enabled when name and valid email are filled", async () => {
     render(<AddPersonForm />);
-    fireEvent.change(screen.getByLabelText(/Enter Name/i), {
-      target: { value: "John" },
-    });
-    fireEvent.change(screen.getByLabelText(/Enter Email/i), {
-      target: { value: "john@example.com" },
-    });
+    await userEvent.clear(screen.getByLabelText(/Enter Name/i));
+    await userEvent.type(screen.getByLabelText(/Enter Name/i), "John");
+    await userEvent.clear(screen.getByLabelText(/Enter Email/i));
+    await userEvent.type(screen.getByLabelText(/Enter Email/i), "john@example.com");
     expect(screen.getByRole("button", { name: /Create/i })).not.toBeDisabled();
   });
 
@@ -50,13 +46,11 @@ describe("AddPerson Component", () => {
     const mockedCreatePerson = createPerson as jest.MockedFunction<typeof createPerson>;
     render(<AddPersonForm />);
 
-    fireEvent.change(screen.getByLabelText(/Enter Name/i), {
-      target: { value: "John Doe" },
-    });
-    fireEvent.change(screen.getByLabelText(/Enter Email/i), {
-      target: { value: "john.doe@example.com" },
-    });
-    fireEvent.click(screen.getByRole("button", { name: /Create/i }));
+    await userEvent.clear(screen.getByLabelText(/Enter Name/i));
+    await userEvent.type(screen.getByLabelText(/Enter Name/i), "John Doe");
+    await userEvent.clear(screen.getByLabelText(/Enter Email/i));
+    await userEvent.type(screen.getByLabelText(/Enter Email/i), "john.doe@example.com");
+    await userEvent.click(screen.getByRole("button", { name: /Create/i }));
 
     await waitFor(() => {
       expect(mockedCreatePerson).toHaveBeenCalledWith(expect.any(FormData));
@@ -69,9 +63,11 @@ describe("AddPerson Component", () => {
 
     const nameInput = screen.getByLabelText(/Enter Name/i);
     const emailInput = screen.getByLabelText(/Enter Email/i);
-    fireEvent.change(nameInput, { target: { value: "John Doe" } });
-    fireEvent.change(emailInput, { target: { value: "john@example.com" } });
-    fireEvent.click(screen.getByRole("button", { name: /Create/i }));
+    await userEvent.clear(nameInput);
+    await userEvent.type(nameInput, "John Doe");
+    await userEvent.clear(emailInput);
+    await userEvent.type(emailInput, "john@example.com");
+    await userEvent.click(screen.getByRole("button", { name: /Create/i }));
 
     await waitFor(() => {
       expect((nameInput as HTMLInputElement).value).toBe("");
@@ -84,13 +80,11 @@ describe("AddPerson Component", () => {
     (createPerson as jest.MockedFunction<typeof createPerson>).mockRejectedValue("string error");
     render(<AddPersonForm />);
 
-    fireEvent.change(screen.getByLabelText(/Enter Name/i), {
-      target: { value: "John Doe" },
-    });
-    fireEvent.change(screen.getByLabelText(/Enter Email/i), {
-      target: { value: "john@example.com" },
-    });
-    fireEvent.click(screen.getByRole("button", { name: /Create/i }));
+    await userEvent.clear(screen.getByLabelText(/Enter Name/i));
+    await userEvent.type(screen.getByLabelText(/Enter Name/i), "John Doe");
+    await userEvent.clear(screen.getByLabelText(/Enter Email/i));
+    await userEvent.type(screen.getByLabelText(/Enter Email/i), "john@example.com");
+    await userEvent.click(screen.getByRole("button", { name: /Create/i }));
 
     await waitFor(() => {
       expect(screen.getByText("An error occurred")).toBeInTheDocument();
@@ -104,13 +98,11 @@ describe("AddPerson Component", () => {
     (createPerson as jest.MockedFunction<typeof createPerson>).mockResolvedValue(undefined);
     render(<AddPersonForm />);
 
-    fireEvent.change(screen.getByLabelText(/Enter Name/i), {
-      target: { value: "John Doe" },
-    });
-    fireEvent.change(screen.getByLabelText(/Enter Email/i), {
-      target: { value: "john@example.com" },
-    });
-    fireEvent.click(screen.getByRole("button", { name: /Create/i }));
+    await userEvent.clear(screen.getByLabelText(/Enter Name/i));
+    await userEvent.type(screen.getByLabelText(/Enter Name/i), "John Doe");
+    await userEvent.clear(screen.getByLabelText(/Enter Email/i));
+    await userEvent.type(screen.getByLabelText(/Enter Email/i), "john@example.com");
+    await userEvent.click(screen.getByRole("button", { name: /Create/i }));
 
     await waitFor(() => {
       expect(showSnackbar).toHaveBeenCalledWith("Person created successfully");
@@ -123,13 +115,11 @@ describe("AddPerson Component", () => {
     );
     render(<AddPersonForm />);
 
-    fireEvent.change(screen.getByLabelText(/Enter Name/i), {
-      target: { value: "John Doe" },
-    });
-    fireEvent.change(screen.getByLabelText(/Enter Email/i), {
-      target: { value: "john@example.com" },
-    });
-    fireEvent.click(screen.getByRole("button", { name: /Create/i }));
+    await userEvent.clear(screen.getByLabelText(/Enter Name/i));
+    await userEvent.type(screen.getByLabelText(/Enter Name/i), "John Doe");
+    await userEvent.clear(screen.getByLabelText(/Enter Email/i));
+    await userEvent.type(screen.getByLabelText(/Enter Email/i), "john@example.com");
+    await userEvent.click(screen.getByRole("button", { name: /Create/i }));
 
     await waitFor(() => {
       expect(screen.getByText("A person with this email already exists")).toBeInTheDocument();

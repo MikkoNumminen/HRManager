@@ -1,4 +1,5 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import AddTeamForm from "../components/AddTeam";
 import { createTeam } from "../serverActions";
 
@@ -16,11 +17,10 @@ describe("AddTeam Component", () => {
     expect(screen.getByRole("button", { name: /Create/i })).toBeDisabled();
   });
 
-  test("submit button is enabled when name is filled", () => {
+  test("submit button is enabled when name is filled", async () => {
     render(<AddTeamForm />);
-    fireEvent.change(screen.getByLabelText(/Enter Team Name/i), {
-      target: { value: "Engineering" },
-    });
+    await userEvent.clear(screen.getByLabelText(/Enter Team Name/i));
+    await userEvent.type(screen.getByLabelText(/Enter Team Name/i), "Engineering");
     expect(screen.getByRole("button", { name: /Create/i })).not.toBeDisabled();
   });
 
@@ -28,10 +28,9 @@ describe("AddTeam Component", () => {
     const mockedCreateTeam = createTeam as jest.MockedFunction<typeof createTeam>;
     render(<AddTeamForm />);
 
-    fireEvent.change(screen.getByLabelText(/Enter Team Name/i), {
-      target: { value: "Engineering" },
-    });
-    fireEvent.click(screen.getByRole("button", { name: /Create/i }));
+    await userEvent.clear(screen.getByLabelText(/Enter Team Name/i));
+    await userEvent.type(screen.getByLabelText(/Enter Team Name/i), "Engineering");
+    await userEvent.click(screen.getByRole("button", { name: /Create/i }));
 
     await waitFor(() => {
       expect(mockedCreateTeam).toHaveBeenCalledWith(expect.any(FormData));
@@ -43,8 +42,9 @@ describe("AddTeam Component", () => {
     render(<AddTeamForm />);
 
     const input = screen.getByLabelText(/Enter Team Name/i);
-    fireEvent.change(input, { target: { value: "Engineering" } });
-    fireEvent.click(screen.getByRole("button", { name: /Create/i }));
+    await userEvent.clear(input);
+    await userEvent.type(input, "Engineering");
+    await userEvent.click(screen.getByRole("button", { name: /Create/i }));
 
     await waitFor(() => {
       expect((input as HTMLInputElement).value).toBe("");
@@ -58,10 +58,9 @@ describe("AddTeam Component", () => {
     (createTeam as jest.MockedFunction<typeof createTeam>).mockResolvedValue(undefined);
     render(<AddTeamForm />);
 
-    fireEvent.change(screen.getByLabelText(/Enter Team Name/i), {
-      target: { value: "Engineering" },
-    });
-    fireEvent.click(screen.getByRole("button", { name: /Create/i }));
+    await userEvent.clear(screen.getByLabelText(/Enter Team Name/i));
+    await userEvent.type(screen.getByLabelText(/Enter Team Name/i), "Engineering");
+    await userEvent.click(screen.getByRole("button", { name: /Create/i }));
 
     await waitFor(() => {
       expect(showSnackbar).toHaveBeenCalledWith("Team created successfully");
@@ -73,10 +72,9 @@ describe("AddTeam Component", () => {
     (createTeam as jest.MockedFunction<typeof createTeam>).mockRejectedValue("string error");
     render(<AddTeamForm />);
 
-    fireEvent.change(screen.getByLabelText(/Enter Team Name/i), {
-      target: { value: "Engineering" },
-    });
-    fireEvent.click(screen.getByRole("button", { name: /Create/i }));
+    await userEvent.clear(screen.getByLabelText(/Enter Team Name/i));
+    await userEvent.type(screen.getByLabelText(/Enter Team Name/i), "Engineering");
+    await userEvent.click(screen.getByRole("button", { name: /Create/i }));
 
     await waitFor(() => {
       expect(screen.getByText("An error occurred")).toBeInTheDocument();
@@ -89,10 +87,9 @@ describe("AddTeam Component", () => {
     );
     render(<AddTeamForm />);
 
-    fireEvent.change(screen.getByLabelText(/Enter Team Name/i), {
-      target: { value: "Engineering" },
-    });
-    fireEvent.click(screen.getByRole("button", { name: /Create/i }));
+    await userEvent.clear(screen.getByLabelText(/Enter Team Name/i));
+    await userEvent.type(screen.getByLabelText(/Enter Team Name/i), "Engineering");
+    await userEvent.click(screen.getByRole("button", { name: /Create/i }));
 
     await waitFor(() => {
       expect(screen.getByText("Team already exists")).toBeInTheDocument();
