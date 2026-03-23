@@ -11,25 +11,25 @@ This is a **portfolio / showcase project**. The goal is to demonstrate technical
 
 ## Tech stack
 
-| Layer      | Technology                                                                |
-| ---------- | ------------------------------------------------------------------------- |
-| Framework  | Next.js 16 (App Router, Server Components)                                |
-| UI         | React 19 + MUI v7 — dark theme throughout, no Tailwind                    |
-| Language   | TypeScript 5.9                                                            |
-| ORM        | Prisma 7 (driver adapters, Typed SQL, `prisma.config.ts`)                 |
-| Database   | PostgreSQL (local dev + Vercel Postgres / Neon in production)             |
-| Validation | Zod 4                                                                     |
-| Auth       | NextAuth v5 (JWT strategy, Google + GitHub OAuth + demo login)            |
-| i18n       | next-intl, 18 locales, AI-powered translation pipeline                    |
-| Testing    | Jest 30 + React Testing Library                                           |
-| CI/CD      | GitHub Actions (lint, format, test, build on every push) + auto-fix agent |
-| Linting    | ESLint 9 (flat config)                                                    |
-| Formatting | Prettier 3 (`printWidth: 100`, double quotes, trailing commas)            |
-| Deployment | Vercel with Vercel Postgres (Neon serverless PostgreSQL)                  |
+| Layer      | Technology                                                     |
+| ---------- | -------------------------------------------------------------- |
+| Framework  | Next.js 16 (App Router, Server Components)                     |
+| UI         | React 19 + MUI v7 — dark theme throughout, no Tailwind         |
+| Language   | TypeScript 5.9                                                 |
+| ORM        | Prisma 7 (driver adapters, raw SQL, `prisma.config.ts`)        |
+| Database   | PostgreSQL (local dev + Vercel Postgres / Neon in production)  |
+| Validation | Zod 4                                                          |
+| Auth       | NextAuth v5 (JWT strategy, Google + GitHub OAuth + demo login) |
+| i18n       | next-intl, 18 locales, AI-powered translation pipeline         |
+| Testing    | Jest 30 + React Testing Library                                |
+| CI/CD      | GitHub Actions (lint, format, test, build on every push)       |
+| Linting    | ESLint 9 (flat config)                                         |
+| Formatting | Prettier 3 (`printWidth: 100`, double quotes, trailing commas) |
+| Deployment | Vercel with Vercel Postgres (Neon serverless PostgreSQL)       |
 
 ## Architecture
 
-- **Reads** go in `queries.ts` (no `"use server"`). Validated through Zod schemas. Dashboard metrics use Prisma Typed SQL (`prisma/sql/`) with `$queryRawTyped` for type-safe raw queries.
+- **Reads** go in `queries.ts` (no `"use server"`). Validated through Zod schemas. Dashboard metrics use inline `$queryRaw` with CTEs and window functions (PgBouncer-compatible unnamed parameterized queries).
 - **Mutations** go in `serverActions.ts` (marked `"use server"`). Always inside `prisma.$transaction()` — even single operations. Every mutation is audit-logged via deferred `after()` writes from `auditLog.ts` for non-blocking post-response processing.
 - **Audit logging** — `auditLog.ts` provides deferred audit logging via Next.js `after()`. Pattern: `captureAuditContext()` captures user/session before or inside the transaction, audit entries are collected inside the transaction, then `deferAudit(entries)` schedules writes after the response is sent. `logAudit()` is a synchronous write for non-request contexts (tests, build-time). `deferAuditLog()` is a convenience wrapper that captures context and defers in one call. No FK to User — logs survive user deletion. `logPermissionDenial()` and `logRateLimitHit()` log security events (permission denials and rate limit hits) to the same audit trail, also deferred via `after()`.
 - Pages are async Server Components that fetch data and pass it as props to Client Components. No `useEffect` data fetching.
@@ -53,10 +53,8 @@ This is a **portfolio / showcase project**. The goal is to demonstrate technical
 
 ## Autonomous agents
 
-Two autonomous agents run in CI/CD:
-
-- **CI auto-fix agent** (`.github/workflows/autofix.yml`) — triggers on CI failure on `main` via `workflow_run`. Uses `anthropics/claude-code-action` to download failure logs, analyze errors, and create a fix PR. Restricted tool access (`Edit`, `Write`, `Read`, `Glob`, `Grep`, `Bash(git:*)`, `Bash(npm:*)`, `Bash(npx:*)`). Prevents infinite loops by skipping `autofix/` branches. Requires `ANTHROPIC_API_KEY` GitHub secret.
 - **i18n translation agent** (`scripts/i18n-sync.ts`) — audits 17 locale files against `en.json`, translates missing keys via Claude API. Run manually via `npm run i18n:translate` or via parallel Claude Code subagents during development.
+- **CI auto-fix agent** (`.github/workflows/autofix.yml`) — **DISABLED** (`if: false`). Was using paid `anthropics/claude-code-action`. TODO: replace with local CLI-based script.
 
 ## File structure
 
@@ -92,8 +90,7 @@ src/
 └── tutorialConfig.ts # Gamified demo tour (8-step tutorial)
 messages/             # 18 locale JSON files (en, fi, de, fr, es, ...)
 prisma/
-├── schema.prisma     # Data model (PostgreSQL)
-└── sql/              # Prisma Typed SQL queries (dashboard metrics)
+└── schema.prisma     # Data model (PostgreSQL)
 scripts/
 └── i18n-sync.ts      # i18n audit and translation pipeline
 docs/
