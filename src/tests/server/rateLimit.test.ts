@@ -26,6 +26,7 @@ jest.mock("@/db", () => ({
 // Mock @/mongoDb — logRateLimitHit writes audit logs to MongoDB
 jest.mock("@/mongoDb", () => ({
   getAuditLogCollection: () => (globalThis as Record<string, unknown>).__testAuditLogCollection,
+  isMongoAvailable: () => true,
 }));
 
 // Mock @/auth — rateLimit uses auth() to identify authenticated users

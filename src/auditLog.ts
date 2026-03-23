@@ -1,4 +1,4 @@
-import { getAuditLogCollection } from "@/mongoDb";
+import { getAuditLogCollection, isMongoAvailable } from "@/mongoDb";
 import { auth } from "@/auth";
 import { getDemoSessionId } from "@/demoSession";
 import { AuditActionSchema, AuditEntityTypeSchema } from "@/schemas";
@@ -40,6 +40,7 @@ export async function logAudit({
   before,
   after: afterData,
 }: AuditLogParams): Promise<void> {
+  if (!isMongoAvailable()) return;
   const user = await getSessionUser();
   const sessionId = await getDemoSessionId();
 
@@ -82,6 +83,7 @@ export async function captureAuditContext(): Promise<{
  */
 export function deferAudit(entries: DeferredAuditEntry[]): void {
   if (entries.length === 0) return;
+  if (!isMongoAvailable()) return;
 
   after(async () => {
     try {
@@ -116,6 +118,7 @@ export async function deferAuditLog(params: AuditLogParams): Promise<void> {
 }
 
 export async function logPermissionDenial(permissionKey: string): Promise<void> {
+  if (!isMongoAvailable()) return;
   const user = await getSessionUser();
   const sessionId = await getDemoSessionId();
 
@@ -139,6 +142,7 @@ export async function logPermissionDenial(permissionKey: string): Promise<void> 
 }
 
 export async function logRateLimitHit(action: string, identifier: string): Promise<void> {
+  if (!isMongoAvailable()) return;
   const sessionId = await getDemoSessionId();
 
   // Hash IP-based identifiers to avoid storing raw IPs (GDPR PII concern)

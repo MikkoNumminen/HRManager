@@ -15,6 +15,7 @@ jest.mock("../../auth", () => ({
 const mockDeleteMany = jest.fn().mockResolvedValue({ deletedCount: 0 });
 jest.mock("../../mongoDb", () => ({
   getAuditLogCollection: () => ({ deleteMany: mockDeleteMany }),
+  isMongoAvailable: () => true,
 }));
 
 // Import after mocking so getDemoSessionId uses the mocked auth

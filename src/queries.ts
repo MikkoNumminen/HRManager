@@ -21,7 +21,7 @@ import {
 } from "./schemas";
 import { resolvePermissions, PERMISSION_KEYS, hasPermission } from "@/permissions";
 import { getDemoSessionId } from "@/demoSession";
-import { getAuditLogCollection } from "@/mongoDb";
+import { getAuditLogCollection, isMongoAvailable } from "@/mongoDb";
 import { Filter } from "mongodb";
 
 export async function getPersons(): Promise<Person[]> {
@@ -151,6 +151,10 @@ export async function getAuditLogs(
   }
   const parsed = AuditLogFilterSchema.parse(filters ?? {});
   const { userEmail, action, entityType, dateFrom, dateTo, page, pageSize } = parsed;
+
+  if (!isMongoAvailable()) {
+    return { logs: [], total: 0 };
+  }
 
   const sessionId = await getDemoSessionId();
   const col = getAuditLogCollection();
@@ -288,12 +292,14 @@ export async function getDashboardMetrics(): Promise<DashboardMetrics> {
         FROM daily
         ORDER BY date ASC
       `,
-      getAuditLogCollection()
-        .find({ sessionId })
-        .sort({ createdAt: -1, _id: -1 })
-        .limit(10)
-        .project({ action: 1, entityType: 1, userEmail: 1, createdAt: 1 })
-        .toArray(),
+      isMongoAvailable()
+        ? getAuditLogCollection()
+            .find({ sessionId })
+            .sort({ createdAt: -1, _id: -1 })
+            .limit(10)
+            .project({ action: 1, entityType: 1, userEmail: 1, createdAt: 1 })
+            .toArray()
+        : Promise.resolve([]),
     ]);
 
   const counts = countsRows[0];
@@ -326,6 +332,9 @@ export async function getAuditLogUserEmails(): Promise<string[]> {
   const allowed = await hasPermission("admin:view_audit_log");
   if (!allowed) {
     throw new Error("Permission denied");
+  }
+  if (!isMongoAvailable()) {
+    return [];
   }
   const sessionId = await getDemoSessionId();
   const col = getAuditLogCollection();
@@ -381,7 +390,7 @@ export async function getDataExportCounts(): Promise<DataExportCounts> {
     prisma.person.count({ where: { deletedAt: null, sessionId } }),
     prisma.team.count({ where: { deletedAt: null, sessionId } }),
     prisma.department.count({ where: { deletedAt: null, sessionId } }),
-    getAuditLogCollection().countDocuments({ sessionId }),
+    isMongoAvailable() ? getAuditLogCollection().countDocuments({ sessionId }) : 0,
   ]);
   return { persons, teams, departments, auditLogs };
 }

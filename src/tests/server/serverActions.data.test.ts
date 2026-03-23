@@ -41,6 +41,7 @@ jest.mock("@/auditLog", () => ({
 // We store fake log entries here so tests can populate and query them.
 let mockAuditLogs: Array<Record<string, unknown>> = [];
 jest.mock("@/mongoDb", () => ({
+  isMongoAvailable: () => true,
   getAuditLogCollection: () => ({
     find: (query: Record<string, unknown>) => {
       // Filter by sessionId if provided
@@ -142,7 +143,9 @@ describe("updateProfileName", () => {
       data: { email: "alice@test.com", name: "Alice", role: "user" },
     });
     auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
-    await expect(updateProfileName(formData({ name: "" }))).rejects.toThrow("Name is required");
+    expect(await updateProfileName(formData({ name: "" }))).toEqual({
+      error: expect.stringContaining("Name is required"),
+    });
   });
 
   // A whitespace-only name should also be rejected.
@@ -151,7 +154,9 @@ describe("updateProfileName", () => {
       data: { email: "alice@test.com", name: "Alice", role: "user" },
     });
     auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
-    await expect(updateProfileName(formData({ name: "   " }))).rejects.toThrow("Name is required");
+    expect(await updateProfileName(formData({ name: "   " }))).toEqual({
+      error: expect.stringContaining("Name is required"),
+    });
   });
 
   // Names over the max length (255 chars) should be rejected.
@@ -161,25 +166,25 @@ describe("updateProfileName", () => {
     });
     auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
     const longName = "A".repeat(256);
-    await expect(updateProfileName(formData({ name: longName }))).rejects.toThrow(
-      "characters or less",
-    );
+    expect(await updateProfileName(formData({ name: longName }))).toEqual({
+      error: expect.stringContaining("characters or less"),
+    });
   });
 
   // Unauthenticated users can't update a profile — no session, no go.
   test("throws when not authenticated", async () => {
     auth.mockResolvedValueOnce(null);
-    await expect(updateProfileName(formData({ name: "Hacker" }))).rejects.toThrow(
-      "Not authenticated",
-    );
+    expect(await updateProfileName(formData({ name: "Hacker" }))).toEqual({
+      error: expect.stringContaining("Not authenticated"),
+    });
   });
 
   // Session with missing user id should also fail.
   test("throws when session has no user id", async () => {
     auth.mockResolvedValueOnce({ user: { email: "alice@test.com" } });
-    await expect(updateProfileName(formData({ name: "Alice" }))).rejects.toThrow(
-      "Not authenticated",
-    );
+    expect(await updateProfileName(formData({ name: "Alice" }))).toEqual({
+      error: expect.stringContaining("Not authenticated"),
+    });
   });
 
   // If the user has been deleted between session creation and profile update, fail gracefully.
@@ -187,7 +192,9 @@ describe("updateProfileName", () => {
     auth.mockResolvedValueOnce({
       user: { id: "00000000-0000-0000-0000-000000000000", email: "ghost@test.com" },
     });
-    await expect(updateProfileName(formData({ name: "Ghost" }))).rejects.toThrow("User not found");
+    expect(await updateProfileName(formData({ name: "Ghost" }))).toEqual({
+      error: expect.stringContaining("User not found"),
+    });
   });
 
   // Missing name field in form data should be rejected.
@@ -196,7 +203,9 @@ describe("updateProfileName", () => {
       data: { email: "alice@test.com", name: "Alice", role: "user" },
     });
     auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
-    await expect(updateProfileName(formData({}))).rejects.toThrow("Name is required");
+    expect(await updateProfileName(formData({}))).toEqual({
+      error: expect.stringContaining("Name is required"),
+    });
   });
 });
 
@@ -266,9 +275,9 @@ describe("updateProfileImage", () => {
       data: { email: "alice@test.com", name: "Alice", role: "user" },
     });
     auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
-    await expect(updateProfileImage(formData({ image: "javascript:alert(1)" }))).rejects.toThrow(
-      "protocol",
-    );
+    expect(await updateProfileImage(formData({ image: "javascript:alert(1)" }))).toEqual({
+      error: expect.stringContaining("protocol"),
+    });
   });
 
   // ftp URLs should also be rejected.
@@ -277,9 +286,9 @@ describe("updateProfileImage", () => {
       data: { email: "alice@test.com", name: "Alice", role: "user" },
     });
     auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
-    await expect(
-      updateProfileImage(formData({ image: "ftp://example.com/pic.jpg" })),
-    ).rejects.toThrow("protocol");
+    expect(await updateProfileImage(formData({ image: "ftp://example.com/pic.jpg" }))).toEqual({
+      error: expect.stringContaining("protocol"),
+    });
   });
 
   // Completely invalid URLs that can't be parsed should be rejected.
@@ -288,9 +297,9 @@ describe("updateProfileImage", () => {
       data: { email: "alice@test.com", name: "Alice", role: "user" },
     });
     auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
-    await expect(updateProfileImage(formData({ image: "not a url" }))).rejects.toThrow(
-      "Invalid URL format",
-    );
+    expect(await updateProfileImage(formData({ image: "not a url" }))).toEqual({
+      error: expect.stringContaining("Invalid URL format"),
+    });
   });
 
   // URLs over the max length (2048 chars) should be rejected.
@@ -300,17 +309,17 @@ describe("updateProfileImage", () => {
     });
     auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
     const longUrl = "https://example.com/" + "a".repeat(2040);
-    await expect(updateProfileImage(formData({ image: longUrl }))).rejects.toThrow(
-      "characters or less",
-    );
+    expect(await updateProfileImage(formData({ image: longUrl }))).toEqual({
+      error: expect.stringContaining("characters or less"),
+    });
   });
 
   // Unauthenticated users can't change profile pictures.
   test("throws when not authenticated", async () => {
     auth.mockResolvedValueOnce(null);
-    await expect(
-      updateProfileImage(formData({ image: "https://example.com/pic.jpg" })),
-    ).rejects.toThrow("Not authenticated");
+    expect(await updateProfileImage(formData({ image: "https://example.com/pic.jpg" }))).toEqual({
+      error: expect.stringContaining("Not authenticated"),
+    });
   });
 
   // If the user was deleted after login, fail gracefully.
@@ -318,9 +327,9 @@ describe("updateProfileImage", () => {
     auth.mockResolvedValueOnce({
       user: { id: "00000000-0000-0000-0000-000000000000", email: "ghost@test.com" },
     });
-    await expect(
-      updateProfileImage(formData({ image: "https://example.com/pic.jpg" })),
-    ).rejects.toThrow("User not found");
+    expect(await updateProfileImage(formData({ image: "https://example.com/pic.jpg" }))).toEqual({
+      error: expect.stringContaining("User not found"),
+    });
   });
 
   // http URLs (not just https) should be accepted.

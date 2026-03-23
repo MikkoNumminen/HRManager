@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
 import { prisma } from "@/db";
-import { getAuditLogCollection } from "@/mongoDb";
+import { getAuditLogCollection, isMongoAvailable } from "@/mongoDb";
 
 /**
  * Returns the demo session ID from the current JWT, or null for real users.
@@ -124,7 +124,9 @@ export async function cleanupStaleDemoSessions(): Promise<number> {
   if (sessionIds.length === 0) return 0;
 
   // Clean up audit logs from MongoDB (separate from PG transaction)
-  await getAuditLogCollection().deleteMany({ sessionId: { $in: sessionIds } });
+  if (isMongoAvailable()) {
+    await getAuditLogCollection().deleteMany({ sessionId: { $in: sessionIds } });
+  }
 
   await prisma.$transaction(async (tx) => {
     await tx.teamMember.deleteMany({ where: { sessionId: { in: sessionIds } } });

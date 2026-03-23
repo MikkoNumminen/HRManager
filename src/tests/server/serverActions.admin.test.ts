@@ -100,7 +100,7 @@ describe("resetAll", () => {
 
   // Resetting an already empty database should just work without complaining.
   test("succeeds on empty database", async () => {
-    await expect(resetAll()).resolves.not.toThrow();
+    expect(await resetAll()).toBeUndefined();
   });
 });
 
@@ -126,9 +126,9 @@ describe("updateUserRole", () => {
       data: { email: "alice@test.com", name: "Alice", role: "user" },
     });
 
-    await expect(updateUserRole(formData({ userId: user.id, role: "superuser" }))).rejects.toThrow(
-      "Invalid role",
-    );
+    expect(await updateUserRole(formData({ userId: user.id, role: "superuser" }))).toEqual({
+      error: expect.stringContaining("Invalid role"),
+    });
   });
 
   // Can't change the superuser's role — it's permanent and locked.
@@ -137,35 +137,39 @@ describe("updateUserRole", () => {
       data: { email: "super@test.com", name: "Super", role: "superuser" },
     });
 
-    await expect(updateUserRole(formData({ userId: user.id, role: "user" }))).rejects.toThrow(
-      "Cannot change the superuser's role",
-    );
+    expect(await updateUserRole(formData({ userId: user.id, role: "user" }))).toEqual({
+      error: expect.stringContaining("Cannot change the superuser's role"),
+    });
   });
 
   // Can't update a user that doesn't exist.
   test("throws when user not found", async () => {
-    await expect(
-      updateUserRole(formData({ userId: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", role: "user" })),
-    ).rejects.toThrow("User not found");
+    expect(
+      await updateUserRole(
+        formData({ userId: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", role: "user" }),
+      ),
+    ).toEqual({ error: expect.stringContaining("User not found") });
   });
 
   // UUID validation — garbage IDs get caught early.
   test("throws on invalid UUID", async () => {
-    await expect(updateUserRole(formData({ userId: "bad-id", role: "user" }))).rejects.toThrow(
-      "Invalid userId format",
-    );
+    expect(await updateUserRole(formData({ userId: "bad-id", role: "user" }))).toEqual({
+      error: expect.stringContaining("Invalid userId format"),
+    });
   });
 
   // Both fields are required — no partial submissions.
   test("throws when userId is missing", async () => {
-    await expect(updateUserRole(formData({ role: "user" }))).rejects.toThrow("No userId provided");
+    expect(await updateUserRole(formData({ role: "user" }))).toEqual({
+      error: expect.stringContaining("No userId provided"),
+    });
   });
 
   // Role field is also required.
   test("throws when role is missing", async () => {
-    await expect(
-      updateUserRole(formData({ userId: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" })),
-    ).rejects.toThrow("No role provided");
+    expect(
+      await updateUserRole(formData({ userId: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" })),
+    ).toEqual({ error: expect.stringContaining("No role provided") });
   });
 
   // Demo sessions can assign the superuser role — sandbox data, no restrictions needed.
@@ -292,11 +296,11 @@ describe("updateUserPermission", () => {
       data: { key: "person:create", description: "Create persons" },
     });
 
-    await expect(
-      updateUserPermission(
+    expect(
+      await updateUserPermission(
         formData({ userId: user.id, permissionKey: "person:create", action: "grant" }),
       ),
-    ).rejects.toThrow("Cannot modify superuser permissions");
+    ).toEqual({ error: expect.stringContaining("Cannot modify superuser permissions") });
   });
 
   // Can't modify permissions for a user that doesn't exist.
@@ -305,15 +309,15 @@ describe("updateUserPermission", () => {
       data: { key: "person:create", description: "Create persons" },
     });
 
-    await expect(
-      updateUserPermission(
+    expect(
+      await updateUserPermission(
         formData({
           userId: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
           permissionKey: "person:create",
           action: "grant",
         }),
       ),
-    ).rejects.toThrow("User not found");
+    ).toEqual({ error: expect.stringContaining("User not found") });
   });
 
   // Can't grant a permission that doesn't exist in the catalog.
@@ -322,48 +326,48 @@ describe("updateUserPermission", () => {
       data: { email: "alice@test.com", name: "Alice", role: "user" },
     });
 
-    await expect(
-      updateUserPermission(
+    expect(
+      await updateUserPermission(
         formData({ userId: user.id, permissionKey: "fake:permission", action: "grant" }),
       ),
-    ).rejects.toThrow("Permission not found");
+    ).toEqual({ error: expect.stringContaining("Permission not found") });
   });
 
   // UUID validation on the userId field.
   test("throws on invalid UUID", async () => {
-    await expect(
-      updateUserPermission(
+    expect(
+      await updateUserPermission(
         formData({ userId: "bad", permissionKey: "person:create", action: "grant" }),
       ),
-    ).rejects.toThrow("Invalid userId format");
+    ).toEqual({ error: expect.stringContaining("Invalid userId format") });
   });
 
   // All three required fields must be present — no partial submissions.
   test("throws when userId is missing", async () => {
-    await expect(
-      updateUserPermission(formData({ permissionKey: "person:create", action: "grant" })),
-    ).rejects.toThrow("No userId provided");
+    expect(
+      await updateUserPermission(formData({ permissionKey: "person:create", action: "grant" })),
+    ).toEqual({ error: expect.stringContaining("No userId provided") });
   });
 
   // Permission key is required.
   test("throws when permissionKey is missing", async () => {
-    await expect(
-      updateUserPermission(
+    expect(
+      await updateUserPermission(
         formData({ userId: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", action: "grant" }),
       ),
-    ).rejects.toThrow("No permissionKey provided");
+    ).toEqual({ error: expect.stringContaining("No permissionKey provided") });
   });
 
   // Action is required.
   test("throws when action is missing", async () => {
-    await expect(
-      updateUserPermission(
+    expect(
+      await updateUserPermission(
         formData({
           userId: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
           permissionKey: "person:create",
         }),
       ),
-    ).rejects.toThrow("No action provided");
+    ).toEqual({ error: expect.stringContaining("No action provided") });
   });
 
   // Demo sessions can modify superuser permissions — sandbox lets you experiment.
@@ -580,9 +584,9 @@ describe("kickOutUser", () => {
       data: { email: "super@test.com", name: "Super", role: "superuser" },
     });
 
-    await expect(kickOutUser(formData({ userId: superuser.id }))).rejects.toThrow(
-      "Cannot kick out the superuser",
-    );
+    expect(await kickOutUser(formData({ userId: superuser.id }))).toEqual({
+      error: expect.stringContaining("Cannot kick out the superuser"),
+    });
 
     // Verify user was not deleted
     const stillExists = await testPrisma.user.findUnique({ where: { id: superuser.id } });
@@ -591,19 +595,23 @@ describe("kickOutUser", () => {
 
   // Throws when no userId is provided in the form data.
   test("throws on missing userId", async () => {
-    await expect(kickOutUser(formData({}))).rejects.toThrow("No userId provided");
+    expect(await kickOutUser(formData({}))).toEqual({
+      error: expect.stringContaining("No userId provided"),
+    });
   });
 
   // Throws when the userId doesn't match any user in the database.
   test("throws on non-existent user", async () => {
-    await expect(
-      kickOutUser(formData({ userId: "00000000-0000-0000-0000-000000000000" })),
-    ).rejects.toThrow("User not found");
+    expect(await kickOutUser(formData({ userId: "00000000-0000-0000-0000-000000000000" }))).toEqual(
+      { error: expect.stringContaining("User not found") },
+    );
   });
 
   // Throws when userId is not a valid UUID format.
   test("throws on invalid UUID", async () => {
-    await expect(kickOutUser(formData({ userId: "not-a-uuid" }))).rejects.toThrow();
+    expect(await kickOutUser(formData({ userId: "not-a-uuid" }))).toEqual({
+      error: expect.any(String),
+    });
   });
 
   // Demo sessions cannot kick real OAuth users — only the demo user is allowed.
@@ -613,9 +621,9 @@ describe("kickOutUser", () => {
       data: { email: "real@oauth.com", name: "Real User", role: "user" },
     });
 
-    await expect(kickOutUser(formData({ userId: realUser.id }))).rejects.toThrow(
-      "Demo sessions cannot manage real users",
-    );
+    expect(await kickOutUser(formData({ userId: realUser.id }))).toEqual({
+      error: expect.stringContaining("Demo sessions cannot manage real users"),
+    });
 
     // Verify user was not deleted
     const stillExists = await testPrisma.user.findUnique({ where: { id: realUser.id } });
@@ -629,9 +637,9 @@ describe("kickOutUser", () => {
     });
     auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
 
-    await expect(kickOutUser(formData({ userId: user.id }))).rejects.toThrow(
-      "Cannot kick yourself out",
-    );
+    expect(await kickOutUser(formData({ userId: user.id }))).toEqual({
+      error: expect.stringContaining("Cannot kick yourself out"),
+    });
 
     // Verify user was not deleted
     const stillExists = await testPrisma.user.findUnique({ where: { id: user.id } });

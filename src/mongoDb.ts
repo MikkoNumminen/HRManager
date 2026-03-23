@@ -17,6 +17,11 @@ const globalForMongo = globalThis as unknown as {
   mongoClient: MongoClient | undefined;
 };
 
+/** Returns true when MONGODB_URL is configured and MongoDB can be used. */
+export function isMongoAvailable(): boolean {
+  return !!process.env.MONGODB_URL;
+}
+
 function getMongoClient(): MongoClient {
   if (!globalForMongo.mongoClient) {
     const url = process.env.MONGODB_URL;

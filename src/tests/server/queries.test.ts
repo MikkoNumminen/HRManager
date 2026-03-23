@@ -15,6 +15,7 @@ jest.mock("@/db", () => ({
 // Mock @/mongoDb to use the in-memory test MongoDB collection via globalThis
 jest.mock("@/mongoDb", () => ({
   getAuditLogCollection: () => (globalThis as Record<string, unknown>).__testAuditLogCollection,
+  isMongoAvailable: () => true,
 }));
 
 // Mock next-auth — it uses ESM imports that Jest can't parse in CJS mode.

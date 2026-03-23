@@ -22,6 +22,7 @@ async function flushAfterCallbacks() {
 // Mock @/mongoDb to use the in-memory test MongoDB collection via globalThis
 jest.mock("@/mongoDb", () => ({
   getAuditLogCollection: () => (globalThis as Record<string, unknown>).__testAuditLogCollection,
+  isMongoAvailable: () => true,
 }));
 
 // Mock @/db (still needed for cleanDb which uses PG)
