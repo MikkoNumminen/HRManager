@@ -129,7 +129,7 @@ docker-compose.yml    # PostgreSQL 17 + MongoDB 8 + app with health checks
 
 Every TODO item must have a color-coded size estimate prefix: 🟢 small, 🟡 medium, 🔴 large. When listing estimates in text, use: 🟢 **[S]**, 🟡 **[M]**, 🔴 **[L]**.
 
-**⚠️ MANDATORY: Every Claude instance MUST mark what it is working on in TODO.md BEFORE starting any work.** Move the task to "In Progress" with your `[worktree-name]` or `[main]` tag. If your task is not already in the list, add it first. The user monitors TODO.md to know what every Claude is doing — unmarked work is invisible and causes confusion and collisions. **No exceptions. No silent work.**
+**⚠️ MANDATORY: There are exactly 4 Claude instances, permanently named: Claude 1, Claude 2, Claude 3, Claude 4.** Names are assigned by the user — never pick your own name. If you don't know which one you are, ask the user. Move tasks to "In Progress" with your name, e.g. `[Claude 1, main]` or `[Claude 3, worktree-name]`. The user monitors TODO.md to know what every Claude is doing — unmarked work is invisible and causes confusion and collisions. **No exceptions. No silent work.**
 
 ## Commit style
 
