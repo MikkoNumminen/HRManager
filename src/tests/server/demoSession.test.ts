@@ -5,6 +5,12 @@ jest.mock("../../auth", () => ({
   auth: jest.fn(() => Promise.resolve(null)),
 }));
 
+// Mock MongoDB — cleanup deletes audit logs from MongoDB, but CI has no MongoDB.
+const mockDeleteMany = jest.fn().mockResolvedValue({ deletedCount: 0 });
+jest.mock("../../mongoDb", () => ({
+  getAuditLogCollection: () => ({ deleteMany: mockDeleteMany }),
+}));
+
 // Import after mocking so getDemoSessionId uses the mocked auth
 const { seedDemoData, cleanupStaleDemoSessions, getDemoSessionId } =
   require("../../demoSession") as typeof import("../../demoSession");
