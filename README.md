@@ -217,4 +217,13 @@ Deployed on **Vercel** with **Vercel Postgres** (Neon) and **MongoDB Atlas** (fr
 
 ---
 
+## Roadmap
+
+*Last updated: March 2026*
+
+- [ ] Preview/staging deployments with branch protection — zero-downtime deploys, no broken commits in production
+- [ ] Additional theme screenshots in docs — showcase all 6 visual themes
+
+---
+
 Commit style: [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
