@@ -80,10 +80,8 @@ describe("DataImportExport", () => {
 
   // Renders nothing visible when user has no import or export permissions
   test("renders nothing when user has no data:import or data:export", () => {
-    const { container } = render(
-      <DataImportExport counts={defaultCounts} permissions={makePermissions()} />,
-    );
-    expect(container.querySelector("h6")).toBeNull();
+    render(<DataImportExport counts={defaultCounts} permissions={makePermissions()} />);
+    expect(screen.queryByRole("heading")).not.toBeInTheDocument();
   });
 
   // Shows export section when user has data:export permission

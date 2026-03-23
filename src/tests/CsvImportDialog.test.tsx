@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import CsvImportDialog from "../components/CsvImportDialog";
 
 jest.mock("next/navigation", () => ({
@@ -64,11 +64,11 @@ describe("CsvImportDialog", () => {
     const input = document.getElementById("csv-file-input") as HTMLInputElement;
     const file = new File(["data"], "test.txt", { type: "text/plain" });
 
-    await act(async () => {
-      fireEvent.change(input, { target: { files: [file] } });
-    });
+    fireEvent.change(input, { target: { files: [file] } });
 
-    expect(screen.getByText("Please upload a .csv file")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("Please upload a .csv file")).toBeInTheDocument();
+    });
   });
 
   // Rejects files that exceed the size limit
@@ -79,11 +79,11 @@ describe("CsvImportDialog", () => {
     const bigContent = "a".repeat(1024 * 1024 + 1);
     const file = csvFile(bigContent);
 
-    await act(async () => {
-      fireEvent.change(input, { target: { files: [file] } });
-    });
+    fireEvent.change(input, { target: { files: [file] } });
 
-    expect(screen.getByText("File exceeds 1 MB limit")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("File exceeds 1 MB limit")).toBeInTheDocument();
+    });
   });
 
   // Shows preview table after selecting a valid CSV file
@@ -92,11 +92,7 @@ describe("CsvImportDialog", () => {
     const input = document.getElementById("csv-file-input") as HTMLInputElement;
     const file = csvFile("name,email\nAlice,alice@test.com\nBob,bob@test.com");
 
-    await act(async () => {
-      fireEvent.change(input, { target: { files: [file] } });
-      // Wait for FileReader to complete
-      await new Promise((r) => setTimeout(r, 50));
-    });
+    fireEvent.change(input, { target: { files: [file] } });
 
     await waitFor(() => {
       expect(screen.getByText("Alice")).toBeInTheDocument();
@@ -110,10 +106,7 @@ describe("CsvImportDialog", () => {
     const input = document.getElementById("csv-file-input") as HTMLInputElement;
     const file = csvFile("name,email\nAlice,alice@test.com\nBob,bob@test.com");
 
-    await act(async () => {
-      fireEvent.change(input, { target: { files: [file] } });
-      await new Promise((r) => setTimeout(r, 50));
-    });
+    fireEvent.change(input, { target: { files: [file] } });
 
     await waitFor(() => {
       // The mock returns raw ICU string; just verify the chip is rendered
@@ -128,10 +121,7 @@ describe("CsvImportDialog", () => {
     // Row 2 has empty name and invalid email — both will produce errors
     const file = csvFile("name,email\nAlice,alice@test.com\n,bad-email");
 
-    await act(async () => {
-      fireEvent.change(input, { target: { files: [file] } });
-      await new Promise((r) => setTimeout(r, 50));
-    });
+    fireEvent.change(input, { target: { files: [file] } });
 
     await waitFor(() => {
       expect(screen.getByText(/error/i)).toBeInTheDocument();
@@ -144,10 +134,7 @@ describe("CsvImportDialog", () => {
     const input = document.getElementById("csv-file-input") as HTMLInputElement;
     const file = csvFile("name,email\nAlice,alice@test.com");
 
-    await act(async () => {
-      fireEvent.change(input, { target: { files: [file] } });
-      await new Promise((r) => setTimeout(r, 50));
-    });
+    fireEvent.change(input, { target: { files: [file] } });
 
     await waitFor(() => {
       // Import button should exist (text includes ICU plural format)
@@ -161,10 +148,7 @@ describe("CsvImportDialog", () => {
     const input = document.getElementById("csv-file-input") as HTMLInputElement;
     const file = csvFile("name,email");
 
-    await act(async () => {
-      fireEvent.change(input, { target: { files: [file] } });
-      await new Promise((r) => setTimeout(r, 50));
-    });
+    fireEvent.change(input, { target: { files: [file] } });
 
     await waitFor(() => {
       expect(screen.getByText("CSV file is empty or contains only headers")).toBeInTheDocument();
@@ -177,10 +161,7 @@ describe("CsvImportDialog", () => {
     const input = document.getElementById("csv-file-input") as HTMLInputElement;
     const file = csvFile("name,email\nAlice,alice@test.com", "employees.csv");
 
-    await act(async () => {
-      fireEvent.change(input, { target: { files: [file] } });
-      await new Promise((r) => setTimeout(r, 50));
-    });
+    fireEvent.change(input, { target: { files: [file] } });
 
     await waitFor(() => {
       expect(screen.getByText(/employees\.csv/)).toBeInTheDocument();
@@ -194,10 +175,7 @@ describe("CsvImportDialog", () => {
     const rows = Array.from({ length: 10 }, (_, i) => `Person${i},p${i}@test.com`).join("\n");
     const file = csvFile(`name,email\n${rows}`);
 
-    await act(async () => {
-      fireEvent.change(input, { target: { files: [file] } });
-      await new Promise((r) => setTimeout(r, 50));
-    });
+    fireEvent.change(input, { target: { files: [file] } });
 
     await waitFor(() => {
       expect(screen.getByText("Person0")).toBeInTheDocument();
@@ -213,11 +191,8 @@ describe("CsvImportDialog", () => {
     const dropZone = screen.getByText("Drop a CSV file here or click to browse").closest("div")!;
     const file = csvFile("name,email\nAlice,alice@test.com");
 
-    await act(async () => {
-      fireEvent.drop(dropZone, {
-        dataTransfer: { files: [file] },
-      });
-      await new Promise((r) => setTimeout(r, 50));
+    fireEvent.drop(dropZone, {
+      dataTransfer: { files: [file] },
     });
 
     await waitFor(() => {
@@ -231,10 +206,7 @@ describe("CsvImportDialog", () => {
     const input = document.getElementById("csv-file-input") as HTMLInputElement;
     const file = csvFile("name,email,position\nAlice,alice@test.com,Manager");
 
-    await act(async () => {
-      fireEvent.change(input, { target: { files: [file] } });
-      await new Promise((r) => setTimeout(r, 50));
-    });
+    fireEvent.change(input, { target: { files: [file] } });
 
     await waitFor(() => {
       expect(screen.getByText("name")).toBeInTheDocument();
@@ -250,10 +222,7 @@ describe("CsvImportDialog", () => {
     // Both rows have empty names
     const file = csvFile("name,email\n,bad@test.com\n,another@test.com");
 
-    await act(async () => {
-      fireEvent.change(input, { target: { files: [file] } });
-      await new Promise((r) => setTimeout(r, 50));
-    });
+    fireEvent.change(input, { target: { files: [file] } });
 
     await waitFor(() => {
       // Cancel button is there, but no Import button
@@ -270,11 +239,11 @@ describe("CsvImportDialog", () => {
     const input = document.getElementById("csv-file-input") as HTMLInputElement;
     const file = new File(["data"], "test.txt", { type: "text/plain" });
 
-    await act(async () => {
-      fireEvent.change(input, { target: { files: [file] } });
-    });
+    fireEvent.change(input, { target: { files: [file] } });
 
-    expect(screen.getByText("Please upload a .csv file")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("Please upload a .csv file")).toBeInTheDocument();
+    });
 
     // Close
     fireEvent.click(screen.getByRole("button", { name: /Cancel/i }));
@@ -291,10 +260,7 @@ describe("CsvImportDialog", () => {
     // Row 2 has empty name — will produce a validation error
     const file = csvFile("name,email\n,alice@test.com\nBob,bob@test.com");
 
-    await act(async () => {
-      fireEvent.change(input, { target: { files: [file] } });
-      await new Promise((r) => setTimeout(r, 50));
-    });
+    fireEvent.change(input, { target: { files: [file] } });
 
     await waitFor(() => {
       // Should show at least one row error message
