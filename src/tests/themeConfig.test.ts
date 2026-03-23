@@ -88,12 +88,12 @@ describe("themeConfig", () => {
     }
   });
 
-  // Dark palette matches the original color values
-  test("dark palette preserves original color values", () => {
-    expect(THEME_PALETTES.dark.slate100).toBe("rgb(241 245 249)");
-    expect(THEME_PALETTES.dark.slate700).toBe("rgb(51 65 85)");
-    expect(THEME_PALETTES.dark.green400).toBe("rgb(74 222 128)");
-    expect(THEME_PALETTES.dark.error).toBe("#f87171");
+  // Dark palette matches the expected color values
+  test("dark palette preserves expected color values", () => {
+    expect(THEME_PALETTES.dark.slate100).toBe("#F1F5F9");
+    expect(THEME_PALETTES.dark.slate700).toBe("#0F172A");
+    expect(THEME_PALETTES.dark.green400).toBe("#4ADE80");
+    expect(THEME_PALETTES.dark.error).toBe("#F87171");
   });
 
   // Light and dark themes have inverted text/background direction

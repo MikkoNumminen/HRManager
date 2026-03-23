@@ -39,7 +39,7 @@ function loadTheme(): ThemeName {
 }
 
 function getPaletteMode(theme: ThemeName): "dark" | "light" {
-  return theme === "light" || theme === "bubblegum" ? "light" : "dark";
+  return theme === "light" ? "light" : "dark";
 }
 
 function buildCssVariables(theme: ThemeName): Record<string, string> {
