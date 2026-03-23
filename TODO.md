@@ -10,8 +10,12 @@ In Progress items must show the owner: `[worktree-name]` or `[main]`.
 
 ## In Progress
 
-- 🔴 Demo session isolation — per-session data instead of shared DB `[snackbar-notifications]`
+> 📋 **Audit research:** Items marked "(found by audit)" have detailed file:line references in memory file `project_audit_findings.md`. Read it before starting any of these tasks.
+
+- 🟡 Data import/export — CSV/Excel import of employees, export of audit logs/reports (admin tool) `[main]`
+- 🔴 MongoDB audit logs — migrate audit log storage from PostgreSQL to MongoDB (polyglot persistence) `[main]`
 
 ## Backlog
 
-- 🟡 Rethink demo user role & permissions — after session isolation, demo = complete separate instance with full superuser access (data is sandboxed, no restrictions needed)
+- 🟡 Fix ugly themes — review all 6 themes, redesign the ones that look bad while keeping the good ones
+- 🟢 README screenshots with different themes — the 3 current screenshots all use one theme, add shots showcasing other themes

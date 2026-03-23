@@ -18,10 +18,16 @@ jest.mock("@/permissions", () => ({
   seedPermissions: jest.fn(),
 }));
 
-// Mock audit logging — logAudit calls getCurrentUser() which needs auth.
-// Audit log behavior is tested separately.
+// Mock audit logging — deferred audit functions schedule writes via after().
+// Audit log behavior is tested separately in auditLog.test.ts.
 jest.mock("@/auditLog", () => ({
-  logAudit: jest.fn(),
+  captureAuditContext: jest.fn().mockResolvedValue({
+    userId: null,
+    userEmail: null,
+    sessionId: null,
+  }),
+  deferAudit: jest.fn(),
+  deferAuditLog: jest.fn(),
 }));
 
 // Mock rate limiting — rateLimit uses next/headers which doesn't exist in tests.

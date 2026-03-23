@@ -18,6 +18,11 @@ jest.mock("next/headers", () => ({
   })),
 }));
 
+// Mock next/server — after() runs callbacks immediately so audit logs are written in tests
+jest.mock("next/server", () => ({
+  after: (cb: () => void | Promise<void>) => cb(),
+}));
+
 import { rateLimit, rateLimitAuth, RateLimitError, cleanupExpiredRateLimits } from "@/rateLimit";
 
 beforeEach(async () => {
