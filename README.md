@@ -1,6 +1,6 @@
 # HRManager
 
-A production-grade HR management system with polyglot persistence (PostgreSQL + MongoDB), granular RBAC, dashboard analytics, CSV data import/export, audit logging, rate limiting, CSP + security headers, AI-powered i18n across 18 languages, mobile-first responsive design, and 1306 tests (1272 unit/integration + 34 E2E) at 97.8% line coverage.
+A full-stack HR management system built to production standards — not as a toy project, but as a showcase of real architectural decisions. Every technical choice has a reason. This README explains them.
 
 [![CI](https://github.com/MikkoNumminen/HRManager/actions/workflows/ci.yml/badge.svg)](https://github.com/MikkoNumminen/HRManager/actions/workflows/ci.yml)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)
@@ -29,42 +29,112 @@ A production-grade HR management system with polyglot persistence (PostgreSQL + 
 
 ## Highlights
 
-- **Polyglot persistence** — PostgreSQL for relational data (entities, RBAC, rate limiting) + MongoDB for append-heavy audit logs; demonstrates choosing the right database for each workload; native `mongodb` v7 driver with typed collections, `mongodb-memory-server` for hermetic test isolation
-- **Dashboard analytics** — KPI cards, bar chart (members per team), pie chart (teams per department), line chart (organization growth), and recent activity feed powered by MUI X Charts; backed by 5 parallel PostgreSQL queries with CTEs and window functions + 1 MongoDB query for recent activity; permission-gated via `dashboard:view`
-- **CSV data import/export** — bulk-import persons via CSV upload with client-side validation preview, drag-and-drop, and RFC 4180 parsing; export persons, teams, departments, and audit logs as CSV; permission-gated (`data:import`, `data:export`); custom CSV parser with no external dependencies
-- **Optimistic updates** — React 19 `useOptimistic` on all create actions; new items appear in the table instantly before the server responds, then seamlessly merge with real data on revalidation
-- **Mobile-first responsive design** — card-based layouts for mobile (< 900px), collapsible filters, responsive form buttons (stack vertically on mobile), hamburger menu with navigation drawer, shared responsive style tokens via `muiStyles.ts`
-- **1306 tests (1272 unit/integration + 34 E2E), 97.8% line coverage** — Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, rate limiting, auth route handlers, CSP proxy, audit logging, CSV utils, style tokens, dashboard analytics, optimistic UI, demo session isolation, all 48 UI components tested against real PostgreSQL + in-memory MongoDB, plus Playwright E2E covering full user flows
-- **User profile page** — edit display name, set custom profile picture via URL, view role badge, join date, and read-only permissions summary grouped by domain; accessible from TopBar menu on both desktop and mobile
-- **Demo session isolation** — each "Try Demo" click creates a private data sandbox with pre-seeded org data (6 people, 3 teams, 2 departments); sessions auto-expire after 24 hours of inactivity; no cross-session data leakage
-- **Granular RBAC** — 4 roles, 26 permission keys, per-user grant/deny overrides with three-state toggles (deny / role default / grant), and "kick out" user removal with confirmation dialog
-- **Soft deletes** — `deletedAt` column on Person, Team, Department, and TeamMember with partial unique indexes; split into production scope (`WHERE sessionId IS NULL`) and demo scope (`WHERE sessionId IS NOT NULL`) for multi-tenant uniqueness; cascade soft-deletes for team memberships and FK nulling for manager/head references; preserves full audit history
-- **Immutable audit trail** — every mutation logged with before/after JSON snapshots to MongoDB; audit writes are deferred via Next.js `after()` for non-blocking post-response processing; permission denials and rate limit hits also logged as security events; schema-flexible document store is a natural fit for append-heavy, variable-shape audit data
-- **18 languages** — next-intl with cookie persistence, Accept-Language detection, and an AI-powered translation pipeline using parallel Claude Code agents
-- **Gamified demo tour** — 8-step tutorial with DOM-aware navigation hints, spotlight overlays, confetti celebrations, and auto-detection of task completion
-- **Snackbar notifications** — global success/error toasts via React context + MUI Snackbar; consistent feedback across all 17 form actions
-- **Accessibility (WCAG)** — semantic landmarks, skip-to-content link, ARIA labels on dialogs and controls, `role="alert"` on all error messages, keyboard-navigable table rows, `scope="col"` on all table headers, info tooltips with `cursor: "help"` on non-obvious column headers
-- **6 visual themes** — CSS custom properties with FOUC-preventing inline script; instant switching without re-render
-- **Content-Security-Policy** — nonce-based CSP via Next.js 16 proxy with per-request nonce generation; Emotion/MUI style injection, FOUC prevention script, and OAuth avatar domains whitelisted; plus X-Frame-Options, X-Content-Type-Options, Referrer-Policy, and Permissions-Policy on all routes
-- **Rate limiting** — PostgreSQL-based sliding window on all server actions (30 req/min) and auth endpoints (10 req/min); user-based for authenticated users, IP-based for auth and anonymous; no external services required
-- **CSV data import/export** — export persons, teams, departments, and audit logs as CSV; import persons from CSV with drag-and-drop dialog, client-side validation, preview table, and error reporting; permission-gated via `data:import` and `data:export`
-- **Docker-ready** — `docker compose up` for a fully working local environment with PostgreSQL + MongoDB, auto-migration, and demo login
+### 🗄️ Data & persistence
+
+- **Two databases, one app (polyglot persistence)** — PostgreSQL handles structured data (people, teams, permissions) because relational data needs ACID transactions and JOINs. MongoDB handles audit logs because they're append-only, variable-shape, and never updated — a document store is a natural fit. *Using one database for everything works, but choosing the right database for each workload is what production systems do.*
+
+- **Nothing is ever truly deleted (soft deletes)** — Records get a `deletedAt` timestamp instead of being removed. Partial unique indexes (`WHERE deletedAt IS NULL`) enforce uniqueness only on active records, so a deleted "John Smith" doesn't block creating a new one. Deleting a person cascades to their team memberships and nulls manager references. *Why? In HR systems, you need to answer "who was on this team last quarter?" years later. Hard deletes destroy that history.*
+
+- **Every change is recorded forever (immutable audit trail)** — Every mutation logs a before/after JSON snapshot to MongoDB. Writes are deferred via Next.js `after()` — the user gets their response immediately, logging happens in the background. Permission denials and rate limit hits are also logged as security events. *Why? Compliance requires a full history of who changed what, when, and why — and it shouldn't slow down the user to record it.*
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Server as serverActions.ts
+    participant PG as PostgreSQL
+    participant Audit as auditLog.ts
+    participant Mongo as MongoDB
+
+    User->>Server: Create person
+    Server->>Server: captureAuditContext()
+    Server->>PG: $transaction { create }
+    PG-->>Server: ✅ Committed
+    Server-->>User: Response sent immediately
+    Note over Server,Mongo: after() — runs in background
+    Server->>Audit: deferAudit(entries)
+    Audit->>Mongo: insertMany(auditDocs)
+```
+
+### 🔐 Security & access control
+
+- **26 permissions, not just 4 roles (granular RBAC)** — Instead of "admin = can do everything," each action has its own permission key (`person:create`, `team:delete`, `data:export`). Any permission can be overridden per-user: grant a regular user `person:create` without promoting them, or deny `team:delete` from an administrator who shouldn't have it. *Why? Simple role checks seem fine until you need exceptions — and every real organization has them.*
+
+```mermaid
+graph TD
+    subgraph "How permissions are resolved"
+        Check["Check permission<br/><i>e.g. person:create</i>"] --> IsSuperuser{"Is superuser?"}
+        IsSuperuser -->|Yes| AllGranted["✅ All granted<br/><i>Superusers can do everything</i>"]
+        IsSuperuser -->|No| HasOverride{"Per-user override?"}
+        HasOverride -->|"Granted ✓"| Granted["✅ Allowed"]
+        HasOverride -->|"Denied ✗"| Denied["❌ Blocked"]
+        HasOverride -->|No override| RoleDefault{"In role's default list?"}
+        RoleDefault -->|Yes| Granted
+        RoleDefault -->|No| Denied
+    end
+```
+
+- **Rate limiting without Redis** — A sliding-window algorithm built on PostgreSQL (30 req/min for actions, 10 req/min for auth). Uses atomic `INSERT...ON CONFLICT` so two simultaneous requests can't both sneak past the limit. *Why PostgreSQL instead of Redis? One fewer service to deploy, monitor, and pay for. The database you already have is powerful enough.*
+
+- **Security headers on every response (CSP)** — Each request gets a unique random nonce. Only scripts and styles tagged with that nonce can execute — even if an attacker injects HTML, the browser blocks it because the injected code doesn't have the secret nonce. Plus X-Frame-Options, X-Content-Type-Options, Referrer-Policy, and Permissions-Policy. *Why nonces? They're harder to bypass than domain allowlists and protect against inline script injection.*
+
+- **Demo users can't see real data (session isolation)** — Each "Try Demo" creates a private sandbox with a UUID. All database tables have a `sessionId` column — queries filter by it, so demo data and real data never mix. Sessions auto-expire after 24 hours. *This is a multi-tenancy pattern: hard data isolation without separate databases.*
+
+```mermaid
+graph LR
+    subgraph "Demo session isolation"
+        Demo["Try Demo clicked"] --> UUID["Generate session UUID"]
+        UUID --> Seed["Seed sandbox data<br/><i>6 people, 3 teams, 2 depts</i>"]
+        Seed --> Filter["All queries filter by sessionId"]
+        Filter --> R1["Real user data<br/><i>sessionId = NULL</i>"]
+        Filter --> R2["Demo sandbox<br/><i>sessionId = abc-123</i>"]
+        R1 -.- X["🚫 Never mixed"]
+        R2 -.- X
+    end
+```
+
+### ✨ User experience
+
+- **Dashboard analytics** — KPI cards, bar charts, pie charts, line charts, and activity feed via MUI X Charts. Backed by 5 parallel PostgreSQL queries using CTEs and window functions — advanced SQL that computes complex aggregations in the database instead of fetching raw rows and looping in JavaScript. *Why raw SQL instead of the ORM? Prisma can't express CTEs or window functions, and these queries run much faster than the equivalent N+1 ORM approach.*
+
+- **Instant feedback (optimistic updates)** — When you create a person, they appear in the table immediately — before the server responds. React 19's `useOptimistic` shows the new item instantly, then reconciles when the server confirms. *Why? On slow connections, waiting 500ms+ for a table update feels broken. Optimistic UI makes the app feel instant.*
+
+- **Mobile-first responsive design** — Card layouts on mobile, tables on desktop, collapsible filters, stacking form buttons, hamburger navigation. All responsive tokens centralized in `muiStyles.ts`. *Why mobile-first? Building for small screens first ensures mobile never gets a degraded experience — you enhance for desktop, not patch for mobile.*
+
+- **6 visual themes** — Dark, Light, Cyberpunk, Retro Terminal, Bubblegum, and Ocean. CSS variables injected before the page renders (prevents the flash of wrong theme on load). Switching is instant with zero re-renders. *A small feature, but FOUC prevention and zero-rerender switching demonstrate attention to polish.*
+
+- **18 languages** — next-intl with cookie persistence and Accept-Language auto-detection. An AI translation pipeline audits 17 locale files and auto-translates missing keys via Claude API. *Why AI-powered? Manual translation doesn't scale. This pipeline translates 17 locales in ~80 seconds.*
+
+- **Gamified demo tour** — 8-step interactive tutorial with spotlight overlays, confetti, and auto-detection of task completion. Navigation hints are DOM-aware — they find the right element dynamically, so UI refactors don't break the tour.
+
+- **Snackbar notifications** — Global success/error toasts via React context across all 17 form actions. No silent failures, no mystery about what happened.
+
+- **Accessibility (WCAG)** — Semantic landmarks, skip-to-content, ARIA labels, `role="alert"` on errors (screen readers announce immediately), keyboard-navigable tables, and info tooltips with `cursor: "help"`. *Built into every component from the start, not bolted on afterward.*
+
+### 📦 Data operations
+
+- **CSV import/export** — Drag-and-drop CSV upload with client-side validation preview and RFC 4180 parsing (the official CSV standard). Export persons, teams, departments, and audit logs. Custom CSV parser with zero external dependencies. *Why no library? Full control over error handling, smaller bundle, and no third-party code in the data pipeline.*
+
+### 🧪 Quality
+
+- **1306 tests, 97.8% line coverage** — Unit tests, integration tests against real PostgreSQL + in-memory MongoDB (no database mocks), and 34 Playwright E2E tests covering full user flows. *Why real databases in tests? Mocked tests can pass while production breaks. If your test doesn't hit a real database, it's not testing what you think it's testing.*
+
+- **Docker-ready** — `docker compose up` starts PostgreSQL + MongoDB + the app. Migrations run automatically, demo login works out of the box. *One command, zero setup, fully working.*
 
 ---
 
 ## Tech stack
 
-| Layer      | Technology                                              |
-| ---------- | ------------------------------------------------------- |
-| Framework  | Next.js 16 (App Router, Server Components)              |
-| UI         | React 19 + MUI v7 + MUI X Charts                        |
-| Language   | TypeScript 5.9                                          |
-| ORM        | Prisma 7 (driver adapters, raw SQL, `prisma.config.ts`) |
-| Databases  | PostgreSQL (relational) + MongoDB 8 (audit logs)        |
-| Validation | Zod 4                                                   |
-| Auth       | NextAuth v5 (JWT, Google + GitHub OAuth + demo login)   |
-| Testing    | Jest 30 + React Testing Library + Playwright E2E        |
-| CI/CD      | GitHub Actions (lint, test, build)                      |
+| Layer | Technology | Why this choice |
+| --- | --- | --- |
+| Framework | Next.js 16 (App Router) | Server Components for zero-waterfall data fetching |
+| UI | React 19 + MUI v7 + MUI X Charts | `useOptimistic` + `useActionState` eliminate form boilerplate |
+| Language | TypeScript 5.9 | End-to-end type safety from database schema to UI props |
+| ORM | Prisma 7 | Type-safe queries + raw SQL escape hatch for complex analytics |
+| Databases | PostgreSQL + MongoDB 8 | Relational data in SQL, append-only logs in a document store |
+| Validation | Zod 4 | Runtime validation + TypeScript type inference from one schema |
+| Auth | NextAuth v5 (JWT) | Stateless auth that scales without session storage |
+| Testing | Jest 30 + Playwright | Unit/integration against real DBs + E2E against production builds |
+| CI/CD | GitHub Actions | Lint, format, i18n audit, test, build — on every push |
 
 ---
 
@@ -74,77 +144,81 @@ A production-grade HR management system with polyglot persistence (PostgreSQL + 
 
 ```mermaid
 graph LR
-    Browser -->|HTTP| Proxy["proxy.ts (CSP + nonce)"]
-    Proxy -->|Next.js App Router| Next["Next.js"]
-    Next -->|Server Component| SC["Page (async)"]
-    SC -->|read| Q["queries.ts"]
-    SC -->|props| CC["Client Component"]
-    CC -->|action=| SA["serverActions.ts"]
+    Browser -->|HTTP| Proxy["proxy.ts<br/><i>CSP + security headers</i>"]
+    Proxy --> Next["Next.js App Router"]
+    Next -->|Server Component| SC["Page (async)<br/><i>fetches data server-side</i>"]
+    SC -->|read| Q["queries.ts<br/><i>Zod-validated reads</i>"]
+    SC -->|props| CC["Client Component<br/><i>renders UI</i>"]
+    CC -->|"action="| SA["serverActions.ts<br/><i>mutations + validation</i>"]
     SA -->|$transaction| Prisma
-    SA -->|after()| Audit["auditLog.ts"]
-    Audit -->|deferred write| Mongo[(MongoDB)]
+    SA -->|"after()"| Audit["auditLog.ts"]
+    Audit -->|deferred write| Mongo[(MongoDB<br/><i>audit logs</i>)]
     Q -->|audit reads| Mongo
     Q --> Prisma
-    Prisma --> PG[(PostgreSQL)]
+    Prisma --> PG[(PostgreSQL<br/><i>relational data</i>)]
 ```
 
-- **Reads** in `queries.ts` — Zod-validated, no `"use server"`; dashboard metrics use inline `$queryRaw` with CTEs and window functions for PostgreSQL data + native MongoDB driver for audit log reads
-- **Mutations** in `serverActions.ts` — always inside `$transaction`, audit-logged via deferred `after()` writes to MongoDB; deletes are soft (set `deletedAt`) with cascade logic
-- **Types** in `schemas.ts` — Zod schemas with `z.infer` exports, used everywhere
-- **Auth** in `auth.ts` — JWT strategy with permission-enriched tokens; automatic superuser bootstrapping; `permissionsVersion`-based stale permission detection
-- **RBAC** in `permissions.ts` — resolution: superuser (all) → user override → role default
-- **Demo isolation** in `demoSession.ts` — each demo login creates a `DemoSession` with a UUID; all entity tables carry a nullable `sessionId` column; queries and mutations filter by `sessionId` (`null` = real user, UUID = demo sandbox); stale sessions cleaned up after 24h
-- **Profile** in `/profile` — authenticated users can edit their display name, set a custom profile picture URL, and view their effective permissions; changes are audit-logged
-- **Forms** — React 19 `useActionState` with `action=` prop, no `onSubmit`; `useOptimistic` for instant table updates on create; success/error feedback via global snackbar; responsive button layout (stacked on mobile, inline on desktop)
-- **Responsive** — mobile-first via MUI breakpoints (`xs`/`sm`/`md`); dual-render pattern (table + card views) with CSS display toggles; shared tokens in `muiStyles.ts`
-- **Themes** — CSS custom properties injected before hydration; 6 palettes switchable at runtime
-- **Data import/export** in `csvUtils.ts` + `admin/data/` — RFC 4180 CSV parser/generator with no dependencies; bulk person import with validation preview; export for persons, teams, departments, and audit logs; permission-gated admin page
-- **i18n** — 18 locale files synced against `en.json` via custom audit tooling
+**How data flows through the app:**
+
+| What | Where | How it works |
+| --- | --- | --- |
+| Reads | `queries.ts` | Zod-validated, no `"use server"`. Dashboard uses raw SQL with CTEs for complex aggregations |
+| Mutations | `serverActions.ts` | Always inside `$transaction` — even single operations, because consistency beats micro-optimization |
+| Audit logging | `auditLog.ts` → MongoDB | Deferred via `after()` so it never slows down the user's response |
+| Types | `schemas.ts` | Zod schemas → `z.infer` → TypeScript types. One source of truth, used everywhere |
+| Auth | `auth.ts` | JWT with permission-enriched tokens. `permissionsVersion` detects stale permissions without extra DB calls |
+| RBAC | `permissions.ts` | Resolution order: superuser (all) → user override → role default |
+| Demo isolation | `demoSession.ts` | `sessionId` column on all entities — `NULL` = real user, UUID = demo sandbox |
+| Forms | React 19 | `useActionState` with `action=` prop (no `onSubmit`); `useOptimistic` for instant create feedback |
+| Responsive | `muiStyles.ts` | Centralized tokens for breakpoints, spacing, typography — one file, all components |
+| Themes | `themeConfig.ts` | CSS custom properties injected before hydration; 6 palettes switchable at runtime |
+| i18n | `messages/*.json` | 18 locale files synced via AI translation pipeline |
+| CSV | `csvUtils.ts` | RFC 4180 parser/generator with zero dependencies; permission-gated admin page |
 
 ---
 
 ## RBAC
 
-| Role          | Access                                                       |
-| ------------- | ------------------------------------------------------------ |
-| Superuser     | All permissions (immutable)                                  |
-| Administrator | All CRUD + dashboard + audit log (no admin UI or data reset) |
-| User          | Read-only                                                    |
-| Guest         | Read-only (unauthenticated)                                  |
+| Role | Access | Typical use case |
+| --- | --- | --- |
+| Superuser | All 26 permissions (immutable) | System admin — first OAuth user is auto-promoted |
+| Administrator | All CRUD + dashboard + audit log | Day-to-day management (no admin UI or data reset) |
+| User | Read-only | Regular employee viewing org data |
+| Guest | Read-only (unauthenticated) | Public visitors browsing without login |
 
-Individual permissions can be overridden per-user — e.g. granting `person:create` to a user, or denying `team:delete` from an administrator.
+**The key insight:** roles define defaults, but individual permissions can be overridden per-user. Want to give a User `person:create` without making them admin? Grant it. Want to block an Administrator from deleting teams? Deny it. Overrides always win — deny takes precedence over grant.
 
 ---
 
 ## Testing
 
-| Layer            | Tests    |
-| ---------------- | -------- |
-| Zod schemas      | 94       |
-| Prisma queries   | 60       |
-| Server actions   | 186      |
-| Auth callbacks   | 32       |
-| Audit logging    | 11       |
-| Rate limiting    | 18       |
-| Auth route       | 5        |
-| CSP proxy        | 20       |
-| RBAC logic       | 28       |
-| CSV utils        | 39       |
-| Style tokens     | 37       |
-| Demo session     | 12       |
-| Theme config     | 12       |
-| Tutorial config  | 26       |
-| i18n             | 14       |
-| UI components    | 663      |
-| E2E (Playwright) | 34       |
-| **Total**        | **1306** |
+| Layer | Tests | What it covers |
+| --- | --- | --- |
+| UI components | 663 | All 48 components: charts, forms, permission toggles, mobile views, themes |
+| Server actions | 186 | Every mutation: happy path, errors, permission denials, cascades |
+| Zod schemas | 94 | Validation rules, edge cases, type inference |
+| Prisma queries | 60 | Real PostgreSQL + MongoDB queries — not mocks |
+| CSV utils | 39 | RFC 4180 parsing, import validation, export formatting |
+| Style tokens | 37 | Responsive breakpoints, theme tokens, component styles |
+| Auth callbacks | 32 | JWT enrichment, permission freshness, superuser bootstrap |
+| RBAC logic | 28 | Resolution, overrides, deny-wins, superuser bypass |
+| Tutorial config | 26 | Tour steps, DOM selectors, completion detection |
+| CSP proxy | 20 | Nonce generation, header injection, domain allowlists |
+| Rate limiting | 18 | Sliding window, race conditions, cleanup |
+| i18n | 14 | Locale loading, cookie persistence, Accept-Language detection |
+| Demo session | 12 | Sandbox creation, isolation, cleanup, expiry |
+| Theme config | 12 | All 6 themes, CSS variables, FOUC prevention |
+| Audit logging | 11 | Deferred writes, before/after snapshots, security events |
+| Auth route | 5 | Rate limiting on auth endpoints, CSRF, GET passthrough |
+| E2E (Playwright) | 34 | Full user flows: auth, CRUD, admin access, guest limits, themes |
+| **Total** | **1306** | **97.8% line coverage · 95.4% function coverage** |
 
 ```
 Statements : 97.58%    Branches : 92.90%
 Functions  : 95.40%    Lines    : 97.81%
 ```
 
-Server-side tests run against a real PostgreSQL test database + in-memory MongoDB (`mongodb-memory-server`) — including audit logging, rate limiting, server actions, and Prisma queries with full coverage of deferred `after()` writes, permission denials, and error branches. Client-side tests cover all 48 UI components including dashboard charts, optimistic create wrappers, permission toggles, audit log filtering, mobile card views, tutorial system, snackbar notifications, theme switching, language selection, data import/export, and profile editor. Playwright E2E tests run against a production build covering authentication, CRUD for all entities, admin/audit access, guest access control, theme/language persistence, and snackbar lifecycle.
+**Testing philosophy:** Server-side tests run against **real PostgreSQL** and **in-memory MongoDB** — not mocks. If your test doesn't touch the real database, it's not catching the bugs that matter (wrong SQL, missing indexes, constraint violations). Client-side tests cover all 48 UI components. Playwright E2E tests run against a production build.
 
 ---
 
@@ -159,20 +233,18 @@ npm run i18n:fix        # auto-fill missing keys with English fallback, remove e
 npm run i18n:translate  # auto-translate via Claude Haiku API (requires ANTHROPIC_API_KEY)
 ```
 
-**AI translation pipeline** — the i18n sync agent (`scripts/i18n-sync.ts`) audits 17 locale files against `en.json`. Two translation paths: parallel Claude Code subagents during development (6 agents, 17 locales, ~80s) or headless Claude Haiku API for CI.
-
 ---
 
 ## Autonomous agents
 
-| Agent                | Trigger                           | What it does                                                                                                                     |
-| -------------------- | --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| **i18n translation** | Manual (`npm run i18n:translate`) | Audits 17 locale files against `en.json`, translates missing keys via Claude API                                                 |
-| **CI auto-fix**      | CI failure (`workflow_run`)       | Triages failures, gathers sanitized logs, classifies error type, applies targeted fix via Claude Code, opens PR for human review |
+| Agent | Trigger | What it does |
+| --- | --- | --- |
+| **i18n translation** | `npm run i18n:translate` | Audits 17 locale files against `en.json`, translates missing keys via Claude API |
+| **CI auto-fix** | CI failure (`workflow_run`) | Triages failures, gathers sanitized logs, classifies error type, applies targeted fix, opens PR |
 
-The **i18n translation agent** uses the Claude API with restricted tool access for safety. It can be run headless via `npm run i18n:translate` or through parallel Claude Code subagents during development.
+The **i18n translation agent** audits all locale files, identifies missing keys, and auto-translates via Claude API. Two modes: parallel agents during development (17 locales in ~80s) or headless API for CI.
 
-The **CI auto-fix agent** (currently disabled — requires paid API credits) triggers on CI failures and runs a 6-stage pipeline: (1) transient failure detection (skips flaky runs with a passing sibling), (2) concurrent run guard (prevents autofix pile-up), (3) context gathering (15k-char sanitized logs + commit diff + failure classification), (4) infrastructure failure bypass (DEPENDENCY/SCHEMA categories skipped), (5) targeted fix with restricted tool access (`Edit`, `Read`, `Glob`, `Grep`, `Bash(npm run format)`, `Bash(npm run lint)` only), and (6) PR creation for human review — never auto-merges. Log sanitization redacts database URLs, API keys, GitHub tokens, and npm tokens before sending to the API.
+The **CI auto-fix agent** (optional — requires paid API credits) runs a 6-stage pipeline on CI failures: transient detection → concurrent run guard → context gathering (sanitized logs + diff) → infrastructure bypass → targeted fix with restricted tools → PR for human review. Never auto-merges. Log sanitization redacts database URLs, API keys, and tokens before sending to the API.
 
 ---
 
@@ -184,7 +256,7 @@ The **CI auto-fix agent** (currently disabled — requires paid API credits) tri
 docker compose up             # starts PostgreSQL + MongoDB + app at localhost:3000
 ```
 
-That's it. The container runs migrations automatically and the demo login works out of the box — no OAuth setup required. To add Google/GitHub OAuth, create a `.env` file with your credentials (see below).
+That's it. Migrations run automatically, demo login works out of the box — no OAuth setup needed. To add Google/GitHub OAuth, create a `.env` file with your credentials (see below).
 
 ### Manual setup
 
@@ -198,28 +270,28 @@ npx prisma migrate dev        # apply schema migrations
 npm run dev                   # start dev server at localhost:3000
 ```
 
-| Variable             | Description                                 |
-| -------------------- | ------------------------------------------- |
-| `DATABASE_URL`       | PostgreSQL connection string                |
-| `MONGODB_URL`        | MongoDB connection string                   |
-| `AUTH_SECRET`        | NextAuth secret                             |
-| `AUTH_GOOGLE_ID`     | Google OAuth client ID                      |
-| `AUTH_GOOGLE_SECRET` | Google OAuth client secret                  |
-| `AUTH_GITHUB_ID`     | GitHub OAuth client ID                      |
-| `AUTH_GITHUB_SECRET` | GitHub OAuth client secret                  |
-| `ANTHROPIC_API_KEY`  | Claude API key (for i18n translation agent) |
+| Variable | Required | Description |
+| --- | --- | --- |
+| `DATABASE_URL` | Yes | PostgreSQL connection string |
+| `MONGODB_URL` | Yes | MongoDB connection string |
+| `AUTH_SECRET` | Yes | NextAuth secret (`npx auth secret` generates one) |
+| `AUTH_GOOGLE_ID` | No | Google OAuth client ID |
+| `AUTH_GOOGLE_SECRET` | No | Google OAuth client secret |
+| `AUTH_GITHUB_ID` | No | GitHub OAuth client ID |
+| `AUTH_GITHUB_SECRET` | No | GitHub OAuth client secret |
+| `ANTHROPIC_API_KEY` | No | Claude API key (for i18n translation agent) |
 
 ---
 
 ## Deployment
 
-Deployed on **Vercel** with **Vercel Postgres** (Neon) and **MongoDB Atlas** (free tier). Build: `prisma generate && prisma migrate deploy && next build`. The first OAuth user is bootstrapped as superuser. A demo login lets visitors explore without setting up OAuth.
+Deployed on **Vercel** with **Vercel Postgres** (Neon) and **MongoDB Atlas** (free tier). Build: `prisma generate && prisma migrate deploy && next build`. The first OAuth user is auto-promoted to superuser. Demo login available for visitors to explore without OAuth.
 
 ---
 
 ## Roadmap
 
-_Last updated: March 2026_
+*Last updated: March 2026*
 
 - [ ] Preview/staging deployments with branch protection — zero-downtime deploys, no broken commits in production
 - [ ] Additional theme screenshots in docs — showcase all 6 visual themes
