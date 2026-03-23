@@ -6,6 +6,7 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 4 permanent Claude instances: **Claude 1, Claude 2, Claude 3, Claude 4.**
 
 **🚨 MANDATORY RULES — NO EXCEPTIONS:**
+
 1. **Re-read this file BEFORE starting ANY work** — every single session, every single task.
 2. **NEVER start a task without FIRST moving it to "In Progress" with your name tag.** If you skip this, you are causing collisions.
 3. **If you pause or stop mid-task, your entry MUST stay in "In Progress" until the work is committed and pushed.** Do not remove it just because you stopped — other Claudes need to see it.
