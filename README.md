@@ -1,6 +1,6 @@
 # HRManager
 
-A production-grade HR management system with granular RBAC, dashboard analytics, CSV data import/export, audit logging, rate limiting, CSP + security headers, AI-powered i18n across 18 languages, mobile-first responsive design, and 1291 tests (1257 unit/integration + 34 E2E) at 97.6% line coverage.
+A production-grade HR management system with granular RBAC, dashboard analytics, CSV data import/export, audit logging, rate limiting, CSP + security headers, AI-powered i18n across 18 languages, mobile-first responsive design, and 1316 tests (1282 unit/integration + 34 E2E) at 97.8% line coverage.
 
 [![CI](https://github.com/MikkoNumminen/HRManager/actions/workflows/ci.yml/badge.svg)](https://github.com/MikkoNumminen/HRManager/actions/workflows/ci.yml)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)
@@ -32,7 +32,7 @@ A production-grade HR management system with granular RBAC, dashboard analytics,
 - **CSV data import/export** — bulk-import persons via CSV upload with client-side validation preview, drag-and-drop, and RFC 4180 parsing; export persons, teams, departments, and audit logs as CSV; permission-gated (`data:import`, `data:export`); custom CSV parser with no external dependencies
 - **Optimistic updates** — React 19 `useOptimistic` on all create actions; new items appear in the table instantly before the server responds, then seamlessly merge with real data on revalidation
 - **Mobile-first responsive design** — card-based layouts for mobile (< 900px), collapsible filters, responsive form buttons (stack vertically on mobile), hamburger menu with navigation drawer, shared responsive style tokens via `muiStyles.ts`
-- **1291 tests (1257 unit/integration + 34 E2E), 97.6% line coverage** — Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, rate limiting, auth route handlers, CSP proxy, audit logging, CSV utils, style tokens, dashboard analytics, optimistic UI, demo session isolation, all 48 UI components tested against real PostgreSQL, plus Playwright E2E covering full user flows
+- **1316 tests (1282 unit/integration + 34 E2E), 97.8% line coverage** — Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, rate limiting, auth route handlers, CSP proxy, audit logging, CSV utils, style tokens, dashboard analytics, optimistic UI, demo session isolation, all 48 UI components tested against real PostgreSQL, plus Playwright E2E covering full user flows
 - **User profile page** — edit display name, set custom profile picture via URL, view role badge, join date, and read-only permissions summary grouped by domain; accessible from TopBar menu on both desktop and mobile
 - **Demo session isolation** — each "Try Demo" click creates a private data sandbox with pre-seeded org data (6 people, 3 teams, 2 departments); sessions auto-expire after 24 hours of inactivity; no cross-session data leakage
 - **Granular RBAC** — 4 roles, 26 permission keys, per-user grant/deny overrides with three-state toggles (deny / role default / grant), and "kick out" user removal with confirmation dialog
@@ -134,14 +134,14 @@ Individual permissions can be overridden per-user — e.g. granting `person:crea
 | i18n             | 14       |
 | UI components    | 663      |
 | E2E (Playwright) | 34       |
-| **Total**        | **1291** |
+| **Total**        | **1316** |
 
 ```
-Statements : 97.35%    Branches : 92.68%
-Functions  : 94.58%    Lines    : 97.60%
+Statements : 97.58%    Branches : 92.90%
+Functions  : 95.40%    Lines    : 97.81%
 ```
 
-Server-side tests run against a real PostgreSQL test database. Client-side tests cover all 48 UI components including dashboard charts, optimistic create wrappers, permission toggles, audit log filtering, mobile card views, tutorial system, snackbar notifications, theme switching, language selection, data import/export, and profile editor. Playwright E2E tests run against a production build covering authentication, CRUD for all entities, admin/audit access, guest access control, theme/language persistence, and snackbar lifecycle.
+Server-side tests run against a real PostgreSQL test database — including audit logging, rate limiting, server actions, and Prisma queries with full coverage of deferred `after()` writes, permission denials, and error branches. Client-side tests cover all 48 UI components including dashboard charts, optimistic create wrappers, permission toggles, audit log filtering, mobile card views, tutorial system, snackbar notifications, theme switching, language selection, data import/export, and profile editor. Playwright E2E tests run against a production build covering authentication, CRUD for all entities, admin/audit access, guest access control, theme/language persistence, and snackbar lifecycle.
 
 ---
 
@@ -162,11 +162,14 @@ npm run i18n:translate  # auto-translate via Claude Haiku API (requires ANTHROPI
 
 ## Autonomous agents
 
-| Agent                | Trigger                           | What it does                                                                     |
-| -------------------- | --------------------------------- | -------------------------------------------------------------------------------- |
-| **i18n translation** | Manual (`npm run i18n:translate`) | Audits 17 locale files against `en.json`, translates missing keys via Claude API |
+| Agent                | Trigger                           | What it does                                                                                                                     |
+| -------------------- | --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| **i18n translation** | Manual (`npm run i18n:translate`) | Audits 17 locale files against `en.json`, translates missing keys via Claude API                                                 |
+| **CI auto-fix**      | CI failure (`workflow_run`)       | Triages failures, gathers sanitized logs, classifies error type, applies targeted fix via Claude Code, opens PR for human review |
 
-The translation agent uses the Claude API with restricted tool access for safety. It can be run headless via `npm run i18n:translate` or through parallel Claude Code subagents during development.
+The **i18n translation agent** uses the Claude API with restricted tool access for safety. It can be run headless via `npm run i18n:translate` or through parallel Claude Code subagents during development.
+
+The **CI auto-fix agent** (currently disabled — requires paid API credits) triggers on CI failures and runs a 6-stage pipeline: (1) transient failure detection (skips flaky runs with a passing sibling), (2) concurrent run guard (prevents autofix pile-up), (3) context gathering (15k-char sanitized logs + commit diff + failure classification), (4) infrastructure failure bypass (DEPENDENCY/SCHEMA categories skipped), (5) targeted fix with restricted tool access (`Edit`, `Read`, `Glob`, `Grep`, `Bash(npm run format)`, `Bash(npm run lint)` only), and (6) PR creation for human review — never auto-merges. Log sanitization redacts database URLs, API keys, GitHub tokens, and npm tokens before sending to the API.
 
 ---
 

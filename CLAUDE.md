@@ -54,7 +54,7 @@ This is a **portfolio / showcase project**. The goal is to demonstrate technical
 ## Autonomous agents
 
 - **i18n translation agent** (`scripts/i18n-sync.ts`) — audits 17 locale files against `en.json`, translates missing keys via Claude API. Run manually via `npm run i18n:translate` or via parallel Claude Code subagents during development.
-- **CI auto-fix agent** (`.github/workflows/autofix.yml`) — **DISABLED** (`if: false`). Was using paid `anthropics/claude-code-action`. TODO: replace with local CLI-based script.
+- **CI auto-fix agent** (`.github/workflows/autofix.yml`) — **DISABLED** (`if: false && ...`). Triggers on CI failure via `workflow_run`, triages the failure (transient detection, concurrent run guard, infrastructure skip), gathers context (15k-char sanitized logs, commit diff, failure classification into FORMATTING/LINT/TEST/BUILD/SCHEMA/DEPENDENCY), then uses `anthropics/claude-code-action@v1` with restricted tools (`Edit,Read,Glob,Grep,Bash(npm run format),Bash(npm run lint)`) and strict constraints (no workflow edits, no test assertion changes, no schema changes). Creates a PR for human review — never auto-merges. 💰 PAID: requires `ANTHROPIC_API_KEY` secret.
 
 ## File structure
 
@@ -72,7 +72,7 @@ src/
 │   └── profile/                 # User profile (auth-protected)
 ├── components/       # Reusable MUI client components (48 components, incl. DataImportExport + CsvImportDialog)
 ├── i18n/             # next-intl configuration (actions, config, request)
-├── tests/            # Jest tests (1257 tests)
+├── tests/            # Jest tests (1282 tests)
 ├── types/            # TypeScript module augmentations (next-auth.d.ts)
 ├── auditLog.ts       # Deferred audit logging via after() (captureAuditContext, deferAudit, logAudit)
 ├── auth.ts           # NextAuth v5 configuration + RBAC callbacks
