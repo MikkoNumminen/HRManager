@@ -27,8 +27,13 @@ export default function GlobalError({
         Something went wrong
       </Typography>
       <Typography variant="body2" sx={{ color: colors.slate400 }}>
-        {error.message || "An unexpected error occurred"}
+        An unexpected error occurred
       </Typography>
+      {error.digest && (
+        <Typography variant="caption" sx={{ color: colors.slate500 }}>
+          Reference: {error.digest}
+        </Typography>
+      )}
       <Button
         onClick={reset}
         sx={{

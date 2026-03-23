@@ -11,6 +11,7 @@ import {
   MAX_EMAIL_LENGTH,
   MAX_POSITION_LENGTH,
   MAX_DESCRIPTION_LENGTH,
+  EmailSchema,
 } from "@/schemas";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -39,7 +40,7 @@ export async function createPerson(data: FormData) {
   if (email.trim().length > MAX_EMAIL_LENGTH) {
     throw new Error(`Email must be ${MAX_EMAIL_LENGTH} characters or less`);
   }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  if (!EmailSchema.safeParse(email).success) {
     throw new Error("Invalid email format");
   }
 
@@ -228,7 +229,7 @@ export async function updateEmail(data: FormData) {
   if (newEmail.length > MAX_EMAIL_LENGTH) {
     throw new Error(`Email must be ${MAX_EMAIL_LENGTH} characters or less`);
   }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) {
+  if (!EmailSchema.safeParse(newEmail).success) {
     throw new Error("Invalid email format");
   }
 

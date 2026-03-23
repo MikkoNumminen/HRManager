@@ -5,11 +5,13 @@ export const MAX_EMAIL_LENGTH = 320;
 export const MAX_POSITION_LENGTH = 255;
 export const MAX_DESCRIPTION_LENGTH = 1000;
 
+export const EmailSchema = z.string().email().max(MAX_EMAIL_LENGTH);
+
 export const PersonSchema = z.object({
   id: z.string().uuid(),
   name: z.string().min(1).max(MAX_NAME_LENGTH),
   position: z.string().max(MAX_POSITION_LENGTH).nullable(),
-  email: z.string().max(MAX_EMAIL_LENGTH).nullable(),
+  email: z.string().email().max(MAX_EMAIL_LENGTH).nullable(),
   createdAt: z.date(),
   updatedAt: z.date(),
 });

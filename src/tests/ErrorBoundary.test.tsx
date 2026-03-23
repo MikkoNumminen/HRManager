@@ -2,16 +2,17 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import GlobalError from "../app/error";
 
 describe("GlobalError", () => {
-  // Renders the fallback UI with the error message.
-  test("renders error message", () => {
-    const error = new Error("Something broke");
+  // Shows generic message instead of raw error details (prevents info disclosure).
+  test("shows generic message, not raw error.message", () => {
+    const error = new Error("DB connection failed: password invalid");
     render(<GlobalError error={error} reset={() => {}} />);
     expect(screen.getByText("Something went wrong")).toBeInTheDocument();
-    expect(screen.getByText("Something broke")).toBeInTheDocument();
+    expect(screen.getByText("An unexpected error occurred")).toBeInTheDocument();
+    expect(screen.queryByText("DB connection failed")).not.toBeInTheDocument();
   });
 
-  // Shows a default message when the error has no message.
-  test("renders default message when error.message is empty", () => {
+  // Shows the generic message for empty error messages too.
+  test("renders generic message when error.message is empty", () => {
     const error = new Error("");
     render(<GlobalError error={error} reset={() => {}} />);
     expect(screen.getByText("An unexpected error occurred")).toBeInTheDocument();
@@ -33,11 +34,18 @@ describe("GlobalError", () => {
     expect(reset).toHaveBeenCalledTimes(1);
   });
 
-  // Handles errors with a digest property (Next.js production errors).
-  test("handles error with digest property", () => {
-    const error = Object.assign(new Error("DB connection failed"), { digest: "abc123" });
+  // Shows the digest reference code when present (for support purposes).
+  test("shows digest reference when present", () => {
+    const error = Object.assign(new Error("internal error"), { digest: "abc123" });
     render(<GlobalError error={error} reset={() => {}} />);
-    expect(screen.getByText("Something went wrong")).toBeInTheDocument();
-    expect(screen.getByText("DB connection failed")).toBeInTheDocument();
+    expect(screen.getByText("Reference: abc123")).toBeInTheDocument();
+    expect(screen.queryByText("internal error")).not.toBeInTheDocument();
+  });
+
+  // Does not show digest section when digest is not present.
+  test("hides digest reference when not present", () => {
+    const error = new Error("something");
+    render(<GlobalError error={error} reset={() => {}} />);
+    expect(screen.queryByText(/Reference:/)).not.toBeInTheDocument();
   });
 });

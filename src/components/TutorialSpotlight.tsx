@@ -19,6 +19,12 @@ const GLOW_STYLE = `
   border-radius: 4px;
   animation: tutorial-pulse 2s ease-in-out infinite;
 }
+@media (prefers-reduced-motion: reduce) {
+  .tutorial-spotlight-target {
+    animation: none;
+    box-shadow: 0 0 0 4px rgba(74, 222, 128, 0.3);
+  }
+}
 `;
 
 export default function TutorialSpotlight() {
