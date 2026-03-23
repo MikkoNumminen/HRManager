@@ -55,7 +55,7 @@ A production-grade HR management system with granular RBAC, dashboard analytics,
 | Framework  | Next.js 16 (App Router, Server Components)                     |
 | UI         | React 19 + MUI v7 + MUI X Charts                               |
 | Language   | TypeScript 5.9                                                 |
-| ORM        | Prisma 7 (driver adapters, `prisma.config.ts`)                      |
+| ORM        | Prisma 7 (driver adapters, `prisma.config.ts`)                 |
 | Database   | PostgreSQL (Vercel Postgres / Neon in production)              |
 | Validation | Zod 4                                                          |
 | Auth       | NextAuth v5 (JWT, Google + GitHub OAuth + demo login)          |
