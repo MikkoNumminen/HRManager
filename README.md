@@ -18,11 +18,11 @@ A full-stack HR management system built to production standards — not as a toy
 ### **[Try the live demo](https://hr-manager-pearl.vercel.app)** — click "Try Demo" to sign in instantly with your own isolated data sandbox, no account required.
 
 <p align="center">
-  <img src="docs/screenshots/overview.png" alt="Dashboard overview" width="100%">
+  <img src="docs/screenshots/overview.png" alt="Dashboard overview — dark theme" width="100%">
 </p>
 <p align="center">
-  <img src="docs/screenshots/permissions.png" alt="Permission editor" width="49%">
-  <img src="docs/screenshots/audit-log.png" alt="Audit log" width="49%">
+  <img src="docs/screenshots/permissions.png" alt="Permission editor — cyberpunk theme" width="49%">
+  <img src="docs/screenshots/audit-log.png" alt="Audit log — ocean theme" width="49%">
 </p>
 
 ---
