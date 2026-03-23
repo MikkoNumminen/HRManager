@@ -277,3 +277,21 @@ export async function getProfile(): Promise<UserProfile | null> {
     resolvedPermissions,
   });
 }
+
+export interface DataExportCounts {
+  persons: number;
+  teams: number;
+  departments: number;
+  auditLogs: number;
+}
+
+export async function getDataExportCounts(): Promise<DataExportCounts> {
+  const sessionId = await getDemoSessionId();
+  const [persons, teams, departments, auditLogs] = await Promise.all([
+    prisma.person.count({ where: { deletedAt: null, sessionId } }),
+    prisma.team.count({ where: { deletedAt: null, sessionId } }),
+    prisma.department.count({ where: { deletedAt: null, sessionId } }),
+    prisma.auditLog.count({ where: { sessionId } }),
+  ]);
+  return { persons, teams, departments, auditLogs };
+}

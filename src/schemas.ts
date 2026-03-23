@@ -95,6 +95,8 @@ export const AuditActionSchema = z.enum([
   "reset",
   "permission_denied",
   "rate_limited",
+  "import",
+  "export",
 ]);
 
 export const AuditEntityTypeSchema = z.enum([
@@ -174,3 +176,14 @@ export type DashboardTeamSize = z.infer<typeof DashboardTeamSizeSchema>;
 export type DashboardDepartmentSize = z.infer<typeof DashboardDepartmentSizeSchema>;
 export type DashboardGrowthPoint = z.infer<typeof DashboardGrowthPointSchema>;
 export type DashboardRecentActivity = z.infer<typeof DashboardRecentActivitySchema>;
+
+export const CsvPersonImportRowSchema = z.object({
+  name: z.string().min(1, "Name is required").max(MAX_NAME_LENGTH),
+  email: z.string().email("Invalid email format").max(MAX_EMAIL_LENGTH),
+  position: z.string().max(MAX_POSITION_LENGTH).optional(),
+});
+
+export type CsvPersonImportRow = z.infer<typeof CsvPersonImportRowSchema>;
+
+export const MAX_IMPORT_ROWS = 1000;
+export const MAX_IMPORT_FILE_SIZE = 1024 * 1024; // 1 MB

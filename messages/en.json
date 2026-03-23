@@ -40,7 +40,8 @@
     "theme": "Theme",
     "dashboard": "Dashboard",
     "profile": "Profile",
-    "menu": "Menu"
+    "menu": "Menu",
+    "dataImportExport": "Data Import / Export"
   },
   "home": {
     "title": "Human Resources Management System",
@@ -193,6 +194,8 @@
     "actionReset": "Reset",
     "actionPermissionDenied": "Permission Denied",
     "actionRateLimited": "Rate Limited",
+    "actionImport": "Import",
+    "actionExport": "Export",
     "typePerson": "Person",
     "typeTeam": "Team",
     "typeTeamMember": "Team Member",
@@ -272,7 +275,9 @@
     "permManageUsers": "manage users",
     "permChangePermissions": "change user permissions",
     "permViewAuditLog": "view the audit log",
-    "permViewDashboard": "view the dashboard"
+    "permViewDashboard": "view the dashboard",
+    "permImportData": "import data from CSV",
+    "permExportData": "export data to CSV"
   },
   "profile": {
     "title": "Profile",
@@ -319,7 +324,46 @@
     "dataReset": "All data reset successfully",
     "userKickedOut": "{name} has been kicked out",
     "profileNameUpdated": "Display name updated successfully",
-    "profileImageUpdated": "Profile picture updated successfully"
+    "profileImageUpdated": "Profile picture updated successfully",
+    "dataImported": "{count, plural, one {# person imported successfully} other {# persons imported successfully}}"
+  },
+  "dataIO": {
+    "title": "Data Import / Export",
+    "exportTitle": "Export Data",
+    "exportDescription": "Download your data as CSV files for backup or analysis.",
+    "importTitle": "Import Data",
+    "importDescription": "Upload a CSV file to bulk-add new persons to the system.",
+    "persons": "Persons",
+    "teams": "Teams",
+    "departments": "Departments",
+    "auditLogs": "Audit Logs",
+    "recordCount": "{count, plural, one {# record} other {# records}}",
+    "downloadCsv": "Download as CSV",
+    "export": "Export",
+    "importPersons": "Import Persons",
+    "importPersonsHelp": "Upload a CSV with columns: name, email, position (optional). Duplicate emails will be skipped.",
+    "downloadTemplate": "Download Template",
+    "uploadCsv": "Upload CSV",
+    "importDialogTitle": "Import Persons from CSV",
+    "dropZoneText": "Drop a CSV file here or click to browse",
+    "dropZoneSubtext": "Maximum 1,000 rows, 1 MB file size",
+    "errorNotCsv": "Please upload a .csv file",
+    "errorTooLarge": "File exceeds 1 MB limit",
+    "errorEmptyFile": "CSV file is empty or contains only headers",
+    "errorTooManyRows": "Maximum {max} rows per import",
+    "previewFile": "Preview: {name}",
+    "validRows": "{count, plural, one {# valid row} other {# valid rows}}",
+    "errorRows": "{count, plural, one {# error} other {# errors}}",
+    "rowError": "Row {row}, {field}: {message}",
+    "moreErrors": "... and {count} more errors",
+    "cancel": "Cancel",
+    "close": "Close",
+    "importing": "Importing...",
+    "importCount": "Import {count, plural, one {# person} other {# persons}}",
+    "importSuccess": "Import completed!",
+    "importedCount": "{count} imported",
+    "skippedCount": "{count} skipped (duplicates)",
+    "errorCount": "{count, plural, one {# error} other {# errors}}"
   },
   "tutorial": {
     "checklistTitle": "Demo Tour",

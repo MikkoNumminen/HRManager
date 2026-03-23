@@ -70,6 +70,7 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
 
   const canSeed = permissions?.["data:seed"];
   const canReset = permissions?.["data:reset"];
+  const canDataIO = permissions?.["data:import"] || permissions?.["data:export"];
 
   const handleSeed = (clearExisting: boolean) => {
     setSeedDialogOpen(false);
@@ -224,6 +225,16 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
                       data-tutorial="nav-audit-log"
                     >
                       {t("auditLog")}
+                    </MenuItem>
+                  )}
+                  {canDataIO && (
+                    <MenuItem
+                      component={Link}
+                      href="/admin/data"
+                      onClick={() => setAnchorEl(null)}
+                      sx={userMenuItemStyles}
+                    >
+                      {t("dataImportExport")}
                     </MenuItem>
                   )}
                   {canSeed && (
@@ -404,6 +415,21 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
                   data-tutorial="nav-audit-log-mobile"
                 >
                   <ListItemText primary={t("auditLog")} />
+                </ListItemButton>
+              </ListItem>
+            )}
+            {canDataIO && (
+              <ListItem disablePadding>
+                <ListItemButton
+                  component={Link}
+                  href="/admin/data"
+                  onClick={() => setDrawerOpen(false)}
+                  sx={{
+                    color: colors.slate100,
+                    "&:hover": { backgroundColor: colors.hoverOverlay },
+                  }}
+                >
+                  <ListItemText primary={t("dataImportExport")} />
                 </ListItemButton>
               </ListItem>
             )}

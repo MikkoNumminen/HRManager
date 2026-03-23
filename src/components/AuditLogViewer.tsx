@@ -35,6 +35,8 @@ const actionColors: Record<string, string> = {
   reset: colors.warning,
   permission_denied: colors.error,
   rate_limited: colors.error,
+  import: colors.info,
+  export: colors.slate300,
 };
 
 const selectStyles = {
@@ -100,6 +102,8 @@ export default function AuditLogViewer({
       reset: t("actionReset"),
       permission_denied: t("actionPermissionDenied"),
       rate_limited: t("actionRateLimited"),
+      import: t("actionImport"),
+      export: t("actionExport"),
     }),
     [t],
   );
@@ -129,6 +133,9 @@ export default function AuditLogViewer({
       "admin:manage_users": t("permManageUsers"),
       "admin:assign_permissions": t("permChangePermissions"),
       "admin:view_audit_log": t("permViewAuditLog"),
+      "dashboard:view": t("permViewDashboard"),
+      "data:import": t("permImportData"),
+      "data:export": t("permExportData"),
     }),
     [t],
   );
