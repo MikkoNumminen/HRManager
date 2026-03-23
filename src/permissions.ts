@@ -125,7 +125,9 @@ export async function resolvePermissions(
   role: string,
   overrides: { key: string; granted: boolean }[],
 ): Promise<Record<string, boolean>> {
-  const defaults = ROLE_DEFAULTS[role] ?? ROLE_DEFAULTS.guest;
+  // Unknown/corrupted roles get zero permissions (deny-all) rather than
+  // falling back to guest which grants read access.
+  const defaults = ROLE_DEFAULTS[role] ?? [];
   const result: Record<string, boolean> = {};
 
   for (const key of PERMISSION_KEYS) {

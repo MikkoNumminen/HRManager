@@ -113,12 +113,16 @@ describe("Permission Resolution", () => {
     expect("fake:nonexistent" in result).toBe(false);
   });
 
-  // Unknown roles fall back to guest permissions
-  test("unknown role falls back to guest defaults", async () => {
+  // Unknown/corrupted roles get deny-all (zero permissions)
+  test("unknown role gets deny-all (no permissions)", async () => {
     const result = await resolvePermissions("nonexistent", []);
 
-    expect(result["person:read"]).toBe(true);
+    expect(result["person:read"]).toBe(false);
     expect(result["person:create"]).toBe(false);
+    // Every key should be false
+    for (const key of PERMISSION_KEYS) {
+      expect(result[key]).toBe(false);
+    }
   });
 
   // All permission keys are present in the result

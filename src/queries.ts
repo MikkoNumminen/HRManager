@@ -230,7 +230,7 @@ export async function getDashboardMetrics(): Promise<DashboardMetrics> {
           (SELECT COUNT(*)::int FROM "Person" WHERE "deletedAt" IS NULL AND "sessionId" IS NOT DISTINCT FROM ${sessionId}) AS "totalPersons",
           (SELECT COUNT(*)::int FROM "Team" WHERE "deletedAt" IS NULL AND "sessionId" IS NOT DISTINCT FROM ${sessionId}) AS "totalTeams",
           (SELECT COUNT(*)::int FROM "Department" WHERE "deletedAt" IS NULL AND "sessionId" IS NOT DISTINCT FROM ${sessionId}) AS "totalDepartments",
-          (SELECT COUNT(*)::int FROM "User") AS "totalUsers"
+          (SELECT COUNT(*)::int FROM "User" WHERE (${sessionId}::text IS NULL OR email = 'demo@hrmanager.app')) AS "totalUsers"
       `,
       prisma.$queryRaw<TeamSizeRow[]>`
         SELECT

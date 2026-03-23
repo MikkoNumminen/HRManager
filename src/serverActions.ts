@@ -167,8 +167,8 @@ export async function updatePersonName(data: FormData) {
     if (!personBefore) {
       throw new Error("Person not found");
     }
-    await tx.person.update({
-      where: { id: personID },
+    await tx.person.updateMany({
+      where: { id: personID, sessionId },
       data: { name: newName },
     });
     auditEntries.push({
@@ -212,8 +212,8 @@ export async function updatePosition(data: FormData) {
     if (!personBefore) {
       throw new Error("Person not found");
     }
-    await tx.person.update({
-      where: { id: personID },
+    await tx.person.updateMany({
+      where: { id: personID, sessionId },
       data: { position: newPosition },
     });
     auditEntries.push({
@@ -267,8 +267,8 @@ export async function updateEmail(data: FormData) {
     if (!personBefore) {
       throw new Error("Person not found");
     }
-    await tx.person.update({
-      where: { id: personID },
+    await tx.person.updateMany({
+      where: { id: personID, sessionId },
       data: { email: newEmail },
     });
     auditEntries.push({
@@ -313,8 +313,8 @@ export async function addManager(data: FormData) {
       if (!teamBefore) {
         throw new Error("Team not found");
       }
-      await tx.team.update({
-        where: { teamId: teamID },
+      await tx.team.updateMany({
+        where: { teamId: teamID, sessionId },
         data: { teamManagerId: personID },
       });
       auditEntries.push({
@@ -483,8 +483,8 @@ export async function updateTeamName(data: FormData) {
     if (!teamBefore) {
       throw new Error("Team not found");
     }
-    await tx.team.update({
-      where: { teamId: teamID },
+    await tx.team.updateMany({
+      where: { teamId: teamID, sessionId },
       data: { teamName: newName },
     });
     auditEntries.push({
@@ -591,10 +591,10 @@ export async function removeMember(data: FormData) {
       before: { personId: personID, teamId: teamID },
     });
 
-    const team = await tx.team.findUnique({ where: { teamId: teamID } });
+    const team = await tx.team.findFirst({ where: { teamId: teamID, sessionId } });
     if (team?.teamManagerId === personID) {
-      await tx.team.update({
-        where: { teamId: teamID },
+      await tx.team.updateMany({
+        where: { teamId: teamID, sessionId },
         data: { teamManagerId: null },
       });
       auditEntries.push({
@@ -731,8 +731,8 @@ export async function updateDepartment(data: FormData) {
     if (!deptBefore) {
       throw new Error("Department not found");
     }
-    await tx.department.update({
-      where: { id: departmentID },
+    await tx.department.updateMany({
+      where: { id: departmentID, sessionId },
       data: { name, description },
     });
     auditEntries.push({
@@ -775,8 +775,8 @@ export async function updateDepartmentHead(data: FormData) {
     if (!deptBefore) {
       throw new Error("Department not found");
     }
-    await tx.department.update({
-      where: { id: departmentID },
+    await tx.department.updateMany({
+      where: { id: departmentID, sessionId },
       data: { headId: personID },
     });
     auditEntries.push({
@@ -817,8 +817,8 @@ export async function assignTeamToDepartment(data: FormData) {
     if (!teamBefore) {
       throw new Error("Team not found");
     }
-    await tx.team.update({
-      where: { teamId: teamID },
+    await tx.team.updateMany({
+      where: { teamId: teamID, sessionId },
       data: { departmentId: departmentID },
     });
     auditEntries.push({
@@ -853,8 +853,8 @@ export async function removeTeamFromDepartment(data: FormData) {
     if (!teamBefore) {
       throw new Error("Team not found");
     }
-    await tx.team.update({
-      where: { teamId: teamID },
+    await tx.team.updateMany({
+      where: { teamId: teamID, sessionId },
       data: { departmentId: null },
     });
     auditEntries.push({
@@ -1502,9 +1502,11 @@ export async function exportAuditLogsCsv(): Promise<string> {
   await rateLimit("exportAuditLogsCsv");
 
   const sessionId = await getDemoSessionId();
+  const MAX_EXPORT_ROWS = 10000;
   const logs = await prisma.auditLog.findMany({
     where: { sessionId },
     orderBy: { createdAt: "desc" },
+    take: MAX_EXPORT_ROWS,
   });
 
   return generateCSV(

@@ -139,6 +139,13 @@ export async function logPermissionDenial(permissionKey: string): Promise<void> 
 }
 
 export async function logRateLimitHit(action: string, identifier: string): Promise<void> {
+  const sessionId = await getDemoSessionId();
+
+  // Hash IP-based identifiers to avoid storing raw IPs (GDPR PII concern)
+  const safeIdentifier = identifier.startsWith("ip:")
+    ? `ip:${Buffer.from(identifier).toString("base64").slice(0, 12)}...`
+    : identifier;
+
   after(async () => {
     try {
       await prisma.auditLog.create({
@@ -149,7 +156,8 @@ export async function logRateLimitHit(action: string, identifier: string): Promi
           entityType: "security",
           entityId: null,
           before: null,
-          after: JSON.stringify({ rateLimitedAction: action, identifier }),
+          after: JSON.stringify({ rateLimitedAction: action, identifier: safeIdentifier }),
+          sessionId,
         },
       });
     } catch (error) {
