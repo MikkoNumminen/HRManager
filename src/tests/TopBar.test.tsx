@@ -129,42 +129,53 @@ describe("TopBar", () => {
     expect(screen.getByText("AS")).toBeInTheDocument();
   });
 
-  // Shows the "User Management" menu item when user has admin:manage_users permission
-  test("shows User Management link when user has admin permission", () => {
-    mockUseSession.mockReturnValue({
-      data: {
-        user: {
-          name: "Alice Smith",
-          email: "alice@example.com",
-          image: null,
-          permissions: { "admin:manage_users": true },
+  // Shows a permission-gated menu item when the user has the required session permission
+  test.each([
+    ["User Management", { "admin:manage_users": true }, "/admin"],
+    ["Audit Log", { "admin:view_audit_log": true }, "/admin/audit"],
+    ["Dashboard", { "dashboard:view": true }, "/dashboard"],
+  ])(
+    "shows %s link when user has the required permission",
+    (linkText, permissions, expectedHref) => {
+      mockUseSession.mockReturnValue({
+        data: {
+          user: {
+            name: "Alice",
+            email: "a@b.com",
+            image: null,
+            permissions,
+          },
         },
-      },
-      status: "authenticated",
-    });
-    render(<TopBar title="Home" />);
-    fireEvent.click(screen.getByLabelText("User menu"));
-    expect(screen.getByText("User Management")).toBeInTheDocument();
-    const link = screen.getByText("User Management").closest("a");
-    expect(link).toHaveAttribute("href", "/admin");
-  });
+        status: "authenticated",
+      });
+      render(<TopBar title="Home" />);
+      fireEvent.click(screen.getByLabelText("User menu"));
+      expect(screen.getByText(linkText)).toBeInTheDocument();
+      const link = screen.getByText(linkText).closest("a");
+      expect(link).toHaveAttribute("href", expectedHref);
+    },
+  );
 
-  // Hides the "User Management" menu item when user lacks admin permission
-  test("hides User Management link when user lacks admin permission", () => {
+  // Hides a permission-gated menu item when the user lacks the required session permission
+  test.each([
+    ["User Management", { "admin:manage_users": false }],
+    ["Audit Log", { "admin:view_audit_log": false }],
+    ["Dashboard", { "dashboard:view": false }],
+  ])("hides %s link when user lacks the required permission", (linkText, permissions) => {
     mockUseSession.mockReturnValue({
       data: {
         user: {
-          name: "Alice Smith",
-          email: "alice@example.com",
+          name: "Alice",
+          email: "a@b.com",
           image: null,
-          permissions: { "admin:manage_users": false },
+          permissions,
         },
       },
       status: "authenticated",
     });
     render(<TopBar title="Home" />);
     fireEvent.click(screen.getByLabelText("User menu"));
-    expect(screen.queryByText("User Management")).not.toBeInTheDocument();
+    expect(screen.queryByText(linkText)).not.toBeInTheDocument();
   });
 
   // Hides the "User Management" menu item when permissions object is missing entirely
@@ -245,82 +256,6 @@ describe("TopBar", () => {
         "Are you sure you want to delete all persons and teams? This action cannot be undone.",
       ),
     ).toBeInTheDocument();
-  });
-
-  // Shows "Audit Log" menu item when user has admin:view_audit_log permission
-  test("shows Audit Log link when user has audit log permission", () => {
-    mockUseSession.mockReturnValue({
-      data: {
-        user: {
-          name: "Alice",
-          email: "a@b.com",
-          image: null,
-          permissions: { "admin:view_audit_log": true },
-        },
-      },
-      status: "authenticated",
-    });
-    render(<TopBar title="Home" />);
-    fireEvent.click(screen.getByLabelText("User menu"));
-    expect(screen.getByText("Audit Log")).toBeInTheDocument();
-    const link = screen.getByText("Audit Log").closest("a");
-    expect(link).toHaveAttribute("href", "/admin/audit");
-  });
-
-  // Shows "Dashboard" menu item when user has dashboard:view permission.
-  test("shows Dashboard link when user has dashboard permission", () => {
-    mockUseSession.mockReturnValue({
-      data: {
-        user: {
-          name: "Alice",
-          email: "a@b.com",
-          image: null,
-          permissions: { "dashboard:view": true },
-        },
-      },
-      status: "authenticated",
-    });
-    render(<TopBar title="Home" />);
-    fireEvent.click(screen.getByLabelText("User menu"));
-    expect(screen.getByText("Dashboard")).toBeInTheDocument();
-    const link = screen.getByText("Dashboard").closest("a");
-    expect(link).toHaveAttribute("href", "/dashboard");
-  });
-
-  // Hides "Dashboard" menu item when user lacks dashboard:view permission.
-  test("hides Dashboard link when user lacks permission", () => {
-    mockUseSession.mockReturnValue({
-      data: {
-        user: {
-          name: "Alice",
-          email: "a@b.com",
-          image: null,
-          permissions: { "dashboard:view": false },
-        },
-      },
-      status: "authenticated",
-    });
-    render(<TopBar title="Home" />);
-    fireEvent.click(screen.getByLabelText("User menu"));
-    expect(screen.queryByText("Dashboard")).not.toBeInTheDocument();
-  });
-
-  // Hides "Audit Log" menu item when user lacks the permission
-  test("hides Audit Log link when user lacks permission", () => {
-    mockUseSession.mockReturnValue({
-      data: {
-        user: {
-          name: "Alice",
-          email: "a@b.com",
-          image: null,
-          permissions: { "admin:view_audit_log": false },
-        },
-      },
-      status: "authenticated",
-    });
-    render(<TopBar title="Home" />);
-    fireEvent.click(screen.getByLabelText("User menu"));
-    expect(screen.queryByText("Audit Log")).not.toBeInTheDocument();
   });
 
   // Clicking "Keep Existing" in the seed dialog calls seedMockData(false)

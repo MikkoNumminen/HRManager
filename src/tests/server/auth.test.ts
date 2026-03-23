@@ -477,3 +477,23 @@ describe("auth.ts callbacks", () => {
     });
   });
 });
+
+describe("demo login gating", () => {
+  // Verifies the demo Credentials provider is included when NEXT_PUBLIC_DEMO_LOGIN is "true".
+  test("includes demo credentials provider when NEXT_PUBLIC_DEMO_LOGIN is true", () => {
+    const config = (globalThis as Record<string, unknown>).__authConfig as Record<string, unknown>;
+    const providers = config.providers as unknown[];
+    // With NEXT_PUBLIC_DEMO_LOGIN=true, we should have 3 providers: Google, GitHub, Credentials
+    expect(providers).toHaveLength(3);
+    // The third provider should be the credentials provider with id "demo"
+    expect((providers[2] as Record<string, unknown>).id).toBe("demo");
+  });
+
+  // Verifies the demo provider has the expected authorize function.
+  test("demo credentials provider has authorize function", () => {
+    const config = (globalThis as Record<string, unknown>).__authConfig as Record<string, unknown>;
+    const providers = config.providers as unknown[];
+    const demoProvider = providers[2] as Record<string, unknown>;
+    expect(typeof demoProvider.authorize).toBe("function");
+  });
+});

@@ -1382,6 +1382,164 @@ describe("initializePermissions", () => {
   });
 });
 
+describe("addManager", () => {
+  beforeEach(() => cleanDb());
+  afterAll(async () => {
+    await cleanDb();
+  });
+
+  // Sets a person as manager of a single team.
+  test("sets person as manager of a team", async () => {
+    const person = await testPrisma.person.create({
+      data: { name: "Alice", email: "alice@test.com" },
+    });
+    const team = await testPrisma.team.create({
+      data: { teamName: "Engineering" },
+    });
+
+    await addManager(formData({ personID: person.id, teamID: team.teamId }));
+
+    const updated = await testPrisma.team.findUnique({ where: { teamId: team.teamId } });
+    expect(updated!.teamManagerId).toBe(person.id);
+  });
+
+  // Automatically adds manager as team member if not already a member.
+  test("adds manager as team member if not already a member", async () => {
+    const person = await testPrisma.person.create({
+      data: { name: "Alice", email: "alice@test.com" },
+    });
+    const team = await testPrisma.team.create({
+      data: { teamName: "Engineering" },
+    });
+
+    await addManager(formData({ personID: person.id, teamID: team.teamId }));
+
+    const membership = await testPrisma.teamMember.findFirst({
+      where: { personId: person.id, teamId: team.teamId },
+    });
+    expect(membership).not.toBeNull();
+  });
+
+  // Sets a person as manager of MULTIPLE teams in one call (M8 fix verification).
+  test("sets person as manager of multiple teams simultaneously", async () => {
+    const person = await testPrisma.person.create({
+      data: { name: "Alice", email: "alice@test.com" },
+    });
+    const team1 = await testPrisma.team.create({ data: { teamName: "Team A" } });
+    const team2 = await testPrisma.team.create({ data: { teamName: "Team B" } });
+    const team3 = await testPrisma.team.create({ data: { teamName: "Team C" } });
+
+    await addManager(
+      formData({ personID: person.id, teamID: [team1.teamId, team2.teamId, team3.teamId] }),
+    );
+
+    const t1 = await testPrisma.team.findUnique({ where: { teamId: team1.teamId } });
+    const t2 = await testPrisma.team.findUnique({ where: { teamId: team2.teamId } });
+    const t3 = await testPrisma.team.findUnique({ where: { teamId: team3.teamId } });
+    expect(t1!.teamManagerId).toBe(person.id);
+    expect(t2!.teamManagerId).toBe(person.id);
+    expect(t3!.teamManagerId).toBe(person.id);
+
+    // Should also be added as member to all three teams
+    const memberships = await testPrisma.teamMember.findMany({
+      where: { personId: person.id },
+    });
+    expect(memberships).toHaveLength(3);
+  });
+
+  // Does not duplicate team membership if person is already a member.
+  test("does not duplicate membership if person is already a member", async () => {
+    const person = await testPrisma.person.create({
+      data: { name: "Alice", email: "alice@test.com" },
+    });
+    const team = await testPrisma.team.create({
+      data: { teamName: "Engineering" },
+    });
+    await testPrisma.teamMember.create({
+      data: { personId: person.id, teamId: team.teamId },
+    });
+
+    await addManager(formData({ personID: person.id, teamID: team.teamId }));
+
+    const memberships = await testPrisma.teamMember.findMany({
+      where: { personId: person.id, teamId: team.teamId },
+    });
+    expect(memberships).toHaveLength(1);
+  });
+
+  // Restores soft-deleted team membership when setting as manager.
+  test("restores soft-deleted membership when setting as manager", async () => {
+    const person = await testPrisma.person.create({
+      data: { name: "Alice", email: "alice@test.com" },
+    });
+    const team = await testPrisma.team.create({
+      data: { teamName: "Engineering" },
+    });
+    await testPrisma.teamMember.create({
+      data: { personId: person.id, teamId: team.teamId, deletedAt: new Date() },
+    });
+
+    await addManager(formData({ personID: person.id, teamID: team.teamId }));
+
+    const membership = await testPrisma.teamMember.findFirst({
+      where: { personId: person.id, teamId: team.teamId },
+    });
+    expect(membership!.deletedAt).toBeNull();
+  });
+
+  // Throws when no teamID is provided.
+  test("throws when no teamID provided", async () => {
+    const person = await testPrisma.person.create({
+      data: { name: "Alice", email: "alice@test.com" },
+    });
+    await expect(addManager(formData({ personID: person.id }))).rejects.toThrow(
+      "No teamID selected",
+    );
+  });
+
+  // Throws when no personID is provided.
+  test("throws when no personID provided", async () => {
+    const team = await testPrisma.team.create({ data: { teamName: "Eng" } });
+    await expect(addManager(formData({ teamID: team.teamId }))).rejects.toThrow(
+      "No personID provided",
+    );
+  });
+
+  // Throws when person does not exist.
+  test("throws when person does not exist", async () => {
+    const team = await testPrisma.team.create({ data: { teamName: "Eng" } });
+    await expect(
+      addManager(
+        formData({ personID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", teamID: team.teamId }),
+      ),
+    ).rejects.toThrow("Person not found");
+  });
+
+  // Throws when team does not exist.
+  test("throws when team does not exist", async () => {
+    const person = await testPrisma.person.create({
+      data: { name: "Alice", email: "alice@test.com" },
+    });
+    await expect(
+      addManager(formData({ personID: person.id, teamID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" })),
+    ).rejects.toThrow("Team not found");
+  });
+
+  // Throws on invalid UUID for teamID.
+  test("throws on invalid teamID format", async () => {
+    await expect(
+      addManager(formData({ personID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", teamID: "bad-id" })),
+    ).rejects.toThrow("Invalid teamID format");
+  });
+
+  // Throws on invalid UUID for personID.
+  test("throws on invalid personID format", async () => {
+    await expect(
+      addManager(formData({ personID: "bad-id", teamID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" })),
+    ).rejects.toThrow("Invalid personID format");
+  });
+});
+
 describe("createDepartment", () => {
   beforeEach(() => cleanDb());
   afterAll(async () => {

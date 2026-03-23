@@ -550,6 +550,111 @@ describe("getAuditLogs", () => {
     expect(result.logs).toHaveLength(2);
     expect(result.total).toBe(3);
   });
+
+  // Filters by multiple criteria simultaneously (action + entityType).
+  test("filters by action AND entityType together", async () => {
+    await testPrisma.auditLog.createMany({
+      data: [
+        { action: "create", entityType: "person", userId: null, userEmail: null },
+        { action: "create", entityType: "team", userId: null, userEmail: null },
+        { action: "update", entityType: "person", userId: null, userEmail: null },
+        { action: "update", entityType: "team", userId: null, userEmail: null },
+      ],
+    });
+
+    const result = await getAuditLogs({ action: "create", entityType: "person" });
+    expect(result.logs).toHaveLength(1);
+    expect(result.logs[0].action).toBe("create");
+    expect(result.logs[0].entityType).toBe("person");
+  });
+
+  // Filters by date range using ISO string format (dateFrom + dateTo).
+  test("filters by date range with ISO strings", async () => {
+    const now = new Date();
+    const yesterday = new Date(now.getTime() - 86400000);
+    const twoDaysAgo = new Date(now.getTime() - 172800000);
+
+    await testPrisma.auditLog.createMany({
+      data: [
+        {
+          action: "create",
+          entityType: "person",
+          userId: null,
+          userEmail: null,
+          createdAt: twoDaysAgo,
+        },
+        {
+          action: "update",
+          entityType: "person",
+          userId: null,
+          userEmail: null,
+          createdAt: yesterday,
+        },
+        {
+          action: "delete",
+          entityType: "person",
+          userId: null,
+          userEmail: null,
+          createdAt: now,
+        },
+      ],
+    });
+
+    const result = await getAuditLogs({
+      dateFrom: yesterday.toISOString(),
+      dateTo: now.toISOString(),
+    });
+    // Should include yesterday and today entries, but not two days ago
+    expect(result.logs.length).toBeGreaterThanOrEqual(2);
+    expect(result.logs.every((l) => new Date(l.createdAt) >= yesterday)).toBe(true);
+  });
+
+  // Filters by all criteria at once (action + entityType + userEmail + dateRange).
+  test("filters by all criteria simultaneously", async () => {
+    const now = new Date();
+    await testPrisma.auditLog.createMany({
+      data: [
+        {
+          action: "create",
+          entityType: "person",
+          userId: "u1",
+          userEmail: "alice@test.com",
+          createdAt: now,
+        },
+        {
+          action: "create",
+          entityType: "person",
+          userId: "u2",
+          userEmail: "bob@test.com",
+          createdAt: now,
+        },
+        {
+          action: "update",
+          entityType: "person",
+          userId: "u1",
+          userEmail: "alice@test.com",
+          createdAt: now,
+        },
+        {
+          action: "create",
+          entityType: "team",
+          userId: "u1",
+          userEmail: "alice@test.com",
+          createdAt: now,
+        },
+      ],
+    });
+
+    const result = await getAuditLogs({
+      action: "create",
+      entityType: "person",
+      userEmail: "alice@test.com",
+    });
+    expect(result.logs).toHaveLength(1);
+    expect(result.logs[0].userEmail).toBe("alice@test.com");
+    expect(result.logs[0].action).toBe("create");
+    expect(result.logs[0].entityType).toBe("person");
+  });
 });
 
 describe("getAuditLogUserEmails", () => {
