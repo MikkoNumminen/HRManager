@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate --sql && prisma migrate deploy && next build",
+    "build": "prisma migrate deploy && prisma generate --sql && next build",
     "start": "next start",
     "lint": "eslint .",
     "test": "jest --verbose",
@@ -19,7 +19,7 @@
     "validate": "prettier --check . && eslint . && (npx tsx scripts/i18n-sync.ts || true) && npx prisma db push --accept-data-loss && jest --config jest.config.all.ts --runInBand --verbose",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "postinstall": "prisma generate --sql",
+    "postinstall": "prisma generate",
     "prepare": "husky"
   },
   "dependencies": {

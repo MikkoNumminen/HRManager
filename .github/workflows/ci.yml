@@ -42,8 +42,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Generate Prisma client
-        run: npx prisma generate
+      - name: Push schema to test database
+        run: npx prisma db push --accept-data-loss
+
+      - name: Generate Prisma client with Typed SQL
+        run: npx prisma generate --sql
 
       - name: Check formatting
         run: npm run format:check
