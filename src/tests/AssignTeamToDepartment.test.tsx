@@ -105,9 +105,8 @@ describe("AssignTeamToDepartment Component", () => {
   // Hidden inputs contain the department ID and selected team ID.
   test("includes departmentID as hidden input", () => {
     render(<AssignTeamToDepartmentForm departmentID={departmentID} availableTeams={mockTeams} />);
-    const deptInput = document.querySelector('input[name="departmentID"]') as HTMLInputElement;
-    expect(deptInput).toBeTruthy();
-    expect(deptInput.value).toBe(departmentID);
+    const deptInput = screen.getByDisplayValue(departmentID);
+    expect(deptInput).toBeInTheDocument();
   });
 
   // Submit button becomes enabled after selecting a team.
@@ -117,6 +116,6 @@ describe("AssignTeamToDepartment Component", () => {
     fireEvent.mouseDown(screen.getByLabelText(/Select Team/i));
     fireEvent.click(screen.getByText("Backend"));
 
-    expect(screen.getByRole("button", { name: /Assign/i })).not.toBeDisabled();
+    expect(screen.getByRole("button", { name: /Assign/i })).toBeEnabled();
   });
 });

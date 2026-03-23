@@ -86,7 +86,7 @@ describe("ProfileEditor", () => {
     const nameInput = screen.getByLabelText("Enter New Name");
     fireEvent.change(nameInput, { target: { value: "Alice Johnson" } });
     const saveButtons = screen.getAllByRole("button", { name: /Save/i });
-    expect(saveButtons[0]).not.toBeDisabled();
+    expect(saveButtons[0]).toBeEnabled();
   });
 
   // Submitting the name form calls the updateProfileName server action.
@@ -256,7 +256,7 @@ describe("ProfileEditor", () => {
     const imageInput = screen.getByLabelText("Image URL");
     fireEvent.change(imageInput, { target: { value: "https://new.com/pic.jpg" } });
     const saveButtons = screen.getAllByRole("button", { name: /Save/i });
-    expect(saveButtons[1]).not.toBeDisabled();
+    expect(saveButtons[1]).toBeEnabled();
   });
 
   // Shows the join date in the profile header.

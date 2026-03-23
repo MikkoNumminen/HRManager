@@ -29,7 +29,7 @@ describe("AddDepartment Component", () => {
     render(<AddDepartmentForm />);
     await userEvent.clear(screen.getByLabelText(/Enter Department Name/i));
     await userEvent.type(screen.getByLabelText(/Enter Department Name/i), "Engineering");
-    expect(screen.getByRole("button", { name: /Create/i })).not.toBeDisabled();
+    expect(screen.getByRole("button", { name: /Create/i })).toBeEnabled();
   });
 
   // Submit button is disabled when name is only whitespace.

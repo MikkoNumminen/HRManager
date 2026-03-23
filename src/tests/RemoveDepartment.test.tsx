@@ -23,7 +23,7 @@ describe("RemoveDepartment Component", () => {
   // Remove button is enabled.
   test("remove button is enabled", () => {
     render(<RemoveDepartmentForm departmentID={departmentID} />);
-    expect(screen.getByRole("button", { name: /Remove/i })).not.toBeDisabled();
+    expect(screen.getByRole("button", { name: /Remove/i })).toBeEnabled();
   });
 
   // Opens confirmation dialog when remove is clicked.

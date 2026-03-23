@@ -66,7 +66,7 @@ describe("RemoveMemberFromTeam Component", () => {
     render(<RemoveMemberFromTeam teamID={teamID} persons={mockPersons} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Alice" }));
-    expect(screen.getByRole("button", { name: /Remove Member/i })).not.toBeDisabled();
+    expect(screen.getByRole("button", { name: /Remove Member/i })).toBeEnabled();
   });
 
   test("opens confirmation dialog when remove member is clicked", () => {

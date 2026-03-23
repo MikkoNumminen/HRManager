@@ -21,7 +21,7 @@ describe("AddTeam Component", () => {
     render(<AddTeamForm />);
     await userEvent.clear(screen.getByLabelText(/Enter Team Name/i));
     await userEvent.type(screen.getByLabelText(/Enter Team Name/i), "Engineering");
-    expect(screen.getByRole("button", { name: /Create/i })).not.toBeDisabled();
+    expect(screen.getByRole("button", { name: /Create/i })).toBeEnabled();
   });
 
   test("submits the form and calls createTeam", async () => {

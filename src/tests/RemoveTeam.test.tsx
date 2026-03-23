@@ -16,7 +16,7 @@ describe("RemoveTeam Component", () => {
 
   test("remove button is enabled", () => {
     render(<RemoveTeamForm teamID={teamID} />);
-    expect(screen.getByRole("button", { name: /Remove/i })).not.toBeDisabled();
+    expect(screen.getByRole("button", { name: /Remove/i })).toBeEnabled();
   });
 
   test("opens confirmation dialog when remove is clicked", async () => {

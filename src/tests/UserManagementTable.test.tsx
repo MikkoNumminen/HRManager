@@ -96,7 +96,7 @@ describe("UserManagementTable", () => {
   test("navigates to admin page on Enter key", () => {
     mockPush.mockClear();
     render(<UserManagementTable users={mockUsers} />);
-    const row = screen.getByText("Alice").closest("tr")!;
+    const row = screen.getByRole("row", { name: /Alice/ });
     fireEvent.keyDown(row, { key: "Enter" });
     expect(mockPush).toHaveBeenCalledWith("/admin/aaa-111");
   });
@@ -105,7 +105,7 @@ describe("UserManagementTable", () => {
   test("navigates to admin page on Space key", () => {
     mockPush.mockClear();
     render(<UserManagementTable users={mockUsers} />);
-    const row = screen.getByText("Bob").closest("tr")!;
+    const row = screen.getByRole("row", { name: /Bob/ });
     fireEvent.keyDown(row, { key: " " });
     expect(mockPush).toHaveBeenCalledWith("/admin/bbb-222");
   });
@@ -114,7 +114,7 @@ describe("UserManagementTable", () => {
   test("does not navigate on non-trigger key", () => {
     mockPush.mockClear();
     render(<UserManagementTable users={mockUsers} />);
-    const row = screen.getByText("Alice").closest("tr")!;
+    const row = screen.getByRole("row", { name: /Alice/ });
     fireEvent.keyDown(row, { key: "Tab" });
     expect(mockPush).not.toHaveBeenCalled();
   });

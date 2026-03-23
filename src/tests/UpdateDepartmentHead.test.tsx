@@ -65,7 +65,7 @@ describe("UpdateDepartmentHead Component", () => {
   test("submit button is enabled after selecting a person", () => {
     render(<UpdateDepartmentHeadForm departmentID={departmentID} persons={mockPersons} />);
     fireEvent.click(screen.getByRole("button", { name: "Alice" }));
-    expect(screen.getByRole("button", { name: /Set Head/i })).not.toBeDisabled();
+    expect(screen.getByRole("button", { name: /Set Head/i })).toBeEnabled();
   });
 
   // Excludes persons whose IDs are in the excludeIds list.

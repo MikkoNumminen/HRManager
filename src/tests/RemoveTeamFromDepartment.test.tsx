@@ -113,6 +113,6 @@ describe("RemoveTeamFromDepartment Component", () => {
     fireEvent.mouseDown(screen.getByLabelText(/Select Team/i));
     fireEvent.click(screen.getByText("Backend"));
 
-    expect(screen.getByRole("button", { name: /Remove/i })).not.toBeDisabled();
+    expect(screen.getByRole("button", { name: /Remove/i })).toBeEnabled();
   });
 });

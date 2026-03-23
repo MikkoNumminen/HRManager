@@ -309,7 +309,7 @@ describe("UserPermissionEditor", () => {
     fireEvent.click(screen.getByRole("option", { name: /User/i }));
 
     // Save Role should now be enabled
-    expect(screen.getByRole("button", { name: /Save Role/i })).not.toBeDisabled();
+    expect(screen.getByRole("button", { name: /Save Role/i })).toBeEnabled();
   });
 
   // Submitting the role form calls updateUserRole via useActionState

@@ -58,7 +58,7 @@ describe("UpdateTeamName Component", () => {
     fireEvent.change(screen.getByLabelText(/Enter New Team Name/i), {
       target: { value: "Platform" },
     });
-    expect(screen.getByRole("button", { name: /Change/i })).not.toBeDisabled();
+    expect(screen.getByRole("button", { name: /Change/i })).toBeEnabled();
   });
 
   // Submits the form and calls updateTeamName, then navigates back.

@@ -24,7 +24,7 @@ const AddMemberForm: React.FC<{ teamID: string; persons: Person[]; excludeIds?: 
   excludeIds = [],
 }) => {
   const t = useTranslations("teams");
-  const tc = useTranslations("common");
+
   const tn = useTranslations("notifications");
   const { showSnackbar } = useSnackbar();
   const [selectedMember, setSelectedMember] = useState<string>("");

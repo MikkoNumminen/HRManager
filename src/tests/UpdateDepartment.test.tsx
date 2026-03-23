@@ -96,7 +96,7 @@ describe("UpdateDepartment Component", () => {
     fireEvent.change(screen.getByLabelText(/Enter Department Name/i), {
       target: { value: "Product" },
     });
-    expect(screen.getByRole("button", { name: /Save/i })).not.toBeDisabled();
+    expect(screen.getByRole("button", { name: /Save/i })).toBeEnabled();
   });
 
   // Submit button is enabled when only the description is changed.
@@ -111,7 +111,7 @@ describe("UpdateDepartment Component", () => {
     fireEvent.change(screen.getByLabelText(/Description/i), {
       target: { value: "Updated description" },
     });
-    expect(screen.getByRole("button", { name: /Save/i })).not.toBeDisabled();
+    expect(screen.getByRole("button", { name: /Save/i })).toBeEnabled();
   });
 
   // Submits the form and calls updateDepartment.

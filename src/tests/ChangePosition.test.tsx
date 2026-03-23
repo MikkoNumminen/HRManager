@@ -41,7 +41,7 @@ describe("UpdatePosition Component", () => {
     fireEvent.change(screen.getByLabelText(/Enter New Position/i), {
       target: { value: "Senior Developer" },
     });
-    expect(screen.getByRole("button", { name: /Change/i })).not.toBeDisabled();
+    expect(screen.getByRole("button", { name: /Change/i })).toBeEnabled();
   });
 
   test("should submit the form and call updatePosition", async () => {

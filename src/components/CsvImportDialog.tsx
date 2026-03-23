@@ -177,6 +177,7 @@ export default function CsvImportDialog({ open, onClose }: CsvImportDialogProps)
         {/* File drop zone / picker */}
         {!importDone && !preview && (
           <Box
+            data-testid="csv-drop-zone"
             onDragOver={(e) => e.preventDefault()}
             onDrop={handleDrop}
             sx={{
@@ -196,6 +197,7 @@ export default function CsvImportDialog({ open, onClose }: CsvImportDialogProps)
             </Typography>
             <input
               id="csv-file-input"
+              data-testid="csv-file-input"
               type="file"
               accept=".csv"
               style={{ display: "none" }}

@@ -39,7 +39,7 @@ describe("AddPerson Component", () => {
     await userEvent.type(screen.getByLabelText(/Enter Name/i), "John");
     await userEvent.clear(screen.getByLabelText(/Enter Email/i));
     await userEvent.type(screen.getByLabelText(/Enter Email/i), "john@example.com");
-    expect(screen.getByRole("button", { name: /Create/i })).not.toBeDisabled();
+    expect(screen.getByRole("button", { name: /Create/i })).toBeEnabled();
   });
 
   test("submits the form and calls createPerson", async () => {

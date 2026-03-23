@@ -62,7 +62,7 @@ describe("CsvImportDialog", () => {
   // Rejects non-CSV files with error message
   test("shows error for non-CSV files", async () => {
     render(<CsvImportDialog open={true} onClose={jest.fn()} />);
-    const input = document.getElementById("csv-file-input") as HTMLInputElement;
+    const input = screen.getByTestId("csv-file-input") as HTMLInputElement;
     const file = new File(["data"], "test.txt", { type: "text/plain" });
 
     fireEvent.change(input, { target: { files: [file] } });
@@ -75,7 +75,7 @@ describe("CsvImportDialog", () => {
   // Rejects files that exceed the size limit
   test("shows error for oversized files", async () => {
     render(<CsvImportDialog open={true} onClose={jest.fn()} />);
-    const input = document.getElementById("csv-file-input") as HTMLInputElement;
+    const input = screen.getByTestId("csv-file-input") as HTMLInputElement;
     // Create a file that's > 1MB
     const bigContent = "a".repeat(1024 * 1024 + 1);
     const file = csvFile(bigContent);
@@ -90,7 +90,7 @@ describe("CsvImportDialog", () => {
   // Shows preview table after selecting a valid CSV file
   test("shows preview after selecting a valid CSV file", async () => {
     render(<CsvImportDialog open={true} onClose={jest.fn()} />);
-    const input = document.getElementById("csv-file-input") as HTMLInputElement;
+    const input = screen.getByTestId("csv-file-input") as HTMLInputElement;
     const file = csvFile("name,email\nAlice,alice@test.com\nBob,bob@test.com");
 
     fireEvent.change(input, { target: { files: [file] } });
@@ -104,7 +104,7 @@ describe("CsvImportDialog", () => {
   // Shows valid row count in preview chips (ICU plural — raw format returned by mock)
   test("shows valid row count chip after file selection", async () => {
     render(<CsvImportDialog open={true} onClose={jest.fn()} />);
-    const input = document.getElementById("csv-file-input") as HTMLInputElement;
+    const input = screen.getByTestId("csv-file-input") as HTMLInputElement;
     const file = csvFile("name,email\nAlice,alice@test.com\nBob,bob@test.com");
 
     fireEvent.change(input, { target: { files: [file] } });
@@ -118,7 +118,7 @@ describe("CsvImportDialog", () => {
   // Shows error count chip when CSV has invalid rows
   test("shows error count chip for invalid rows", async () => {
     render(<CsvImportDialog open={true} onClose={jest.fn()} />);
-    const input = document.getElementById("csv-file-input") as HTMLInputElement;
+    const input = screen.getByTestId("csv-file-input") as HTMLInputElement;
     // Row 2 has empty name and invalid email — both will produce errors
     const file = csvFile("name,email\nAlice,alice@test.com\n,bad-email");
 
@@ -132,7 +132,7 @@ describe("CsvImportDialog", () => {
   // Shows import button after valid file selection
   test("shows import button after valid file selection", async () => {
     render(<CsvImportDialog open={true} onClose={jest.fn()} />);
-    const input = document.getElementById("csv-file-input") as HTMLInputElement;
+    const input = screen.getByTestId("csv-file-input") as HTMLInputElement;
     const file = csvFile("name,email\nAlice,alice@test.com");
 
     fireEvent.change(input, { target: { files: [file] } });
@@ -146,7 +146,7 @@ describe("CsvImportDialog", () => {
   // Rejects CSV with only headers and no data rows
   test("shows error for CSV with only headers", async () => {
     render(<CsvImportDialog open={true} onClose={jest.fn()} />);
-    const input = document.getElementById("csv-file-input") as HTMLInputElement;
+    const input = screen.getByTestId("csv-file-input") as HTMLInputElement;
     const file = csvFile("name,email");
 
     fireEvent.change(input, { target: { files: [file] } });
@@ -159,7 +159,7 @@ describe("CsvImportDialog", () => {
   // Shows file name in preview
   test("shows file name in preview", async () => {
     render(<CsvImportDialog open={true} onClose={jest.fn()} />);
-    const input = document.getElementById("csv-file-input") as HTMLInputElement;
+    const input = screen.getByTestId("csv-file-input") as HTMLInputElement;
     const file = csvFile("name,email\nAlice,alice@test.com", "employees.csv");
 
     fireEvent.change(input, { target: { files: [file] } });
@@ -172,7 +172,7 @@ describe("CsvImportDialog", () => {
   // Shows at most 5 preview rows
   test("limits preview to first 5 data rows", async () => {
     render(<CsvImportDialog open={true} onClose={jest.fn()} />);
-    const input = document.getElementById("csv-file-input") as HTMLInputElement;
+    const input = screen.getByTestId("csv-file-input") as HTMLInputElement;
     const rows = Array.from({ length: 10 }, (_, i) => `Person${i},p${i}@test.com`).join("\n");
     const file = csvFile(`name,email\n${rows}`);
 
@@ -189,7 +189,7 @@ describe("CsvImportDialog", () => {
   // Handles drag and drop of a CSV file
   test("handles file drop", async () => {
     render(<CsvImportDialog open={true} onClose={jest.fn()} />);
-    const dropZone = screen.getByText("Drop a CSV file here or click to browse").closest("div")!;
+    const dropZone = screen.getByTestId("csv-drop-zone");
     const file = csvFile("name,email\nAlice,alice@test.com");
 
     fireEvent.drop(dropZone, {
@@ -204,7 +204,7 @@ describe("CsvImportDialog", () => {
   // Shows header cells in preview table
   test("shows CSV headers in preview table", async () => {
     render(<CsvImportDialog open={true} onClose={jest.fn()} />);
-    const input = document.getElementById("csv-file-input") as HTMLInputElement;
+    const input = screen.getByTestId("csv-file-input") as HTMLInputElement;
     const file = csvFile("name,email,position\nAlice,alice@test.com,Manager");
 
     fireEvent.change(input, { target: { files: [file] } });
@@ -219,7 +219,7 @@ describe("CsvImportDialog", () => {
   // Does not show import button when all rows are invalid
   test("hides import button when no valid rows", async () => {
     render(<CsvImportDialog open={true} onClose={jest.fn()} />);
-    const input = document.getElementById("csv-file-input") as HTMLInputElement;
+    const input = screen.getByTestId("csv-file-input") as HTMLInputElement;
     // Both rows have empty names
     const file = csvFile("name,email\n,bad@test.com\n,another@test.com");
 
@@ -237,7 +237,7 @@ describe("CsvImportDialog", () => {
   // Clears state when dialog is reopened after closing
   test("clears preview and errors when dialog is closed and reopened", async () => {
     const { rerender } = render(<CsvImportDialog open={true} onClose={jest.fn()} />);
-    const input = document.getElementById("csv-file-input") as HTMLInputElement;
+    const input = screen.getByTestId("csv-file-input") as HTMLInputElement;
     const file = new File(["data"], "test.txt", { type: "text/plain" });
 
     fireEvent.change(input, { target: { files: [file] } });
@@ -257,7 +257,7 @@ describe("CsvImportDialog", () => {
   // Shows validation error details in preview
   test("shows validation error details for invalid rows", async () => {
     render(<CsvImportDialog open={true} onClose={jest.fn()} />);
-    const input = document.getElementById("csv-file-input") as HTMLInputElement;
+    const input = screen.getByTestId("csv-file-input") as HTMLInputElement;
     // Row 2 has empty name — will produce a validation error
     const file = csvFile("name,email\n,alice@test.com\nBob,bob@test.com");
 
@@ -272,7 +272,7 @@ describe("CsvImportDialog", () => {
   // Shows error when CSV has more than MAX_IMPORT_ROWS data rows
   test("shows error for CSV with too many rows", async () => {
     render(<CsvImportDialog open={true} onClose={jest.fn()} />);
-    const input = document.getElementById("csv-file-input") as HTMLInputElement;
+    const input = screen.getByTestId("csv-file-input") as HTMLInputElement;
     // Create a CSV with 1001 data rows (exceeds MAX_IMPORT_ROWS = 1000)
     const header = "name,email";
     const rows = Array.from({ length: 1001 }, (_, i) => `Person${i},p${i}@test.com`).join("\n");
@@ -288,10 +288,10 @@ describe("CsvImportDialog", () => {
   // Clicking the drop zone triggers the file input click handler
   test("clicking drop zone triggers file input click", async () => {
     render(<CsvImportDialog open={true} onClose={jest.fn()} />);
-    const input = document.getElementById("csv-file-input") as HTMLInputElement;
+    const input = screen.getByTestId("csv-file-input") as HTMLInputElement;
     const clickSpy = jest.spyOn(input, "click");
 
-    const dropZone = screen.getByText("Drop a CSV file here or click to browse").closest("div")!;
+    const dropZone = screen.getByTestId("csv-drop-zone");
     await userEvent.click(dropZone);
 
     expect(clickSpy).toHaveBeenCalled();
@@ -301,7 +301,7 @@ describe("CsvImportDialog", () => {
   // DragOver event is prevented (required for drop to work)
   test("dragOver event is prevented on drop zone", () => {
     render(<CsvImportDialog open={true} onClose={jest.fn()} />);
-    const dropZone = screen.getByText("Drop a CSV file here or click to browse").closest("div")!;
+    const dropZone = screen.getByTestId("csv-drop-zone");
     const event = new Event("dragover", { bubbles: true, cancelable: true });
     const _prevented = !dropZone.dispatchEvent(event);
     // The event should be preventable (React's onDragOver calls preventDefault)
@@ -315,7 +315,7 @@ describe("CsvImportDialog", () => {
     });
 
     render(<CsvImportDialog open={true} onClose={jest.fn()} />);
-    const input = document.getElementById("csv-file-input") as HTMLInputElement;
+    const input = screen.getByTestId("csv-file-input") as HTMLInputElement;
     const file = csvFile("name,email\nAlice,alice@test.com");
 
     fireEvent.change(input, { target: { files: [file] } });
@@ -338,7 +338,7 @@ describe("CsvImportDialog", () => {
     });
 
     render(<CsvImportDialog open={true} onClose={jest.fn()} />);
-    const input = document.getElementById("csv-file-input") as HTMLInputElement;
+    const input = screen.getByTestId("csv-file-input") as HTMLInputElement;
     const file = csvFile(
       "name,email\nAlice,alice@test.com\nBob,bob@test.com\nCharlie,charlie@test.com\n,bad",
     );
@@ -364,7 +364,7 @@ describe("CsvImportDialog", () => {
     });
 
     render(<CsvImportDialog open={true} onClose={jest.fn()} />);
-    const input = document.getElementById("csv-file-input") as HTMLInputElement;
+    const input = screen.getByTestId("csv-file-input") as HTMLInputElement;
     const file = csvFile("name,email\nAlice,alice@test.com");
 
     fireEvent.change(input, { target: { files: [file] } });
@@ -387,7 +387,7 @@ describe("CsvImportDialog", () => {
     });
 
     render(<CsvImportDialog open={true} onClose={jest.fn()} />);
-    const input = document.getElementById("csv-file-input") as HTMLInputElement;
+    const input = screen.getByTestId("csv-file-input") as HTMLInputElement;
     const file = csvFile("name,email\nAlice,alice@test.com");
 
     fireEvent.change(input, { target: { files: [file] } });
@@ -406,7 +406,7 @@ describe("CsvImportDialog", () => {
   // File input change with no file selected does nothing (guard clause)
   test("does nothing when file input change fires with no file", async () => {
     render(<CsvImportDialog open={true} onClose={jest.fn()} />);
-    const input = document.getElementById("csv-file-input") as HTMLInputElement;
+    const input = screen.getByTestId("csv-file-input") as HTMLInputElement;
 
     fireEvent.change(input, { target: { files: [] } });
 
@@ -417,7 +417,7 @@ describe("CsvImportDialog", () => {
   // Drop with no files does nothing
   test("does nothing when drop event has no files", async () => {
     render(<CsvImportDialog open={true} onClose={jest.fn()} />);
-    const dropZone = screen.getByText("Drop a CSV file here or click to browse").closest("div")!;
+    const dropZone = screen.getByTestId("csv-drop-zone");
 
     fireEvent.drop(dropZone, {
       dataTransfer: { files: [] },

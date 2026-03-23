@@ -26,7 +26,7 @@ describe("Remove People", () => {
 
   test("remove button is enabled", () => {
     render(<RemovePersonForm personID={personID} />);
-    expect(screen.getByRole("button", { name: /Remove/i })).not.toBeDisabled();
+    expect(screen.getByRole("button", { name: /Remove/i })).toBeEnabled();
   });
 
   test("opens confirmation dialog when remove is clicked", async () => {

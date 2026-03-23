@@ -47,7 +47,7 @@ describe("UpdateManager Component", () => {
     render(<UpdateManagerForm teamID={teamID} persons={mockPersons} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Alice" }));
-    expect(screen.getByRole("button", { name: /Add Manager/i })).not.toBeDisabled();
+    expect(screen.getByRole("button", { name: /Add Manager/i })).toBeEnabled();
   });
 
   test("excludes persons with ids in excludeIds", () => {

@@ -41,7 +41,7 @@ describe("Update Email", () => {
     fireEvent.change(screen.getByLabelText(/Enter New Email/i), {
       target: { value: "valid@example.com" },
     });
-    expect(screen.getByRole("button", { name: /Change/i })).not.toBeDisabled();
+    expect(screen.getByRole("button", { name: /Change/i })).toBeEnabled();
   });
 
   test("should submit the form and call updateEmail", async () => {

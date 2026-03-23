@@ -58,7 +58,7 @@ describe("UpdatePersonName Component", () => {
     fireEvent.change(screen.getByLabelText(/Enter New Name/i), {
       target: { value: "Alicia" },
     });
-    expect(screen.getByRole("button", { name: /Change/i })).not.toBeDisabled();
+    expect(screen.getByRole("button", { name: /Change/i })).toBeEnabled();
   });
 
   // Submits the form and calls updatePersonName, then navigates back.

@@ -23,7 +23,7 @@ const UpdateManagerForm: React.FC<{ teamID: string; persons: Person[]; excludeId
   excludeIds = [],
 }) => {
   const t = useTranslations("teams");
-  const tc = useTranslations("common");
+
   const tn = useTranslations("notifications");
   const { showSnackbar } = useSnackbar();
   const [newManager, setNewManager] = useState<string>("");

@@ -57,7 +57,7 @@ describe("AddPeopleToTeam Component", () => {
     render(<AddPeopleToTeam teamID={teamID} persons={mockPersons} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Alice" }));
-    expect(screen.getByRole("button", { name: /Add Member/i })).not.toBeDisabled();
+    expect(screen.getByRole("button", { name: /Add Member/i })).toBeEnabled();
   });
 
   test("excludes persons with ids in excludeIds", () => {

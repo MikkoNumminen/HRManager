@@ -23,7 +23,7 @@ const UpdateDepartmentHeadForm: React.FC<{
   excludeIds?: string[];
 }> = ({ departmentID, persons, excludeIds = [] }) => {
   const t = useTranslations("departments");
-  const tc = useTranslations("common");
+
   const tn = useTranslations("notifications");
   const { showSnackbar } = useSnackbar();
   const [newHead, setNewHead] = useState<string>("");

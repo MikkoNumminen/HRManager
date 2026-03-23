@@ -840,7 +840,7 @@ describe("AuditLogViewer mobile card view", () => {
       />,
     );
     const toggle = screen.getByTestId("filter-toggle");
-    expect(toggle.textContent).toContain("(2)");
+    expect(toggle).toHaveTextContent("(2)");
   });
 
   // Card view shows pagination.
