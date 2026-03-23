@@ -12,10 +12,13 @@ In Progress items must show the owner: `[worktree-name]` or `[main]`.
 
 > 📋 **Audit research:** Items marked "(found by audit)" have detailed file:line references in memory file `project_audit_findings.md`. Read it before starting any of these tasks.
 
-- 🟡 Data import/export — CSV/Excel import of employees, export of audit logs/reports (admin tool) `[main]`
 - 🔴 MongoDB audit logs — migrate audit log storage from PostgreSQL to MongoDB (polyglot persistence) `[main]`
+
+## Recently Completed
+
+- ✅ Data import/export — CSV import/export admin tool with 101 tests (~2h)
+- ✅ Fix after() test failures (79 tests) — PR #8 merged (15 min)
 
 ## Backlog
 
-- 🟡 Fix ugly themes — review all 6 themes, redesign the ones that look bad while keeping the good ones
 - 🟢 README screenshots with different themes — the 3 current screenshots all use one theme, add shots showcasing other themes
