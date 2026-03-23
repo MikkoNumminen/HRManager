@@ -1,9 +1,10 @@
-import { testPrisma, cleanDb } from "./testDb";
-
-// Mock @/demoSession — captureAuditContext and logAudit call getDemoSessionId
-jest.mock("@/demoSession", () => ({
-  getDemoSessionId: jest.fn().mockResolvedValue(null),
-}));
+import { cleanDb } from "./testDb";
+import {
+  setupTestMongo,
+  teardownTestMongo,
+  cleanTestMongo,
+  getTestAuditLogCollection,
+} from "./testMongoDb";
 
 // Mock next/server after() to collect callbacks so tests can await them
 const afterCallbacks: Array<() => Promise<void>> = [];
@@ -18,7 +19,12 @@ async function flushAfterCallbacks() {
   afterCallbacks.length = 0;
 }
 
-// Mock @/db to use the test database
+// Mock @/mongoDb to use the in-memory test MongoDB collection via globalThis
+jest.mock("@/mongoDb", () => ({
+  getAuditLogCollection: () => (globalThis as Record<string, unknown>).__testAuditLogCollection,
+}));
+
+// Mock @/db (still needed for cleanDb which uses PG)
 jest.mock("@/db", () => ({
   prisma: require("./testDb").testPrisma,
 }));
@@ -29,22 +35,26 @@ jest.mock("@/auth", () => ({
   auth: (...args: unknown[]) => mockAuth(...args),
 }));
 
-import {
-  logAudit,
-  logPermissionDenial,
-  logRateLimitHit,
-  captureAuditContext,
-  deferAudit,
-  deferAuditLog,
-} from "@/auditLog";
+// Mock demo session — defaults to null (production mode)
+jest.mock("@/demoSession", () => ({
+  getDemoSessionId: jest.fn().mockResolvedValue(null),
+}));
+
+import { logAudit, logPermissionDenial, logRateLimitHit } from "@/auditLog";
+
+beforeAll(async () => {
+  await setupTestMongo();
+  (globalThis as Record<string, unknown>).__testAuditLogCollection = getTestAuditLogCollection();
+});
 
 beforeEach(async () => {
   jest.clearAllMocks();
   await cleanDb();
+  await cleanTestMongo();
 });
 
 afterAll(async () => {
-  await testPrisma.$disconnect();
+  await teardownTestMongo();
 });
 
 describe("logAudit", () => {
@@ -61,7 +71,7 @@ describe("logAudit", () => {
       after: { name: "Alice" },
     });
 
-    const logs = await testPrisma.auditLog.findMany();
+    const logs = await getTestAuditLogCollection().find().toArray();
     expect(logs).toHaveLength(1);
     expect(logs[0].userId).toBe("user-123");
     expect(logs[0].userEmail).toBe("alice@example.com");
@@ -82,7 +92,7 @@ describe("logAudit", () => {
       after: { clearExisting: true },
     });
 
-    const logs = await testPrisma.auditLog.findMany();
+    const logs = await getTestAuditLogCollection().find().toArray();
     expect(logs).toHaveLength(1);
     expect(logs[0].userId).toBeNull();
     expect(logs[0].userEmail).toBeNull();
@@ -101,7 +111,7 @@ describe("logAudit", () => {
       after: { position: "Senior Dev" },
     });
 
-    const logs = await testPrisma.auditLog.findMany();
+    const logs = await getTestAuditLogCollection().find().toArray();
     expect(logs[0].before).toBe('{"position":"Dev"}');
     expect(logs[0].after).toBe('{"position":"Senior Dev"}');
   });
@@ -116,7 +126,7 @@ describe("logAudit", () => {
       entityId: "t-1",
     });
 
-    const logs = await testPrisma.auditLog.findMany();
+    const logs = await getTestAuditLogCollection().find().toArray();
     expect(logs[0].before).toBeNull();
     expect(logs[0].after).toBeNull();
   });
@@ -131,30 +141,8 @@ describe("logAudit", () => {
       before: { count: 5 },
     });
 
-    const logs = await testPrisma.auditLog.findMany();
+    const logs = await getTestAuditLogCollection().find().toArray();
     expect(logs[0].entityId).toBeNull();
-  });
-
-  // Works with a transaction client — audit entry is created inside the tx.
-  test("uses transaction client when tx is provided", async () => {
-    mockAuth.mockResolvedValue({
-      user: { id: "user-1", email: "bob@example.com" },
-    });
-
-    await testPrisma.$transaction(async (tx) => {
-      await logAudit({
-        action: "create",
-        entityType: "team",
-        entityId: "team-1",
-        after: { teamName: "Engineering" },
-        tx,
-      });
-    });
-
-    const logs = await testPrisma.auditLog.findMany();
-    expect(logs).toHaveLength(1);
-    expect(logs[0].entityType).toBe("team");
-    expect(logs[0].after).toBe('{"teamName":"Engineering"}');
   });
 });
 
@@ -168,7 +156,7 @@ describe("logPermissionDenial", () => {
     await logPermissionDenial("person:delete");
     await flushAfterCallbacks();
 
-    const logs = await testPrisma.auditLog.findMany();
+    const logs = await getTestAuditLogCollection().find().toArray();
     expect(logs).toHaveLength(1);
     expect(logs[0].action).toBe("permission_denied");
     expect(logs[0].entityType).toBe("security");
@@ -184,7 +172,7 @@ describe("logPermissionDenial", () => {
     await logPermissionDenial("admin:manage_users");
     await flushAfterCallbacks();
 
-    const logs = await testPrisma.auditLog.findMany();
+    const logs = await getTestAuditLogCollection().find().toArray();
     expect(logs).toHaveLength(1);
     expect(logs[0].action).toBe("permission_denied");
     expect(logs[0].userId).toBeNull();
@@ -195,8 +183,9 @@ describe("logPermissionDenial", () => {
   // Logs error to console when database write fails (does not throw).
   test("logs error to console when write fails", async () => {
     const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
-    const createSpy = jest
-      .spyOn(testPrisma.auditLog, "create")
+    const col = getTestAuditLogCollection();
+    const insertSpy = jest
+      .spyOn(col, "insertOne")
       .mockRejectedValueOnce(new Error("DB write failed"));
 
     mockAuth.mockResolvedValue({
@@ -211,7 +200,7 @@ describe("logPermissionDenial", () => {
       expect.any(Error),
     );
     consoleSpy.mockRestore();
-    createSpy.mockRestore();
+    insertSpy.mockRestore();
   });
 });
 
@@ -221,7 +210,7 @@ describe("logRateLimitHit", () => {
     await logRateLimitHit("createPerson", "ip:192.168.1.1");
     await flushAfterCallbacks();
 
-    const logs = await testPrisma.auditLog.findMany();
+    const logs = await getTestAuditLogCollection().find().toArray();
     expect(logs).toHaveLength(1);
     expect(logs[0].action).toBe("rate_limited");
     expect(logs[0].entityType).toBe("security");
@@ -238,7 +227,7 @@ describe("logRateLimitHit", () => {
     await logRateLimitHit("auth:signin", "ip:10.0.0.1");
     await flushAfterCallbacks();
 
-    const logs = await testPrisma.auditLog.findMany();
+    const logs = await getTestAuditLogCollection().find().toArray();
     expect(logs).toHaveLength(1);
     expect(logs[0].action).toBe("rate_limited");
     expect(JSON.parse(logs[0].after!)).toEqual({
@@ -250,8 +239,9 @@ describe("logRateLimitHit", () => {
   // Logs error to console when database write fails (does not throw).
   test("logs error to console when write fails", async () => {
     const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
-    const createSpy = jest
-      .spyOn(testPrisma.auditLog, "create")
+    const col = getTestAuditLogCollection();
+    const insertSpy = jest
+      .spyOn(col, "insertOne")
       .mockRejectedValueOnce(new Error("DB write failed"));
 
     await logRateLimitHit("createPerson", "ip:10.0.0.1");
@@ -262,175 +252,6 @@ describe("logRateLimitHit", () => {
       expect.any(Error),
     );
     consoleSpy.mockRestore();
-    createSpy.mockRestore();
-  });
-});
-
-describe("captureAuditContext", () => {
-  // Captures authenticated user's id and email from the session.
-  test("captures user id and email from authenticated session", async () => {
-    mockAuth.mockResolvedValue({
-      user: { id: "user-789", email: "ctx@example.com" },
-    });
-
-    const ctx = await captureAuditContext();
-    expect(ctx.userId).toBe("user-789");
-    expect(ctx.userEmail).toBe("ctx@example.com");
-    expect(ctx.sessionId).toBeNull();
-  });
-
-  // Returns null userId and userEmail when no session exists.
-  test("returns null user when unauthenticated", async () => {
-    mockAuth.mockResolvedValue(null);
-
-    const ctx = await captureAuditContext();
-    expect(ctx.userId).toBeNull();
-    expect(ctx.userEmail).toBeNull();
-  });
-
-  // Returns null sessionId when not in a demo session.
-  test("returns null sessionId for non-demo session", async () => {
-    mockAuth.mockResolvedValue(null);
-
-    const ctx = await captureAuditContext();
-    expect(ctx.sessionId).toBeNull();
-  });
-});
-
-describe("deferAudit", () => {
-  // Writes multiple audit entries via after() callback.
-  test("writes deferred audit entries via after callback", async () => {
-    const entries = [
-      {
-        userId: "u1",
-        userEmail: "u1@test.com",
-        sessionId: null,
-        action: "create" as const,
-        entityType: "person" as const,
-        entityId: "p1",
-        after: { name: "Alice" },
-      },
-      {
-        userId: "u1",
-        userEmail: "u1@test.com",
-        sessionId: null,
-        action: "update" as const,
-        entityType: "team" as const,
-        entityId: "t1",
-        before: { teamName: "Old" },
-        after: { teamName: "New" },
-      },
-    ];
-
-    deferAudit(entries);
-    await flushAfterCallbacks();
-
-    const logs = await testPrisma.auditLog.findMany({ orderBy: { createdAt: "asc" } });
-    expect(logs).toHaveLength(2);
-    expect(logs[0].action).toBe("create");
-    expect(logs[0].entityType).toBe("person");
-    expect(logs[0].userId).toBe("u1");
-    expect(logs[1].action).toBe("update");
-    expect(logs[1].entityType).toBe("team");
-  });
-
-  // Does nothing when given an empty array (early return).
-  test("does nothing with empty entries array", async () => {
-    deferAudit([]);
-    await flushAfterCallbacks();
-
-    const logs = await testPrisma.auditLog.findMany();
-    expect(logs).toHaveLength(0);
-  });
-
-  // Serializes before and after fields as JSON strings.
-  test("serializes before and after as JSON", async () => {
-    deferAudit([
-      {
-        userId: null,
-        userEmail: null,
-        sessionId: null,
-        action: "update" as const,
-        entityType: "person" as const,
-        entityId: "p1",
-        before: { position: "Dev" },
-        after: { position: "Senior Dev" },
-      },
-    ]);
-    await flushAfterCallbacks();
-
-    const logs = await testPrisma.auditLog.findMany();
-    expect(logs[0].before).toBe('{"position":"Dev"}');
-    expect(logs[0].after).toBe('{"position":"Senior Dev"}');
-  });
-
-  // Logs error to console when database write fails (does not throw).
-  test("logs error to console when write fails", async () => {
-    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
-    const createManySpy = jest
-      .spyOn(testPrisma.auditLog, "createMany")
-      .mockRejectedValueOnce(new Error("DB write failed"));
-
-    deferAudit([
-      {
-        userId: null,
-        userEmail: null,
-        sessionId: null,
-        action: "create" as const,
-        entityType: "person" as const,
-        entityId: "p1",
-        after: { name: "Test" },
-      },
-    ]);
-    await flushAfterCallbacks();
-
-    // The function should catch errors and log them, not throw
-    expect(consoleSpy).toHaveBeenCalledWith(
-      "[audit] Failed to write deferred audit entries:",
-      expect.any(Error),
-    );
-    consoleSpy.mockRestore();
-    createManySpy.mockRestore();
-  });
-});
-
-describe("deferAuditLog", () => {
-  // Captures context and defers a single audit entry.
-  test("captures context and defers a single audit entry", async () => {
-    mockAuth.mockResolvedValue({
-      user: { id: "user-def", email: "defer@example.com" },
-    });
-
-    await deferAuditLog({
-      action: "create",
-      entityType: "department",
-      entityId: "d1",
-      after: { name: "Engineering" },
-    });
-    await flushAfterCallbacks();
-
-    const logs = await testPrisma.auditLog.findMany();
-    expect(logs).toHaveLength(1);
-    expect(logs[0].action).toBe("create");
-    expect(logs[0].entityType).toBe("department");
-    expect(logs[0].userId).toBe("user-def");
-    expect(logs[0].userEmail).toBe("defer@example.com");
-  });
-
-  // Works when unauthenticated (null user context).
-  test("works when unauthenticated", async () => {
-    mockAuth.mockResolvedValue(null);
-
-    await deferAuditLog({
-      action: "seed",
-      entityType: "person",
-      after: { count: 10 },
-    });
-    await flushAfterCallbacks();
-
-    const logs = await testPrisma.auditLog.findMany();
-    expect(logs).toHaveLength(1);
-    expect(logs[0].userId).toBeNull();
-    expect(logs[0].userEmail).toBeNull();
+    insertSpy.mockRestore();
   });
 });

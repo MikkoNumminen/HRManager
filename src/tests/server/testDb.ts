@@ -8,7 +8,6 @@ const adapter = new PrismaPg({
 export const testPrisma = new PrismaClient({ adapter });
 
 export async function cleanDb() {
-  await testPrisma.auditLog.deleteMany();
   await testPrisma.userPermission.deleteMany();
   await testPrisma.demoSession.deleteMany();
   await testPrisma.teamMember.deleteMany();

@@ -1,8 +1,20 @@
 import { testPrisma, cleanDb } from "./testDb";
+import {
+  setupTestMongo,
+  teardownTestMongo,
+  cleanTestMongo,
+  getTestAuditLogCollection,
+} from "./testMongoDb";
+import type { AuditLogDocument } from "@/mongoDb";
 
 // Mock @/db to use the test database
 jest.mock("@/db", () => ({
   prisma: require("./testDb").testPrisma,
+}));
+
+// Mock @/mongoDb to use the in-memory test MongoDB collection via globalThis
+jest.mock("@/mongoDb", () => ({
+  getAuditLogCollection: () => (globalThis as Record<string, unknown>).__testAuditLogCollection,
 }));
 
 // Mock next-auth — it uses ESM imports that Jest can't parse in CJS mode.
@@ -40,6 +52,32 @@ import {
 } from "@/queries";
 
 const { auth } = require("@/auth");
+
+/** Helper to insert an audit log document into the test MongoDB collection. */
+async function insertTestAuditLog(
+  data: Partial<AuditLogDocument> & { action: string; entityType: string },
+) {
+  await getTestAuditLogCollection().insertOne({
+    userId: data.userId ?? null,
+    userEmail: data.userEmail ?? null,
+    action: data.action,
+    entityType: data.entityType,
+    entityId: data.entityId ?? null,
+    before: data.before ?? null,
+    after: data.after ?? null,
+    sessionId: data.sessionId ?? null,
+    createdAt: data.createdAt ?? new Date(),
+  });
+}
+
+beforeAll(async () => {
+  await setupTestMongo();
+  (globalThis as Record<string, unknown>).__testAuditLogCollection = getTestAuditLogCollection();
+});
+
+afterAll(async () => {
+  await teardownTestMongo();
+});
 
 describe("getPersons", () => {
   beforeEach(async () => {
@@ -426,6 +464,7 @@ describe("getAllPermissionKeys", () => {
 describe("getAuditLogs", () => {
   beforeEach(async () => {
     await cleanDb();
+    await cleanTestMongo();
   });
 
   // Returns empty result when no audit logs exist.
@@ -437,21 +476,17 @@ describe("getAuditLogs", () => {
 
   // Returns logs in descending order by createdAt (newest first).
   test("returns logs in descending order", async () => {
-    await testPrisma.auditLog.create({
-      data: {
-        action: "create",
-        entityType: "person",
-        userEmail: "alice@example.com",
-        createdAt: new Date("2026-01-01"),
-      },
+    await insertTestAuditLog({
+      action: "create",
+      entityType: "person",
+      userEmail: "alice@example.com",
+      createdAt: new Date("2026-01-01"),
     });
-    await testPrisma.auditLog.create({
-      data: {
-        action: "update",
-        entityType: "person",
-        userEmail: "bob@example.com",
-        createdAt: new Date("2026-02-01"),
-      },
+    await insertTestAuditLog({
+      action: "update",
+      entityType: "person",
+      userEmail: "bob@example.com",
+      createdAt: new Date("2026-02-01"),
     });
     const result = await getAuditLogs();
     expect(result.logs).toHaveLength(2);
@@ -461,11 +496,15 @@ describe("getAuditLogs", () => {
 
   // Filters logs by userEmail.
   test("filters by userEmail", async () => {
-    await testPrisma.auditLog.create({
-      data: { action: "create", entityType: "person", userEmail: "alice@example.com" },
+    await insertTestAuditLog({
+      action: "create",
+      entityType: "person",
+      userEmail: "alice@example.com",
     });
-    await testPrisma.auditLog.create({
-      data: { action: "delete", entityType: "person", userEmail: "bob@example.com" },
+    await insertTestAuditLog({
+      action: "delete",
+      entityType: "person",
+      userEmail: "bob@example.com",
     });
     const result = await getAuditLogs({ userEmail: "alice" });
     expect(result.logs).toHaveLength(1);
@@ -475,11 +514,15 @@ describe("getAuditLogs", () => {
 
   // Filters logs by action type.
   test("filters by action", async () => {
-    await testPrisma.auditLog.create({
-      data: { action: "create", entityType: "person", userEmail: "a@b.com" },
+    await insertTestAuditLog({
+      action: "create",
+      entityType: "person",
+      userEmail: "a@b.com",
     });
-    await testPrisma.auditLog.create({
-      data: { action: "delete", entityType: "person", userEmail: "a@b.com" },
+    await insertTestAuditLog({
+      action: "delete",
+      entityType: "person",
+      userEmail: "a@b.com",
     });
     const result = await getAuditLogs({ action: "delete" });
     expect(result.logs).toHaveLength(1);
@@ -488,11 +531,15 @@ describe("getAuditLogs", () => {
 
   // Filters logs by entity type.
   test("filters by entityType", async () => {
-    await testPrisma.auditLog.create({
-      data: { action: "create", entityType: "person", userEmail: "a@b.com" },
+    await insertTestAuditLog({
+      action: "create",
+      entityType: "person",
+      userEmail: "a@b.com",
     });
-    await testPrisma.auditLog.create({
-      data: { action: "create", entityType: "team", userEmail: "a@b.com" },
+    await insertTestAuditLog({
+      action: "create",
+      entityType: "team",
+      userEmail: "a@b.com",
     });
     const result = await getAuditLogs({ entityType: "team" });
     expect(result.logs).toHaveLength(1);
@@ -502,8 +549,10 @@ describe("getAuditLogs", () => {
   // Paginates correctly — page 1 vs page 2 return different results.
   test("paginates correctly", async () => {
     for (let i = 0; i < 5; i++) {
-      await testPrisma.auditLog.create({
-        data: { action: "create", entityType: "person", userEmail: `user${i}@example.com` },
+      await insertTestAuditLog({
+        action: "create",
+        entityType: "person",
+        userEmail: `user${i}@example.com`,
       });
     }
     const page1 = await getAuditLogs({ page: 1, pageSize: 2 });
@@ -519,14 +568,23 @@ describe("getAuditLogs", () => {
     const old = new Date("2025-01-01T00:00:00Z");
     const mid = new Date("2025-06-15T00:00:00Z");
     const recent = new Date("2025-12-01T00:00:00Z");
-    await testPrisma.auditLog.create({
-      data: { action: "create", entityType: "person", userEmail: "a@b.com", createdAt: old },
+    await insertTestAuditLog({
+      action: "create",
+      entityType: "person",
+      userEmail: "a@b.com",
+      createdAt: old,
     });
-    await testPrisma.auditLog.create({
-      data: { action: "update", entityType: "person", userEmail: "a@b.com", createdAt: mid },
+    await insertTestAuditLog({
+      action: "update",
+      entityType: "person",
+      userEmail: "a@b.com",
+      createdAt: mid,
     });
-    await testPrisma.auditLog.create({
-      data: { action: "delete", entityType: "person", userEmail: "a@b.com", createdAt: recent },
+    await insertTestAuditLog({
+      action: "delete",
+      entityType: "person",
+      userEmail: "a@b.com",
+      createdAt: recent,
     });
     const result = await getAuditLogs({
       dateFrom: new Date("2025-03-01"),
@@ -540,12 +598,16 @@ describe("getAuditLogs", () => {
   // Returns correct total count even when paginated.
   test("returns correct total with filters and pagination", async () => {
     for (let i = 0; i < 3; i++) {
-      await testPrisma.auditLog.create({
-        data: { action: "create", entityType: "person", userEmail: "a@b.com" },
+      await insertTestAuditLog({
+        action: "create",
+        entityType: "person",
+        userEmail: "a@b.com",
       });
     }
-    await testPrisma.auditLog.create({
-      data: { action: "delete", entityType: "person", userEmail: "a@b.com" },
+    await insertTestAuditLog({
+      action: "delete",
+      entityType: "person",
+      userEmail: "a@b.com",
     });
     const result = await getAuditLogs({ action: "create", page: 1, pageSize: 2 });
     expect(result.logs).toHaveLength(2);
@@ -554,14 +616,14 @@ describe("getAuditLogs", () => {
 
   // Filters by multiple criteria simultaneously (action + entityType).
   test("filters by action AND entityType together", async () => {
-    await testPrisma.auditLog.createMany({
-      data: [
-        { action: "create", entityType: "person", userId: null, userEmail: null },
-        { action: "create", entityType: "team", userId: null, userEmail: null },
-        { action: "update", entityType: "person", userId: null, userEmail: null },
-        { action: "update", entityType: "team", userId: null, userEmail: null },
-      ],
-    });
+    for (const d of [
+      { action: "create", entityType: "person" },
+      { action: "create", entityType: "team" },
+      { action: "update", entityType: "person" },
+      { action: "update", entityType: "team" },
+    ] as const) {
+      await insertTestAuditLog(d);
+    }
 
     const result = await getAuditLogs({ action: "create", entityType: "person" });
     expect(result.logs).toHaveLength(1);
@@ -575,30 +637,20 @@ describe("getAuditLogs", () => {
     const yesterday = new Date(now.getTime() - 86400000);
     const twoDaysAgo = new Date(now.getTime() - 172800000);
 
-    await testPrisma.auditLog.createMany({
-      data: [
-        {
-          action: "create",
-          entityType: "person",
-          userId: null,
-          userEmail: null,
-          createdAt: twoDaysAgo,
-        },
-        {
-          action: "update",
-          entityType: "person",
-          userId: null,
-          userEmail: null,
-          createdAt: yesterday,
-        },
-        {
-          action: "delete",
-          entityType: "person",
-          userId: null,
-          userEmail: null,
-          createdAt: now,
-        },
-      ],
+    await insertTestAuditLog({
+      action: "create",
+      entityType: "person",
+      createdAt: twoDaysAgo,
+    });
+    await insertTestAuditLog({
+      action: "update",
+      entityType: "person",
+      createdAt: yesterday,
+    });
+    await insertTestAuditLog({
+      action: "delete",
+      entityType: "person",
+      createdAt: now,
     });
 
     const result = await getAuditLogs({
@@ -613,37 +665,33 @@ describe("getAuditLogs", () => {
   // Filters by all criteria at once (action + entityType + userEmail + dateRange).
   test("filters by all criteria simultaneously", async () => {
     const now = new Date();
-    await testPrisma.auditLog.createMany({
-      data: [
-        {
-          action: "create",
-          entityType: "person",
-          userId: "u1",
-          userEmail: "alice@test.com",
-          createdAt: now,
-        },
-        {
-          action: "create",
-          entityType: "person",
-          userId: "u2",
-          userEmail: "bob@test.com",
-          createdAt: now,
-        },
-        {
-          action: "update",
-          entityType: "person",
-          userId: "u1",
-          userEmail: "alice@test.com",
-          createdAt: now,
-        },
-        {
-          action: "create",
-          entityType: "team",
-          userId: "u1",
-          userEmail: "alice@test.com",
-          createdAt: now,
-        },
-      ],
+    await insertTestAuditLog({
+      action: "create",
+      entityType: "person",
+      userId: "u1",
+      userEmail: "alice@test.com",
+      createdAt: now,
+    });
+    await insertTestAuditLog({
+      action: "create",
+      entityType: "person",
+      userId: "u2",
+      userEmail: "bob@test.com",
+      createdAt: now,
+    });
+    await insertTestAuditLog({
+      action: "update",
+      entityType: "person",
+      userId: "u1",
+      userEmail: "alice@test.com",
+      createdAt: now,
+    });
+    await insertTestAuditLog({
+      action: "create",
+      entityType: "team",
+      userId: "u1",
+      userEmail: "alice@test.com",
+      createdAt: now,
     });
 
     const result = await getAuditLogs({
@@ -661,6 +709,7 @@ describe("getAuditLogs", () => {
 describe("getAuditLogUserEmails", () => {
   beforeEach(async () => {
     await cleanDb();
+    await cleanTestMongo();
   });
 
   // Returns empty array when no logs exist.
@@ -671,14 +720,20 @@ describe("getAuditLogUserEmails", () => {
 
   // Returns distinct emails only — no duplicates.
   test("returns distinct emails", async () => {
-    await testPrisma.auditLog.create({
-      data: { action: "create", entityType: "person", userEmail: "alice@example.com" },
+    await insertTestAuditLog({
+      action: "create",
+      entityType: "person",
+      userEmail: "alice@example.com",
     });
-    await testPrisma.auditLog.create({
-      data: { action: "update", entityType: "person", userEmail: "alice@example.com" },
+    await insertTestAuditLog({
+      action: "update",
+      entityType: "person",
+      userEmail: "alice@example.com",
     });
-    await testPrisma.auditLog.create({
-      data: { action: "delete", entityType: "person", userEmail: "bob@example.com" },
+    await insertTestAuditLog({
+      action: "delete",
+      entityType: "person",
+      userEmail: "bob@example.com",
     });
     const result = await getAuditLogUserEmails();
     expect(result).toEqual(["alice@example.com", "bob@example.com"]);
@@ -686,11 +741,15 @@ describe("getAuditLogUserEmails", () => {
 
   // Excludes null emails (system/anonymous actions).
   test("excludes null emails", async () => {
-    await testPrisma.auditLog.create({
-      data: { action: "create", entityType: "person", userEmail: null },
+    await insertTestAuditLog({
+      action: "create",
+      entityType: "person",
+      userEmail: null,
     });
-    await testPrisma.auditLog.create({
-      data: { action: "create", entityType: "person", userEmail: "alice@example.com" },
+    await insertTestAuditLog({
+      action: "create",
+      entityType: "person",
+      userEmail: "alice@example.com",
     });
     const result = await getAuditLogUserEmails();
     expect(result).toEqual(["alice@example.com"]);
@@ -769,6 +828,7 @@ describe("getDepartments", () => {
 describe("getDashboardMetrics", () => {
   beforeEach(async () => {
     await cleanDb();
+    await cleanTestMongo();
   });
 
   // Returns zero counts when the database is empty.
@@ -886,13 +946,11 @@ describe("getDashboardMetrics", () => {
   // Returns recent audit log activity (max 10 entries, newest first).
   test("returns recent activity from audit log", async () => {
     for (let i = 0; i < 12; i++) {
-      await testPrisma.auditLog.create({
-        data: {
-          action: "create",
-          entityType: "person",
-          userEmail: `user${i}@test.com`,
-          createdAt: new Date(`2026-03-${String(i + 1).padStart(2, "0")}`),
-        },
+      await insertTestAuditLog({
+        action: "create",
+        entityType: "person",
+        userEmail: `user${i}@test.com`,
+        createdAt: new Date(`2026-03-${String(i + 1).padStart(2, "0")}`),
       });
     }
 
@@ -905,8 +963,10 @@ describe("getDashboardMetrics", () => {
 
   // Recent activity includes null userEmail for system actions.
   test("includes null userEmail in recent activity", async () => {
-    await testPrisma.auditLog.create({
-      data: { action: "seed", entityType: "person", userEmail: null },
+    await insertTestAuditLog({
+      action: "seed",
+      entityType: "person",
+      userEmail: null,
     });
 
     const metrics = await getDashboardMetrics();
@@ -955,6 +1015,7 @@ describe("getDataExportCounts", () => {
 
   beforeEach(async () => {
     await cleanDb();
+    await cleanTestMongo();
     hasPermission.mockResolvedValue(true);
   });
 
@@ -977,12 +1038,12 @@ describe("getDataExportCounts", () => {
     });
     await testPrisma.team.create({ data: { teamName: "Alpha" } });
     await testPrisma.department.create({ data: { name: "Engineering" } });
-    await testPrisma.auditLog.createMany({
-      data: [
-        { action: "create", entityType: "person", userEmail: "a@test.com" },
-        { action: "update", entityType: "team", userEmail: "b@test.com" },
-        { action: "delete", entityType: "department", userEmail: "a@test.com" },
-      ],
+    await insertTestAuditLog({ action: "create", entityType: "person", userEmail: "a@test.com" });
+    await insertTestAuditLog({ action: "update", entityType: "team", userEmail: "b@test.com" });
+    await insertTestAuditLog({
+      action: "delete",
+      entityType: "department",
+      userEmail: "a@test.com",
     });
 
     const counts = await getDataExportCounts();

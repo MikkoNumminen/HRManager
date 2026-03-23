@@ -1508,11 +1508,12 @@ export async function exportAuditLogsCsv(): Promise<string> {
 
   const sessionId = await getDemoSessionId();
   const MAX_EXPORT_ROWS = 10000;
-  const logs = await prisma.auditLog.findMany({
-    where: { sessionId },
-    orderBy: { createdAt: "desc" },
-    take: MAX_EXPORT_ROWS,
-  });
+  const { getAuditLogCollection } = await import("@/mongoDb");
+  const logs = await getAuditLogCollection()
+    .find({ sessionId })
+    .sort({ createdAt: -1 })
+    .limit(MAX_EXPORT_ROWS)
+    .toArray();
 
   return generateCSV(
     ["timestamp", "userEmail", "action", "entityType", "entityId", "before", "after"],

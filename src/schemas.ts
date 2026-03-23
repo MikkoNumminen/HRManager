@@ -111,7 +111,7 @@ export const AuditEntityTypeSchema = z.enum([
 ]);
 
 export const AuditLogSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string(),
   userId: z.string().nullable(),
   userEmail: z.string().nullable(),
   action: AuditActionSchema,

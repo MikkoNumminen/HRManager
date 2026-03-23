@@ -1,14 +1,31 @@
 import { testPrisma } from "./testDb";
+import {
+  setupTestMongo,
+  teardownTestMongo,
+  cleanTestMongo,
+  getTestAuditLogCollection,
+} from "./testMongoDb";
 
-// Mock next/server after() to execute callback immediately (no request scope in tests)
+// Mock next/server after() to collect callbacks so tests can await them
+const afterCallbacks: Array<() => Promise<void>> = [];
 jest.mock("next/server", () => ({
-  ...jest.requireActual("next/server"),
-  after: (cb: () => Promise<void>) => cb(),
+  after: (cb: () => Promise<void>) => {
+    afterCallbacks.push(cb);
+  },
 }));
+async function flushAfterCallbacks() {
+  for (const cb of afterCallbacks) await cb();
+  afterCallbacks.length = 0;
+}
 
 // Mock @/db to use the test database
 jest.mock("@/db", () => ({
   prisma: require("./testDb").testPrisma,
+}));
+
+// Mock @/mongoDb — logRateLimitHit writes audit logs to MongoDB
+jest.mock("@/mongoDb", () => ({
+  getAuditLogCollection: () => (globalThis as Record<string, unknown>).__testAuditLogCollection,
 }));
 
 // Mock @/auth — rateLimit uses auth() to identify authenticated users
@@ -24,18 +41,28 @@ jest.mock("next/headers", () => ({
   })),
 }));
 
+// Mock @/demoSession — logRateLimitHit calls getDemoSessionId
+jest.mock("@/demoSession", () => ({
+  getDemoSessionId: jest.fn().mockResolvedValue(null),
+}));
+
 import { rateLimit, rateLimitAuth, RateLimitError, cleanupExpiredRateLimits } from "@/rateLimit";
+
+beforeAll(async () => {
+  await setupTestMongo();
+  (globalThis as Record<string, unknown>).__testAuditLogCollection = getTestAuditLogCollection();
+});
 
 beforeEach(async () => {
   await testPrisma.rateLimit.deleteMany();
-  await testPrisma.auditLog.deleteMany();
+  await cleanTestMongo();
   mockHeaders.clear();
   mockHeaders.set("x-forwarded-for", "192.168.1.1");
 });
 
 afterAll(async () => {
   await testPrisma.rateLimit.deleteMany();
-  await testPrisma.auditLog.deleteMany();
+  await teardownTestMongo();
   await testPrisma.$disconnect();
 });
 
@@ -77,10 +104,11 @@ test("throws RateLimitError when limit exceeded", async () => {
   await expect(rateLimit("testAction")).rejects.toThrow(RateLimitError);
   await expect(rateLimit("testAction")).rejects.toThrow("Too many requests");
 
-  // Verify audit log entries were created for each rate limit hit
-  const auditLogs = await testPrisma.auditLog.findMany({
-    where: { action: "rate_limited" },
-  });
+  // Flush deferred after() callbacks so audit logs are written to MongoDB
+  await flushAfterCallbacks();
+
+  // Verify audit log entries were created for each rate limit hit (in MongoDB)
+  const auditLogs = await getTestAuditLogCollection().find({ action: "rate_limited" }).toArray();
   expect(auditLogs.length).toBeGreaterThanOrEqual(1);
   expect(JSON.parse(auditLogs[0].after!).rateLimitedAction).toBe("testAction");
 });

@@ -399,10 +399,10 @@ describe("AuditLogSchema", () => {
     expect(result.entityId).toBeNull();
   });
 
-  // The ID has to be a proper UUID.
-  test("rejects invalid UUID for id", () => {
-    const log = { ...validLog, id: "bad" };
-    expect(() => AuditLogSchema.parse(log)).toThrow();
+  // The ID accepts any string (MongoDB ObjectId or UUID).
+  test("accepts MongoDB ObjectId as id", () => {
+    const log = { ...validLog, id: "507f1f77bcf86cd799439011" };
+    expect(() => AuditLogSchema.parse(log)).not.toThrow();
   });
 
   // Only valid action types are allowed.

@@ -1,4 +1,11 @@
 import { testPrisma, cleanDb } from "./testDb";
+import {
+  setupTestMongo,
+  teardownTestMongo,
+  cleanTestMongo,
+  getTestAuditLogCollection,
+} from "./testMongoDb";
+import type { AuditLogDocument } from "@/mongoDb";
 
 // Mock @/db to use the test database
 jest.mock("@/db", () => ({
@@ -35,6 +42,12 @@ jest.mock("@/auditLog", () => ({
 // Rate limiting behavior is tested separately in rateLimit.test.ts.
 jest.mock("@/rateLimit", () => ({
   rateLimit: jest.fn(),
+}));
+
+// Mock @/mongoDb — exportAuditLogsCsv dynamically imports this.
+// Use globalThis pattern so test code can share the collection reference.
+jest.mock("@/mongoDb", () => ({
+  getAuditLogCollection: () => (globalThis as Record<string, unknown>).__testAuditLogCollection,
 }));
 
 // Mock demo session — defaults to null (production mode).
@@ -2511,22 +2524,47 @@ describe("exportDepartmentsCsv", () => {
 });
 
 describe("exportAuditLogsCsv", () => {
-  beforeEach(() => cleanDb());
+  beforeAll(async () => {
+    await setupTestMongo();
+    (globalThis as Record<string, unknown>).__testAuditLogCollection = getTestAuditLogCollection();
+  });
+
+  beforeEach(async () => {
+    await cleanDb();
+    await cleanTestMongo();
+  });
+
   afterAll(async () => {
     await cleanDb();
+    await teardownTestMongo();
     await testPrisma.$disconnect();
   });
 
+  /** Helper to insert a test audit log into MongoDB. */
+  async function insertAuditLog(
+    data: Partial<AuditLogDocument> & { action: string; entityType: string },
+  ) {
+    await getTestAuditLogCollection().insertOne({
+      userId: data.userId ?? null,
+      userEmail: data.userEmail ?? null,
+      action: data.action,
+      entityType: data.entityType,
+      entityId: data.entityId ?? null,
+      before: data.before ?? null,
+      after: data.after ?? null,
+      sessionId: data.sessionId ?? null,
+      createdAt: data.createdAt ?? new Date(),
+    });
+  }
+
   // Exports audit logs with headers
   test("exports audit logs as CSV with headers", async () => {
-    await testPrisma.auditLog.create({
-      data: {
-        action: "create",
-        entityType: "person",
-        entityId: "abc-123",
-        userEmail: "alice@test.com",
-        after: '{"name":"Alice"}',
-      },
+    await insertAuditLog({
+      action: "create",
+      entityType: "person",
+      entityId: "abc-123",
+      userEmail: "alice@test.com",
+      after: '{"name":"Alice"}',
     });
 
     const csv = await exportAuditLogsCsv();
@@ -2545,21 +2583,17 @@ describe("exportAuditLogsCsv", () => {
 
   // Exports multiple logs ordered by timestamp descending
   test("exports logs in descending order", async () => {
-    await testPrisma.auditLog.create({
-      data: {
-        action: "create",
-        entityType: "person",
-        userEmail: "first@test.com",
-        createdAt: new Date("2026-01-01"),
-      },
+    await insertAuditLog({
+      action: "create",
+      entityType: "person",
+      userEmail: "first@test.com",
+      createdAt: new Date("2026-01-01"),
     });
-    await testPrisma.auditLog.create({
-      data: {
-        action: "delete",
-        entityType: "team",
-        userEmail: "second@test.com",
-        createdAt: new Date("2026-02-01"),
-      },
+    await insertAuditLog({
+      action: "delete",
+      entityType: "team",
+      userEmail: "second@test.com",
+      createdAt: new Date("2026-02-01"),
     });
 
     const csv = await exportAuditLogsCsv();

@@ -1,4 +1,4 @@
-import { prisma } from "@/db";
+import { getAuditLogCollection } from "@/mongoDb";
 import { auth } from "@/auth";
 import { getDemoSessionId } from "@/demoSession";
 import { AuditActionSchema, AuditEntityTypeSchema } from "@/schemas";
@@ -43,17 +43,16 @@ export async function logAudit({
   const user = await getSessionUser();
   const sessionId = await getDemoSessionId();
 
-  await prisma.auditLog.create({
-    data: {
-      userId: user?.id ?? null,
-      userEmail: user?.email ?? null,
-      action,
-      entityType,
-      entityId: entityId ?? null,
-      before: before !== undefined ? JSON.stringify(before) : null,
-      after: afterData !== undefined ? JSON.stringify(afterData) : null,
-      sessionId,
-    },
+  await getAuditLogCollection().insertOne({
+    userId: user?.id ?? null,
+    userEmail: user?.email ?? null,
+    action,
+    entityType,
+    entityId: entityId ?? null,
+    before: before !== undefined ? JSON.stringify(before) : null,
+    after: afterData !== undefined ? JSON.stringify(afterData) : null,
+    sessionId,
+    createdAt: new Date(),
   });
 }
 
@@ -86,8 +85,9 @@ export function deferAudit(entries: DeferredAuditEntry[]): void {
 
   after(async () => {
     try {
-      await prisma.auditLog.createMany({
-        data: entries.map((entry) => ({
+      const col = getAuditLogCollection();
+      await col.insertMany(
+        entries.map((entry) => ({
           userId: entry.userId,
           userEmail: entry.userEmail,
           action: entry.action,
@@ -96,8 +96,9 @@ export function deferAudit(entries: DeferredAuditEntry[]): void {
           before: entry.before !== undefined ? JSON.stringify(entry.before) : null,
           after: entry.after !== undefined ? JSON.stringify(entry.after) : null,
           sessionId: entry.sessionId,
+          createdAt: new Date(),
         })),
-      });
+      );
     } catch (error) {
       console.error("[audit] Failed to write deferred audit entries:", error);
     }
@@ -120,17 +121,16 @@ export async function logPermissionDenial(permissionKey: string): Promise<void> 
 
   after(async () => {
     try {
-      await prisma.auditLog.create({
-        data: {
-          userId: user?.id ?? null,
-          userEmail: user?.email ?? null,
-          action: "permission_denied",
-          entityType: "security",
-          entityId: null,
-          before: null,
-          after: JSON.stringify({ permissionKey }),
-          sessionId,
-        },
+      await getAuditLogCollection().insertOne({
+        userId: user?.id ?? null,
+        userEmail: user?.email ?? null,
+        action: "permission_denied",
+        entityType: "security",
+        entityId: null,
+        before: null,
+        after: JSON.stringify({ permissionKey }),
+        sessionId,
+        createdAt: new Date(),
       });
     } catch (error) {
       console.error("[audit] Failed to log permission denial:", error);
@@ -148,17 +148,16 @@ export async function logRateLimitHit(action: string, identifier: string): Promi
 
   after(async () => {
     try {
-      await prisma.auditLog.create({
-        data: {
-          userId: null,
-          userEmail: null,
-          action: "rate_limited",
-          entityType: "security",
-          entityId: null,
-          before: null,
-          after: JSON.stringify({ rateLimitedAction: action, identifier: safeIdentifier }),
-          sessionId,
-        },
+      await getAuditLogCollection().insertOne({
+        userId: null,
+        userEmail: null,
+        action: "rate_limited",
+        entityType: "security",
+        entityId: null,
+        before: null,
+        after: JSON.stringify({ rateLimitedAction: action, identifier: safeIdentifier }),
+        sessionId,
+        createdAt: new Date(),
       });
     } catch (error) {
       console.error("[audit] Failed to log rate limit hit:", error);

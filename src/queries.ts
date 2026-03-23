@@ -1,4 +1,3 @@
-import { Prisma } from "@prisma/client";
 import { prisma } from "@/db";
 import { auth } from "@/auth";
 import {
@@ -22,6 +21,8 @@ import {
 } from "./schemas";
 import { resolvePermissions, PERMISSION_KEYS, hasPermission } from "@/permissions";
 import { getDemoSessionId } from "@/demoSession";
+import { getAuditLogCollection } from "@/mongoDb";
+import { Filter } from "mongodb";
 
 export async function getPersons(): Promise<Person[]> {
   const sessionId = await getDemoSessionId();
@@ -152,39 +153,50 @@ export async function getAuditLogs(
   const { userEmail, action, entityType, dateFrom, dateTo, page, pageSize } = parsed;
 
   const sessionId = await getDemoSessionId();
-  const where: Prisma.AuditLogWhereInput = { sessionId };
+  const col = getAuditLogCollection();
+  const filter: Filter<{ sessionId: string | null }> = { sessionId };
 
   if (userEmail) {
-    where.userEmail = { contains: userEmail };
+    (filter as Record<string, unknown>).userEmail = { $regex: userEmail, $options: "i" };
   }
   if (action) {
-    where.action = action;
+    (filter as Record<string, unknown>).action = action;
   }
   if (entityType) {
-    where.entityType = entityType;
+    (filter as Record<string, unknown>).entityType = entityType;
   }
   if (dateFrom || dateTo) {
-    where.createdAt = {
-      ...(dateFrom && { gte: dateFrom }),
-      ...(dateTo && { lte: dateTo }),
-    };
+    const createdAtFilter: Record<string, Date> = {};
+    if (dateFrom) createdAtFilter.$gte = dateFrom;
+    if (dateTo) createdAtFilter.$lte = dateTo;
+    (filter as Record<string, unknown>).createdAt = createdAtFilter;
   }
 
-  const [logs, total] = await Promise.all([
-    prisma.auditLog.findMany({
-      where,
-      omit: { sessionId: true },
-      orderBy: { createdAt: "desc" },
-      skip: (page - 1) * pageSize,
-      take: pageSize,
-    }),
-    prisma.auditLog.count({ where }),
+  const [docs, total] = await Promise.all([
+    col
+      .find(filter)
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * pageSize)
+      .limit(pageSize)
+      .toArray(),
+    col.countDocuments(filter),
   ]);
 
-  return {
-    logs: logs.map((log) => AuditLogSchema.parse(log)),
-    total,
-  };
+  const logs = docs.map((doc) =>
+    AuditLogSchema.parse({
+      id: doc._id!.toString(),
+      userId: doc.userId,
+      userEmail: doc.userEmail,
+      action: doc.action,
+      entityType: doc.entityType,
+      entityId: doc.entityId,
+      before: doc.before,
+      after: doc.after,
+      createdAt: doc.createdAt,
+    }),
+  );
+
+  return { logs, total };
 }
 
 // Raw SQL result types for dashboard queries (unnamed parameterized queries
@@ -209,13 +221,6 @@ interface GrowthTimelineRow {
   teams: number;
   departments: number;
 }
-interface RecentActivityRow {
-  action: string;
-  entityType: string;
-  userEmail: string | null;
-  createdAt: Date;
-}
-
 export async function getDashboardMetrics(): Promise<DashboardMetrics> {
   const allowed = await hasPermission("dashboard:view");
   if (!allowed) {
@@ -223,7 +228,7 @@ export async function getDashboardMetrics(): Promise<DashboardMetrics> {
   }
   const sessionId = await getDemoSessionId();
 
-  const [countsRows, teamSizes, departmentSizes, growthTimeline, recentActivityRows] =
+  const [countsRows, teamSizes, departmentSizes, growthTimeline, recentActivityDocs] =
     await Promise.all([
       prisma.$queryRaw<DashboardCountsRow[]>`
         SELECT
@@ -283,17 +288,16 @@ export async function getDashboardMetrics(): Promise<DashboardMetrics> {
         FROM daily
         ORDER BY date ASC
       `,
-      prisma.$queryRaw<RecentActivityRow[]>`
-        SELECT "action", "entityType", "userEmail", "createdAt"
-        FROM "AuditLog"
-        WHERE "sessionId" IS NOT DISTINCT FROM ${sessionId}
-        ORDER BY "createdAt" DESC
-        LIMIT 10
-      `,
+      getAuditLogCollection()
+        .find({ sessionId })
+        .sort({ createdAt: -1 })
+        .limit(10)
+        .project({ action: 1, entityType: 1, userEmail: 1, createdAt: 1 })
+        .toArray(),
     ]);
 
   const counts = countsRows[0];
-  const recentActivity = recentActivityRows.map((log) => DashboardRecentActivitySchema.parse(log));
+  const recentActivity = recentActivityDocs.map((log) => DashboardRecentActivitySchema.parse(log));
 
   return DashboardMetricsSchema.parse({
     totalPersons: counts?.totalPersons ?? 0,
@@ -324,13 +328,12 @@ export async function getAuditLogUserEmails(): Promise<string[]> {
     throw new Error("Permission denied");
   }
   const sessionId = await getDemoSessionId();
-  const results = await prisma.auditLog.findMany({
-    select: { userEmail: true },
-    distinct: ["userEmail"],
-    where: { userEmail: { not: null }, sessionId },
-    orderBy: { userEmail: "asc" },
+  const col = getAuditLogCollection();
+  const emails = await col.distinct("userEmail", {
+    userEmail: { $ne: null },
+    sessionId,
   });
-  return results.map((r) => r.userEmail!);
+  return (emails as string[]).filter(Boolean).sort();
 }
 
 export async function getProfile(): Promise<UserProfile | null> {
@@ -378,7 +381,7 @@ export async function getDataExportCounts(): Promise<DataExportCounts> {
     prisma.person.count({ where: { deletedAt: null, sessionId } }),
     prisma.team.count({ where: { deletedAt: null, sessionId } }),
     prisma.department.count({ where: { deletedAt: null, sessionId } }),
-    prisma.auditLog.count({ where: { sessionId } }),
+    getAuditLogCollection().countDocuments({ sessionId }),
   ]);
   return { persons, teams, departments, auditLogs };
 }
