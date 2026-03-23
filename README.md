@@ -1,6 +1,6 @@
 # HRManager
 
-A production-grade HR management system with granular RBAC, dashboard analytics, audit logging, rate limiting, CSP + security headers, AI-powered i18n across 18 languages, mobile-first responsive design, and 1114 tests (1080 unit/integration + 34 E2E) at 99.5% line coverage.
+A production-grade HR management system with granular RBAC, dashboard analytics, audit logging, rate limiting, CSP + security headers, AI-powered i18n across 18 languages, mobile-first responsive design, and 1120 tests (1086 unit/integration + 34 E2E) at 99.5% line coverage.
 
 [![CI](https://github.com/MikkoNumminen/HRManager/actions/workflows/ci.yml/badge.svg)](https://github.com/MikkoNumminen/HRManager/actions/workflows/ci.yml)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)
@@ -30,7 +30,7 @@ A production-grade HR management system with granular RBAC, dashboard analytics,
 - **Dashboard analytics** — KPI cards, bar chart (members per team), pie chart (teams per department), line chart (organization growth), and recent activity feed powered by MUI X Charts; permission-gated via `dashboard:view`
 - **Optimistic updates** — React 19 `useOptimistic` on all create actions; new items appear in the table instantly before the server responds, then seamlessly merge with real data on revalidation
 - **Mobile-first responsive design** — card-based layouts for mobile (< 900px), collapsible filters, responsive form buttons (stack vertically on mobile), hamburger menu with navigation drawer, shared responsive style tokens via `muiStyles.ts`
-- **1114 tests (1080 unit/integration + 34 E2E), 99.5% line coverage** — Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, rate limiting, auth route handlers, CSP proxy, audit logging, style tokens, dashboard analytics, optimistic UI, demo session isolation, all 45 UI components tested against real PostgreSQL, plus Playwright E2E covering full user flows
+- **1120 tests (1086 unit/integration + 34 E2E), 99.5% line coverage** — Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, rate limiting, auth route handlers, CSP proxy, audit logging, style tokens, dashboard analytics, optimistic UI, demo session isolation, all 45 UI components tested against real PostgreSQL, plus Playwright E2E covering full user flows
 - **Demo session isolation** — each "Try Demo" click creates a private data sandbox with pre-seeded org data (9 people, 5 teams, 4 departments); sessions auto-expire after 24 hours of inactivity; no cross-session data leakage
 - **Granular RBAC** — 4 roles, 24 permission keys, per-user grant/deny overrides with three-state toggles (deny / role default / grant), and "kick out" user removal with confirmation dialog
 - **Soft deletes** — `deletedAt` column on Person, Team, Department, and TeamMember with partial unique indexes; split into production scope (`WHERE sessionId IS NULL`) and demo scope (`WHERE sessionId IS NOT NULL`) for multi-tenant uniqueness; cascade soft-deletes for team memberships and FK nulling for manager/head references; preserves full audit history
@@ -126,9 +126,9 @@ Individual permissions can be overridden per-user — e.g. granting `person:crea
 | Theme config     | 12       |
 | Tutorial config  | 26       |
 | i18n             | 14       |
-| UI components    | 592      |
+| UI components    | 600      |
 | E2E (Playwright) | 34       |
-| **Total**        | **1114** |
+| **Total**        | **1120** |
 
 ```
 Statements : 99.11%    Branches : 94.95%
