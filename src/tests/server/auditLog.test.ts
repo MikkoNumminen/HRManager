@@ -195,7 +195,7 @@ describe("logRateLimitHit", () => {
     expect(logs[0].userEmail).toBeNull();
     expect(JSON.parse(logs[0].after!)).toEqual({
       rateLimitedAction: "createPerson",
-      identifier: "ip:192.168.1.1",
+      identifier: "ip:aXA6MTkyLjE2...",
     });
   });
 
@@ -209,7 +209,7 @@ describe("logRateLimitHit", () => {
     expect(logs[0].action).toBe("rate_limited");
     expect(JSON.parse(logs[0].after!)).toEqual({
       rateLimitedAction: "auth:signin",
-      identifier: "ip:10.0.0.1",
+      identifier: "ip:aXA6MTAuMC4w...",
     });
   });
 });
