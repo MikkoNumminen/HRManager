@@ -38,25 +38,12 @@ export default async function RootLayout({
         <script nonce={nonce} dangerouslySetInnerHTML={{ __html: foucScript }} />
       </head>
       <body style={{ fontFamily: inter.style.fontFamily }}>
-        <Box
-          component="a"
-          href="#main-content"
-          sx={{
-            position: "absolute",
-            top: -40,
-            left: 0,
-            px: 2,
-            py: 1,
-            zIndex: 1500,
-            backgroundColor: "var(--hrm-green400)",
-            color: "var(--hrm-slate700)",
-            fontWeight: 600,
-            textDecoration: "none",
-            "&:focus": { top: 0 },
-          }}
-        >
+        <style
+          nonce={nonce}
+        >{`.skip-link{position:absolute;top:-40px;left:0;padding:8px 16px;z-index:1500;background:var(--hrm-green400);color:var(--hrm-slate700);font-weight:600;text-decoration:none}.skip-link:focus{top:0}`}</style>
+        <a href="#main-content" className="skip-link">
           Skip to main content
-        </Box>
+        </a>
         <SessionProvider>
           <AppRouterCacheProvider options={{ nonce }}>
             <NextIntlClientProvider locale={locale} messages={messages}>
