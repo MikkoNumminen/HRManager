@@ -1,8 +1,11 @@
 import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 
-export const testPrisma = new PrismaClient({
-  datasources: { db: { url: process.env.DATABASE_URL } },
+const adapter = new PrismaPg({
+  connectionString: process.env.DATABASE_URL!,
 });
+
+export const testPrisma = new PrismaClient({ adapter });
 
 export async function cleanDb() {
   await testPrisma.auditLog.deleteMany();
