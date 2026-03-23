@@ -27,7 +27,7 @@ A production-grade HR management system with granular RBAC, dashboard analytics,
 
 ## Highlights
 
-- **Dashboard analytics** — KPI cards, bar chart (members per team), pie chart (teams per department), line chart (organization growth), and recent activity feed powered by MUI X Charts; permission-gated via `dashboard:view`
+- **Dashboard analytics** — KPI cards, bar chart (members per team), pie chart (teams per department), line chart (organization growth), and recent activity feed powered by MUI X Charts; backed by Prisma Typed SQL queries with CTEs and window functions (5 parallel `$queryRawTyped` calls replacing 10+ ORM round-trips); permission-gated via `dashboard:view`
 - **Optimistic updates** — React 19 `useOptimistic` on all create actions; new items appear in the table instantly before the server responds, then seamlessly merge with real data on revalidation
 - **Mobile-first responsive design** — card-based layouts for mobile (< 900px), collapsible filters, responsive form buttons (stack vertically on mobile), hamburger menu with navigation drawer, shared responsive style tokens via `muiStyles.ts`
 - **1189 tests (1155 unit/integration + 34 E2E), 99.4% line coverage** — Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, rate limiting, auth route handlers, CSP proxy, audit logging, style tokens, dashboard analytics, optimistic UI, demo session isolation, all 46 UI components tested against real PostgreSQL, plus Playwright E2E covering full user flows
@@ -55,7 +55,7 @@ A production-grade HR management system with granular RBAC, dashboard analytics,
 | Framework  | Next.js 16 (App Router, Server Components)                     |
 | UI         | React 19 + MUI v7 + MUI X Charts                               |
 | Language   | TypeScript 5.9                                                 |
-| ORM        | Prisma 7 (driver adapters, `prisma.config.ts`)                 |
+| ORM        | Prisma 7 (driver adapters, Typed SQL, `prisma.config.ts`)      |
 | Database   | PostgreSQL (Vercel Postgres / Neon in production)              |
 | Validation | Zod 4                                                          |
 | Auth       | NextAuth v5 (JWT, Google + GitHub OAuth + demo login)          |
@@ -83,7 +83,7 @@ graph LR
     Prisma --> PG[(PostgreSQL)]
 ```
 
-- **Reads** in `queries.ts` — Zod-validated, no `"use server"`
+- **Reads** in `queries.ts` — Zod-validated, no `"use server"`; dashboard metrics use Prisma Typed SQL (`prisma/sql/`) with `$queryRawTyped` for type-safe raw queries with CTEs and window functions
 - **Mutations** in `serverActions.ts` — always inside `$transaction`, always audit-logged; deletes are soft (set `deletedAt`) with cascade logic
 - **Types** in `schemas.ts` — Zod schemas with `z.infer` exports, used everywhere
 - **Auth** in `auth.ts` — JWT strategy with permission-enriched tokens; automatic superuser bootstrapping; `permissionsVersion`-based stale permission detection

@@ -16,7 +16,7 @@ This is a **portfolio / showcase project**. The goal is to demonstrate technical
 | Framework  | Next.js 16 (App Router, Server Components)                                |
 | UI         | React 19 + MUI v7 — dark theme throughout, no Tailwind                    |
 | Language   | TypeScript 5.9                                                            |
-| ORM        | Prisma 7 (`relationLoadStrategy: 'join'`)                                 |
+| ORM        | Prisma 7 (driver adapters, Typed SQL, `prisma.config.ts`)                 |
 | Database   | PostgreSQL (local dev + Vercel Postgres / Neon in production)             |
 | Validation | Zod 4                                                                     |
 | Auth       | NextAuth v5 (JWT strategy, Google + GitHub OAuth + demo login)            |
@@ -29,7 +29,7 @@ This is a **portfolio / showcase project**. The goal is to demonstrate technical
 
 ## Architecture
 
-- **Reads** go in `queries.ts` (no `"use server"`). Validated through Zod schemas.
+- **Reads** go in `queries.ts` (no `"use server"`). Validated through Zod schemas. Dashboard metrics use Prisma Typed SQL (`prisma/sql/`) with `$queryRawTyped` for type-safe raw queries.
 - **Mutations** go in `serverActions.ts` (marked `"use server"`). Always inside `prisma.$transaction()` — even single operations. Every mutation is audit-logged via `logAudit()` from `auditLog.ts` inside the same transaction for atomicity.
 - **Audit logging** — `auditLog.ts` provides `logAudit()` which records who, what action, which entity, and before/after JSON snapshots. Uses `auth()` session for actor identity. Accepts optional `tx` param to run inside an existing transaction. No FK to User — logs survive user deletion. `logPermissionDenial()` and `logRateLimitHit()` log security events (permission denials and rate limit hits) to the same audit trail.
 - Pages are async Server Components that fetch data and pass it as props to Client Components. No `useEffect` data fetching.
@@ -89,7 +89,8 @@ src/
 └── tutorialConfig.ts # Gamified demo tour (8-step tutorial)
 messages/             # 18 locale JSON files (en, fi, de, fr, es, ...)
 prisma/
-└── schema.prisma     # Data model (PostgreSQL)
+├── schema.prisma     # Data model (PostgreSQL)
+└── sql/              # Prisma Typed SQL queries (dashboard metrics)
 scripts/
 └── i18n-sync.ts      # i18n audit and translation pipeline
 docs/
