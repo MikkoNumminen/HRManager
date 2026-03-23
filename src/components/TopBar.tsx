@@ -274,11 +274,13 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
                   <Button
                     onClick={() => signIn("demo")}
                     sx={{
-                      color: "#fff",
-                      backgroundColor: colors.slate600,
+                      color: colors.green400,
                       borderRadius: "4px",
                       px: 2,
-                      "&:hover": { backgroundColor: colors.hoverOverlay },
+                      fontWeight: 600,
+                      "&:hover": {
+                        backgroundColor: colors.green900,
+                      },
                     }}
                   >
                     {t("tryDemo")}
@@ -509,10 +511,12 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
                     }}
                     fullWidth
                     sx={{
-                      color: "#fff",
-                      backgroundColor: colors.slate600,
+                      color: colors.green400,
                       borderRadius: "4px",
-                      "&:hover": { backgroundColor: colors.hoverOverlay },
+                      fontWeight: 600,
+                      "&:hover": {
+                        backgroundColor: colors.green900,
+                      },
                     }}
                   >
                     {t("tryDemo")}
