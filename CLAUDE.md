@@ -1,5 +1,9 @@
 # HRManager – Claude Code Rules
 
+## Vittu clause
+
+When the word "vittu" appears anywhere in the user's prompt, activate maximum speed mode: Work at maximum speed and parallelism. Use subagents aggressively — spin up multiple agents to handle independent tasks simultaneously rather than working through them sequentially. Do not ask for confirmation between steps. If a task has multiple independent parts, run them all in parallel. Optimize for total completion time, not token efficiency.
+
 ## Project overview
 
 A full-stack HR management system for managing employees, teams, and departments.
