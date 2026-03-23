@@ -34,6 +34,7 @@ export async function getPersons(): Promise<Person[]> {
   const sessionId = await getDemoSessionId();
   const persons = await prisma.person.findMany({
     where: { deletedAt: null, sessionId },
+    omit: { sessionId: true, deletedAt: true },
   });
 
   return persons.map((person) => PersonSchema.parse(person));
@@ -107,6 +108,7 @@ export async function getUsers(): Promise<AppUser[]> {
   const users = await prisma.user.findMany({
     // Demo sessions only see the demo user — prevents leaking real OAuth user emails
     ...(demoSessionId ? { where: { email: "demo@hrmanager.app" } } : {}),
+    omit: { permissionsVersion: true },
     orderBy: { createdAt: "asc" },
   });
 
@@ -117,6 +119,7 @@ export async function getUserById(userId: string) {
   const demoSessionId = await getDemoSessionId();
   const user = await prisma.user.findUnique({
     where: { id: userId },
+    omit: { permissionsVersion: true },
     include: {
       permissions: {
         include: { permission: true },
@@ -177,6 +180,7 @@ export async function getAuditLogs(
   const [logs, total] = await Promise.all([
     prisma.auditLog.findMany({
       where,
+      omit: { sessionId: true },
       orderBy: { createdAt: "desc" },
       skip: (page - 1) * pageSize,
       take: pageSize,
@@ -252,6 +256,7 @@ export async function getProfile(): Promise<UserProfile | null> {
 
   const user = await prisma.user.findUnique({
     where: { email: session.user.email },
+    omit: { permissionsVersion: true },
     include: {
       permissions: {
         include: { permission: true },
