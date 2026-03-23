@@ -1,8 +1,8 @@
 name: Auto-fix CI failures
 
 # DISABLED — requires paid Anthropic API credits.
-# TODO: Replace with local CLI-based autofix agent (like i18n-sync.ts).
-# See TODO.md for the replacement task.
+# To enable: remove the `false &&` prefix from the `if` condition below.
+# Requires ANTHROPIC_API_KEY secret in repository settings.
 
 on:
   workflow_run:
@@ -13,35 +13,80 @@ permissions:
   contents: write
   pull-requests: write
   actions: read
-  issues: write
-  id-token: write
 
 jobs:
   autofix:
-    # Disabled — always skip
-    if: false
+    # 1. TRIGGER RELIABILITY: Only run on actual failures, skip autofix branches
+    #    to prevent infinite loops, and require the CI workflow to have failed.
+    #    Remove `false &&` to enable.
+    if: >
+      false &&
+      github.event.workflow_run.conclusion == 'failure' &&
+      !startsWith(github.event.workflow_run.head_branch, 'autofix/')
     runs-on: ubuntu-latest
     steps:
+      # 5. FALSE POSITIVE HANDLING: Check for transient failures before doing work
+      - name: Check for transient failures
+        id: triage
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Skip if the same commit already has a passing CI run (flaky failure)
+            const runs = await github.rest.actions.listWorkflowRunsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head_sha: context.payload.workflow_run.head_sha,
+              status: 'success'
+            });
+            if (runs.data.total_count > 0) {
+              core.info('Same commit has a passing run — likely transient, skipping');
+              core.setOutput('skip', 'true');
+              return;
+            }
+
+            // Skip if another autofix workflow is already in progress (prevent pile-up)
+            const inProgress = await github.rest.actions.listWorkflowRuns({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'autofix.yml',
+              status: 'in_progress'
+            });
+            if (inProgress.data.total_count > 1) {
+              core.info('Another autofix is already running — skipping');
+              core.setOutput('skip', 'true');
+              return;
+            }
+
+            core.setOutput('skip', 'false');
+
       - name: Checkout code
+        if: steps.triage.outputs.skip != 'true'
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.workflow_run.head_sha }}
-          fetch-depth: 0
+          fetch-depth: 2
 
       - name: Setup git identity
+        if: steps.triage.outputs.skip != 'true'
         run: |
           git config --global user.email "claude[bot]@users.noreply.github.com"
           git config --global user.name "claude[bot]"
 
       - name: Create fix branch
+        if: steps.triage.outputs.skip != 'true'
         id: branch
         run: |
-          BRANCH_NAME="autofix/ci-${{ github.event.workflow_run.run_number }}-${{ github.run_id }}"
+          BRANCH_NAME="autofix/ci-${{ github.event.workflow_run.run_number }}"
           git checkout -b "$BRANCH_NAME"
           echo "branch_name=$BRANCH_NAME" >> "$GITHUB_OUTPUT"
 
-      - name: Get CI failure logs
-        id: failure_details
+      # 2. SIGNAL QUALITY: Fetch failure logs (15k chars), commit diff, failed
+      #    step names, and classify the failure type.
+      # 6. SECURITY: Sanitize logs to redact potential secrets before sending
+      #    to the Anthropic API.
+      - name: Gather failure context
+        if: steps.triage.outputs.skip != 'true'
+        id: context
         uses: actions/github-script@v7
         with:
           script: |
@@ -59,42 +104,180 @@ jobs:
 
             const failedJobs = jobs.data.jobs.filter(job => job.conclusion === 'failure');
 
-            let errorLogs = [];
+            let errorContext = [];
             for (const job of failedJobs) {
+              // Identify which specific steps failed within the job
+              const failedSteps = (job.steps || [])
+                .filter(s => s.conclusion === 'failure')
+                .map(s => s.name);
+
               const logs = await github.rest.actions.downloadJobLogsForWorkflowRun({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 job_id: job.id
               });
-              errorLogs.push({
+
+              // Sanitize logs: redact database URLs, API keys, long base64 strings
+              let logText = typeof logs.data === 'string' ? logs.data : String(logs.data);
+              logText = logText
+                .replace(/postgresql:\/\/[^\s"']+/gi, '[DB_URL_REDACTED]')
+                .replace(/mongodb(\+srv)?:\/\/[^\s"']+/gi, '[DB_URL_REDACTED]')
+                .replace(/sk-[a-zA-Z0-9]{20,}/g, '[API_KEY_REDACTED]')
+                .replace(/ghp_[a-zA-Z0-9]{36,}/g, '[GITHUB_TOKEN_REDACTED]')
+                .replace(/npm_[a-zA-Z0-9]{36,}/g, '[NPM_TOKEN_REDACTED]')
+                .slice(-15000);
+
+              errorContext.push({
                 jobName: job.name,
-                logs: typeof logs.data === 'string' ? logs.data.slice(-5000) : String(logs.data).slice(-5000)
+                failedSteps,
+                logs: logText
               });
             }
 
+            // Fetch the commit diff so the agent knows what changed
+            let commitDiff = '';
+            try {
+              const comparison = await github.rest.repos.compareCommits({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                base: run.data.head_sha + '~1',
+                head: run.data.head_sha
+              });
+              commitDiff = (comparison.data.files || [])
+                .map(f => `${f.status}: ${f.filename} (+${f.additions} -${f.deletions})`)
+                .join('\n') || 'No file changes found';
+            } catch {
+              commitDiff = 'Could not fetch commit diff';
+            }
+
+            // Classify the failure based on which CI step failed
+            const allFailedSteps = errorContext.flatMap(e => e.failedSteps);
+            let failureCategory = 'UNKNOWN';
+            if (allFailedSteps.some(s => /install/i.test(s))) failureCategory = 'DEPENDENCY';
+            else if (allFailedSteps.some(s => /format/i.test(s))) failureCategory = 'FORMATTING';
+            else if (allFailedSteps.some(s => /lint/i.test(s))) failureCategory = 'LINT';
+            else if (allFailedSteps.some(s => /test/i.test(s))) failureCategory = 'TEST';
+            else if (allFailedSteps.some(s => /build/i.test(s))) failureCategory = 'BUILD';
+            else if (allFailedSteps.some(s => /schema|prisma/i.test(s))) failureCategory = 'SCHEMA';
+
             return {
               runUrl: run.data.html_url,
+              branch: run.data.head_branch,
               failedJobs: failedJobs.map(j => j.name),
-              errorLogs: errorLogs
+              failureCategory,
+              errorContext,
+              commitDiff
             };
 
+      # 5. FALSE POSITIVE HANDLING: Skip infrastructure/dependency failures
+      #    that require retrying, not code fixes.
+      - name: Skip infrastructure failures
+        if: steps.triage.outputs.skip != 'true'
+        id: infra_check
+        run: |
+          CATEGORY="${{ fromJSON(steps.context.outputs.result).failureCategory }}"
+          if [ "$CATEGORY" = "DEPENDENCY" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::Infrastructure failure (dependency install) — skipping autofix, retry the CI run instead"
+          elif [ "$CATEGORY" = "SCHEMA" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::Schema/migration failure — requires manual intervention, skipping autofix"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # 3. DIAGNOSTIC ACCURACY: Structured prompt with failure classification,
+      #    project context (CLAUDE.md), commit diff, and categorized instructions.
+      # 4. ACTION RELEVANCE: Restricted tool access (no Write, no arbitrary Bash),
+      #    strict constraints on what the agent can and cannot modify.
       - name: Fix CI failures with Claude Code
+        if: >
+          steps.triage.outputs.skip != 'true' &&
+          steps.infra_check.outputs.skip != 'true'
+        id: claude_fix
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: |
-            The CI pipeline for this project failed. Analyze the errors and make the minimal fixes needed.
+            The CI pipeline failed. Read CLAUDE.md first for project conventions, then analyze and fix.
 
-            Failed CI Run: ${{ fromJSON(steps.failure_details.outputs.result).runUrl }}
-            Failed Jobs: ${{ join(fromJSON(steps.failure_details.outputs.result).failedJobs, ', ') }}
-            Branch: ${{ steps.branch.outputs.branch_name }}
-            Base Branch: main
+            ## Failure Classification
+            Category: ${{ fromJSON(steps.context.outputs.result).failureCategory }}
+            Branch: ${{ fromJSON(steps.context.outputs.result).branch }}
 
-            Error logs:
-            ${{ toJSON(fromJSON(steps.failure_details.outputs.result).errorLogs) }}
+            ## Failed CI Run
+            URL: ${{ fromJSON(steps.context.outputs.result).runUrl }}
+            Failed Jobs: ${{ join(fromJSON(steps.context.outputs.result).failedJobs, ', ') }}
 
-            Instructions:
-            - Only fix what is broken — do not refactor, add features, or make unnecessary changes.
-            - After fixing, run 'npm run format' and 'npm run test:all' to verify.
-            - If you cannot fix the error, explain why in a comment.
-          allowed_tools: "Edit,Write,Bash(git:*),Bash(npm:*),Bash(npx:*),Read,Glob,Grep"
+            ## Files Changed in Failing Commit
+            ${{ fromJSON(steps.context.outputs.result).commitDiff }}
+
+            ## Error Logs (sanitized, last 15k chars per job)
+            ${{ toJSON(fromJSON(steps.context.outputs.result).errorContext) }}
+
+            ## Instructions
+            1. Read CLAUDE.md first to understand project conventions.
+            2. Based on the failure category, apply the appropriate fix:
+               - FORMATTING: Run `npm run format` — do not change code logic.
+               - LINT: Fix the specific ESLint error — do not refactor surrounding code.
+               - TEST: Fix the failing test or the code it tests — check if the test or the code is wrong.
+               - BUILD: Fix type errors or import issues causing the build failure.
+               - UNKNOWN: Analyze logs carefully. If you cannot determine the cause, do not make changes.
+            3. Only fix what is broken — do not refactor, add features, or make unrelated changes.
+            4. After fixing, run `npm run format` to ensure consistent formatting.
+
+            ## Constraints (DO NOT VIOLATE)
+            - Do NOT modify .github/workflows/ files.
+            - Do NOT modify CLAUDE.md, README.md, or TODO.md.
+            - Do NOT remove $transaction wrappers from database mutations.
+            - Do NOT change test assertions or expected values just to make tests pass — fix the code, not the tests.
+            - Do NOT add new dependencies or modify package.json.
+            - Do NOT modify environment variables, .env files, or Docker configuration.
+            - Do NOT modify Prisma schema files — schema changes require manual migration.
+            - If the fix requires database changes, manual intervention, or you cannot determine the root cause, explain the issue without making changes.
+          allowed_tools: "Edit,Read,Glob,Grep,Bash(npm run format),Bash(npm run lint)"
+
+      # 4. ACTION RELEVANCE: Push the fix and create a PR for human review.
+      #    Never auto-merge — a human must review and approve.
+      - name: Check for changes
+        if: >
+          steps.triage.outputs.skip != 'true' &&
+          steps.infra_check.outputs.skip != 'true'
+        id: changes
+        run: |
+          if git diff --quiet; then
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Claude analyzed the failure but made no changes"
+          else
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Push fix and create PR
+        if: steps.changes.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git add -A
+          git commit -m "fix: auto-fix CI failure from run #${{ github.event.workflow_run.run_number }}"
+          git push origin "${{ steps.branch.outputs.branch_name }}"
+          gh pr create \
+            --title "fix: auto-fix CI failure from run #${{ github.event.workflow_run.run_number }}" \
+            --body "$(cat <<'EOF'
+          ## Auto-fix for CI failure
+
+          **Failed run:** ${{ fromJSON(steps.context.outputs.result).runUrl }}
+          **Failure category:** ${{ fromJSON(steps.context.outputs.result).failureCategory }}
+          **Failed jobs:** ${{ join(fromJSON(steps.context.outputs.result).failedJobs, ', ') }}
+
+          ### Changes in failing commit
+          ```
+          ${{ fromJSON(steps.context.outputs.result).commitDiff }}
+          ```
+
+          ---
+
+          This PR was generated automatically by the CI auto-fix agent.
+          **Do not auto-merge — a human must review and approve.**
+          EOF
+          )" \
+            --base main
