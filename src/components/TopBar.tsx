@@ -77,12 +77,12 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
     setSeedDialogOpen(false);
     setError(null);
     startTransition(async () => {
-      try {
-        await seedMockData(clearExisting);
-        showSnackbar(tn("mockDataLoaded"));
-      } catch (e) {
-        setError(e instanceof Error ? e.message : tc("error"));
+      const result = await seedMockData(clearExisting);
+      if (result?.error) {
+        setError(result.error);
+        return;
       }
+      showSnackbar(tn("mockDataLoaded"));
     });
   };
 
@@ -547,13 +547,13 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
       <Box
         component="form"
         action={async () => {
-          try {
-            await resetAll();
-            setError(null);
-            showSnackbar(tn("dataReset"));
-          } catch (e) {
-            setError(e instanceof Error ? e.message : tc("error"));
+          const result = await resetAll();
+          if (result?.error) {
+            setError(result.error);
+            return;
           }
+          setError(null);
+          showSnackbar(tn("dataReset"));
         }}
         ref={formRef}
         sx={{ display: "none" }}

@@ -69,7 +69,9 @@ describe("AddTeam Component", () => {
 
   // Shows generic error message when createTeam throws a non-Error value.
   test("shows generic error when createTeam throws non-Error", async () => {
-    (createTeam as jest.MockedFunction<typeof createTeam>).mockRejectedValue("string error");
+    (createTeam as jest.MockedFunction<typeof createTeam>).mockResolvedValue({
+      error: "An unexpected error occurred",
+    });
     render(<AddTeamForm />);
 
     await userEvent.clear(screen.getByLabelText(/Enter Team Name/i));
@@ -77,14 +79,14 @@ describe("AddTeam Component", () => {
     await userEvent.click(screen.getByRole("button", { name: /Create/i }));
 
     await waitFor(() => {
-      expect(screen.getByText("An error occurred")).toBeInTheDocument();
+      expect(screen.getByText("An unexpected error occurred")).toBeInTheDocument();
     });
   });
 
   test("shows error message when createTeam fails", async () => {
-    (createTeam as jest.MockedFunction<typeof createTeam>).mockRejectedValue(
-      new Error("Team already exists"),
-    );
+    (createTeam as jest.MockedFunction<typeof createTeam>).mockResolvedValue({
+      error: "Team already exists",
+    });
     render(<AddTeamForm />);
 
     await userEvent.clear(screen.getByLabelText(/Enter Team Name/i));

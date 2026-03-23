@@ -33,13 +33,10 @@ const RemoveMemberForm: React.FC<{
 
   const [state, formAction, isPending] = useActionState(
     async (_prev: FormState, formData: FormData): Promise<FormState> => {
-      try {
-        await removeMember(formData);
-        showSnackbar(tn("memberRemoved"));
-        return { error: null };
-      } catch (error) {
-        return { error: error instanceof Error ? error.message : tc("error") };
-      }
+      const result = await removeMember(formData);
+      if (result?.error) return { error: result.error };
+      showSnackbar(tn("memberRemoved"));
+      return { error: null };
     },
     { error: null },
   );

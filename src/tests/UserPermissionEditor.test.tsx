@@ -225,7 +225,7 @@ describe("UserPermissionEditor", () => {
 
   // Shows error message when permission action fails
   test("shows error when permission action fails", async () => {
-    (updateUserPermission as jest.Mock).mockRejectedValue(new Error("Action failed"));
+    (updateUserPermission as jest.Mock).mockResolvedValue({ error: "Action failed" });
     render(
       <UserPermissionEditor
         user={baseUser}
@@ -338,7 +338,7 @@ describe("UserPermissionEditor", () => {
 
   // Shows error message when role update fails
   test("shows error when role update fails", async () => {
-    (updateUserRole as jest.Mock).mockRejectedValue(new Error("Role update failed"));
+    (updateUserRole as jest.Mock).mockResolvedValue({ error: "Role update failed" });
     render(
       <UserPermissionEditor
         user={baseUser}
@@ -359,7 +359,7 @@ describe("UserPermissionEditor", () => {
 
   // Shows generic error message when updateUserRole throws a non-Error value.
   test("shows generic error when role update throws non-Error", async () => {
-    (updateUserRole as jest.Mock).mockRejectedValue("string error");
+    (updateUserRole as jest.Mock).mockResolvedValue({ error: "An unexpected error occurred" });
     render(
       <UserPermissionEditor
         user={baseUser}
@@ -374,13 +374,15 @@ describe("UserPermissionEditor", () => {
     fireEvent.click(screen.getByRole("button", { name: /Save Role/i }));
 
     await waitFor(() => {
-      expect(screen.getByText("An error occurred")).toBeInTheDocument();
+      expect(screen.getByText("An unexpected error occurred")).toBeInTheDocument();
     });
   });
 
   // Shows generic error when permission update throws a non-Error value.
   test("shows generic error when permission update throws non-Error", async () => {
-    (updateUserPermission as jest.Mock).mockRejectedValue("string error");
+    (updateUserPermission as jest.Mock).mockResolvedValue({
+      error: "An unexpected error occurred",
+    });
     render(
       <UserPermissionEditor
         user={baseUser}
@@ -394,7 +396,7 @@ describe("UserPermissionEditor", () => {
     fireEvent.click(grantButtons[grantButtons.length - 1]);
 
     await waitFor(() => {
-      expect(screen.getByText("An error occurred")).toBeInTheDocument();
+      expect(screen.getByText("An unexpected error occurred")).toBeInTheDocument();
     });
   });
 
@@ -504,7 +506,7 @@ describe("UserPermissionEditor", () => {
 
   // Shows error when kickOutUser fails
   test("shows error when kick out fails", async () => {
-    (kickOutUser as jest.Mock).mockRejectedValue(new Error("Cannot kick out"));
+    (kickOutUser as jest.Mock).mockResolvedValue({ error: "Cannot kick out" });
     render(
       <UserPermissionEditor
         user={baseUser}
@@ -524,7 +526,7 @@ describe("UserPermissionEditor", () => {
 
   // Shows generic error when kickOutUser throws a non-Error value
   test("shows generic error when kick out throws non-Error", async () => {
-    (kickOutUser as jest.Mock).mockRejectedValue("string error");
+    (kickOutUser as jest.Mock).mockResolvedValue({ error: "An unexpected error occurred" });
     render(
       <UserPermissionEditor
         user={baseUser}
@@ -538,7 +540,7 @@ describe("UserPermissionEditor", () => {
     fireEvent.click(confirmButtons[confirmButtons.length - 1]);
 
     await waitFor(() => {
-      expect(screen.getByText("An error occurred")).toBeInTheDocument();
+      expect(screen.getByText("An unexpected error occurred")).toBeInTheDocument();
     });
   });
 

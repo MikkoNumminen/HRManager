@@ -50,21 +50,23 @@ describe("RemoveTeam Component", () => {
 
   // Shows generic error message when removeTeam throws a non-Error value.
   test("shows generic error when removeTeam throws non-Error", async () => {
-    (removeTeam as jest.MockedFunction<typeof removeTeam>).mockRejectedValue("string error");
+    (removeTeam as jest.MockedFunction<typeof removeTeam>).mockResolvedValue({
+      error: "An unexpected error occurred",
+    });
     render(<RemoveTeamForm teamID={teamID} />);
 
     await userEvent.click(screen.getByRole("button", { name: /^Remove$/i }));
     await userEvent.click(screen.getByRole("button", { name: /^Remove$/i }));
 
     await waitFor(() => {
-      expect(screen.getByText("An error occurred")).toBeInTheDocument();
+      expect(screen.getByText("An unexpected error occurred")).toBeInTheDocument();
     });
   });
 
   test("shows error message when removeTeam fails", async () => {
-    (removeTeam as jest.MockedFunction<typeof removeTeam>).mockRejectedValue(
-      new Error("Removal failed"),
-    );
+    (removeTeam as jest.MockedFunction<typeof removeTeam>).mockResolvedValue({
+      error: "Removal failed",
+    });
     render(<RemoveTeamForm teamID={teamID} />);
 
     await userEvent.click(screen.getByRole("button", { name: /^Remove$/i }));

@@ -30,13 +30,10 @@ const UpdateDepartmentHeadForm: React.FC<{
 
   const [state, formAction, isPending] = useActionState(
     async (_prev: FormState, formData: FormData): Promise<FormState> => {
-      try {
-        await updateDepartmentHead(formData);
-        showSnackbar(tn("departmentHeadUpdated"));
-        return { error: null };
-      } catch (error) {
-        return { error: error instanceof Error ? error.message : tc("error") };
-      }
+      const result = await updateDepartmentHead(formData);
+      if (result?.error) return { error: result.error };
+      showSnackbar(tn("departmentHeadUpdated"));
+      return { error: null };
     },
     { error: null },
   );

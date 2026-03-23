@@ -79,7 +79,7 @@ describe("UpdatePersonName Component", () => {
 
   // Shows error message when updatePersonName fails with an Error.
   test("shows error message when updatePersonName fails", async () => {
-    (updatePersonName as jest.Mock).mockRejectedValue(new Error("Name update failed"));
+    (updatePersonName as jest.Mock).mockResolvedValue({ error: "Name update failed" });
     render(<UpdatePersonNameForm personID={personID} currentName={currentName} />);
 
     fireEvent.change(screen.getByLabelText(/Enter New Name/i), {
@@ -94,7 +94,7 @@ describe("UpdatePersonName Component", () => {
 
   // Shows generic error message when updatePersonName throws a non-Error value.
   test("shows generic error when updatePersonName throws non-Error", async () => {
-    (updatePersonName as jest.Mock).mockRejectedValue("string error");
+    (updatePersonName as jest.Mock).mockResolvedValue({ error: "An unexpected error occurred" });
     render(<UpdatePersonNameForm personID={personID} currentName={currentName} />);
 
     fireEvent.change(screen.getByLabelText(/Enter New Name/i), {
@@ -103,7 +103,7 @@ describe("UpdatePersonName Component", () => {
     fireEvent.click(screen.getByRole("button", { name: /Change/i }));
 
     await waitFor(() => {
-      expect(screen.getByText("An error occurred")).toBeInTheDocument();
+      expect(screen.getByText("An unexpected error occurred")).toBeInTheDocument();
     });
   });
 

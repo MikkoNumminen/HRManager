@@ -313,7 +313,7 @@ describe("TopBar", () => {
 
   // Shows error message when seedMockData fails
   test("shows error when seedMockData fails", async () => {
-    (seedMockData as jest.Mock).mockRejectedValue(new Error("Seed failed"));
+    (seedMockData as jest.Mock).mockResolvedValue({ error: "Seed failed" });
     mockUseSession.mockReturnValue({
       data: { user: { name: "Alice", email: "a@b.com", image: null } },
       status: "authenticated",
@@ -343,7 +343,7 @@ describe("TopBar", () => {
 
   // Shows generic error message when seedMockData throws a non-Error value.
   test("shows generic error when seedMockData throws non-Error", async () => {
-    (seedMockData as jest.Mock).mockRejectedValue("string error");
+    (seedMockData as jest.Mock).mockResolvedValue({ error: "An unexpected error occurred" });
     mockUseSession.mockReturnValue({
       data: { user: { name: "Alice", email: "a@b.com", image: null } },
       status: "authenticated",
@@ -354,7 +354,7 @@ describe("TopBar", () => {
     fireEvent.click(screen.getByText("Load Mock Data"));
     fireEvent.click(screen.getByText("Replace All"));
     await waitFor(() => {
-      expect(screen.getByText("An error occurred")).toBeInTheDocument();
+      expect(screen.getByText("An unexpected error occurred")).toBeInTheDocument();
     });
   });
 
@@ -379,7 +379,7 @@ describe("TopBar", () => {
   // Shows error message when resetAll fails with an Error.
   test("shows error when resetAll fails", async () => {
     const { resetAll } = jest.requireMock("../serverActions");
-    (resetAll as jest.Mock).mockRejectedValue(new Error("Reset failed"));
+    (resetAll as jest.Mock).mockResolvedValue({ error: "Reset failed" });
     mockUseSession.mockReturnValue({
       data: { user: { name: "Alice", email: "a@b.com", image: null } },
       status: "authenticated",
@@ -397,7 +397,7 @@ describe("TopBar", () => {
   // Shows generic error when resetAll throws a non-Error value.
   test("shows generic error when resetAll throws non-Error", async () => {
     const { resetAll } = jest.requireMock("../serverActions");
-    (resetAll as jest.Mock).mockRejectedValue(42);
+    (resetAll as jest.Mock).mockResolvedValue({ error: "An unexpected error occurred" });
     mockUseSession.mockReturnValue({
       data: { user: { name: "Alice", email: "a@b.com", image: null } },
       status: "authenticated",
@@ -408,7 +408,7 @@ describe("TopBar", () => {
     fireEvent.click(screen.getByText("Reset All Data"));
     fireEvent.click(screen.getByText("Reset All"));
     await waitFor(() => {
-      expect(screen.getByText("An error occurred")).toBeInTheDocument();
+      expect(screen.getByText("An unexpected error occurred")).toBeInTheDocument();
     });
   });
 

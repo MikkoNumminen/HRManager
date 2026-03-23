@@ -31,21 +31,15 @@ const AddDepartmentForm: React.FC<AddDepartmentFormProps> = ({ onOptimisticAdd }
 
   const [state, formAction, isPending] = useActionState(
     async (_prev: FormState, formData: FormData): Promise<FormState> => {
-      try {
-        onOptimisticAdd?.(
-          formData.get("name") as string,
-          (formData.get("description") as string) || "",
-        );
-        completeTutorialStep("create_department");
-        await createDepartment(formData);
-        showSnackbar(tn("departmentCreated"));
-        return { error: null, success: true };
-      } catch (error) {
-        return {
-          error: error instanceof Error ? error.message : tc("error"),
-          success: false,
-        };
-      }
+      onOptimisticAdd?.(
+        formData.get("name") as string,
+        (formData.get("description") as string) || "",
+      );
+      completeTutorialStep("create_department");
+      const result = await createDepartment(formData);
+      if (result?.error) return { error: result.error, success: false };
+      showSnackbar(tn("departmentCreated"));
+      return { error: null, success: true };
     },
     { error: null, success: false },
   );

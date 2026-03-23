@@ -31,14 +31,11 @@ const UpdateTeamNameForm: React.FC<{ teamID: string; currentName: string }> = ({
 
   const [state, formAction, isPending] = useActionState(
     async (_prev: FormState, formData: FormData): Promise<FormState> => {
-      try {
-        await updateTeamName(formData);
-        showSnackbar(tn("teamRenamed"));
-        router.push("/manageTeams");
-        return { error: null };
-      } catch (error) {
-        return { error: error instanceof Error ? error.message : tc("error") };
-      }
+      const result = await updateTeamName(formData);
+      if (result?.error) return { error: result.error };
+      showSnackbar(tn("teamRenamed"));
+      router.push("/manageTeams");
+      return { error: null };
     },
     { error: null },
   );

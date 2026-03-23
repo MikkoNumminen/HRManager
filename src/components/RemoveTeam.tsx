@@ -20,13 +20,10 @@ const RemoveTeamForm: React.FC<{ teamID: string }> = ({ teamID }) => {
 
   const [state, formAction, isPending] = useActionState(
     async (_prev: FormState, formData: FormData): Promise<FormState> => {
-      try {
-        await removeTeam(formData);
-        showSnackbar(tn("teamRemoved"));
-        return { error: null };
-      } catch (error) {
-        return { error: error instanceof Error ? error.message : tc("error") };
-      }
+      const result = await removeTeam(formData);
+      if (result?.error) return { error: result.error };
+      showSnackbar(tn("teamRemoved"));
+      return { error: null };
     },
     { error: null },
   );

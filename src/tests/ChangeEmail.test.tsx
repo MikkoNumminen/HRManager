@@ -61,7 +61,9 @@ describe("Update Email", () => {
 
   // Shows generic error message when updateEmail throws a non-Error value.
   test("shows generic error when updateEmail throws non-Error", async () => {
-    (updateEmail as jest.MockedFunction<typeof updateEmail>).mockRejectedValue("string error");
+    (updateEmail as jest.MockedFunction<typeof updateEmail>).mockResolvedValue({
+      error: "An unexpected error occurred",
+    });
     render(<UpdateEmailForm personID={personID} />);
 
     fireEvent.change(screen.getByLabelText(/Enter New Email/i), {
@@ -70,14 +72,14 @@ describe("Update Email", () => {
     fireEvent.click(screen.getByRole("button", { name: /Change/i }));
 
     await waitFor(() => {
-      expect(screen.getByText("An error occurred")).toBeInTheDocument();
+      expect(screen.getByText("An unexpected error occurred")).toBeInTheDocument();
     });
   });
 
   test("shows error message when updateEmail fails", async () => {
-    (updateEmail as jest.MockedFunction<typeof updateEmail>).mockRejectedValue(
-      new Error("A person with this email already exists"),
-    );
+    (updateEmail as jest.MockedFunction<typeof updateEmail>).mockResolvedValue({
+      error: "A person with this email already exists",
+    });
     render(<UpdateEmailForm personID={personID} />);
 
     fireEvent.change(screen.getByLabelText(/Enter New Email/i), {

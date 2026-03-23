@@ -31,14 +31,11 @@ const UpdatePositionForm: React.FC<{ personID: string; currentPosition?: string 
 
   const [state, formAction, isPending] = useActionState(
     async (_prev: FormState, formData: FormData): Promise<FormState> => {
-      try {
-        await updatePosition(formData);
-        showSnackbar(tn("positionUpdated"));
-        router.push("/managePersons");
-        return { error: null };
-      } catch (error) {
-        return { error: error instanceof Error ? error.message : tc("error") };
-      }
+      const result = await updatePosition(formData);
+      if (result?.error) return { error: result.error };
+      showSnackbar(tn("positionUpdated"));
+      router.push("/managePersons");
+      return { error: null };
     },
     { error: null },
   );

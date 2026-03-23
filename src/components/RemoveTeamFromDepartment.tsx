@@ -27,13 +27,10 @@ const RemoveTeamFromDepartmentForm: React.FC<{
 
   const [state, formAction, isPending] = useActionState(
     async (_prev: FormState, formData: FormData): Promise<FormState> => {
-      try {
-        await removeTeamFromDepartment(formData);
-        showSnackbar(tn("teamRemovedFromDepartment"));
-        return { error: null };
-      } catch (error) {
-        return { error: error instanceof Error ? error.message : tc("error") };
-      }
+      const result = await removeTeamFromDepartment(formData);
+      if (result?.error) return { error: result.error };
+      showSnackbar(tn("teamRemovedFromDepartment"));
+      return { error: null };
     },
     { error: null },
   );

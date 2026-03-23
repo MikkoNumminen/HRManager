@@ -74,7 +74,7 @@ describe("AssignTeamToDepartment Component", () => {
 
   // Shows error message when assignTeamToDepartment fails.
   test("shows error message when assignTeamToDepartment fails", async () => {
-    (assignTeamToDepartment as jest.Mock).mockRejectedValue(new Error("Assignment failed"));
+    (assignTeamToDepartment as jest.Mock).mockResolvedValue({ error: "Assignment failed" });
     render(<AssignTeamToDepartmentForm departmentID={departmentID} availableTeams={mockTeams} />);
 
     fireEvent.mouseDown(screen.getByLabelText(/Select Team/i));
@@ -88,7 +88,9 @@ describe("AssignTeamToDepartment Component", () => {
 
   // Shows generic error message when assignTeamToDepartment throws a non-Error value.
   test("shows generic error when assignTeamToDepartment throws non-Error", async () => {
-    (assignTeamToDepartment as jest.Mock).mockRejectedValue("string error");
+    (assignTeamToDepartment as jest.Mock).mockResolvedValue({
+      error: "An unexpected error occurred",
+    });
     render(<AssignTeamToDepartmentForm departmentID={departmentID} availableTeams={mockTeams} />);
 
     fireEvent.mouseDown(screen.getByLabelText(/Select Team/i));
@@ -96,7 +98,7 @@ describe("AssignTeamToDepartment Component", () => {
     fireEvent.click(screen.getByRole("button", { name: /Assign/i }));
 
     await waitFor(() => {
-      expect(screen.getByText("An error occurred")).toBeInTheDocument();
+      expect(screen.getByText("An unexpected error occurred")).toBeInTheDocument();
     });
   });
 

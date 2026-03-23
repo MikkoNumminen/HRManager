@@ -22,14 +22,11 @@ const RemovePersonForm: React.FC<{ personID: string }> = ({ personID }) => {
 
   const [state, formAction, isPending] = useActionState(
     async (_prev: FormState, formData: FormData): Promise<FormState> => {
-      try {
-        await removePerson(formData);
-        showSnackbar(tn("personRemoved"));
-        router.push("/managePersons");
-        return { error: null };
-      } catch (error) {
-        return { error: error instanceof Error ? error.message : tc("error") };
-      }
+      const result = await removePerson(formData);
+      if (result?.error) return { error: result.error };
+      showSnackbar(tn("personRemoved"));
+      router.push("/managePersons");
+      return { error: null };
     },
     { error: null },
   );

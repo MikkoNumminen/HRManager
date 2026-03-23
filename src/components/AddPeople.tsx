@@ -32,18 +32,12 @@ const AddPersonForm: React.FC<AddPersonFormProps> = ({ onOptimisticAdd }) => {
 
   const [state, formAction, isPending] = useActionState(
     async (_prev: FormState, formData: FormData): Promise<FormState> => {
-      try {
-        onOptimisticAdd?.(formData.get("name") as string, formData.get("email") as string);
-        await createPerson(formData);
-        completeTutorialStep("add_person");
-        showSnackbar(tn("personCreated"));
-        return { error: null, success: true };
-      } catch (error) {
-        return {
-          error: error instanceof Error ? error.message : tc("error"),
-          success: false,
-        };
-      }
+      onOptimisticAdd?.(formData.get("name") as string, formData.get("email") as string);
+      const result = await createPerson(formData);
+      if (result?.error) return { error: result.error, success: false };
+      completeTutorialStep("add_person");
+      showSnackbar(tn("personCreated"));
+      return { error: null, success: true };
     },
     { error: null, success: false },
   );

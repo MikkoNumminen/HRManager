@@ -137,7 +137,7 @@ describe("UpdateDepartment Component", () => {
 
   // Shows error message when updateDepartment fails with an Error.
   test("shows error message when updateDepartment fails", async () => {
-    (updateDepartment as jest.Mock).mockRejectedValue(new Error("Update failed"));
+    (updateDepartment as jest.Mock).mockResolvedValue({ error: "Update failed" });
     render(
       <UpdateDepartmentForm
         departmentID={departmentID}
@@ -158,7 +158,7 @@ describe("UpdateDepartment Component", () => {
 
   // Shows generic error message when updateDepartment throws a non-Error value.
   test("shows generic error when updateDepartment throws non-Error", async () => {
-    (updateDepartment as jest.Mock).mockRejectedValue("string error");
+    (updateDepartment as jest.Mock).mockResolvedValue({ error: "An unexpected error occurred" });
     render(
       <UpdateDepartmentForm
         departmentID={departmentID}
@@ -173,7 +173,7 @@ describe("UpdateDepartment Component", () => {
     fireEvent.click(screen.getByRole("button", { name: /Save/i }));
 
     await waitFor(() => {
-      expect(screen.getByText("An error occurred")).toBeInTheDocument();
+      expect(screen.getByText("An unexpected error occurred")).toBeInTheDocument();
     });
   });
 

@@ -31,14 +31,11 @@ const UpdatePersonNameForm: React.FC<{ personID: string; currentName: string }> 
 
   const [state, formAction, isPending] = useActionState(
     async (_prev: FormState, formData: FormData): Promise<FormState> => {
-      try {
-        await updatePersonName(formData);
-        showSnackbar(tn("nameUpdated"));
-        router.push("/managePersons");
-        return { error: null };
-      } catch (error) {
-        return { error: error instanceof Error ? error.message : tc("error") };
-      }
+      const result = await updatePersonName(formData);
+      if (result?.error) return { error: result.error };
+      showSnackbar(tn("nameUpdated"));
+      router.push("/managePersons");
+      return { error: null };
     },
     { error: null },
   );

@@ -30,18 +30,12 @@ const AddTeamForm: React.FC<AddTeamFormProps> = ({ onOptimisticAdd }) => {
 
   const [state, formAction, isPending] = useActionState(
     async (_prev: FormState, formData: FormData): Promise<FormState> => {
-      try {
-        onOptimisticAdd?.(formData.get("name") as string);
-        completeTutorialStep("create_team");
-        await createTeam(formData);
-        showSnackbar(tn("teamCreated"));
-        return { error: null, success: true };
-      } catch (error) {
-        return {
-          error: error instanceof Error ? error.message : tc("error"),
-          success: false,
-        };
-      }
+      onOptimisticAdd?.(formData.get("name") as string);
+      completeTutorialStep("create_team");
+      const result = await createTeam(formData);
+      if (result?.error) return { error: result.error, success: false };
+      showSnackbar(tn("teamCreated"));
+      return { error: null, success: true };
     },
     { error: null, success: false },
   );

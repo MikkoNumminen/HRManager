@@ -33,14 +33,11 @@ const UpdateEmailForm: React.FC<{ personID: string; currentEmail?: string }> = (
 
   const [state, formAction, isPending] = useActionState(
     async (_prev: FormState, formData: FormData): Promise<FormState> => {
-      try {
-        await updateEmail(formData);
-        showSnackbar(tn("emailUpdated"));
-        router.push("/managePersons");
-        return { error: null };
-      } catch (error) {
-        return { error: error instanceof Error ? error.message : tc("error") };
-      }
+      const result = await updateEmail(formData);
+      if (result?.error) return { error: result.error };
+      showSnackbar(tn("emailUpdated"));
+      router.push("/managePersons");
+      return { error: null };
     },
     { error: null },
   );

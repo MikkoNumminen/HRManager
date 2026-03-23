@@ -77,7 +77,9 @@ describe("AddPerson Component", () => {
 
   // Shows generic error message when createPerson throws a non-Error value.
   test("shows generic error when createPerson throws non-Error", async () => {
-    (createPerson as jest.MockedFunction<typeof createPerson>).mockRejectedValue("string error");
+    (createPerson as jest.MockedFunction<typeof createPerson>).mockResolvedValue({
+      error: "An unexpected error occurred",
+    });
     render(<AddPersonForm />);
 
     await userEvent.clear(screen.getByLabelText(/Enter Name/i));
@@ -87,7 +89,7 @@ describe("AddPerson Component", () => {
     await userEvent.click(screen.getByRole("button", { name: /Create/i }));
 
     await waitFor(() => {
-      expect(screen.getByText("An error occurred")).toBeInTheDocument();
+      expect(screen.getByText("An unexpected error occurred")).toBeInTheDocument();
     });
   });
 
@@ -110,9 +112,9 @@ describe("AddPerson Component", () => {
   });
 
   test("shows error message when createPerson fails", async () => {
-    (createPerson as jest.MockedFunction<typeof createPerson>).mockRejectedValue(
-      new Error("A person with this email already exists"),
-    );
+    (createPerson as jest.MockedFunction<typeof createPerson>).mockResolvedValue({
+      error: "A person with this email already exists",
+    });
     render(<AddPersonForm />);
 
     await userEvent.clear(screen.getByLabelText(/Enter Name/i));

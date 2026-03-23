@@ -51,26 +51,20 @@ export default function ProfileEditor({ profile }: ProfileEditorProps) {
 
   const [nameState, nameAction, nameIsPending] = useActionState(
     async (_prev: FormState, formData: FormData): Promise<FormState> => {
-      try {
-        await updateProfileName(formData);
-        showSnackbar(tn("profileNameUpdated"));
-        return { error: null };
-      } catch (error) {
-        return { error: error instanceof Error ? error.message : tc("error") };
-      }
+      const result = await updateProfileName(formData);
+      if (result?.error) return { error: result.error };
+      showSnackbar(tn("profileNameUpdated"));
+      return { error: null };
     },
     { error: null },
   );
 
   const [imageState, imageAction, imageIsPending] = useActionState(
     async (_prev: FormState, formData: FormData): Promise<FormState> => {
-      try {
-        await updateProfileImage(formData);
-        showSnackbar(tn("profileImageUpdated"));
-        return { error: null };
-      } catch (error) {
-        return { error: error instanceof Error ? error.message : tc("error") };
-      }
+      const result = await updateProfileImage(formData);
+      if (result?.error) return { error: result.error };
+      showSnackbar(tn("profileImageUpdated"));
+      return { error: null };
     },
     { error: null },
   );

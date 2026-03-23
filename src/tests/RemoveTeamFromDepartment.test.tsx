@@ -71,7 +71,7 @@ describe("RemoveTeamFromDepartment Component", () => {
 
   // Shows error message when removeTeamFromDepartment fails.
   test("shows error message when removeTeamFromDepartment fails", async () => {
-    (removeTeamFromDepartment as jest.Mock).mockRejectedValue(new Error("Removal failed"));
+    (removeTeamFromDepartment as jest.Mock).mockResolvedValue({ error: "Removal failed" });
     render(<RemoveTeamFromDepartmentForm currentTeams={mockTeams} />);
 
     fireEvent.mouseDown(screen.getByLabelText(/Select Team/i));
@@ -85,7 +85,9 @@ describe("RemoveTeamFromDepartment Component", () => {
 
   // Shows generic error message when removeTeamFromDepartment throws a non-Error value.
   test("shows generic error when removeTeamFromDepartment throws non-Error", async () => {
-    (removeTeamFromDepartment as jest.Mock).mockRejectedValue("string error");
+    (removeTeamFromDepartment as jest.Mock).mockResolvedValue({
+      error: "An unexpected error occurred",
+    });
     render(<RemoveTeamFromDepartmentForm currentTeams={mockTeams} />);
 
     fireEvent.mouseDown(screen.getByLabelText(/Select Team/i));
@@ -93,7 +95,7 @@ describe("RemoveTeamFromDepartment Component", () => {
     fireEvent.click(screen.getByRole("button", { name: /Remove/i }));
 
     await waitFor(() => {
-      expect(screen.getByText("An error occurred")).toBeInTheDocument();
+      expect(screen.getByText("An unexpected error occurred")).toBeInTheDocument();
     });
   });
 

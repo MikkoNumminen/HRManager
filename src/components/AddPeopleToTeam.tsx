@@ -31,14 +31,11 @@ const AddMemberForm: React.FC<{ teamID: string; persons: Person[]; excludeIds?: 
 
   const [state, formAction, isPending] = useActionState(
     async (_prev: FormState, formData: FormData): Promise<FormState> => {
-      try {
-        completeTutorialStep("add_member");
-        await addMember(formData);
-        showSnackbar(tn("memberAdded"));
-        return { error: null };
-      } catch (error) {
-        return { error: error instanceof Error ? error.message : tc("error") };
-      }
+      completeTutorialStep("add_member");
+      const result = await addMember(formData);
+      if (result?.error) return { error: result.error };
+      showSnackbar(tn("memberAdded"));
+      return { error: null };
     },
     { error: null },
   );

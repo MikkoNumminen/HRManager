@@ -30,13 +30,10 @@ const UpdateManagerForm: React.FC<{ teamID: string; persons: Person[]; excludeId
 
   const [state, formAction, isPending] = useActionState(
     async (_prev: FormState, formData: FormData): Promise<FormState> => {
-      try {
-        await addManager(formData);
-        showSnackbar(tn("managerUpdated"));
-        return { error: null };
-      } catch (error) {
-        return { error: error instanceof Error ? error.message : tc("error") };
-      }
+      const result = await addManager(formData);
+      if (result?.error) return { error: result.error };
+      showSnackbar(tn("managerUpdated"));
+      return { error: null };
     },
     { error: null },
   );

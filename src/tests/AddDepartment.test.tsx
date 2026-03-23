@@ -62,7 +62,7 @@ describe("AddDepartment Component", () => {
 
   // Shows error message when createDepartment fails.
   test("shows error message when createDepartment fails", async () => {
-    (createDepartment as jest.Mock).mockRejectedValue(new Error("Name already in use"));
+    (createDepartment as jest.Mock).mockResolvedValue({ error: "Name already in use" });
     render(<AddDepartmentForm />);
 
     await userEvent.clear(screen.getByLabelText(/Enter Department Name/i));
@@ -76,7 +76,7 @@ describe("AddDepartment Component", () => {
 
   // Shows generic error message when createDepartment throws a non-Error value.
   test("shows generic error when createDepartment throws non-Error", async () => {
-    (createDepartment as jest.Mock).mockRejectedValue("string error");
+    (createDepartment as jest.Mock).mockResolvedValue({ error: "An unexpected error occurred" });
     render(<AddDepartmentForm />);
 
     await userEvent.clear(screen.getByLabelText(/Enter Department Name/i));
@@ -84,7 +84,7 @@ describe("AddDepartment Component", () => {
     await userEvent.click(screen.getByRole("button", { name: /Create/i }));
 
     await waitFor(() => {
-      expect(screen.getByText("An error occurred")).toBeInTheDocument();
+      expect(screen.getByText("An unexpected error occurred")).toBeInTheDocument();
     });
   });
 

@@ -97,7 +97,7 @@ describe("UpdateDepartmentHead Component", () => {
 
   // Shows error message when updateDepartmentHead fails.
   test("shows error message when updateDepartmentHead fails", async () => {
-    (updateDepartmentHead as jest.Mock).mockRejectedValue(new Error("Head assignment failed"));
+    (updateDepartmentHead as jest.Mock).mockResolvedValue({ error: "Head assignment failed" });
     render(<UpdateDepartmentHeadForm departmentID={departmentID} persons={mockPersons} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Alice" }));
@@ -110,14 +110,16 @@ describe("UpdateDepartmentHead Component", () => {
 
   // Shows generic error message when updateDepartmentHead throws a non-Error value.
   test("shows generic error when updateDepartmentHead throws non-Error", async () => {
-    (updateDepartmentHead as jest.Mock).mockRejectedValue("string error");
+    (updateDepartmentHead as jest.Mock).mockResolvedValue({
+      error: "An unexpected error occurred",
+    });
     render(<UpdateDepartmentHeadForm departmentID={departmentID} persons={mockPersons} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Alice" }));
     fireEvent.click(screen.getByRole("button", { name: /Set Head/i }));
 
     await waitFor(() => {
-      expect(screen.getByText("An error occurred")).toBeInTheDocument();
+      expect(screen.getByText("An unexpected error occurred")).toBeInTheDocument();
     });
   });
 

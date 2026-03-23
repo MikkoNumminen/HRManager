@@ -107,28 +107,32 @@ describe("createDepartment", () => {
 
   // Throws when name is empty.
   test("throws on empty name", async () => {
-    await expect(createDepartment(formData({ name: "" }))).rejects.toThrow("Invalid Name");
+    expect(await createDepartment(formData({ name: "" }))).toEqual({
+      error: expect.stringContaining("Invalid Name"),
+    });
   });
 
   // Throws when name is missing.
   test("throws on missing name", async () => {
-    await expect(createDepartment(formData({}))).rejects.toThrow("Invalid Name");
+    expect(await createDepartment(formData({}))).toEqual({
+      error: expect.stringContaining("Invalid Name"),
+    });
   });
 
   // Department names have a length limit.
   test("throws when name exceeds max length", async () => {
     const longName = "A".repeat(256);
-    await expect(createDepartment(formData({ name: longName }))).rejects.toThrow(
-      "characters or less",
-    );
+    expect(await createDepartment(formData({ name: longName }))).toEqual({
+      error: expect.stringContaining("characters or less"),
+    });
   });
 
   // Department descriptions have a length limit.
   test("throws when description exceeds max length", async () => {
     const longDesc = "A".repeat(1001);
-    await expect(
-      createDepartment(formData({ name: "Eng", description: longDesc })),
-    ).rejects.toThrow("characters or less");
+    expect(await createDepartment(formData({ name: "Eng", description: longDesc }))).toEqual({
+      error: expect.stringContaining("characters or less"),
+    });
   });
 });
 
@@ -156,14 +160,16 @@ describe("removeDepartment", () => {
 
   // Throws when no departmentID is provided.
   test("throws on missing departmentID", async () => {
-    await expect(removeDepartment(formData({}))).rejects.toThrow("No departmentID selected");
+    expect(await removeDepartment(formData({}))).toEqual({
+      error: expect.stringContaining("No departmentID selected"),
+    });
   });
 
   // Throws on invalid UUID.
   test("throws on invalid UUID", async () => {
-    await expect(removeDepartment(formData({ departmentID: "bad" }))).rejects.toThrow(
-      "Invalid departmentID format",
-    );
+    expect(await removeDepartment(formData({ departmentID: "bad" }))).toEqual({
+      error: expect.stringContaining("Invalid departmentID format"),
+    });
   });
 });
 
@@ -187,43 +193,45 @@ describe("updateDepartment", () => {
   // Throws when name is empty.
   test("throws on empty name", async () => {
     const dept = await createTestDepartment({ name: "Eng" });
-    await expect(updateDepartment(formData({ departmentID: dept.id, name: "" }))).rejects.toThrow(
-      "Department name is required",
-    );
+    expect(await updateDepartment(formData({ departmentID: dept.id, name: "" }))).toEqual({
+      error: expect.stringContaining("Department name is required"),
+    });
   });
 
   // Throws when departmentID is missing.
   test("throws on missing departmentID", async () => {
-    await expect(updateDepartment(formData({ name: "X" }))).rejects.toThrow(
-      "No departmentID provided",
-    );
+    expect(await updateDepartment(formData({ name: "X" }))).toEqual({
+      error: expect.stringContaining("No departmentID provided"),
+    });
   });
 
   // Department names have a length limit.
   test("throws when name exceeds max length", async () => {
     const dept = await createTestDepartment({ name: "Eng" });
     const longName = "A".repeat(256);
-    await expect(
-      updateDepartment(formData({ departmentID: dept.id, name: longName })),
-    ).rejects.toThrow("characters or less");
+    expect(await updateDepartment(formData({ departmentID: dept.id, name: longName }))).toEqual({
+      error: expect.stringContaining("characters or less"),
+    });
   });
 
   // Department descriptions have a length limit.
   test("throws when description exceeds max length", async () => {
     const dept = await createTestDepartment({ name: "Eng" });
     const longDesc = "A".repeat(1001);
-    await expect(
-      updateDepartment(formData({ departmentID: dept.id, name: "Eng", description: longDesc })),
-    ).rejects.toThrow("characters or less");
+    expect(
+      await updateDepartment(
+        formData({ departmentID: dept.id, name: "Eng", description: longDesc }),
+      ),
+    ).toEqual({ error: expect.stringContaining("characters or less") });
   });
 
   // Can't update a department that doesn't exist.
   test("throws when department does not exist", async () => {
-    await expect(
-      updateDepartment(
+    expect(
+      await updateDepartment(
         formData({ departmentID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", name: "New" }),
       ),
-    ).rejects.toThrow("Department not found");
+    ).toEqual({ error: expect.stringContaining("Department not found") });
   });
 });
 
@@ -257,33 +265,35 @@ describe("updateDepartmentHead", () => {
 
   // Throws when departmentID is missing.
   test("throws on missing departmentID", async () => {
-    await expect(updateDepartmentHead(formData({}))).rejects.toThrow("No departmentID provided");
+    expect(await updateDepartmentHead(formData({}))).toEqual({
+      error: expect.stringContaining("No departmentID provided"),
+    });
   });
 
   // Can't set a non-existent person as department head.
   test("throws when person does not exist", async () => {
     const dept = await createTestDepartment({ name: "Eng" });
-    await expect(
-      updateDepartmentHead(
+    expect(
+      await updateDepartmentHead(
         formData({
           departmentID: dept.id,
           personID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
         }),
       ),
-    ).rejects.toThrow("Person not found");
+    ).toEqual({ error: expect.stringContaining("Person not found") });
   });
 
   // Can't update head of a department that doesn't exist.
   test("throws when department does not exist", async () => {
     const person = await createTestPerson({ name: "Alice" });
-    await expect(
-      updateDepartmentHead(
+    expect(
+      await updateDepartmentHead(
         formData({
           departmentID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
           personID: person.id,
         }),
       ),
-    ).rejects.toThrow("Department not found");
+    ).toEqual({ error: expect.stringContaining("Department not found") });
   });
 });
 
@@ -306,42 +316,44 @@ describe("assignTeamToDepartment", () => {
 
   // Throws when departmentID is missing.
   test("throws on missing departmentID", async () => {
-    await expect(
-      assignTeamToDepartment(formData({ teamID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" })),
-    ).rejects.toThrow("No departmentID provided");
+    expect(
+      await assignTeamToDepartment(formData({ teamID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" })),
+    ).toEqual({ error: expect.stringContaining("No departmentID provided") });
   });
 
   // Throws when teamID is missing.
   test("throws on missing teamID", async () => {
-    await expect(
-      assignTeamToDepartment(formData({ departmentID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" })),
-    ).rejects.toThrow("No teamID provided");
+    expect(
+      await assignTeamToDepartment(
+        formData({ departmentID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" }),
+      ),
+    ).toEqual({ error: expect.stringContaining("No teamID provided") });
   });
 
   // Can't assign a team to a department that doesn't exist.
   test("throws when department does not exist", async () => {
     const team = await createTestTeam({ teamName: "Platform" });
-    await expect(
-      assignTeamToDepartment(
+    expect(
+      await assignTeamToDepartment(
         formData({
           departmentID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
           teamID: team.teamId,
         }),
       ),
-    ).rejects.toThrow("Department not found");
+    ).toEqual({ error: expect.stringContaining("Department not found") });
   });
 
   // Can't assign a non-existent team to a department.
   test("throws when team does not exist", async () => {
     const dept = await createTestDepartment({ name: "Eng" });
-    await expect(
-      assignTeamToDepartment(
+    expect(
+      await assignTeamToDepartment(
         formData({
           departmentID: dept.id,
           teamID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
         }),
       ),
-    ).rejects.toThrow("Team not found");
+    ).toEqual({ error: expect.stringContaining("Team not found") });
   });
 });
 
@@ -364,14 +376,16 @@ describe("removeTeamFromDepartment", () => {
 
   // Throws when teamID is missing.
   test("throws on missing teamID", async () => {
-    await expect(removeTeamFromDepartment(formData({}))).rejects.toThrow("No teamID provided");
+    expect(await removeTeamFromDepartment(formData({}))).toEqual({
+      error: expect.stringContaining("No teamID provided"),
+    });
   });
 
   // Can't remove a team that doesn't exist from a department.
   test("throws when team does not exist", async () => {
-    await expect(
-      removeTeamFromDepartment(formData({ teamID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" })),
-    ).rejects.toThrow("Team not found");
+    expect(
+      await removeTeamFromDepartment(formData({ teamID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" })),
+    ).toEqual({ error: expect.stringContaining("Team not found") });
   });
 });
 

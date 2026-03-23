@@ -100,18 +100,24 @@ describe("createTeam", () => {
 
   // A team with no name is not a team — you have to call it something.
   test("throws on empty name", async () => {
-    await expect(createTeam(formData({ name: "" }))).rejects.toThrow("Invalid Name");
+    expect(await createTeam(formData({ name: "" }))).toEqual({
+      error: expect.stringContaining("Invalid Name"),
+    });
   });
 
   // Spaces alone don't count as a team name, just like with person names.
   test("throws on whitespace-only name", async () => {
-    await expect(createTeam(formData({ name: "   " }))).rejects.toThrow("Invalid Name");
+    expect(await createTeam(formData({ name: "   " }))).toEqual({
+      error: expect.stringContaining("Invalid Name"),
+    });
   });
 
   // Team names have a length limit to prevent abuse.
   test("throws when team name exceeds max length", async () => {
     const longName = "A".repeat(256);
-    await expect(createTeam(formData({ name: longName }))).rejects.toThrow("characters or less");
+    expect(await createTeam(formData({ name: longName }))).toEqual({
+      error: expect.stringContaining("characters or less"),
+    });
   });
 });
 
@@ -131,40 +137,42 @@ describe("updateTeamName", () => {
 
   // We need to know WHICH team to rename — can't do it without an ID.
   test("throws when no teamID provided", async () => {
-    await expect(updateTeamName(formData({ name: "New Name" }))).rejects.toThrow(
-      "No teamID provided",
-    );
+    expect(await updateTeamName(formData({ name: "New Name" }))).toEqual({
+      error: expect.stringContaining("No teamID provided"),
+    });
   });
 
   // The ID has to be a proper UUID, not some random string.
   test("throws on invalid UUID", async () => {
-    await expect(updateTeamName(formData({ teamID: "bad", name: "New Name" }))).rejects.toThrow(
-      "Invalid teamID format",
-    );
+    expect(await updateTeamName(formData({ teamID: "bad", name: "New Name" }))).toEqual({
+      error: expect.stringContaining("Invalid teamID format"),
+    });
   });
 
   // You can't set a team's name to nothing — names are required.
   test("throws when name is empty", async () => {
     const team = await createTestTeam({ teamName: "Engineering" });
-    await expect(updateTeamName(formData({ teamID: team.teamId, name: "" }))).rejects.toThrow(
-      "New team name is missing",
-    );
+    expect(await updateTeamName(formData({ teamID: team.teamId, name: "" }))).toEqual({
+      error: expect.stringContaining("New team name is missing"),
+    });
   });
 
   // Team names have a length limit.
   test("throws when new name exceeds max length", async () => {
     const team = await createTestTeam({ teamName: "Eng" });
     const longName = "A".repeat(256);
-    await expect(updateTeamName(formData({ teamID: team.teamId, name: longName }))).rejects.toThrow(
-      "characters or less",
-    );
+    expect(await updateTeamName(formData({ teamID: team.teamId, name: longName }))).toEqual({
+      error: expect.stringContaining("characters or less"),
+    });
   });
 
   // Can't rename a team that doesn't exist.
   test("throws when team does not exist", async () => {
-    await expect(
-      updateTeamName(formData({ teamID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", name: "New" })),
-    ).rejects.toThrow("Team not found");
+    expect(
+      await updateTeamName(
+        formData({ teamID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", name: "New" }),
+      ),
+    ).toEqual({ error: expect.stringContaining("Team not found") });
   });
 });
 
@@ -202,14 +210,16 @@ describe("removeTeam", () => {
 
   // Can't delete nothing — you have to actually select a team first.
   test("throws when no teamID provided", async () => {
-    await expect(removeTeam(formData({}))).rejects.toThrow("No teamID selected");
+    expect(await removeTeam(formData({}))).toEqual({
+      error: expect.stringContaining("No teamID selected"),
+    });
   });
 
   // Team IDs are UUIDs — random strings won't fly.
   test("throws on invalid UUID", async () => {
-    await expect(removeTeam(formData({ teamID: "invalid" }))).rejects.toThrow(
-      "Invalid teamID format",
-    );
+    expect(await removeTeam(formData({ teamID: "invalid" }))).toEqual({
+      error: expect.stringContaining("Invalid teamID format"),
+    });
   });
 });
 
@@ -262,49 +272,49 @@ describe("addManager", () => {
 
   // You have to say which team gets the manager.
   test("throws when no teamID provided", async () => {
-    await expect(
-      addManager(formData({ personID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" })),
-    ).rejects.toThrow("No teamID selected");
+    expect(
+      await addManager(formData({ personID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" })),
+    ).toEqual({ error: expect.stringContaining("No teamID selected") });
   });
 
   // You have to say who becomes the manager.
   test("throws when no personID provided", async () => {
-    await expect(
-      addManager(formData({ teamID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" })),
-    ).rejects.toThrow("No personID provided");
+    expect(await addManager(formData({ teamID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" }))).toEqual({
+      error: expect.stringContaining("No personID provided"),
+    });
   });
 
   // Garbage IDs get caught before they hit the database.
   test("throws on invalid UUID", async () => {
-    await expect(addManager(formData({ teamID: "bad", personID: "bad" }))).rejects.toThrow(
-      "Invalid",
-    );
+    expect(await addManager(formData({ teamID: "bad", personID: "bad" }))).toEqual({
+      error: expect.stringContaining("Invalid"),
+    });
   });
 
   // Can't assign a manager that doesn't exist in the person table.
   test("throws when person does not exist", async () => {
     const team = await createTestTeam({ teamName: "Team A" });
-    await expect(
-      addManager(
+    expect(
+      await addManager(
         formData({
           teamID: team.teamId,
           personID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
         }),
       ),
-    ).rejects.toThrow("Person not found");
+    ).toEqual({ error: expect.stringContaining("Person not found") });
   });
 
   // Can't assign a manager to a team that doesn't exist.
   test("throws when team does not exist", async () => {
     const person = await createTestPerson({ name: "Alice" });
-    await expect(
-      addManager(
+    expect(
+      await addManager(
         formData({
           teamID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
           personID: person.id,
         }),
       ),
-    ).rejects.toThrow("Team not found");
+    ).toEqual({ error: expect.stringContaining("Team not found") });
   });
 });
 
@@ -334,28 +344,30 @@ describe("addMember", () => {
       data: { personId: person.id, teamId: team.teamId },
     });
 
-    await expect(addMember(formData({ teamID: team.teamId, personID: person.id }))).rejects.toThrow(
-      "Person is already a member of the team",
-    );
+    expect(await addMember(formData({ teamID: team.teamId, personID: person.id }))).toEqual({
+      error: expect.stringContaining("Person is already a member of the team"),
+    });
   });
 
   // Have to specify which team to add the member to.
   test("throws when no teamID provided", async () => {
-    await expect(
-      addMember(formData({ personID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" })),
-    ).rejects.toThrow("No teamID selected");
+    expect(await addMember(formData({ personID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" }))).toEqual(
+      { error: expect.stringContaining("No teamID selected") },
+    );
   });
 
   // Have to specify which person to add.
   test("throws when no personID provided", async () => {
-    await expect(
-      addMember(formData({ teamID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" })),
-    ).rejects.toThrow("No personID selected");
+    expect(await addMember(formData({ teamID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" }))).toEqual({
+      error: expect.stringContaining("No personID selected"),
+    });
   });
 
   // UUID validation — same as every other action.
   test("throws on invalid UUID", async () => {
-    await expect(addMember(formData({ teamID: "x", personID: "y" }))).rejects.toThrow("Invalid");
+    expect(await addMember(formData({ teamID: "x", personID: "y" }))).toEqual({
+      error: expect.stringContaining("Invalid"),
+    });
   });
 });
 
@@ -416,28 +428,30 @@ describe("removeMember", () => {
     const person = await createTestPerson({ name: "Alice", email: "alice@test.com" });
     const team = await createTestTeam({ teamName: "Team A" });
 
-    await expect(
-      removeMember(formData({ teamID: team.teamId, personID: person.id })),
-    ).rejects.toThrow("Person is not a member of the team");
+    expect(await removeMember(formData({ teamID: team.teamId, personID: person.id }))).toEqual({
+      error: expect.stringContaining("Person is not a member of the team"),
+    });
   });
 
   // Need to know which team to remove the member from.
   test("throws when no teamID provided", async () => {
-    await expect(
-      removeMember(formData({ personID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" })),
-    ).rejects.toThrow("No teamID selected");
+    expect(
+      await removeMember(formData({ personID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" })),
+    ).toEqual({ error: expect.stringContaining("No teamID selected") });
   });
 
   // Need to know which person to remove.
   test("throws when no personID provided", async () => {
-    await expect(
-      removeMember(formData({ teamID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" })),
-    ).rejects.toThrow("No personID selected");
+    expect(
+      await removeMember(formData({ teamID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" })),
+    ).toEqual({ error: expect.stringContaining("No personID selected") });
   });
 
   // UUID check — keeps bad data out.
   test("throws on invalid UUID", async () => {
-    await expect(removeMember(formData({ teamID: "x", personID: "y" }))).rejects.toThrow("Invalid");
+    expect(await removeMember(formData({ teamID: "x", personID: "y" }))).toEqual({
+      error: expect.stringContaining("Invalid"),
+    });
   });
 });
 
@@ -531,49 +545,55 @@ describe("addManager (extended)", () => {
   // Throws when no teamID is provided.
   test("throws when no teamID provided", async () => {
     const person = await createTestPerson({ name: "Alice", email: "alice@test.com" });
-    await expect(addManager(formData({ personID: person.id }))).rejects.toThrow(
-      "No teamID selected",
-    );
+    expect(await addManager(formData({ personID: person.id }))).toEqual({
+      error: expect.stringContaining("No teamID selected"),
+    });
   });
 
   // Throws when no personID is provided.
   test("throws when no personID provided", async () => {
     const team = await createTestTeam({ teamName: "Eng" });
-    await expect(addManager(formData({ teamID: team.teamId }))).rejects.toThrow(
-      "No personID provided",
-    );
+    expect(await addManager(formData({ teamID: team.teamId }))).toEqual({
+      error: expect.stringContaining("No personID provided"),
+    });
   });
 
   // Throws when person does not exist.
   test("throws when person does not exist", async () => {
     const team = await createTestTeam({ teamName: "Eng" });
-    await expect(
-      addManager(
+    expect(
+      await addManager(
         formData({ personID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", teamID: team.teamId }),
       ),
-    ).rejects.toThrow("Person not found");
+    ).toEqual({ error: expect.stringContaining("Person not found") });
   });
 
   // Throws when team does not exist.
   test("throws when team does not exist", async () => {
     const person = await createTestPerson({ name: "Alice", email: "alice@test.com" });
-    await expect(
-      addManager(formData({ personID: person.id, teamID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" })),
-    ).rejects.toThrow("Team not found");
+    expect(
+      await addManager(
+        formData({ personID: person.id, teamID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" }),
+      ),
+    ).toEqual({ error: expect.stringContaining("Team not found") });
   });
 
   // Throws on invalid UUID for teamID.
   test("throws on invalid teamID format", async () => {
-    await expect(
-      addManager(formData({ personID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", teamID: "bad-id" })),
-    ).rejects.toThrow("Invalid teamID format");
+    expect(
+      await addManager(
+        formData({ personID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", teamID: "bad-id" }),
+      ),
+    ).toEqual({ error: expect.stringContaining("Invalid teamID format") });
   });
 
   // Throws on invalid UUID for personID.
   test("throws on invalid personID format", async () => {
-    await expect(
-      addManager(formData({ personID: "bad-id", teamID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" })),
-    ).rejects.toThrow("Invalid personID format");
+    expect(
+      await addManager(
+        formData({ personID: "bad-id", teamID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" }),
+      ),
+    ).toEqual({ error: expect.stringContaining("Invalid personID format") });
   });
 });
 

@@ -104,7 +104,7 @@ describe("ProfileEditor", () => {
 
   // Shows error message when name update fails.
   test("shows error when name update fails", async () => {
-    (updateProfileName as jest.Mock).mockRejectedValue(new Error("Name is required"));
+    (updateProfileName as jest.Mock).mockResolvedValue({ error: "Name is required" });
     render(<ProfileEditor profile={baseProfile} />);
     const nameInput = screen.getByLabelText("Enter New Name");
     fireEvent.change(nameInput, { target: { value: "A" } });
@@ -117,14 +117,14 @@ describe("ProfileEditor", () => {
 
   // Shows generic error when update throws a non-Error object.
   test("shows generic error when name update throws non-Error", async () => {
-    (updateProfileName as jest.Mock).mockRejectedValue("unexpected");
+    (updateProfileName as jest.Mock).mockResolvedValue({ error: "An unexpected error occurred" });
     render(<ProfileEditor profile={baseProfile} />);
     const nameInput = screen.getByLabelText("Enter New Name");
     fireEvent.change(nameInput, { target: { value: "New Name" } });
     const saveButtons = screen.getAllByRole("button", { name: /Save/i });
     fireEvent.click(saveButtons[0]);
     await waitFor(() => {
-      expect(screen.getByText("An error occurred")).toBeInTheDocument();
+      expect(screen.getByText("An unexpected error occurred")).toBeInTheDocument();
     });
   });
 
@@ -171,7 +171,7 @@ describe("ProfileEditor", () => {
 
   // Shows error when image update fails.
   test("shows error when image update fails", async () => {
-    (updateProfileImage as jest.Mock).mockRejectedValue(new Error("Invalid URL format"));
+    (updateProfileImage as jest.Mock).mockResolvedValue({ error: "Invalid URL format" });
     render(<ProfileEditor profile={baseProfile} />);
     const imageInput = screen.getByLabelText("Image URL");
     fireEvent.change(imageInput, { target: { value: "bad-url" } });
@@ -184,14 +184,14 @@ describe("ProfileEditor", () => {
 
   // Shows generic error when image update throws non-Error.
   test("shows generic error when image update throws non-Error", async () => {
-    (updateProfileImage as jest.Mock).mockRejectedValue("unexpected");
+    (updateProfileImage as jest.Mock).mockResolvedValue({ error: "An unexpected error occurred" });
     render(<ProfileEditor profile={baseProfile} />);
     const imageInput = screen.getByLabelText("Image URL");
     fireEvent.change(imageInput, { target: { value: "https://example.com/new.jpg" } });
     const saveButtons = screen.getAllByRole("button", { name: /Save/i });
     fireEvent.click(saveButtons[1]);
     await waitFor(() => {
-      expect(screen.getByText("An error occurred")).toBeInTheDocument();
+      expect(screen.getByText("An unexpected error occurred")).toBeInTheDocument();
     });
   });
 
@@ -278,7 +278,7 @@ describe("ProfileEditor", () => {
 
   // Error messages have the alert role for accessibility.
   test("error messages have role=alert", async () => {
-    (updateProfileName as jest.Mock).mockRejectedValue(new Error("Bad name"));
+    (updateProfileName as jest.Mock).mockResolvedValue({ error: "Bad name" });
     render(<ProfileEditor profile={baseProfile} />);
     const nameInput = screen.getByLabelText("Enter New Name");
     fireEvent.change(nameInput, { target: { value: "X" } });

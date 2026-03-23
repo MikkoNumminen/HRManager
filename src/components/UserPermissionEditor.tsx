@@ -85,13 +85,10 @@ export default function UserPermissionEditor({
 
   const [roleState, roleAction, roleIsPending] = useActionState(
     async (_prev: FormState, formData: FormData): Promise<FormState> => {
-      try {
-        await updateUserRole(formData);
-        showSnackbar(tn("roleUpdated"));
-        return { error: null };
-      } catch (error) {
-        return { error: error instanceof Error ? error.message : tc("error") };
-      }
+      const result = await updateUserRole(formData);
+      if (result?.error) return { error: result.error };
+      showSnackbar(tn("roleUpdated"));
+      return { error: null };
     },
     { error: null },
   );
@@ -102,33 +99,33 @@ export default function UserPermissionEditor({
   const handlePermissionAction = (permissionKey: string, action: "grant" | "deny" | "reset") => {
     setPermError(null);
     startTransition(async () => {
-      try {
-        const formData = new FormData();
-        formData.set("userId", user.id);
-        formData.set("permissionKey", permissionKey);
-        formData.set("action", action);
-        await updateUserPermission(formData);
-        completeTutorialStep("manage_permissions");
-        showSnackbar(tn("permissionUpdated"));
-      } catch (e) {
-        setPermError(e instanceof Error ? e.message : tc("error"));
+      const formData = new FormData();
+      formData.set("userId", user.id);
+      formData.set("permissionKey", permissionKey);
+      formData.set("action", action);
+      const result = await updateUserPermission(formData);
+      if (result?.error) {
+        setPermError(result.error);
+        return;
       }
+      completeTutorialStep("manage_permissions");
+      showSnackbar(tn("permissionUpdated"));
     });
   };
 
   const handleKickOut = async () => {
     setKickOutPending(true);
-    try {
-      const formData = new FormData();
-      formData.set("userId", user.id);
-      await kickOutUser(formData);
-      showSnackbar(tn("userKickedOut", { name: user.name ?? user.email }));
-      router.push("/admin");
-    } catch (e) {
-      setPermError(e instanceof Error ? e.message : tc("error"));
+    const formData = new FormData();
+    formData.set("userId", user.id);
+    const result = await kickOutUser(formData);
+    if (result?.error) {
+      setPermError(result.error);
       setKickOutPending(false);
+      setKickOutOpen(false);
+      return;
     }
-    setKickOutOpen(false);
+    showSnackbar(tn("userKickedOut", { name: user.name ?? user.email }));
+    router.push("/admin");
   };
 
   const formatKey = (key: string) => {
