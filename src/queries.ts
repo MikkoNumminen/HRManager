@@ -175,7 +175,7 @@ export async function getAuditLogs(
   const [docs, total] = await Promise.all([
     col
       .find(filter)
-      .sort({ createdAt: -1 })
+      .sort({ createdAt: -1, _id: -1 })
       .skip((page - 1) * pageSize)
       .limit(pageSize)
       .toArray(),
@@ -290,7 +290,7 @@ export async function getDashboardMetrics(): Promise<DashboardMetrics> {
       `,
       getAuditLogCollection()
         .find({ sessionId })
-        .sort({ createdAt: -1 })
+        .sort({ createdAt: -1, _id: -1 })
         .limit(10)
         .project({ action: 1, entityType: 1, userEmail: 1, createdAt: 1 })
         .toArray(),
