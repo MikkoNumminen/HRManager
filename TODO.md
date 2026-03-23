@@ -11,15 +11,13 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 
 > 📋 **Audit research:** Items marked "(found by audit)" have detailed file:line references in memory file `project_audit_findings.md`. Read it before starting any of these tasks.
 
-- 🟢⚡ CSV import edge case tests — BOM, non-UTF-8, embedded newlines, empty files [Claude 2, main]
-- 🟢⚡ Rate limit boundary/race condition tests — exact boundary, concurrent requests, window expiry [Claude 2, main]
-- 🟡⚡ Dashboard raw SQL query tests — `getDashboardMetrics()` CTEs/window functions untested [Claude 2, main]
-- 🟡⚡ Deferred audit logging edge case tests — write failures, permission denial logging, rate limit hit logging [Claude 2, main]
 - 🟡⚡ Translate server action error messages — errors hardcoded in English, bypass i18n [Claude 1, main]
 - 🟡⚡ Memoize expensive components — AuditLogViewer (20KB) and DashboardCharts re-render unnecessarily [Claude 1, main]
+- 🟢🧠 Rate limit IP spoofing protection — trusts `x-forwarded-for` without proxy validation [Claude 4, main]
 
 ## Recently Completed
 
+- ✅ 4 test coverage tasks — CSV edge cases (unicode, headers-only, short rows), rate limit boundaries + window expiry + concurrency, dashboard SQL (soft-deletes, session isolation, MongoDB fallback), audit log MongoDB unavailable paths + identifier hashing
 - ✅ Playwright E2E test suite — 7 new spec files, 40+ tests: dashboard, profile, data I/O, person/team/dept detail editing, form validation, full workflow
 - ✅ WCAG accessibility — aria-expanded (AuditLogViewer, TopBar), aria-sort (Timestamp col), aria-describedby (5 forms)
 - ✅ Fix all lint warnings — 137 no-node-access + 22 no-unnecessary-act + 1 prefer-to-have-value → zero lint issues
@@ -52,6 +50,5 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 
 ### Security
 
-- 🟢🧠 Rate limit IP spoofing protection — trusts `x-forwarded-for` without proxy validation
 - 🟢⚡ Demo session cleanup failure logging — silent failures leave stale data
 - 🟡🧠 JWT permission revocation window — permissions valid up to 1h after admin revokes them

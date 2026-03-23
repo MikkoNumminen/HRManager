@@ -971,6 +971,111 @@ describe("getDashboardMetrics", () => {
     const metrics = await getDashboardMetrics();
     expect(metrics.recentActivity).toEqual([]);
   });
+
+  // Soft-deleted persons must not appear in totalPersons count.
+  test("excludes soft-deleted persons from totalPersons", async () => {
+    await testPrisma.person.createMany({
+      data: [
+        { name: "Active", email: "active@test.com" },
+        { name: "Deleted", email: "deleted@test.com", deletedAt: new Date() },
+      ],
+    });
+    const metrics = await getDashboardMetrics();
+    expect(metrics.totalPersons).toBe(1);
+  });
+
+  // Soft-deleted teams must not appear in totalTeams or teamSizes.
+  test("excludes soft-deleted teams from totalTeams and teamSizes", async () => {
+    await testPrisma.team.createMany({
+      data: [{ teamName: "Active" }, { teamName: "Gone", deletedAt: new Date() }],
+    });
+    const metrics = await getDashboardMetrics();
+    expect(metrics.totalTeams).toBe(1);
+    expect(metrics.teamSizes).toHaveLength(1);
+    expect(metrics.teamSizes[0].teamName).toBe("Active");
+  });
+
+  // Soft-deleted team members must not count toward memberCount.
+  test("excludes soft-deleted team members from memberCount", async () => {
+    const person1 = await testPrisma.person.create({ data: { name: "P1", email: "p1@test.com" } });
+    const person2 = await testPrisma.person.create({ data: { name: "P2", email: "p2@test.com" } });
+    const team = await testPrisma.team.create({ data: { teamName: "Alpha" } });
+    await testPrisma.teamMember.createMany({
+      data: [
+        { personId: person1.id, teamId: team.teamId },
+        { personId: person2.id, teamId: team.teamId, deletedAt: new Date() },
+      ],
+    });
+    const metrics = await getDashboardMetrics();
+    expect(metrics.teamSizes[0].memberCount).toBe(1); // only the active member
+  });
+
+  // Growth timeline with only teams (no persons or departments on those dates).
+  test("growth timeline works when only teams exist", async () => {
+    await testPrisma.team.create({
+      data: { teamName: "Alpha", createdAt: new Date("2026-01-10T10:00:00Z") },
+    });
+    await testPrisma.team.create({
+      data: { teamName: "Beta", createdAt: new Date("2026-01-10T14:00:00Z") },
+    });
+    const metrics = await getDashboardMetrics();
+    expect(metrics.growthTimeline).toHaveLength(1);
+    expect(metrics.growthTimeline[0]).toEqual({
+      date: "2026-01-10",
+      persons: 0,
+      teams: 2,
+      departments: 0,
+    });
+  });
+
+  // Growth timeline window function: cumulative values accumulate across multiple dates.
+  test("growth timeline accumulates cumulative totals across dates", async () => {
+    await testPrisma.team.create({
+      data: { teamName: "A", createdAt: new Date("2026-02-01T10:00:00Z") },
+    });
+    await testPrisma.team.create({
+      data: { teamName: "B", createdAt: new Date("2026-02-05T10:00:00Z") },
+    });
+    await testPrisma.team.create({
+      data: { teamName: "C", createdAt: new Date("2026-02-05T12:00:00Z") },
+    });
+    const metrics = await getDashboardMetrics();
+    expect(metrics.growthTimeline[0].teams).toBe(1); // 2026-02-01: 1 cumulative
+    expect(metrics.growthTimeline[1].teams).toBe(3); // 2026-02-05: 1+2 cumulative
+  });
+
+  // Demo session isolation: metrics must only reflect entities matching the current sessionId.
+  test("demo session isolation — only counts entities for current session", async () => {
+    // Production entities (sessionId = null)
+    await testPrisma.person.createMany({
+      data: [
+        { name: "Prod1", email: "prod1@test.com" },
+        { name: "Prod2", email: "prod2@test.com" },
+      ],
+    });
+    // Demo session entities
+    await testPrisma.person.createMany({
+      data: [
+        { name: "Demo1", email: "demo1@test.com", sessionId: "sess-abc" },
+        { name: "Demo2", email: "demo2@test.com", sessionId: "sess-abc" },
+        { name: "Demo3", email: "demo3@test.com", sessionId: "sess-abc" },
+      ],
+    });
+
+    mockGetDemoSessionId.mockResolvedValueOnce("sess-abc");
+    const metrics = await getDashboardMetrics();
+    expect(metrics.totalPersons).toBe(3); // only the demo session's persons
+  });
+
+  // When MongoDB is unavailable, getDashboardMetrics returns empty recentActivity.
+  test("returns empty recentActivity when MongoDB is unavailable", async () => {
+    jest.spyOn(require("@/mongoDb"), "isMongoAvailable").mockReturnValueOnce(false);
+    await testPrisma.person.create({ data: { name: "A", email: "a@test.com" } });
+
+    const metrics = await getDashboardMetrics();
+    expect(metrics.recentActivity).toEqual([]);
+    expect(metrics.totalPersons).toBe(1); // PG counts still work
+  });
 });
 
 describe("audit log permission checks", () => {

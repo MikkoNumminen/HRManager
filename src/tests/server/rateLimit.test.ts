@@ -167,7 +167,41 @@ test("tracks different IPs independently", async () => {
   expect(records.every((r) => r.count === 1)).toBe(true);
 });
 
-// Falls back to x-real-ip when x-forwarded-for is not available
+// Prefers x-vercel-forwarded-for (spoof-proof) over x-forwarded-for
+test("prefers x-vercel-forwarded-for over x-forwarded-for", async () => {
+  mockHeaders.clear();
+  mockHeaders.set("x-vercel-forwarded-for", "198.51.100.1");
+  mockHeaders.set("x-forwarded-for", "203.0.113.99");
+
+  await rateLimit("testAction");
+
+  const record = await testPrisma.rateLimit.findFirst();
+  expect(record?.identifier).toBe("ip:198.51.100.1");
+});
+
+// Extracts first IP from x-vercel-forwarded-for with multiple IPs
+test("extracts first IP from x-vercel-forwarded-for with multiple IPs", async () => {
+  mockHeaders.clear();
+  mockHeaders.set("x-vercel-forwarded-for", "198.51.100.1, 10.0.0.1");
+
+  await rateLimit("testAction");
+
+  const record = await testPrisma.rateLimit.findFirst();
+  expect(record?.identifier).toBe("ip:198.51.100.1");
+});
+
+// Falls back to x-forwarded-for when x-vercel-forwarded-for is absent
+test("falls back to x-forwarded-for when Vercel header absent", async () => {
+  mockHeaders.clear();
+  mockHeaders.set("x-forwarded-for", "203.0.113.1, 70.41.3.18");
+
+  await rateLimit("testAction");
+
+  const record = await testPrisma.rateLimit.findFirst();
+  expect(record?.identifier).toBe("ip:203.0.113.1");
+});
+
+// Falls back to x-real-ip when neither Vercel nor x-forwarded-for is available
 test("uses x-real-ip as fallback identifier", async () => {
   mockHeaders.clear();
   mockHeaders.set("x-real-ip", "172.16.0.1");
@@ -186,16 +220,6 @@ test("uses 'anonymous' when no IP headers present", async () => {
 
   const record = await testPrisma.rateLimit.findFirst();
   expect(record?.identifier).toBe("anonymous");
-});
-
-// Handles x-forwarded-for with multiple IPs (takes the first one)
-test("extracts first IP from x-forwarded-for with multiple IPs", async () => {
-  mockHeaders.set("x-forwarded-for", "203.0.113.1, 70.41.3.18, 150.172.238.178");
-
-  await rateLimit("testAction");
-
-  const record = await testPrisma.rateLimit.findFirst();
-  expect(record?.identifier).toBe("ip:203.0.113.1");
 });
 
 // Falls back to count=1 when $queryRaw returns an empty array (does not throw).
@@ -318,4 +342,90 @@ test("cleanupExpiredRateLimits removes expired records", async () => {
 test("cleanupExpiredRateLimits returns 0 when nothing to clean", async () => {
   const deleted = await cleanupExpiredRateLimits();
   expect(deleted).toBe(0);
+});
+
+// Lower boundary: count at 29 (MAX_REQUESTS - 1) increments to 30 (= limit) — request must pass.
+// The existing "throws RateLimitError when limit exceeded" test covers the upper boundary (31 > 30).
+test("request that brings count to exactly MAX_REQUESTS does not throw", async () => {
+  await testPrisma.rateLimit.create({
+    data: {
+      identifier: "ip:192.168.1.1",
+      action: "testAction",
+      count: 29,
+      windowStart: new Date(),
+    },
+  });
+  // count goes from 29 → 30 (= MAX_REQUESTS, not over) — must not throw
+  await expect(rateLimit("testAction")).resolves.toBeUndefined();
+});
+
+// Window expiry: record just past 60s boundary should reset (expired)
+test("resets counter when window has just expired (1ms past boundary)", async () => {
+  await testPrisma.rateLimit.create({
+    data: {
+      identifier: "ip:192.168.1.1",
+      action: "testAction",
+      count: 30,
+      windowStart: new Date(Date.now() - 60_001), // 1ms past the 60s boundary
+    },
+  });
+  await expect(rateLimit("testAction")).resolves.toBeUndefined();
+
+  const record = await testPrisma.rateLimit.findUnique({
+    where: { identifier_action: { identifier: "ip:192.168.1.1", action: "testAction" } },
+  });
+  expect(record?.count).toBe(1); // window reset
+});
+
+// Window expiry: record within the window (30s) should NOT reset — count increments
+test("does not reset counter when window is still active (30s elapsed)", async () => {
+  await testPrisma.rateLimit.create({
+    data: {
+      identifier: "ip:192.168.1.1",
+      action: "testAction",
+      count: 5,
+      windowStart: new Date(Date.now() - 30_000), // 30s ago — halfway through window
+    },
+  });
+  await rateLimit("testAction");
+
+  const record = await testPrisma.rateLimit.findUnique({
+    where: { identifier_action: { identifier: "ip:192.168.1.1", action: "testAction" } },
+  });
+  expect(record?.count).toBe(6); // incremented, not reset
+});
+
+// Concurrent requests: atomic SQL upsert must increment correctly under concurrent load
+test("handles concurrent requests atomically — all increments registered", async () => {
+  // Fire 10 concurrent requests simultaneously
+  await Promise.all(Array.from({ length: 10 }, () => rateLimit("concurrentTest")));
+
+  const record = await testPrisma.rateLimit.findUnique({
+    where: { identifier_action: { identifier: "ip:192.168.1.1", action: "concurrentTest" } },
+  });
+  expect(record?.count).toBe(10);
+});
+
+// Concurrent requests near limit: some succeed, some throw — total count is correct
+test("concurrent requests at limit — correct number of errors thrown", async () => {
+  // Seed at count 25 — only 5 more requests should succeed (25+5=30 ≤ 30)
+  await testPrisma.rateLimit.create({
+    data: {
+      identifier: "ip:192.168.1.1",
+      action: "concurrentLimit",
+      count: 25,
+      windowStart: new Date(),
+    },
+  });
+
+  const results = await Promise.allSettled(
+    Array.from({ length: 10 }, () => rateLimit("concurrentLimit")),
+  );
+
+  const fulfilled = results.filter((r) => r.status === "fulfilled").length;
+  const rejected = results.filter((r) => r.status === "rejected").length;
+
+  // 5 should pass (reaching count 30), 5 should be blocked (count > 30)
+  expect(fulfilled).toBe(5);
+  expect(rejected).toBe(5);
 });

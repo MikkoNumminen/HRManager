@@ -1,5 +1,22 @@
 import { parseCSV, generateCSV, validatePersonImportRows } from "../csvUtils";
 
+describe("parseCSV — unicode and non-ASCII content", () => {
+  // parseCSV must pass through non-ASCII characters unchanged (international names, accents, CJK)
+  test("preserves unicode characters in field values", () => {
+    const result = parseCSV("name,email\nJosé Müller,jose@test.com\n王小明,wang@test.com");
+    expect(result[1][0]).toBe("José Müller");
+    expect(result[2][0]).toBe("王小明");
+  });
+
+  // UTF-8 BOM followed by unicode content: BOM stripped, unicode content preserved
+  test("strips BOM and preserves unicode content after it", () => {
+    const bom = "\uFEFF";
+    const result = parseCSV(bom + "name,email\nÅngström,a@b.com");
+    expect(result[0][0]).toBe("name"); // BOM stripped from first field
+    expect(result[1][0]).toBe("Ångström"); // unicode preserved in data row
+  });
+});
+
 describe("parseCSV", () => {
   // Returns empty array for empty input
   test("returns empty array for empty string", () => {
@@ -343,5 +360,51 @@ describe("validatePersonImportRows", () => {
     expect(result.valid).toHaveLength(2);
     expect(result.errors.length).toBeGreaterThan(0);
     expect(result.skipped).toBe(1);
+  });
+
+  // Headers-only CSV (no data rows) should return empty results
+  test("headers-only CSV returns empty valid array", () => {
+    const rows = [["name", "email", "position"]];
+    const result = validatePersonImportRows(rows, new Set());
+    expect(result).toEqual({ valid: [], errors: [], skipped: 0 });
+  });
+
+  // Row with fewer columns than the header — missing email cell becomes empty string → error
+  test("errors on row with fewer columns than header", () => {
+    const rows = [
+      ["name", "email"],
+      ["Alice"], // only 1 column — email column is absent
+    ];
+    const result = validatePersonImportRows(rows, new Set());
+    expect(result.valid).toHaveLength(0);
+    expect(result.errors).toHaveLength(1);
+    expect(result.errors[0].field).toBe("email");
+  });
+
+  // Extra columns beyond known headers should be silently ignored
+  test("ignores extra columns beyond known headers", () => {
+    const rows = [
+      ["name", "email", "position", "department", "phone"],
+      ["Alice", "alice@test.com", "Manager", "Engineering", "555-1234"],
+    ];
+    const result = validatePersonImportRows(rows, new Set());
+    expect(result.valid).toHaveLength(1);
+    expect(result.valid[0].name).toBe("Alice");
+    expect(result.valid[0].email).toBe("alice@test.com");
+  });
+
+  // Non-ASCII and international characters in names should pass through unchanged
+  test("accepts unicode and international characters in name", () => {
+    const rows = [
+      ["name", "email"],
+      ["José Müller", "jose@test.com"],
+      ["Ångström, Anders", "anders@test.com"],
+      ["王小明", "wang@test.com"],
+    ];
+    const result = validatePersonImportRows(rows, new Set());
+    expect(result.valid).toHaveLength(3);
+    expect(result.valid[0].name).toBe("José Müller");
+    expect(result.valid[1].name).toBe("Ångström, Anders");
+    expect(result.valid[2].name).toBe("王小明");
   });
 });

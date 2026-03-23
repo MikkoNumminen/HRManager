@@ -397,3 +397,102 @@ describe("deferAuditLog", () => {
     expect(logs[0].after).toBe('{"name":"Engineering"}');
   });
 });
+
+describe("MongoDB unavailable — all functions must return early without writing", () => {
+  // Helper: override isMongoAvailable to return false for one call
+  function mockMongoUnavailable() {
+    jest.spyOn(require("@/mongoDb"), "isMongoAvailable").mockReturnValueOnce(false);
+  }
+
+  // logAudit returns early and writes nothing when MongoDB is unavailable.
+  test("logAudit does not write when MongoDB unavailable", async () => {
+    mockAuth.mockResolvedValue({ user: { id: "u1", email: "u@test.com" } });
+    mockMongoUnavailable();
+
+    await logAudit({ action: "create", entityType: "person" });
+
+    const logs = await getTestAuditLogCollection().find().toArray();
+    expect(logs).toHaveLength(0);
+  });
+
+  // deferAudit skips registration of after() callback when MongoDB is unavailable.
+  test("deferAudit registers no after() callback when MongoDB unavailable", () => {
+    mockMongoUnavailable();
+    deferAudit([
+      {
+        action: "create" as const,
+        entityType: "person" as const,
+        userId: null,
+        userEmail: null,
+        sessionId: null,
+      },
+    ]);
+    expect(afterCallbacks).toHaveLength(0);
+  });
+
+  // logPermissionDenial returns early and registers no after() callback.
+  test("logPermissionDenial registers no after() callback when MongoDB unavailable", async () => {
+    mockAuth.mockResolvedValue({ user: { id: "u1", email: "u@test.com" } });
+    mockMongoUnavailable();
+
+    await logPermissionDenial("person:delete");
+
+    expect(afterCallbacks).toHaveLength(0);
+  });
+
+  // logRateLimitHit returns early and registers no after() callback.
+  test("logRateLimitHit registers no after() callback when MongoDB unavailable", async () => {
+    mockMongoUnavailable();
+
+    await logRateLimitHit("createPerson", "ip:10.0.0.1");
+
+    expect(afterCallbacks).toHaveLength(0);
+  });
+
+  // deferAuditLog wraps deferAudit — also skips when MongoDB unavailable.
+  test("deferAuditLog registers no after() callback when MongoDB unavailable", async () => {
+    mockAuth.mockResolvedValue({ user: { id: "u1", email: "u@test.com" } });
+    mockMongoUnavailable();
+
+    await deferAuditLog({ action: "create", entityType: "person" });
+
+    expect(afterCallbacks).toHaveLength(0);
+  });
+});
+
+describe("logRateLimitHit — identifier hashing", () => {
+  // IP-based identifiers (ip: prefix) are hashed to avoid storing raw IPs (GDPR)
+  test("hashes ip: prefixed identifiers (GDPR — no raw IPs stored)", async () => {
+    await logRateLimitHit("createPerson", "ip:203.0.113.42");
+    await flushAfterCallbacks();
+
+    const logs = await getTestAuditLogCollection().find().toArray();
+    expect(logs).toHaveLength(1);
+    const after = JSON.parse(logs[0].after!);
+    // Must not contain the raw IP address
+    expect(after.identifier).not.toContain("203.0.113.42");
+    expect(after.identifier).toMatch(/^ip:[A-Za-z0-9+/].*\.\.\.$/); // base64 truncated
+  });
+
+  // Non-IP identifiers (user: or anonymous) are stored as-is (no PII concern)
+  test("stores non-IP identifiers (user:) as-is without hashing", async () => {
+    await logRateLimitHit("createPerson", "user:user-abc-123");
+    await flushAfterCallbacks();
+
+    const logs = await getTestAuditLogCollection().find().toArray();
+    expect(logs).toHaveLength(1);
+    const after = JSON.parse(logs[0].after!);
+    expect(after.identifier).toBe("user:user-abc-123");
+  });
+
+  // anonymous identifier stored as-is
+  test("stores anonymous identifier as-is", async () => {
+    await logRateLimitHit("createPerson", "anonymous");
+    await flushAfterCallbacks();
+
+    const logs = await getTestAuditLogCollection().find().toArray();
+    expect(logs).toHaveLength(1);
+    const after = JSON.parse(logs[0].after!);
+    expect(after.identifier).toBe("anonymous");
+  });
+});
