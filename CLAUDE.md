@@ -72,7 +72,7 @@ src/
 │   └── profile/                 # User profile (auth-protected)
 ├── components/       # Reusable MUI client components (48 components, incl. DataImportExport + CsvImportDialog)
 ├── i18n/             # next-intl configuration (actions, config, request)
-├── tests/            # Jest tests (1272 tests)
+├── tests/            # Jest tests (1322 tests)
 ├── types/            # TypeScript module augmentations (next-auth.d.ts)
 ├── auditLog.ts       # Deferred audit logging via after() (captureAuditContext, deferAudit, logAudit)
 ├── auth.ts           # NextAuth v5 configuration + RBAC callbacks
