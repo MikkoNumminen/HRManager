@@ -43,6 +43,7 @@ interface UserPermissionEditorProps {
   allPermissionKeys: string[];
   roleDefaults: Record<string, string[]>;
   canAssignPermissions: boolean;
+  isDemoSession?: boolean;
 }
 
 type FormState = { error: string | null };
@@ -59,6 +60,7 @@ export default function UserPermissionEditor({
   allPermissionKeys,
   roleDefaults,
   canAssignPermissions,
+  isDemoSession,
 }: UserPermissionEditorProps) {
   const t = useTranslations("admin");
   const tc = useTranslations("common");
@@ -67,7 +69,8 @@ export default function UserPermissionEditor({
   const router = useRouter();
   const [selectedRole, setSelectedRole] = useState(user.role);
   const roleChanged = selectedRole !== user.role;
-  const isSuperuser = user.role === "superuser";
+  // In demo sessions, superuser restrictions are lifted — users can experiment freely
+  const isSuperuser = !isDemoSession && user.role === "superuser";
   const [isPending, startTransition] = useTransition();
   const [permError, setPermError] = useState<string | null>(null);
   const [kickOutOpen, setKickOutOpen] = useState(false);
@@ -195,6 +198,7 @@ export default function UserPermissionEditor({
                   "& .MuiSvgIcon-root": { color: colors.slate300 },
                 }}
               >
+                {isDemoSession && <MenuItem value="superuser">{t("roleSuperuser")}</MenuItem>}
                 <MenuItem value="administrator">{t("roleAdministrator")}</MenuItem>
                 <MenuItem value="user">{t("roleUser")}</MenuItem>
                 <MenuItem value="guest">{t("roleGuest")}</MenuItem>

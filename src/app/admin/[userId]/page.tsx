@@ -6,6 +6,7 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getUserPermissions, ROLE_DEFAULTS } from "@/permissions";
 import { getTranslations } from "next-intl/server";
+import { getDemoSessionId } from "@/demoSession";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -34,6 +35,7 @@ export default async function UserPermissionPage({
 
   const allPermissionKeys = await getAllPermissionKeys();
   const canAssignPermissions = permissions["admin:assign_permissions"];
+  const demoSessionId = await getDemoSessionId();
 
   return (
     <>
@@ -47,6 +49,7 @@ export default async function UserPermissionPage({
         allPermissionKeys={allPermissionKeys}
         roleDefaults={ROLE_DEFAULTS}
         canAssignPermissions={canAssignPermissions}
+        isDemoSession={!!demoSessionId}
       />
     </>
   );

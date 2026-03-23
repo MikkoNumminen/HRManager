@@ -1031,14 +1031,17 @@ export async function updateUserRole(data: FormData) {
   if (!newRole) throw new Error("No role provided");
   validateUUID(userId, "userId");
 
-  const validRoles = ["administrator", "user", "guest"];
+  const demoSessionId = await getDemoSessionId();
+  const validRoles = demoSessionId
+    ? ["superuser", "administrator", "user", "guest"]
+    : ["administrator", "user", "guest"];
   if (!validRoles.includes(newRole)) {
     throw new Error("Invalid role. Cannot assign superuser role through the UI.");
   }
 
   const targetUser = await prisma.user.findUnique({ where: { id: userId } });
   if (!targetUser) throw new Error("User not found");
-  if (targetUser.role === "superuser") {
+  if (!demoSessionId && targetUser.role === "superuser") {
     throw new Error("Cannot change the superuser's role");
   }
 
@@ -1072,9 +1075,10 @@ export async function updateUserPermission(data: FormData) {
   if (!action) throw new Error("No action provided");
   validateUUID(userId, "userId");
 
+  const demoSessionId = await getDemoSessionId();
   const targetUser = await prisma.user.findUnique({ where: { id: userId } });
   if (!targetUser) throw new Error("User not found");
-  if (targetUser.role === "superuser") {
+  if (!demoSessionId && targetUser.role === "superuser") {
     throw new Error("Cannot modify superuser permissions");
   }
 

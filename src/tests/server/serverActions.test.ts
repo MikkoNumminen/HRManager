@@ -30,6 +30,13 @@ jest.mock("@/rateLimit", () => ({
   rateLimit: jest.fn(),
 }));
 
+// Mock demo session — defaults to null (production mode).
+// Individual tests override mockGetDemoSessionId to simulate demo sessions.
+const mockGetDemoSessionId = jest.fn().mockResolvedValue(null);
+jest.mock("@/demoSession", () => ({
+  getDemoSessionId: () => mockGetDemoSessionId(),
+}));
+
 // Mock Next.js server functions — these don't exist in a test environment,
 // but the server actions call them after every mutation.
 jest.mock("next/cache", () => ({
@@ -985,6 +992,32 @@ describe("updateUserRole", () => {
       updateUserRole(formData({ userId: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" })),
     ).rejects.toThrow("No role provided");
   });
+
+  // Demo sessions can assign the superuser role — sandbox data, no restrictions needed.
+  test("allows assigning superuser role in demo session", async () => {
+    mockGetDemoSessionId.mockResolvedValueOnce("demo-sess-123");
+    const user = await testPrisma.user.create({
+      data: { email: "alice@test.com", name: "Alice", role: "user" },
+    });
+
+    await updateUserRole(formData({ userId: user.id, role: "superuser" }));
+
+    const updated = await testPrisma.user.findUnique({ where: { id: user.id } });
+    expect(updated!.role).toBe("superuser");
+  });
+
+  // Demo sessions can change a superuser's role — experiment freely with all roles.
+  test("allows changing superuser role in demo session", async () => {
+    mockGetDemoSessionId.mockResolvedValueOnce("demo-sess-123");
+    const user = await testPrisma.user.create({
+      data: { email: "super@test.com", name: "Super", role: "superuser" },
+    });
+
+    await updateUserRole(formData({ userId: user.id, role: "administrator" }));
+
+    const updated = await testPrisma.user.findUnique({ where: { id: user.id } });
+    expect(updated!.role).toBe("administrator");
+  });
 });
 
 describe("updateUserPermission", () => {
@@ -1159,6 +1192,26 @@ describe("updateUserPermission", () => {
         }),
       ),
     ).rejects.toThrow("No action provided");
+  });
+
+  // Demo sessions can modify superuser permissions — sandbox lets you experiment.
+  test("allows modifying superuser permissions in demo session", async () => {
+    mockGetDemoSessionId.mockResolvedValueOnce("demo-sess-123");
+    const user = await testPrisma.user.create({
+      data: { email: "super@test.com", name: "Super", role: "superuser" },
+    });
+    const perm = await testPrisma.permission.create({
+      data: { key: "person:create", description: "Create persons" },
+    });
+
+    await updateUserPermission(
+      formData({ userId: user.id, permissionKey: "person:create", action: "deny" }),
+    );
+
+    const override = await testPrisma.userPermission.findFirst({
+      where: { userId: user.id, permissionId: perm.id },
+    });
+    expect(override!.granted).toBe(false);
   });
 });
 

@@ -560,4 +560,88 @@ describe("UserPermissionEditor", () => {
       ),
     ).toBeInTheDocument();
   });
+
+  // In demo mode, superuser role dropdown and permission toggles are shown (not locked)
+  test("shows role dropdown for superuser in demo session", () => {
+    const superUser = { ...baseUser, role: "superuser" };
+    render(
+      <UserPermissionEditor
+        user={superUser}
+        allPermissionKeys={allKeys}
+        roleDefaults={roleDefaults}
+        canAssignPermissions={true}
+        isDemoSession={true}
+      />,
+    );
+    // Should NOT show the "cannot change" message
+    expect(screen.queryByText("The superuser role cannot be changed.")).not.toBeInTheDocument();
+    // Should show the role dropdown with superuser option
+    expect(screen.getByRole("combobox")).toBeInTheDocument();
+  });
+
+  // In demo mode, superuser permissions are editable (not locked)
+  test("shows permission toggles for superuser in demo session", () => {
+    const superUser = { ...baseUser, role: "superuser" };
+    render(
+      <UserPermissionEditor
+        user={superUser}
+        allPermissionKeys={allKeys}
+        roleDefaults={roleDefaults}
+        canAssignPermissions={true}
+        isDemoSession={true}
+      />,
+    );
+    // Should NOT show the "all permissions" locked message
+    expect(
+      screen.queryByText("The superuser has all permissions and cannot be modified."),
+    ).not.toBeInTheDocument();
+    // Should show Grant/Deny toggles
+    expect(screen.getAllByText("Grant").length).toBeGreaterThan(0);
+  });
+
+  // In demo mode, the role dropdown includes the superuser option
+  test("includes superuser option in role dropdown in demo session", () => {
+    render(
+      <UserPermissionEditor
+        user={baseUser}
+        allPermissionKeys={allKeys}
+        roleDefaults={roleDefaults}
+        canAssignPermissions={true}
+        isDemoSession={true}
+      />,
+    );
+    fireEvent.mouseDown(screen.getByRole("combobox"));
+    expect(screen.getByRole("option", { name: /Superuser/i })).toBeInTheDocument();
+  });
+
+  // In production mode, the superuser option is not in the role dropdown
+  test("excludes superuser option from role dropdown in production", () => {
+    render(
+      <UserPermissionEditor
+        user={baseUser}
+        allPermissionKeys={allKeys}
+        roleDefaults={roleDefaults}
+        canAssignPermissions={true}
+        isDemoSession={false}
+      />,
+    );
+    fireEvent.mouseDown(screen.getByRole("combobox"));
+    expect(screen.queryByRole("option", { name: /Superuser/i })).not.toBeInTheDocument();
+  });
+
+  // In demo mode, kick out button is shown for superuser
+  test("shows kick out button for superuser in demo session", () => {
+    const superUser = { ...baseUser, role: "superuser" };
+    render(
+      <UserPermissionEditor
+        user={superUser}
+        allPermissionKeys={allKeys}
+        roleDefaults={roleDefaults}
+        canAssignPermissions={true}
+        isDemoSession={true}
+      />,
+    );
+    expect(screen.getByText("Danger Zone")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Kick Out/i })).toBeInTheDocument();
+  });
 });

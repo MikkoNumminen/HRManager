@@ -18,6 +18,13 @@ jest.mock("@/permissions", () => ({
   hasPermission: jest.fn(() => true),
 }));
 
+// Mock demo session — defaults to null (production mode).
+// Individual tests override mockGetDemoSessionId to simulate demo sessions.
+const mockGetDemoSessionId = jest.fn().mockResolvedValue(null);
+jest.mock("@/demoSession", () => ({
+  getDemoSessionId: () => mockGetDemoSessionId(),
+}));
+
 import {
   getPersons,
   getTeams,
@@ -305,6 +312,21 @@ describe("getUsers", () => {
     expect(user.name).toBeNull();
     expect(user.image).toBeNull();
   });
+
+  // Demo sessions only see the demo user — prevents leaking real OAuth user emails.
+  test("filters to only demo user in demo session", async () => {
+    mockGetDemoSessionId.mockResolvedValueOnce("demo-sess-123");
+    await testPrisma.user.create({
+      data: { email: "demo@hrmanager.app", name: "Demo", role: "superuser" },
+    });
+    await testPrisma.user.create({
+      data: { email: "real@oauth.com", name: "Real User", role: "administrator" },
+    });
+
+    const result = await getUsers();
+    expect(result).toHaveLength(1);
+    expect(result[0].email).toBe("demo@hrmanager.app");
+  });
 });
 
 describe("getUserById", () => {
@@ -352,6 +374,29 @@ describe("getUserById", () => {
   test("returns null for non-existent user", async () => {
     const result = await getUserById("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11");
     expect(result).toBeNull();
+  });
+
+  // Demo sessions can't view real OAuth users by guessing UUIDs — privacy protection.
+  test("returns null for non-demo user in demo session", async () => {
+    mockGetDemoSessionId.mockResolvedValueOnce("demo-sess-123");
+    const realUser = await testPrisma.user.create({
+      data: { email: "real@oauth.com", name: "Real", role: "administrator" },
+    });
+
+    const result = await getUserById(realUser.id);
+    expect(result).toBeNull();
+  });
+
+  // Demo sessions can view the demo user's own data.
+  test("returns demo user in demo session", async () => {
+    mockGetDemoSessionId.mockResolvedValueOnce("demo-sess-123");
+    const demoUser = await testPrisma.user.create({
+      data: { email: "demo@hrmanager.app", name: "Demo", role: "superuser" },
+    });
+
+    const result = await getUserById(demoUser.id);
+    expect(result).not.toBeNull();
+    expect(result!.email).toBe("demo@hrmanager.app");
   });
 });
 

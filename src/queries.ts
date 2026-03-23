@@ -93,7 +93,10 @@ export async function getDepartments(): Promise<Department[]> {
 }
 
 export async function getUsers(): Promise<AppUser[]> {
+  const demoSessionId = await getDemoSessionId();
   const users = await prisma.user.findMany({
+    // Demo sessions only see the demo user — prevents leaking real OAuth user emails
+    ...(demoSessionId ? { where: { email: "demo@hrmanager.app" } } : {}),
     orderBy: { createdAt: "asc" },
   });
 
@@ -101,6 +104,7 @@ export async function getUsers(): Promise<AppUser[]> {
 }
 
 export async function getUserById(userId: string) {
+  const demoSessionId = await getDemoSessionId();
   const user = await prisma.user.findUnique({
     where: { id: userId },
     include: {
@@ -111,6 +115,8 @@ export async function getUserById(userId: string) {
   });
 
   if (!user) return null;
+  // Demo sessions can only view the demo user — prevents accessing real OAuth users by UUID
+  if (demoSessionId && user.email !== "demo@hrmanager.app") return null;
 
   const overrides = user.permissions.map((up) => ({
     key: up.permission.key,
