@@ -2,13 +2,6 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/db";
 import { auth } from "@/auth";
 import {
-  dashboardCounts,
-  dashboardTeamSizes,
-  dashboardDepartmentSizes,
-  dashboardGrowthTimeline,
-  dashboardRecentActivity,
-} from "@prisma/client/sql";
-import {
   PersonSchema,
   TeamSchema,
   DepartmentSchema,
@@ -194,19 +187,105 @@ export async function getAuditLogs(
   };
 }
 
+// Raw SQL result types for dashboard queries (unnamed parameterized queries
+// instead of Prisma Typed SQL named prepared statements — PgBouncer compatible)
+interface DashboardCountsRow {
+  totalPersons: number;
+  totalTeams: number;
+  totalDepartments: number;
+  totalUsers: number;
+}
+interface TeamSizeRow {
+  teamName: string;
+  memberCount: number;
+}
+interface DepartmentSizeRow {
+  departmentName: string;
+  teamCount: number;
+}
+interface GrowthTimelineRow {
+  date: string;
+  persons: number;
+  teams: number;
+  departments: number;
+}
+interface RecentActivityRow {
+  action: string;
+  entityType: string;
+  userEmail: string | null;
+  createdAt: Date;
+}
+
 export async function getDashboardMetrics(): Promise<DashboardMetrics> {
   const sessionId = await getDemoSessionId();
-  // Prisma Typed SQL doesn't support nullable params, but PostgreSQL
-  // IS NOT DISTINCT FROM handles null correctly at the query level
-  const sid = sessionId as string;
 
   const [countsRows, teamSizes, departmentSizes, growthTimeline, recentActivityRows] =
     await Promise.all([
-      prisma.$queryRawTyped(dashboardCounts(sid)),
-      prisma.$queryRawTyped(dashboardTeamSizes(sid)),
-      prisma.$queryRawTyped(dashboardDepartmentSizes(sid)),
-      prisma.$queryRawTyped(dashboardGrowthTimeline(sid)),
-      prisma.$queryRawTyped(dashboardRecentActivity(sid)),
+      prisma.$queryRaw<DashboardCountsRow[]>`
+        SELECT
+          (SELECT COUNT(*)::int FROM "Person" WHERE "deletedAt" IS NULL AND "sessionId" IS NOT DISTINCT FROM ${sessionId}) AS "totalPersons",
+          (SELECT COUNT(*)::int FROM "Team" WHERE "deletedAt" IS NULL AND "sessionId" IS NOT DISTINCT FROM ${sessionId}) AS "totalTeams",
+          (SELECT COUNT(*)::int FROM "Department" WHERE "deletedAt" IS NULL AND "sessionId" IS NOT DISTINCT FROM ${sessionId}) AS "totalDepartments",
+          (SELECT COUNT(*)::int FROM "User") AS "totalUsers"
+      `,
+      prisma.$queryRaw<TeamSizeRow[]>`
+        SELECT
+          t."teamName",
+          COUNT(tm.id)::int AS "memberCount"
+        FROM "Team" t
+        LEFT JOIN "TeamMember" tm
+          ON tm."teamId" = t."teamId"
+          AND tm."deletedAt" IS NULL
+          AND tm."sessionId" IS NOT DISTINCT FROM ${sessionId}
+        WHERE t."deletedAt" IS NULL
+          AND t."sessionId" IS NOT DISTINCT FROM ${sessionId}
+        GROUP BY t."teamId", t."teamName"
+        ORDER BY t."teamName" ASC
+      `,
+      prisma.$queryRaw<DepartmentSizeRow[]>`
+        SELECT
+          d."name" AS "departmentName",
+          COUNT(t."teamId")::int AS "teamCount"
+        FROM "Department" d
+        LEFT JOIN "Team" t
+          ON t."departmentId" = d.id
+          AND t."deletedAt" IS NULL
+          AND t."sessionId" IS NOT DISTINCT FROM ${sessionId}
+        WHERE d."deletedAt" IS NULL
+          AND d."sessionId" IS NOT DISTINCT FROM ${sessionId}
+        GROUP BY d.id, d."name"
+        ORDER BY d."name" ASC
+      `,
+      prisma.$queryRaw<GrowthTimelineRow[]>`
+        WITH daily AS (
+          SELECT date, SUM(p)::int AS p, SUM(t)::int AS t, SUM(d)::int AS d
+          FROM (
+            SELECT "createdAt"::date AS date, 1 AS p, 0 AS t, 0 AS d
+            FROM "Person" WHERE "deletedAt" IS NULL AND "sessionId" IS NOT DISTINCT FROM ${sessionId}
+            UNION ALL
+            SELECT "createdAt"::date AS date, 0 AS p, 1 AS t, 0 AS d
+            FROM "Team" WHERE "deletedAt" IS NULL AND "sessionId" IS NOT DISTINCT FROM ${sessionId}
+            UNION ALL
+            SELECT "createdAt"::date AS date, 0 AS p, 0 AS t, 1 AS d
+            FROM "Department" WHERE "deletedAt" IS NULL AND "sessionId" IS NOT DISTINCT FROM ${sessionId}
+          ) combined
+          GROUP BY date
+        )
+        SELECT
+          date::text AS "date",
+          SUM(p) OVER (ORDER BY date)::int AS "persons",
+          SUM(t) OVER (ORDER BY date)::int AS "teams",
+          SUM(d) OVER (ORDER BY date)::int AS "departments"
+        FROM daily
+        ORDER BY date ASC
+      `,
+      prisma.$queryRaw<RecentActivityRow[]>`
+        SELECT "action", "entityType", "userEmail", "createdAt"
+        FROM "AuditLog"
+        WHERE "sessionId" IS NOT DISTINCT FROM ${sessionId}
+        ORDER BY "createdAt" DESC
+        LIMIT 10
+      `,
     ]);
 
   const counts = countsRows[0];
