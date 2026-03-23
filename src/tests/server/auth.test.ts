@@ -2,13 +2,18 @@ import { testPrisma, cleanDb } from "./testDb";
 
 // Capture the NextAuth config so we can test callbacks directly.
 // Use globalThis to avoid TDZ issues — jest.mock is hoisted above all declarations.
-jest.mock("next-auth", () => ({
-  __esModule: true,
-  default: (config: Record<string, unknown>) => {
-    (globalThis as Record<string, unknown>).__authConfig = config;
-    return { handlers: {}, auth: jest.fn(), signIn: jest.fn(), signOut: jest.fn() };
-  },
-}));
+// Set NEXT_PUBLIC_DEMO_LOGIN inside the factory so the demo Credentials provider
+// is included when auth.ts evaluates (jest.mock factories run before module code).
+jest.mock("next-auth", () => {
+  process.env.NEXT_PUBLIC_DEMO_LOGIN = "true";
+  return {
+    __esModule: true,
+    default: (config: Record<string, unknown>) => {
+      (globalThis as Record<string, unknown>).__authConfig = config;
+      return { handlers: {}, auth: jest.fn(), signIn: jest.fn(), signOut: jest.fn() };
+    },
+  };
+});
 
 // Mock providers — NextAuth v5 provider constructors return objects
 jest.mock("next-auth/providers/google", () => ({ __esModule: true, default: {} }));

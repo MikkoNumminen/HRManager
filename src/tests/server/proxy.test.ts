@@ -153,11 +153,8 @@ describe("proxy config", () => {
     expect(source).toContain("favicon");
   });
 
-  // Matcher skips prefetch requests
-  it("matcher skips prefetch requests", () => {
-    const missing = config.matcher[0].missing;
-    expect(missing).toEqual(
-      expect.arrayContaining([expect.objectContaining({ key: "next-router-prefetch" })]),
-    );
+  // Matcher does not exclude prefetch requests — all routes get security headers
+  it("matcher does not exclude prefetch requests", () => {
+    expect(config.matcher[0].missing).toBeUndefined();
   });
 });

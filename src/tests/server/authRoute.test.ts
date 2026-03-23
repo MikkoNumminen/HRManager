@@ -38,7 +38,8 @@ test("delegates to NextAuth POST handler when under rate limit", async () => {
 
   const response = await POST(request);
 
-  expect(mockRateLimitAuth).toHaveBeenCalledWith("credentials");
+  // All auth POST endpoints share one fixed rate limit bucket
+  expect(mockRateLimitAuth).toHaveBeenCalledWith("auth-post");
   expect(mockPost).toHaveBeenCalledWith(request);
   expect(response.status).toBe(200);
 });
@@ -58,13 +59,13 @@ test("returns 429 when auth rate limit is exceeded", async () => {
   expect(mockPost).not.toHaveBeenCalled();
 });
 
-// Extracts action name from the last path segment
-test("extracts action from URL path", async () => {
+// All auth POST endpoints use the same fixed rate limit action
+test("uses fixed auth-post action regardless of URL path", async () => {
   const request = new NextRequest("http://localhost/api/auth/signout");
 
   await POST(request);
 
-  expect(mockRateLimitAuth).toHaveBeenCalledWith("signout");
+  expect(mockRateLimitAuth).toHaveBeenCalledWith("auth-post");
 });
 
 // Re-throws non-RateLimitError errors
@@ -77,11 +78,11 @@ test("re-throws non-rate-limit errors", async () => {
   expect(mockPost).not.toHaveBeenCalled();
 });
 
-// Extracts the correct action for different auth endpoints
-test("extracts signin action from URL", async () => {
+// Signin endpoint also uses the shared auth-post bucket
+test("signin endpoint uses fixed auth-post action", async () => {
   const request = new NextRequest("http://localhost/api/auth/signin");
 
   await POST(request);
 
-  expect(mockRateLimitAuth).toHaveBeenCalledWith("signin");
+  expect(mockRateLimitAuth).toHaveBeenCalledWith("auth-post");
 });

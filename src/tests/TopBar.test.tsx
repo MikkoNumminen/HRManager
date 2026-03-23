@@ -1,3 +1,6 @@
+// Enable demo login so the "Try Demo" button renders in tests
+process.env.NEXT_PUBLIC_DEMO_LOGIN = "true";
+
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import TopBar from "../components/TopBar";
 import { useSession, signIn, signOut } from "next-auth/react";
