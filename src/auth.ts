@@ -8,8 +8,7 @@ import { seedDemoData, cleanupStaleDemoSessions } from "@/demoSession";
 
 // Demo login is enabled by default so the demo works out of the box.
 // Set NEXT_PUBLIC_DEMO_LOGIN=false to disable the zero-credential demo provider.
-// demo provider. Uses NEXT_PUBLIC_ prefix so the client can conditionally show
-// the demo login button.
+// Uses NEXT_PUBLIC_ prefix so the client can conditionally show the demo login button.
 const demoProvider =
   process.env.NEXT_PUBLIC_DEMO_LOGIN !== "false"
     ? [
