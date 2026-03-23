@@ -27,7 +27,7 @@ A production-grade HR management system with granular RBAC, dashboard analytics,
 
 ## Highlights
 
-- **Dashboard analytics** — KPI cards, bar chart (members per team), pie chart (teams per department), line chart (organization growth), and recent activity feed powered by MUI X Charts; backed by Prisma Typed SQL queries with CTEs and window functions (5 parallel `$queryRawTyped` calls replacing 10+ ORM round-trips); permission-gated via `dashboard:view`
+- **Dashboard analytics** — KPI cards, bar chart (members per team), pie chart (teams per department), line chart (organization growth), and recent activity feed powered by MUI X Charts; backed by 5 parallel raw SQL queries with CTEs and window functions (replacing 10+ ORM round-trips); permission-gated via `dashboard:view`
 - **CSV data import/export** — bulk-import persons via CSV upload with client-side validation preview, drag-and-drop, and RFC 4180 parsing; export persons, teams, departments, and audit logs as CSV; permission-gated (`data:import`, `data:export`); custom CSV parser with no external dependencies
 - **Optimistic updates** — React 19 `useOptimistic` on all create actions; new items appear in the table instantly before the server responds, then seamlessly merge with real data on revalidation
 - **Mobile-first responsive design** — card-based layouts for mobile (< 900px), collapsible filters, responsive form buttons (stack vertically on mobile), hamburger menu with navigation drawer, shared responsive style tokens via `muiStyles.ts`
@@ -44,24 +44,24 @@ A production-grade HR management system with granular RBAC, dashboard analytics,
 - **6 visual themes** — CSS custom properties with FOUC-preventing inline script; instant switching without re-render
 - **Content-Security-Policy** — nonce-based CSP via Next.js 16 proxy with per-request nonce generation; Emotion/MUI style injection, FOUC prevention script, and OAuth avatar domains whitelisted; plus X-Frame-Options, X-Content-Type-Options, Referrer-Policy, and Permissions-Policy on all routes
 - **Rate limiting** — PostgreSQL-based sliding window on all server actions (30 req/min) and auth endpoints (10 req/min); user-based for authenticated users, IP-based for auth and anonymous; no external services required
-- **Autonomous CI auto-fix** — when CI fails on `main`, a GitHub Actions agent downloads failure logs, analyzes errors with Claude Code (`anthropics/claude-code-action`), and creates a fix PR for human review; restricted tool access and loop prevention for safety
+- **CSV data import/export** — export persons, teams, departments, and audit logs as CSV; import persons from CSV with drag-and-drop dialog, client-side validation, preview table, and error reporting; permission-gated via `data:import` and `data:export`
 - **Docker-ready** — `docker compose up` for a fully working local environment with PostgreSQL, auto-migration, and demo login
 
 ---
 
 ## Tech stack
 
-| Layer      | Technology                                                     |
-| ---------- | -------------------------------------------------------------- |
-| Framework  | Next.js 16 (App Router, Server Components)                     |
-| UI         | React 19 + MUI v7 + MUI X Charts                               |
-| Language   | TypeScript 5.9                                                 |
-| ORM        | Prisma 7 (driver adapters, Typed SQL, `prisma.config.ts`)      |
-| Database   | PostgreSQL (Vercel Postgres / Neon in production)              |
-| Validation | Zod 4                                                          |
-| Auth       | NextAuth v5 (JWT, Google + GitHub OAuth + demo login)          |
-| Testing    | Jest 30 + React Testing Library + Playwright E2E               |
-| CI/CD      | GitHub Actions (lint, test, build) + autonomous auto-fix agent |
+| Layer      | Technology                                              |
+| ---------- | ------------------------------------------------------- |
+| Framework  | Next.js 16 (App Router, Server Components)              |
+| UI         | React 19 + MUI v7 + MUI X Charts                        |
+| Language   | TypeScript 5.9                                          |
+| ORM        | Prisma 7 (driver adapters, raw SQL, `prisma.config.ts`) |
+| Database   | PostgreSQL (Vercel Postgres / Neon in production)       |
+| Validation | Zod 4                                                   |
+| Auth       | NextAuth v5 (JWT, Google + GitHub OAuth + demo login)   |
+| Testing    | Jest 30 + React Testing Library + Playwright E2E        |
+| CI/CD      | GitHub Actions (lint, test, build)                      |
 
 ---
 
@@ -84,7 +84,7 @@ graph LR
     Prisma --> PG[(PostgreSQL)]
 ```
 
-- **Reads** in `queries.ts` — Zod-validated, no `"use server"`; dashboard metrics use Prisma Typed SQL (`prisma/sql/`) with `$queryRawTyped` for type-safe raw queries with CTEs and window functions
+- **Reads** in `queries.ts` — Zod-validated, no `"use server"`; dashboard metrics use inline `$queryRaw` with CTEs and window functions (PgBouncer-compatible unnamed parameterized queries)
 - **Mutations** in `serverActions.ts` — always inside `$transaction`, audit-logged via deferred `after()` writes; deletes are soft (set `deletedAt`) with cascade logic
 - **Types** in `schemas.ts` — Zod schemas with `z.infer` exports, used everywhere
 - **Auth** in `auth.ts` — JWT strategy with permission-enriched tokens; automatic superuser bootstrapping; `permissionsVersion`-based stale permission detection
@@ -161,12 +161,11 @@ npm run i18n:translate  # auto-translate via Claude Haiku API (requires ANTHROPI
 
 ## Autonomous agents
 
-| Agent                | Trigger                           | What it does                                                                                |
-| -------------------- | --------------------------------- | ------------------------------------------------------------------------------------------- |
-| **CI auto-fix**      | CI fails on `main`                | Downloads failure logs, runs Claude Code to analyze and fix errors, creates a PR for review |
-| **i18n translation** | Manual (`npm run i18n:translate`) | Audits 17 locale files against `en.json`, translates missing keys via Claude API            |
+| Agent                | Trigger                           | What it does                                                                     |
+| -------------------- | --------------------------------- | -------------------------------------------------------------------------------- |
+| **i18n translation** | Manual (`npm run i18n:translate`) | Audits 17 locale files against `en.json`, translates missing keys via Claude API |
 
-Both agents use the `anthropics/claude-code-action` or Claude API for intelligence, with restricted tool access for safety. The CI auto-fix agent (`autofix.yml`) prevents infinite loops by skipping branches it created. Fix PRs are never auto-merged — a human must review and approve.
+The translation agent uses the Claude API with restricted tool access for safety. It can be run headless via `npm run i18n:translate` or through parallel Claude Code subagents during development.
 
 ---
 
@@ -192,15 +191,15 @@ npx prisma migrate dev        # apply schema migrations
 npm run dev                   # start dev server at localhost:3000
 ```
 
-| Variable             | Description                                          |
-| -------------------- | ---------------------------------------------------- |
-| `DATABASE_URL`       | PostgreSQL connection string                         |
-| `AUTH_SECRET`        | NextAuth secret                                      |
-| `AUTH_GOOGLE_ID`     | Google OAuth client ID                               |
-| `AUTH_GOOGLE_SECRET` | Google OAuth client secret                           |
-| `AUTH_GITHUB_ID`     | GitHub OAuth client ID                               |
-| `AUTH_GITHUB_SECRET` | GitHub OAuth client secret                           |
-| `ANTHROPIC_API_KEY`  | Claude API key (for auto-fix agent + i18n translate) |
+| Variable             | Description                                 |
+| -------------------- | ------------------------------------------- |
+| `DATABASE_URL`       | PostgreSQL connection string                |
+| `AUTH_SECRET`        | NextAuth secret                             |
+| `AUTH_GOOGLE_ID`     | Google OAuth client ID                      |
+| `AUTH_GOOGLE_SECRET` | Google OAuth client secret                  |
+| `AUTH_GITHUB_ID`     | GitHub OAuth client ID                      |
+| `AUTH_GITHUB_SECRET` | GitHub OAuth client secret                  |
+| `ANTHROPIC_API_KEY`  | Claude API key (for i18n translation agent) |
 
 ---
 
