@@ -12,6 +12,7 @@ A production-grade HR management system with granular RBAC, dashboard analytics,
 ![Jest](https://img.shields.io/badge/Tested_with-Jest_30-C21325?style=flat-square&logo=jest)
 ![Prettier](https://img.shields.io/badge/Formatted_with-Prettier-F7B93E?style=flat-square&logo=prettier)
 ![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=flat-square&logo=docker)
+![Last Commit](https://img.shields.io/github/last-commit/MikkoNumminen/HRManager?style=flat-square)
 
 ### **[Try the live demo](https://hr-manager-pearl.vercel.app)** — click "Try Demo" to sign in instantly with your own isolated data sandbox, no account required.
 
@@ -31,7 +32,7 @@ A production-grade HR management system with granular RBAC, dashboard analytics,
 - **CSV data import/export** — bulk-import persons via CSV upload with client-side validation preview, drag-and-drop, and RFC 4180 parsing; export persons, teams, departments, and audit logs as CSV; permission-gated (`data:import`, `data:export`); custom CSV parser with no external dependencies
 - **Optimistic updates** — React 19 `useOptimistic` on all create actions; new items appear in the table instantly before the server responds, then seamlessly merge with real data on revalidation
 - **Mobile-first responsive design** — card-based layouts for mobile (< 900px), collapsible filters, responsive form buttons (stack vertically on mobile), hamburger menu with navigation drawer, shared responsive style tokens via `muiStyles.ts`
-- **1291 tests (1257 unit/integration + 34 E2E), 97.6% line coverage** — Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, rate limiting, auth route handlers, CSP proxy, audit logging, CSV utils, style tokens, dashboard analytics, optimistic UI, demo session isolation, all 49 UI components tested against real PostgreSQL, plus Playwright E2E covering full user flows
+- **1291 tests (1257 unit/integration + 34 E2E), 97.6% line coverage** — Zod schemas, RBAC logic, auth callbacks, Prisma queries, server actions, rate limiting, auth route handlers, CSP proxy, audit logging, CSV utils, style tokens, dashboard analytics, optimistic UI, demo session isolation, all 48 UI components tested against real PostgreSQL, plus Playwright E2E covering full user flows
 - **User profile page** — edit display name, set custom profile picture via URL, view role badge, join date, and read-only permissions summary grouped by domain; accessible from TopBar menu on both desktop and mobile
 - **Demo session isolation** — each "Try Demo" click creates a private data sandbox with pre-seeded org data (6 people, 3 teams, 2 departments); sessions auto-expire after 24 hours of inactivity; no cross-session data leakage
 - **Granular RBAC** — 4 roles, 26 permission keys, per-user grant/deny overrides with three-state toggles (deny / role default / grant), and "kick out" user removal with confirmation dialog
@@ -140,7 +141,7 @@ Statements : 97.35%    Branches : 92.68%
 Functions  : 94.58%    Lines    : 97.60%
 ```
 
-Server-side tests run against a real PostgreSQL test database. Client-side tests cover all 49 UI components including dashboard charts, optimistic create wrappers, permission toggles, audit log filtering, mobile card views, tutorial system, snackbar notifications, theme switching, language selection, data import/export, and profile editor. Playwright E2E tests run against a production build covering authentication, CRUD for all entities, admin/audit access, guest access control, theme/language persistence, and snackbar lifecycle.
+Server-side tests run against a real PostgreSQL test database. Client-side tests cover all 48 UI components including dashboard charts, optimistic create wrappers, permission toggles, audit log filtering, mobile card views, tutorial system, snackbar notifications, theme switching, language selection, data import/export, and profile editor. Playwright E2E tests run against a production build covering authentication, CRUD for all entities, admin/audit access, guest access control, theme/language persistence, and snackbar lifecycle.
 
 ---
 
