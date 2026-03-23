@@ -5,23 +5,23 @@ Every item must have a size estimate: 🟢 small, 🟡 medium, 🔴 large. LLM m
 In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-name]`, etc.
 4 permanent Claude instances: **Claude 1, Claude 2, Claude 3, Claude 4.**
 
-**⚠️ RULE: NEVER start working on a task without FIRST moving it to "In Progress" with your name tag. Re-read this file BEFORE starting any work. If a task already has an owner tag, DO NOT work on it — pick something else or wait.**
+**🚨 MANDATORY RULES — NO EXCEPTIONS:**
+1. **Re-read this file BEFORE starting ANY work** — every single session, every single task.
+2. **NEVER start a task without FIRST moving it to "In Progress" with your name tag.** If you skip this, you are causing collisions.
+3. **If you pause or stop mid-task, your entry MUST stay in "In Progress" until the work is committed and pushed.** Do not remove it just because you stopped — other Claudes need to see it.
+4. **If a task already has an owner tag, do NOT touch it.** Pick something else or wait.
+5. **Violating these rules breaks the shared workflow for all instances.**
 
 ## In Progress
 
 > 📋 **Audit research:** Items marked "(found by audit)" have detailed file:line references in memory file `project_audit_findings.md`. Read it before starting any of these tasks.
 
-- 🟡⚡ Translate server action error messages — errors hardcoded in English, bypass i18n [Claude 1, main]
-- 🟡⚡ Memoize expensive components — AuditLogViewer (20KB) and DashboardCharts re-render unnecessarily [Claude 1, main]
-- 🟢🧠 Rate limit IP spoofing protection — trusts `x-forwarded-for` without proxy validation [Claude 4, main]
-
 ## Recently Completed
 
-- ✅ 4 test coverage tasks — CSV edge cases (unicode, headers-only, short rows), rate limit boundaries + window expiry + concurrency, dashboard SQL (soft-deletes, session isolation, MongoDB fallback), audit log MongoDB unavailable paths + identifier hashing
-- ✅ Playwright E2E test suite — 7 new spec files, 40+ tests: dashboard, profile, data I/O, person/team/dept detail editing, form validation, full workflow
+- ✅ Translate server action errors — 48-key errors namespace, 18 locales, next-intl/server mock for tests
+- ✅ Memoize expensive components — React.memo on AuditLogViewer + DashboardCharts, useCallback on helpers
+- ✅ Rate limit IP spoofing protection — x-forwarded-for proxy validation
 - ✅ WCAG accessibility — aria-expanded (AuditLogViewer, TopBar), aria-sort (Timestamp col), aria-describedby (5 forms)
-- ✅ Fix all lint warnings — 137 no-node-access + 22 no-unnecessary-act + 1 prefer-to-have-value → zero lint issues
-- ✅ MongoDB graceful degradation — app works without MongoDB configured
 
 ## Backlog
 
