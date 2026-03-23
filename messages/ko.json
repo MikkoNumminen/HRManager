@@ -40,7 +40,7 @@
     "theme": "테마",
     "dashboard": "대시보드",
     "menu": "메뉴",
-    "profile": "Profile"
+    "profile": "프로필"
   },
   "home": {
     "title": "인사 관리 시스템",
@@ -297,8 +297,8 @@
     "teamRenamed": "팀 이름이 변경되었습니다",
     "departmentUpdated": "부서가 업데이트되었습니다",
     "userKickedOut": "{name}이(가) 추방되었습니다",
-    "profileNameUpdated": "Display name updated successfully",
-    "profileImageUpdated": "Profile picture updated successfully"
+    "profileNameUpdated": "표시 이름이 업데이트되었습니다",
+    "profileImageUpdated": "프로필 사진이 업데이트되었습니다"
   },
   "tutorial": {
     "checklistTitle": "데모 투어",
@@ -339,24 +339,24 @@
     "nav_click_audit_log": "감사 로그를 클릭하여 기록을 확인하세요."
   },
   "profile": {
-    "title": "Profile",
-    "heading": "Your Profile",
-    "avatar": "Profile picture",
-    "changeName": "Change Name",
-    "enterNewName": "Enter New Name",
-    "email": "Email",
-    "role": "Role",
-    "joinedAt": "Joined",
-    "permissions": "Your Permissions",
-    "permissionsDescription": "Permissions granted to your account based on your role and any individual overrides.",
-    "allowed": "Allowed",
-    "denied": "Denied",
-    "noPermissions": "No permissions assigned",
-    "profilePicture": "Profile Picture",
-    "imageUrl": "Image URL",
-    "imageUrlPlaceholder": "https://example.com/avatar.jpg",
-    "setImage": "Set Image",
-    "removeImage": "Remove Image",
-    "imageHelp": "Enter a direct link to an image. Leave empty and save to use your OAuth avatar."
+    "title": "프로필",
+    "heading": "내 프로필",
+    "avatar": "프로필 사진",
+    "changeName": "이름 변경",
+    "enterNewName": "새 이름 입력",
+    "email": "이메일",
+    "role": "역할",
+    "joinedAt": "가입일",
+    "permissions": "내 권한",
+    "permissionsDescription": "역할 및 개별 재정의에 따라 계정에 부여된 권한입니다.",
+    "allowed": "허용",
+    "denied": "거부",
+    "noPermissions": "할당된 권한이 없습니다",
+    "profilePicture": "프로필 사진",
+    "imageUrl": "이미지 URL",
+    "imageUrlPlaceholder": "https://example.com/프로필.jpg",
+    "setImage": "이미지 설정",
+    "removeImage": "이미지 제거",
+    "imageHelp": "이미지에 대한 직접 링크를 입력하세요. 비워두고 저장하면 OAuth 아바타가 사용됩니다."
   }
 }

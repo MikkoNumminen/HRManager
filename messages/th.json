@@ -40,7 +40,7 @@
     "theme": "ธีม",
     "dashboard": "แดชบอร์ด",
     "menu": "เมนู",
-    "profile": "Profile"
+    "profile": "โปรไฟล์"
   },
   "home": {
     "title": "ระบบจัดการทรัพยากรบุคคล",
@@ -297,8 +297,8 @@
     "teamRenamed": "เปลี่ยนชื่อทีมสำเร็จ",
     "departmentUpdated": "อัปเดตแผนกสำเร็จ",
     "userKickedOut": "{name} ถูกไล่ออกแล้ว",
-    "profileNameUpdated": "Display name updated successfully",
-    "profileImageUpdated": "Profile picture updated successfully"
+    "profileNameUpdated": "อัปเดตชื่อที่แสดงสำเร็จ",
+    "profileImageUpdated": "อัปเดตรูปโปรไฟล์สำเร็จ"
   },
   "tutorial": {
     "checklistTitle": "ทัวร์สาธิต",
@@ -339,24 +339,24 @@
     "nav_click_audit_log": "คลิกบันทึกการตรวจสอบเพื่อดูประวัติ"
   },
   "profile": {
-    "title": "Profile",
-    "heading": "Your Profile",
-    "avatar": "Profile picture",
-    "changeName": "Change Name",
-    "enterNewName": "Enter New Name",
-    "email": "Email",
-    "role": "Role",
-    "joinedAt": "Joined",
-    "permissions": "Your Permissions",
-    "permissionsDescription": "Permissions granted to your account based on your role and any individual overrides.",
-    "allowed": "Allowed",
-    "denied": "Denied",
-    "noPermissions": "No permissions assigned",
-    "profilePicture": "Profile Picture",
-    "imageUrl": "Image URL",
-    "imageUrlPlaceholder": "https://example.com/avatar.jpg",
-    "setImage": "Set Image",
-    "removeImage": "Remove Image",
-    "imageHelp": "Enter a direct link to an image. Leave empty and save to use your OAuth avatar."
+    "title": "โปรไฟล์",
+    "heading": "โปรไฟล์ของคุณ",
+    "avatar": "รูปโปรไฟล์",
+    "changeName": "เปลี่ยนชื่อ",
+    "enterNewName": "กรอกชื่อใหม่",
+    "email": "อีเมล",
+    "role": "บทบาท",
+    "joinedAt": "วันที่เข้าร่วม",
+    "permissions": "สิทธิ์ของคุณ",
+    "permissionsDescription": "สิทธิ์ที่มอบให้บัญชีของคุณตามบทบาทและการแทนที่รายบุคคล",
+    "allowed": "อนุญาต",
+    "denied": "ปฏิเสธ",
+    "noPermissions": "ไม่มีสิทธิ์ที่ได้รับมอบหมาย",
+    "profilePicture": "รูปโปรไฟล์",
+    "imageUrl": "URL รูปภาพ",
+    "imageUrlPlaceholder": "https://example.com/รูปโปรไฟล์.jpg",
+    "setImage": "ตั้งรูปภาพ",
+    "removeImage": "ลบรูปภาพ",
+    "imageHelp": "กรอกลิงก์โดยตรงไปยังรูปภาพ เว้นว่างไว้แล้วบันทึกเพื่อใช้รูป OAuth ของคุณ"
   }
 }

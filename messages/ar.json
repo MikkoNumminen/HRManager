@@ -40,7 +40,7 @@
     "theme": "السمة",
     "dashboard": "لوحة المعلومات",
     "menu": "القائمة",
-    "profile": "Profile"
+    "profile": "الملف الشخصي"
   },
   "home": {
     "title": "نظام إدارة الموارد البشرية",
@@ -297,8 +297,8 @@
     "teamRenamed": "تمت إعادة تسمية الفريق بنجاح",
     "departmentUpdated": "تم تحديث القسم بنجاح",
     "userKickedOut": "تم طرد {name}",
-    "profileNameUpdated": "Display name updated successfully",
-    "profileImageUpdated": "Profile picture updated successfully"
+    "profileNameUpdated": "تم تحديث الاسم المعروض بنجاح",
+    "profileImageUpdated": "تم تحديث صورة الملف الشخصي بنجاح"
   },
   "tutorial": {
     "checklistTitle": "جولة تعريفية",
@@ -339,24 +339,24 @@
     "nav_click_audit_log": "انقر على سجل التدقيق لعرض السجل."
   },
   "profile": {
-    "title": "Profile",
-    "heading": "Your Profile",
-    "avatar": "Profile picture",
-    "changeName": "Change Name",
-    "enterNewName": "Enter New Name",
-    "email": "Email",
-    "role": "Role",
-    "joinedAt": "Joined",
-    "permissions": "Your Permissions",
-    "permissionsDescription": "Permissions granted to your account based on your role and any individual overrides.",
-    "allowed": "Allowed",
-    "denied": "Denied",
-    "noPermissions": "No permissions assigned",
-    "profilePicture": "Profile Picture",
-    "imageUrl": "Image URL",
-    "imageUrlPlaceholder": "https://example.com/avatar.jpg",
-    "setImage": "Set Image",
-    "removeImage": "Remove Image",
-    "imageHelp": "Enter a direct link to an image. Leave empty and save to use your OAuth avatar."
+    "title": "الملف الشخصي",
+    "heading": "ملفك الشخصي",
+    "avatar": "صورة الملف الشخصي",
+    "changeName": "تغيير الاسم",
+    "enterNewName": "أدخل الاسم الجديد",
+    "email": "البريد الإلكتروني",
+    "role": "الدور",
+    "joinedAt": "تاريخ الانضمام",
+    "permissions": "صلاحياتك",
+    "permissionsDescription": "الصلاحيات الممنوحة لحسابك بناءً على دورك وأي تجاوزات فردية.",
+    "allowed": "مسموح",
+    "denied": "مرفوض",
+    "noPermissions": "لم يتم تعيين صلاحيات",
+    "profilePicture": "صورة الملف الشخصي",
+    "imageUrl": "رابط الصورة",
+    "imageUrlPlaceholder": "https://example.com/صورة-شخصية.jpg",
+    "setImage": "تعيين الصورة",
+    "removeImage": "إزالة الصورة",
+    "imageHelp": "أدخل رابطاً مباشراً للصورة. اتركه فارغاً واحفظ لاستخدام صورة OAuth الخاصة بك."
   }
 }

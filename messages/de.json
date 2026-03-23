@@ -40,7 +40,7 @@
     "theme": "Thema",
     "dashboard": "Übersicht",
     "menu": "Menü",
-    "profile": "Profile"
+    "profile": "Profil"
   },
   "home": {
     "title": "Personalverwaltungssystem",
@@ -297,8 +297,8 @@
     "teamRenamed": "Team erfolgreich umbenannt",
     "departmentUpdated": "Abteilung erfolgreich aktualisiert",
     "userKickedOut": "{name} wurde rausgeworfen",
-    "profileNameUpdated": "Display name updated successfully",
-    "profileImageUpdated": "Profile picture updated successfully"
+    "profileNameUpdated": "Anzeigename erfolgreich aktualisiert",
+    "profileImageUpdated": "Profilbild erfolgreich aktualisiert"
   },
   "tutorial": {
     "checklistTitle": "Demo-Rundgang",
@@ -339,24 +339,24 @@
     "nav_click_audit_log": "Klicken Sie auf Prüfprotokoll, um das Protokoll anzuzeigen."
   },
   "profile": {
-    "title": "Profile",
-    "heading": "Your Profile",
-    "avatar": "Profile picture",
-    "changeName": "Change Name",
-    "enterNewName": "Enter New Name",
-    "email": "Email",
-    "role": "Role",
-    "joinedAt": "Joined",
-    "permissions": "Your Permissions",
-    "permissionsDescription": "Permissions granted to your account based on your role and any individual overrides.",
-    "allowed": "Allowed",
-    "denied": "Denied",
-    "noPermissions": "No permissions assigned",
-    "profilePicture": "Profile Picture",
-    "imageUrl": "Image URL",
-    "imageUrlPlaceholder": "https://example.com/avatar.jpg",
-    "setImage": "Set Image",
-    "removeImage": "Remove Image",
-    "imageHelp": "Enter a direct link to an image. Leave empty and save to use your OAuth avatar."
+    "title": "Profil",
+    "heading": "Ihr Profil",
+    "avatar": "Profilbild",
+    "changeName": "Name ändern",
+    "enterNewName": "Neuen Namen eingeben",
+    "email": "E-Mail",
+    "role": "Rolle",
+    "joinedAt": "Beigetreten",
+    "permissions": "Ihre Berechtigungen",
+    "permissionsDescription": "Berechtigungen, die Ihrem Konto basierend auf Ihrer Rolle und individuellen Überschreibungen gewährt werden.",
+    "allowed": "Erlaubt",
+    "denied": "Verweigert",
+    "noPermissions": "Keine Berechtigungen zugewiesen",
+    "profilePicture": "Profilbild",
+    "imageUrl": "Bild-URL",
+    "imageUrlPlaceholder": "https://example.com/profilbild.jpg",
+    "setImage": "Bild festlegen",
+    "removeImage": "Bild entfernen",
+    "imageHelp": "Geben Sie einen direkten Link zu einem Bild ein. Leer lassen und speichern, um Ihren OAuth-Avatar zu verwenden."
   }
 }

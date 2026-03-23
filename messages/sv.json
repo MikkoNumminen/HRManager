@@ -40,7 +40,7 @@
     "theme": "Tema",
     "dashboard": "Instrumentpanel",
     "menu": "Meny",
-    "profile": "Profile"
+    "profile": "Profil"
   },
   "home": {
     "title": "Personalhanteringssystem",
@@ -297,8 +297,8 @@
     "teamRenamed": "Teamnamn ändrat",
     "departmentUpdated": "Avdelning uppdaterad",
     "userKickedOut": "{name} har sparkats ut",
-    "profileNameUpdated": "Display name updated successfully",
-    "profileImageUpdated": "Profile picture updated successfully"
+    "profileNameUpdated": "Visningsnamn uppdaterat",
+    "profileImageUpdated": "Profilbild uppdaterad"
   },
   "tutorial": {
     "checklistTitle": "Demoguide",
@@ -339,24 +339,24 @@
     "nav_click_audit_log": "Klicka på Revisionslogg för att visa händelseloggen."
   },
   "profile": {
-    "title": "Profile",
-    "heading": "Your Profile",
-    "avatar": "Profile picture",
-    "changeName": "Change Name",
-    "enterNewName": "Enter New Name",
-    "email": "Email",
-    "role": "Role",
-    "joinedAt": "Joined",
-    "permissions": "Your Permissions",
-    "permissionsDescription": "Permissions granted to your account based on your role and any individual overrides.",
-    "allowed": "Allowed",
-    "denied": "Denied",
-    "noPermissions": "No permissions assigned",
-    "profilePicture": "Profile Picture",
-    "imageUrl": "Image URL",
-    "imageUrlPlaceholder": "https://example.com/avatar.jpg",
-    "setImage": "Set Image",
-    "removeImage": "Remove Image",
-    "imageHelp": "Enter a direct link to an image. Leave empty and save to use your OAuth avatar."
+    "title": "Profil",
+    "heading": "Din profil",
+    "avatar": "Profilbild",
+    "changeName": "Ändra namn",
+    "enterNewName": "Ange nytt namn",
+    "email": "E-post",
+    "role": "Roll",
+    "joinedAt": "Gick med",
+    "permissions": "Dina behörigheter",
+    "permissionsDescription": "Behörigheter som tilldelats ditt konto baserat på din roll och eventuella individuella överskrivningar.",
+    "allowed": "Tillåten",
+    "denied": "Nekad",
+    "noPermissions": "Inga behörigheter tilldelade",
+    "profilePicture": "Profilbild",
+    "imageUrl": "Bild-URL",
+    "imageUrlPlaceholder": "https://example.com/profilbild.jpg",
+    "setImage": "Ange bild",
+    "removeImage": "Ta bort bild",
+    "imageHelp": "Ange en direktlänk till en bild. Lämna tomt och spara för att använda din OAuth-avatar."
   }
 }

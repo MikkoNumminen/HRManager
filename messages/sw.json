@@ -40,7 +40,7 @@
     "theme": "Mandhari",
     "dashboard": "Dashibodi",
     "menu": "Menyu",
-    "profile": "Profile"
+    "profile": "Wasifu"
   },
   "home": {
     "title": "Mfumo wa Usimamizi wa Rasilimali Watu",
@@ -297,8 +297,8 @@
     "teamRenamed": "Timu imebadilishwa jina kwa mafanikio",
     "departmentUpdated": "Idara imesasishwa kwa mafanikio",
     "userKickedOut": "{name} amefukuzwa",
-    "profileNameUpdated": "Display name updated successfully",
-    "profileImageUpdated": "Profile picture updated successfully"
+    "profileNameUpdated": "Jina la kuonyesha limesasishwa kwa mafanikio",
+    "profileImageUpdated": "Picha ya wasifu imesasishwa kwa mafanikio"
   },
   "tutorial": {
     "checklistTitle": "Ziara ya Demo",
@@ -339,24 +339,24 @@
     "nav_click_audit_log": "Bofya Kumbukumbu ya Ukaguzi kuona historia."
   },
   "profile": {
-    "title": "Profile",
-    "heading": "Your Profile",
-    "avatar": "Profile picture",
-    "changeName": "Change Name",
-    "enterNewName": "Enter New Name",
-    "email": "Email",
-    "role": "Role",
-    "joinedAt": "Joined",
-    "permissions": "Your Permissions",
-    "permissionsDescription": "Permissions granted to your account based on your role and any individual overrides.",
-    "allowed": "Allowed",
-    "denied": "Denied",
-    "noPermissions": "No permissions assigned",
-    "profilePicture": "Profile Picture",
-    "imageUrl": "Image URL",
-    "imageUrlPlaceholder": "https://example.com/avatar.jpg",
-    "setImage": "Set Image",
-    "removeImage": "Remove Image",
-    "imageHelp": "Enter a direct link to an image. Leave empty and save to use your OAuth avatar."
+    "title": "Wasifu",
+    "heading": "Wasifu wako",
+    "avatar": "Picha ya wasifu",
+    "changeName": "Badilisha jina",
+    "enterNewName": "Ingiza jina jipya",
+    "email": "Barua pepe",
+    "role": "Jukumu",
+    "joinedAt": "Tarikhi ya kujiunga",
+    "permissions": "Ruhusa zako",
+    "permissionsDescription": "Ruhusa zilizotolewa kwa akaunti yako kulingana na jukumu lako na ubatilishaji wa mtu binafsi.",
+    "allowed": "Imeruhusiwa",
+    "denied": "Imezuiwa",
+    "noPermissions": "Hakuna ruhusa zilizopewa",
+    "profilePicture": "Picha ya Wasifu",
+    "imageUrl": "URL ya picha",
+    "imageUrlPlaceholder": "https://example.com/picha-ya-wasifu.jpg",
+    "setImage": "Weka picha",
+    "removeImage": "Ondoa picha",
+    "imageHelp": "Ingiza kiungo cha moja kwa moja cha picha. Acha tupu na uhifadhi kutumia picha yako ya OAuth."
   }
 }

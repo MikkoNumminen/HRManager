@@ -40,7 +40,7 @@
     "theme": "Тема",
     "dashboard": "Панель",
     "menu": "Меню",
-    "profile": "Profile"
+    "profile": "Профіль"
   },
   "home": {
     "title": "Система управління персоналом",
@@ -297,8 +297,8 @@
     "teamRenamed": "Команду успішно перейменовано",
     "departmentUpdated": "Відділ успішно оновлено",
     "userKickedOut": "{name} було виключено",
-    "profileNameUpdated": "Display name updated successfully",
-    "profileImageUpdated": "Profile picture updated successfully"
+    "profileNameUpdated": "Відображуване ім'я успішно оновлено",
+    "profileImageUpdated": "Фото профілю успішно оновлено"
   },
   "tutorial": {
     "checklistTitle": "Огляд демо",
@@ -339,24 +339,24 @@
     "nav_click_audit_log": "Натисніть Журнал аудиту для перегляду історії."
   },
   "profile": {
-    "title": "Profile",
-    "heading": "Your Profile",
-    "avatar": "Profile picture",
-    "changeName": "Change Name",
-    "enterNewName": "Enter New Name",
-    "email": "Email",
-    "role": "Role",
-    "joinedAt": "Joined",
-    "permissions": "Your Permissions",
-    "permissionsDescription": "Permissions granted to your account based on your role and any individual overrides.",
-    "allowed": "Allowed",
-    "denied": "Denied",
-    "noPermissions": "No permissions assigned",
-    "profilePicture": "Profile Picture",
-    "imageUrl": "Image URL",
-    "imageUrlPlaceholder": "https://example.com/avatar.jpg",
-    "setImage": "Set Image",
-    "removeImage": "Remove Image",
-    "imageHelp": "Enter a direct link to an image. Leave empty and save to use your OAuth avatar."
+    "title": "Профіль",
+    "heading": "Ваш профіль",
+    "avatar": "Фото профілю",
+    "changeName": "Змінити ім'я",
+    "enterNewName": "Введіть нове ім'я",
+    "email": "Електронна пошта",
+    "role": "Роль",
+    "joinedAt": "Дата реєстрації",
+    "permissions": "Ваші дозволи",
+    "permissionsDescription": "Дозволи, надані вашому обліковому запису на основі ролі та індивідуальних перевизначень.",
+    "allowed": "Дозволено",
+    "denied": "Заборонено",
+    "noPermissions": "Дозволи не призначено",
+    "profilePicture": "Фото профілю",
+    "imageUrl": "URL зображення",
+    "imageUrlPlaceholder": "https://example.com/аватар.jpg",
+    "setImage": "Встановити зображення",
+    "removeImage": "Видалити зображення",
+    "imageHelp": "Введіть пряме посилання на зображення. Залиште порожнім і збережіть, щоб використовувати аватар OAuth."
   }
 }

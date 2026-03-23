@@ -40,7 +40,7 @@
     "theme": "Tema",
     "dashboard": "Panel",
     "menu": "Menú",
-    "profile": "Profile"
+    "profile": "Perfil"
   },
   "home": {
     "title": "Sistema de Gestión de Recursos Humanos",
@@ -297,8 +297,8 @@
     "teamRenamed": "Equipo renombrado correctamente",
     "departmentUpdated": "Departamento actualizado correctamente",
     "userKickedOut": "{name} ha sido expulsado",
-    "profileNameUpdated": "Display name updated successfully",
-    "profileImageUpdated": "Profile picture updated successfully"
+    "profileNameUpdated": "Nombre de visualización actualizado correctamente",
+    "profileImageUpdated": "Foto de perfil actualizada correctamente"
   },
   "tutorial": {
     "checklistTitle": "Visita guiada",
@@ -339,24 +339,24 @@
     "nav_click_audit_log": "Haz clic en Registro de auditoría para ver el historial."
   },
   "profile": {
-    "title": "Profile",
-    "heading": "Your Profile",
-    "avatar": "Profile picture",
-    "changeName": "Change Name",
-    "enterNewName": "Enter New Name",
-    "email": "Email",
-    "role": "Role",
-    "joinedAt": "Joined",
-    "permissions": "Your Permissions",
-    "permissionsDescription": "Permissions granted to your account based on your role and any individual overrides.",
-    "allowed": "Allowed",
-    "denied": "Denied",
-    "noPermissions": "No permissions assigned",
-    "profilePicture": "Profile Picture",
-    "imageUrl": "Image URL",
-    "imageUrlPlaceholder": "https://example.com/avatar.jpg",
-    "setImage": "Set Image",
-    "removeImage": "Remove Image",
-    "imageHelp": "Enter a direct link to an image. Leave empty and save to use your OAuth avatar."
+    "title": "Perfil",
+    "heading": "Tu perfil",
+    "avatar": "Foto de perfil",
+    "changeName": "Cambiar nombre",
+    "enterNewName": "Introducir nuevo nombre",
+    "email": "Correo electrónico",
+    "role": "Rol",
+    "joinedAt": "Registrado",
+    "permissions": "Tus permisos",
+    "permissionsDescription": "Permisos otorgados a tu cuenta según tu rol y cualquier anulación individual.",
+    "allowed": "Permitido",
+    "denied": "Denegado",
+    "noPermissions": "Sin permisos asignados",
+    "profilePicture": "Foto de perfil",
+    "imageUrl": "URL de imagen",
+    "imageUrlPlaceholder": "https://example.com/foto-perfil.jpg",
+    "setImage": "Establecer imagen",
+    "removeImage": "Eliminar imagen",
+    "imageHelp": "Introduce un enlace directo a una imagen. Deja vacío y guarda para usar tu avatar de OAuth."
   }
 }

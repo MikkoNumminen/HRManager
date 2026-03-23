@@ -40,7 +40,7 @@
     "theme": "主题",
     "dashboard": "仪表板",
     "menu": "菜单",
-    "profile": "Profile"
+    "profile": "个人资料"
   },
   "home": {
     "title": "人力资源管理系统",
@@ -297,8 +297,8 @@
     "teamRenamed": "团队重命名成功",
     "departmentUpdated": "部门更新成功",
     "userKickedOut": "{name}已被踢出",
-    "profileNameUpdated": "Display name updated successfully",
-    "profileImageUpdated": "Profile picture updated successfully"
+    "profileNameUpdated": "显示名称更新成功",
+    "profileImageUpdated": "头像更新成功"
   },
   "tutorial": {
     "checklistTitle": "演示导览",
@@ -339,24 +339,24 @@
     "nav_click_audit_log": "点击审计日志查看历史记录。"
   },
   "profile": {
-    "title": "Profile",
-    "heading": "Your Profile",
-    "avatar": "Profile picture",
-    "changeName": "Change Name",
-    "enterNewName": "Enter New Name",
-    "email": "Email",
-    "role": "Role",
-    "joinedAt": "Joined",
-    "permissions": "Your Permissions",
-    "permissionsDescription": "Permissions granted to your account based on your role and any individual overrides.",
-    "allowed": "Allowed",
-    "denied": "Denied",
-    "noPermissions": "No permissions assigned",
-    "profilePicture": "Profile Picture",
-    "imageUrl": "Image URL",
-    "imageUrlPlaceholder": "https://example.com/avatar.jpg",
-    "setImage": "Set Image",
-    "removeImage": "Remove Image",
-    "imageHelp": "Enter a direct link to an image. Leave empty and save to use your OAuth avatar."
+    "title": "个人资料",
+    "heading": "我的资料",
+    "avatar": "头像",
+    "changeName": "更改姓名",
+    "enterNewName": "输入新姓名",
+    "email": "电子邮箱",
+    "role": "角色",
+    "joinedAt": "加入时间",
+    "permissions": "我的权限",
+    "permissionsDescription": "根据您的角色和个人覆盖设置授予您账户的权限。",
+    "allowed": "允许",
+    "denied": "拒绝",
+    "noPermissions": "未分配权限",
+    "profilePicture": "头像",
+    "imageUrl": "图片链接",
+    "imageUrlPlaceholder": "https://example.com/头像.jpg",
+    "setImage": "设置图片",
+    "removeImage": "移除图片",
+    "imageHelp": "输入图片的直接链接。留空并保存将使用您的OAuth头像。"
   }
 }

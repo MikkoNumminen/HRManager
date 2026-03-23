@@ -40,7 +40,7 @@
     "theme": "Teema",
     "dashboard": "Kojelauta",
     "menu": "Valikko",
-    "profile": "Profile"
+    "profile": "Profiili"
   },
   "home": {
     "title": "Henkilöstöhallintajärjestelmä",
@@ -297,8 +297,8 @@
     "teamRenamed": "Tiimi nimetty uudelleen onnistuneesti",
     "departmentUpdated": "Osasto päivitetty onnistuneesti",
     "userKickedOut": "{name} on poistettu järjestelmästä",
-    "profileNameUpdated": "Display name updated successfully",
-    "profileImageUpdated": "Profile picture updated successfully"
+    "profileNameUpdated": "Näyttönimi päivitetty onnistuneesti",
+    "profileImageUpdated": "Profiilikuva päivitetty onnistuneesti"
   },
   "tutorial": {
     "checklistTitle": "Demokierros",
@@ -339,24 +339,24 @@
     "nav_click_audit_log": "Klikkaa Tapahtumaloki nähdäksesi tapahtumahistorian."
   },
   "profile": {
-    "title": "Profile",
-    "heading": "Your Profile",
-    "avatar": "Profile picture",
-    "changeName": "Change Name",
-    "enterNewName": "Enter New Name",
-    "email": "Email",
-    "role": "Role",
-    "joinedAt": "Joined",
-    "permissions": "Your Permissions",
-    "permissionsDescription": "Permissions granted to your account based on your role and any individual overrides.",
-    "allowed": "Allowed",
-    "denied": "Denied",
-    "noPermissions": "No permissions assigned",
-    "profilePicture": "Profile Picture",
-    "imageUrl": "Image URL",
-    "imageUrlPlaceholder": "https://example.com/avatar.jpg",
-    "setImage": "Set Image",
-    "removeImage": "Remove Image",
-    "imageHelp": "Enter a direct link to an image. Leave empty and save to use your OAuth avatar."
+    "title": "Profiili",
+    "heading": "Oma profiili",
+    "avatar": "Profiilikuva",
+    "changeName": "Vaihda nimi",
+    "enterNewName": "Syötä uusi nimi",
+    "email": "Sähköposti",
+    "role": "Rooli",
+    "joinedAt": "Liittynyt",
+    "permissions": "Käyttöoikeutesi",
+    "permissionsDescription": "Tilillesi myönnetyt käyttöoikeudet roolisi ja mahdollisten yksittäisten ohitusten perusteella.",
+    "allowed": "Sallittu",
+    "denied": "Estetty",
+    "noPermissions": "Ei käyttöoikeuksia",
+    "profilePicture": "Profiilikuva",
+    "imageUrl": "Kuvan URL",
+    "imageUrlPlaceholder": "https://example.com/profiilikuva.jpg",
+    "setImage": "Aseta kuva",
+    "removeImage": "Poista kuva",
+    "imageHelp": "Syötä suora linkki kuvaan. Jätä tyhjäksi ja tallenna käyttääksesi OAuth-avatariasi."
   }
 }

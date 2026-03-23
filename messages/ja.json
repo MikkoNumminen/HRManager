@@ -40,7 +40,7 @@
     "theme": "テーマ",
     "dashboard": "ダッシュボード",
     "menu": "メニュー",
-    "profile": "Profile"
+    "profile": "プロフィール"
   },
   "home": {
     "title": "人事管理システム",
@@ -297,8 +297,8 @@
     "teamRenamed": "チーム名を変更しました",
     "departmentUpdated": "部門を更新しました",
     "userKickedOut": "{name}が追放されました",
-    "profileNameUpdated": "Display name updated successfully",
-    "profileImageUpdated": "Profile picture updated successfully"
+    "profileNameUpdated": "表示名を更新しました",
+    "profileImageUpdated": "プロフィール画像を更新しました"
   },
   "tutorial": {
     "checklistTitle": "デモツアー",
@@ -339,24 +339,24 @@
     "nav_click_audit_log": "監査ログをクリックして履歴を確認してください。"
   },
   "profile": {
-    "title": "Profile",
-    "heading": "Your Profile",
-    "avatar": "Profile picture",
-    "changeName": "Change Name",
-    "enterNewName": "Enter New Name",
-    "email": "Email",
-    "role": "Role",
-    "joinedAt": "Joined",
-    "permissions": "Your Permissions",
-    "permissionsDescription": "Permissions granted to your account based on your role and any individual overrides.",
-    "allowed": "Allowed",
-    "denied": "Denied",
-    "noPermissions": "No permissions assigned",
-    "profilePicture": "Profile Picture",
-    "imageUrl": "Image URL",
-    "imageUrlPlaceholder": "https://example.com/avatar.jpg",
-    "setImage": "Set Image",
-    "removeImage": "Remove Image",
-    "imageHelp": "Enter a direct link to an image. Leave empty and save to use your OAuth avatar."
+    "title": "プロフィール",
+    "heading": "あなたのプロフィール",
+    "avatar": "プロフィール画像",
+    "changeName": "名前を変更",
+    "enterNewName": "新しい名前を入力",
+    "email": "メールアドレス",
+    "role": "ロール",
+    "joinedAt": "参加日",
+    "permissions": "あなたの権限",
+    "permissionsDescription": "ロールおよび個別のオーバーライドに基づいてアカウントに付与された権限。",
+    "allowed": "許可",
+    "denied": "拒否",
+    "noPermissions": "権限が割り当てられていません",
+    "profilePicture": "プロフィール画像",
+    "imageUrl": "画像URL",
+    "imageUrlPlaceholder": "https://example.com/プロフィール.jpg",
+    "setImage": "画像を設定",
+    "removeImage": "画像を削除",
+    "imageHelp": "画像への直接リンクを入力してください。空のまま保存するとOAuthアバターが使用されます。"
   }
 }

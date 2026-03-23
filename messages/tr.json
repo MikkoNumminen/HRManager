@@ -40,7 +40,7 @@
     "theme": "Tema",
     "dashboard": "Gösterge Paneli",
     "menu": "Menü",
-    "profile": "Profile"
+    "profile": "Profil"
   },
   "home": {
     "title": "İnsan Kaynakları Yönetim Sistemi",
@@ -297,8 +297,8 @@
     "teamRenamed": "Ekip başarıyla yeniden adlandırıldı",
     "departmentUpdated": "Departman başarıyla güncellendi",
     "userKickedOut": "{name} atıldı",
-    "profileNameUpdated": "Display name updated successfully",
-    "profileImageUpdated": "Profile picture updated successfully"
+    "profileNameUpdated": "Görünen ad başarıyla güncellendi",
+    "profileImageUpdated": "Profil fotoğrafı başarıyla güncellendi"
   },
   "tutorial": {
     "checklistTitle": "Demo Turu",
@@ -339,24 +339,24 @@
     "nav_click_audit_log": "Denetim kaydını görüntülemek için Denetim Günlüğü'ne tıklayın."
   },
   "profile": {
-    "title": "Profile",
-    "heading": "Your Profile",
-    "avatar": "Profile picture",
-    "changeName": "Change Name",
-    "enterNewName": "Enter New Name",
-    "email": "Email",
-    "role": "Role",
-    "joinedAt": "Joined",
-    "permissions": "Your Permissions",
-    "permissionsDescription": "Permissions granted to your account based on your role and any individual overrides.",
-    "allowed": "Allowed",
-    "denied": "Denied",
-    "noPermissions": "No permissions assigned",
-    "profilePicture": "Profile Picture",
-    "imageUrl": "Image URL",
-    "imageUrlPlaceholder": "https://example.com/avatar.jpg",
-    "setImage": "Set Image",
-    "removeImage": "Remove Image",
-    "imageHelp": "Enter a direct link to an image. Leave empty and save to use your OAuth avatar."
+    "title": "Profil",
+    "heading": "Profiliniz",
+    "avatar": "Profil fotoğrafı",
+    "changeName": "Adı değiştir",
+    "enterNewName": "Yeni ad girin",
+    "email": "E-posta",
+    "role": "Rol",
+    "joinedAt": "Katılım tarihi",
+    "permissions": "İzinleriniz",
+    "permissionsDescription": "Rolünüze ve bireysel geçersiz kılmalara göre hesabınıza verilen izinler.",
+    "allowed": "İzin verildi",
+    "denied": "Reddedildi",
+    "noPermissions": "Atanmış izin yok",
+    "profilePicture": "Profil Fotoğrafı",
+    "imageUrl": "Görsel URL'si",
+    "imageUrlPlaceholder": "https://example.com/profil-resmi.jpg",
+    "setImage": "Görsel ayarla",
+    "removeImage": "Görseli kaldır",
+    "imageHelp": "Bir görsele doğrudan bağlantı girin. OAuth avatarınızı kullanmak için boş bırakıp kaydedin."
   }
 }

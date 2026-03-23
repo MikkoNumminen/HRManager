@@ -39,8 +39,8 @@
     "language": "Język",
     "theme": "Motyw",
     "dashboard": "Panel",
-    "menu": "Menu",
-    "profile": "Profile"
+    "menu": "Menu główne",
+    "profile": "Profil"
   },
   "home": {
     "title": "System Zarządzania Zasobami Ludzkimi",
@@ -297,8 +297,8 @@
     "teamRenamed": "Nazwa zespołu zmieniona pomyślnie",
     "departmentUpdated": "Dział zaktualizowany pomyślnie",
     "userKickedOut": "{name} został wyrzucony",
-    "profileNameUpdated": "Display name updated successfully",
-    "profileImageUpdated": "Profile picture updated successfully"
+    "profileNameUpdated": "Nazwa wyświetlana zaktualizowana pomyślnie",
+    "profileImageUpdated": "Zdjęcie profilowe zaktualizowane pomyślnie"
   },
   "tutorial": {
     "checklistTitle": "Przewodnik demo",
@@ -339,24 +339,24 @@
     "nav_click_audit_log": "Kliknij Dziennik audytu, aby wyświetlić historię."
   },
   "profile": {
-    "title": "Profile",
-    "heading": "Your Profile",
-    "avatar": "Profile picture",
-    "changeName": "Change Name",
-    "enterNewName": "Enter New Name",
-    "email": "Email",
-    "role": "Role",
-    "joinedAt": "Joined",
-    "permissions": "Your Permissions",
-    "permissionsDescription": "Permissions granted to your account based on your role and any individual overrides.",
-    "allowed": "Allowed",
-    "denied": "Denied",
-    "noPermissions": "No permissions assigned",
-    "profilePicture": "Profile Picture",
-    "imageUrl": "Image URL",
-    "imageUrlPlaceholder": "https://example.com/avatar.jpg",
-    "setImage": "Set Image",
-    "removeImage": "Remove Image",
-    "imageHelp": "Enter a direct link to an image. Leave empty and save to use your OAuth avatar."
+    "title": "Profil",
+    "heading": "Twój profil",
+    "avatar": "Zdjęcie profilowe",
+    "changeName": "Zmień imię",
+    "enterNewName": "Wprowadź nowe imię",
+    "email": "E-mail",
+    "role": "Rola",
+    "joinedAt": "Dołączono",
+    "permissions": "Twoje uprawnienia",
+    "permissionsDescription": "Uprawnienia przyznane Twojemu kontu na podstawie roli i indywidualnych nadpisań.",
+    "allowed": "Dozwolone",
+    "denied": "Odmówione",
+    "noPermissions": "Brak przypisanych uprawnień",
+    "profilePicture": "Zdjęcie profilowe",
+    "imageUrl": "Adres URL obrazu",
+    "imageUrlPlaceholder": "https://example.com/zdjecie-profilowe.jpg",
+    "setImage": "Ustaw obraz",
+    "removeImage": "Usuń obraz",
+    "imageHelp": "Wprowadź bezpośredni link do obrazu. Pozostaw puste i zapisz, aby użyć awatara OAuth."
   }
 }

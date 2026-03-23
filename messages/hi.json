@@ -40,7 +40,7 @@
     "theme": "थीम",
     "dashboard": "डैशबोर्ड",
     "menu": "मेनू",
-    "profile": "Profile"
+    "profile": "प्रोफ़ाइल"
   },
   "home": {
     "title": "मानव संसाधन प्रबंधन प्रणाली",
@@ -297,8 +297,8 @@
     "teamRenamed": "टीम का नाम सफलतापूर्वक बदला गया",
     "departmentUpdated": "विभाग सफलतापूर्वक अपडेट किया गया",
     "userKickedOut": "{name} को निकाल दिया गया है",
-    "profileNameUpdated": "Display name updated successfully",
-    "profileImageUpdated": "Profile picture updated successfully"
+    "profileNameUpdated": "प्रदर्शन नाम सफलतापूर्वक अपडेट किया गया",
+    "profileImageUpdated": "प्रोफ़ाइल चित्र सफलतापूर्वक अपडेट किया गया"
   },
   "tutorial": {
     "checklistTitle": "डेमो टूर",
@@ -339,24 +339,24 @@
     "nav_click_audit_log": "ऑडिट लॉग देखने के लिए ऑडिट लॉग पर क्लिक करें।"
   },
   "profile": {
-    "title": "Profile",
-    "heading": "Your Profile",
-    "avatar": "Profile picture",
-    "changeName": "Change Name",
-    "enterNewName": "Enter New Name",
-    "email": "Email",
-    "role": "Role",
-    "joinedAt": "Joined",
-    "permissions": "Your Permissions",
-    "permissionsDescription": "Permissions granted to your account based on your role and any individual overrides.",
-    "allowed": "Allowed",
-    "denied": "Denied",
-    "noPermissions": "No permissions assigned",
-    "profilePicture": "Profile Picture",
-    "imageUrl": "Image URL",
-    "imageUrlPlaceholder": "https://example.com/avatar.jpg",
-    "setImage": "Set Image",
-    "removeImage": "Remove Image",
-    "imageHelp": "Enter a direct link to an image. Leave empty and save to use your OAuth avatar."
+    "title": "प्रोफ़ाइल",
+    "heading": "आपकी प्रोफ़ाइल",
+    "avatar": "प्रोफ़ाइल चित्र",
+    "changeName": "नाम बदलें",
+    "enterNewName": "नया नाम दर्ज करें",
+    "email": "ईमेल",
+    "role": "भूमिका",
+    "joinedAt": "शामिल हुए",
+    "permissions": "आपकी अनुमतियाँ",
+    "permissionsDescription": "आपकी भूमिका और किसी भी व्यक्तिगत ओवरराइड के आधार पर आपके खाते को दी गई अनुमतियाँ।",
+    "allowed": "अनुमत",
+    "denied": "अस्वीकृत",
+    "noPermissions": "कोई अनुमतियाँ असाइन नहीं की गई हैं",
+    "profilePicture": "प्रोफ़ाइल चित्र",
+    "imageUrl": "चित्र URL",
+    "imageUrlPlaceholder": "https://example.com/प्रोफ़ाइल.jpg",
+    "setImage": "चित्र सेट करें",
+    "removeImage": "चित्र हटाएँ",
+    "imageHelp": "चित्र का सीधा लिंक दर्ज करें। खाली छोड़कर सहेजें तो आपका OAuth अवतार उपयोग होगा।"
   }
 }
