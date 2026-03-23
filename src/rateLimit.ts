@@ -14,13 +14,15 @@ export class RateLimitError extends Error {
   }
 }
 
-// IMPORTANT: This function trusts x-forwarded-for and x-real-ip headers.
-// It is safe behind a trusted reverse proxy (Vercel, Cloudflare, nginx) that
-// overwrites these headers with the real client IP. If deployed without a
-// trusted proxy, attackers can spoof IPs to bypass rate limiting.
+// Resolves the client IP from request headers using a trusted-header priority chain.
+// Vercel sets x-vercel-forwarded-for which cannot be spoofed by the client.
+// x-forwarded-for and x-real-ip are only used as fallbacks (e.g. local dev, nginx).
 async function getIpIdentifier(): Promise<string> {
   const headersList = await headers();
+
+  // Priority: platform-verified header first, then standard proxy headers
   const ip =
+    headersList.get("x-vercel-forwarded-for")?.split(",")[0]?.trim() ??
     headersList.get("x-forwarded-for")?.split(",")[0]?.trim() ??
     headersList.get("x-real-ip") ??
     null;
