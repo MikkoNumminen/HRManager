@@ -18,9 +18,10 @@ jest.mock("@/permissions", () => ({
   seedPermissions: jest.fn(),
 }));
 
-// Mock audit logging — deferred audit functions schedule writes via after().
-// Audit log behavior is tested separately in auditLog.test.ts.
+// Mock audit logging — logAudit/deferAudit call auth() and after() which need request scope.
+// Audit log behavior is tested separately.
 jest.mock("@/auditLog", () => ({
+  logAudit: jest.fn(),
   captureAuditContext: jest.fn().mockResolvedValue({
     userId: null,
     userEmail: null,
