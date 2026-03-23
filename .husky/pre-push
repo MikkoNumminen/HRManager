@@ -27,6 +27,6 @@ fi
 echo "i18n OK. $SUMMARY"
 echo ""
 echo "Running full test suite before push..."
-npm run test:all -- --coverage
+npm run test:all -- --coverage --forceExit
 
 echo "All tests passed. Pushing..."
