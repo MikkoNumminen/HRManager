@@ -71,7 +71,7 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
   const canSeed = permissions?.["data:seed"];
   const canReset = permissions?.["data:reset"];
   const canDataIO = permissions?.["data:import"] || permissions?.["data:export"];
-  const demoEnabled = process.env.NEXT_PUBLIC_DEMO_LOGIN === "true";
+  const demoEnabled = process.env.NEXT_PUBLIC_DEMO_LOGIN !== "false";
 
   const handleSeed = (clearExisting: boolean) => {
     setSeedDialogOpen(false);
