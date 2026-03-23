@@ -40,7 +40,8 @@
     "theme": "السمة",
     "dashboard": "لوحة المعلومات",
     "menu": "القائمة",
-    "profile": "الملف الشخصي"
+    "profile": "الملف الشخصي",
+    "dataImportExport": "استيراد/تصدير البيانات"
   },
   "home": {
     "title": "نظام إدارة الموارد البشرية",
@@ -272,7 +273,11 @@
     "typeSecurity": "الأمان",
     "permissionDenied": "تم رفض الإذن: {key}",
     "rateLimited": "تم تجاوز حد الطلبات للإجراء: {action}",
-    "permViewDashboard": "عرض لوحة المعلومات"
+    "permViewDashboard": "عرض لوحة المعلومات",
+    "actionImport": "استيراد",
+    "actionExport": "تصدير",
+    "permImportData": "استيراد البيانات من CSV",
+    "permExportData": "تصدير البيانات إلى CSV"
   },
   "notifications": {
     "personCreated": "تم إنشاء الشخص بنجاح",
@@ -298,7 +303,8 @@
     "departmentUpdated": "تم تحديث القسم بنجاح",
     "userKickedOut": "تم طرد {name}",
     "profileNameUpdated": "تم تحديث الاسم المعروض بنجاح",
-    "profileImageUpdated": "تم تحديث صورة الملف الشخصي بنجاح"
+    "profileImageUpdated": "تم تحديث صورة الملف الشخصي بنجاح",
+    "dataImported": "{count, plural, one {تم استيراد شخص واحد بنجاح} other {تم استيراد # أشخاص بنجاح}}"
   },
   "tutorial": {
     "checklistTitle": "جولة تعريفية",
@@ -358,5 +364,43 @@
     "setImage": "تعيين الصورة",
     "removeImage": "إزالة الصورة",
     "imageHelp": "أدخل رابطاً مباشراً للصورة. اتركه فارغاً واحفظ لاستخدام صورة OAuth الخاصة بك."
+  },
+  "dataIO": {
+    "title": "استيراد/تصدير البيانات",
+    "exportTitle": "تصدير البيانات",
+    "exportDescription": "قم بتنزيل بيانات في ملفات CSV للنسخ الاحتياطية أو التحليل.",
+    "importTitle": "استيراد البيانات",
+    "importDescription": "قم بتحميل ملف CSV لإضافة أشخاص جدد بكميات كبيرة إلى النظام.",
+    "persons": "الأشخاص",
+    "teams": "الفرق",
+    "departments": "الأقسام",
+    "auditLogs": "سجلات التدقيق",
+    "recordCount": "{count, plural, one {سجل واحد} other {# سجلات}}",
+    "downloadCsv": "تنزيل كـ CSV",
+    "export": "تصدير",
+    "importPersons": "استيراد أشخاص",
+    "importPersonsHelp": "قم بتحميل CSV يحتوي على: الاسم والبريد الإلكتروني والمنصب (اختياري). سيتم تخطي رسائل البريد الإلكتروني المكررة.",
+    "downloadTemplate": "تنزيل نموذج",
+    "uploadCsv": "تحميل CSV",
+    "importDialogTitle": "استيراد أشخاص من CSV",
+    "dropZoneText": "أفلت ملف CSV هنا أو انقر للاستعراض",
+    "dropZoneSubtext": "بحد أقصى 1,000 صف، حجم الملف 1 MB",
+    "errorNotCsv": "يرجى تحميل ملف .csv",
+    "errorTooLarge": "يتجاوز الملف حد 1 MB",
+    "errorEmptyFile": "ملف CSV فارغ أو يحتوي فقط على رؤوس",
+    "errorTooManyRows": "الحد الأقصى {max} صف لكل استيراد",
+    "previewFile": "معاينة: {name}",
+    "validRows": "{count, plural, one {صف صحيح واحد} other {# صفوف صحيحة}}",
+    "errorRows": "{count, plural, one {خطأ واحد} other {# أخطاء}}",
+    "rowError": "الصف {row}, {field}: {message}",
+    "moreErrors": "... و {count} أخطاء إضافية",
+    "cancel": "إلغاء",
+    "close": "إغلاق",
+    "importing": "جاري الاستيراد...",
+    "importCount": "استيراد {count, plural, one {شخص واحد} other {# أشخاص}}",
+    "importSuccess": "تم إكمال الاستيراد!",
+    "importedCount": "{count} تم استيراده",
+    "skippedCount": "{count} تم تخطيه (مكررات)",
+    "errorCount": "{count, plural, one {خطأ واحد} other {# أخطاء}}"
   }
 }

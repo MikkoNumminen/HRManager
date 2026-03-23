@@ -40,7 +40,8 @@
     "theme": "Tema",
     "dashboard": "Instrumentpanel",
     "menu": "Meny",
-    "profile": "Profil"
+    "profile": "Profil",
+    "dataImportExport": "Dataimport / -export"
   },
   "home": {
     "title": "Personalhanteringssystem",
@@ -272,7 +273,11 @@
     "typeSecurity": "Säkerhet",
     "permissionDenied": "Åtkomst nekad: {key}",
     "rateLimited": "Hastighetsgräns överskriden för åtgärd: {action}",
-    "permViewDashboard": "visa instrumentpanelen"
+    "permViewDashboard": "visa instrumentpanelen",
+    "actionImport": "Importera",
+    "actionExport": "Exportera",
+    "permImportData": "importera data från CSV",
+    "permExportData": "exportera data till CSV"
   },
   "notifications": {
     "personCreated": "Person skapad",
@@ -298,7 +303,8 @@
     "departmentUpdated": "Avdelning uppdaterad",
     "userKickedOut": "{name} har sparkats ut",
     "profileNameUpdated": "Visningsnamn uppdaterat",
-    "profileImageUpdated": "Profilbild uppdaterad"
+    "profileImageUpdated": "Profilbild uppdaterad",
+    "dataImported": "{count, plural, one {# person importerad} other {# personer importerade}}"
   },
   "tutorial": {
     "checklistTitle": "Demoguide",
@@ -358,5 +364,43 @@
     "setImage": "Ange bild",
     "removeImage": "Ta bort bild",
     "imageHelp": "Ange en direktlänk till en bild. Lämna tomt och spara för att använda din OAuth-avatar."
+  },
+  "dataIO": {
+    "title": "Dataimport / -export",
+    "exportTitle": "Exportera data",
+    "exportDescription": "Hämta dina data som CSV-filer för säkerhetskopiering eller analys.",
+    "importTitle": "Importera data",
+    "importDescription": "Ladda upp en CSV-fil för att massimportera nya personer till systemet.",
+    "persons": "Personer",
+    "teams": "Team",
+    "departments": "Avdelningar",
+    "auditLogs": "Händelseloggar",
+    "recordCount": "{count, plural, one {# post} other {# poster}}",
+    "downloadCsv": "Hämta som CSV",
+    "export": "Exportera",
+    "importPersons": "Importera personer",
+    "importPersonsHelp": "Ladda upp en CSV med kolumner: namn, e-post, befattning (valfritt). Dubbletter av e-postadresser hopas över.",
+    "downloadTemplate": "Hämta mall",
+    "uploadCsv": "Ladda upp CSV",
+    "importDialogTitle": "Importera personer från CSV",
+    "dropZoneText": "Dra en CSV-fil här eller klicka för att bläddra",
+    "dropZoneSubtext": "Maximalt 1 000 rader, 1 MB filstorlek",
+    "errorNotCsv": "Ladda upp en .csv-fil",
+    "errorTooLarge": "Filen överskrider 1 MB-gränsen",
+    "errorEmptyFile": "CSV-filen är tom eller innehåller endast rubriker",
+    "errorTooManyRows": "Maximalt {max} rader per import",
+    "previewFile": "Förhandsgranskning: {name}",
+    "validRows": "{count, plural, one {# giltig rad} other {# giltiga rader}}",
+    "errorRows": "{count, plural, one {# fel} other {# fel}}",
+    "rowError": "Rad {row}, {field}: {message}",
+    "moreErrors": "... och {count} fler fel",
+    "cancel": "Avbryt",
+    "close": "Stäng",
+    "importing": "Importerar...",
+    "importCount": "Importera {count, plural, one {# person} other {# personer}}",
+    "importSuccess": "Import slutförd!",
+    "importedCount": "{count} importerad(e)",
+    "skippedCount": "{count} ignorerad(e) (dubbletter)",
+    "errorCount": "{count, plural, one {# fel} other {# fel}}"
   }
 }

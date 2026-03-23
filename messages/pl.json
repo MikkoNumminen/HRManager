@@ -40,7 +40,8 @@
     "theme": "Motyw",
     "dashboard": "Panel",
     "menu": "Menu główne",
-    "profile": "Profil"
+    "profile": "Profil",
+    "dataImportExport": "Import / Eksport danych"
   },
   "home": {
     "title": "System Zarządzania Zasobami Ludzkimi",
@@ -272,7 +273,11 @@
     "typeSecurity": "Bezpieczeństwo",
     "permissionDenied": "Odmowa dostępu: {key}",
     "rateLimited": "Przekroczono limit żądań dla akcji: {action}",
-    "permViewDashboard": "wyświetlić panel"
+    "permViewDashboard": "wyświetlić panel",
+    "actionImport": "Import",
+    "actionExport": "Eksport",
+    "permImportData": "importować dane z CSV",
+    "permExportData": "eksportować dane do CSV"
   },
   "notifications": {
     "personCreated": "Osoba utworzona pomyślnie",
@@ -298,7 +303,8 @@
     "departmentUpdated": "Dział zaktualizowany pomyślnie",
     "userKickedOut": "{name} został wyrzucony",
     "profileNameUpdated": "Nazwa wyświetlana zaktualizowana pomyślnie",
-    "profileImageUpdated": "Zdjęcie profilowe zaktualizowane pomyślnie"
+    "profileImageUpdated": "Zdjęcie profilowe zaktualizowane pomyślnie",
+    "dataImported": "{count, plural, one {# osoba zaimportowana pomyślnie} other {# osób zaimportowanych pomyślnie}}"
   },
   "tutorial": {
     "checklistTitle": "Przewodnik demo",
@@ -358,5 +364,43 @@
     "setImage": "Ustaw obraz",
     "removeImage": "Usuń obraz",
     "imageHelp": "Wprowadź bezpośredni link do obrazu. Pozostaw puste i zapisz, aby użyć awatara OAuth."
+  },
+  "dataIO": {
+    "title": "Import / Eksport danych",
+    "exportTitle": "Eksportuj dane",
+    "exportDescription": "Pobierz swoje dane jako pliki CSV do kopii zapasowej lub analizy.",
+    "importTitle": "Importuj dane",
+    "importDescription": "Prześlij plik CSV, aby zbiorczo dodać nowe osoby do systemu.",
+    "persons": "Osoby",
+    "teams": "Zespoły",
+    "departments": "Działy",
+    "auditLogs": "Dziennik audytu",
+    "recordCount": "{count, plural, one {# rekord} other {# rekordy}}",
+    "downloadCsv": "Pobierz jako CSV",
+    "export": "Eksportuj",
+    "importPersons": "Importuj osoby",
+    "importPersonsHelp": "Prześlij CSV z kolumnami: nazwa, e-mail, stanowisko (opcjonalnie). Duplikaty e-maili zostaną pominięte.",
+    "downloadTemplate": "Pobierz szablon",
+    "uploadCsv": "Prześlij CSV",
+    "importDialogTitle": "Importuj osoby z CSV",
+    "dropZoneText": "Przeciągnij plik CSV tutaj lub kliknij, aby przeglądać",
+    "dropZoneSubtext": "Maksymalnie 1000 wierszy, rozmiar pliku 1 MB",
+    "errorNotCsv": "Proszę prześlij plik .csv",
+    "errorTooLarge": "Plik przekracza limit 1 MB",
+    "errorEmptyFile": "Plik CSV jest pusty lub zawiera tylko nagłówki",
+    "errorTooManyRows": "Maksymalnie {max} wierszy na import",
+    "previewFile": "Podgląd: {name}",
+    "validRows": "{count, plural, one {# poprawny wiersz} other {# poprawne wiersze}}",
+    "errorRows": "{count, plural, one {# błąd} other {# błędy}}",
+    "rowError": "Wiersz {row}, {field}: {message}",
+    "moreErrors": "... i jeszcze {count} błędów",
+    "cancel": "Anuluj",
+    "close": "Zamknij",
+    "importing": "Importowanie...",
+    "importCount": "Importuj {count, plural, one {# osobę} other {# osób}}",
+    "importSuccess": "Import zakończony!",
+    "importedCount": "{count} zaimportowano",
+    "skippedCount": "{count} pominięto (duplikaty)",
+    "errorCount": "{count, plural, one {# błąd} other {# błędy}}"
   }
 }

@@ -40,7 +40,8 @@
     "theme": "Mandhari",
     "dashboard": "Dashibodi",
     "menu": "Menyu",
-    "profile": "Wasifu"
+    "profile": "Wasifu",
+    "dataImportExport": "Ingiza / Hamisha Data"
   },
   "home": {
     "title": "Mfumo wa Usimamizi wa Rasilimali Watu",
@@ -272,7 +273,11 @@
     "typeSecurity": "Usalama",
     "permissionDenied": "Ruhusa imekataliwa: {key}",
     "rateLimited": "Kikomo cha maombi kimezidishwa kwa kitendo: {action}",
-    "permViewDashboard": "kuona dashibodi"
+    "permViewDashboard": "kuona dashibodi",
+    "actionImport": "Ingiza",
+    "actionExport": "Hamisha",
+    "permImportData": "ingiza data kutoka CSV",
+    "permExportData": "hamisha data kwenda CSV"
   },
   "notifications": {
     "personCreated": "Mtu ameundwa kwa mafanikio",
@@ -298,7 +303,8 @@
     "departmentUpdated": "Idara imesasishwa kwa mafanikio",
     "userKickedOut": "{name} amefukuzwa",
     "profileNameUpdated": "Jina la kuonyesha limesasishwa kwa mafanikio",
-    "profileImageUpdated": "Picha ya wasifu imesasishwa kwa mafanikio"
+    "profileImageUpdated": "Picha ya wasifu imesasishwa kwa mafanikio",
+    "dataImported": "{count, plural, one {# mtu aliingizwa kwa mafanikio} other {# watu waliingizwa kwa mafanikio}}"
   },
   "tutorial": {
     "checklistTitle": "Ziara ya Demo",
@@ -358,5 +364,43 @@
     "setImage": "Weka picha",
     "removeImage": "Ondoa picha",
     "imageHelp": "Ingiza kiungo cha moja kwa moja cha picha. Acha tupu na uhifadhi kutumia picha yako ya OAuth."
+  },
+  "dataIO": {
+    "title": "Ingiza / Hamisha Data",
+    "exportTitle": "Hamisha Data",
+    "exportDescription": "Pakua data yako kama faili za CSV kwa ajili ya nakala salama au uchambuzi.",
+    "importTitle": "Ingiza Data",
+    "importDescription": "Pakia faili ya CSV kuongeza kwa wingi watu wapya kwenye mfumo.",
+    "persons": "Watu",
+    "teams": "Timu",
+    "departments": "Idara",
+    "auditLogs": "Kumbukumbu ya Ukaguzi",
+    "recordCount": "{count, plural, one {# rekodi} other {# rekodi}}",
+    "downloadCsv": "Pakua kama CSV",
+    "export": "Hamisha",
+    "importPersons": "Ingiza Watu",
+    "importPersonsHelp": "Pakia CSV yenye nguzo: jina, barua pepe, nafasi (si lazima). Barua pepe zenye kurudia zitarudishwa.",
+    "downloadTemplate": "Pakua Kigezo",
+    "uploadCsv": "Pakia CSV",
+    "importDialogTitle": "Ingiza Watu kutoka CSV",
+    "dropZoneText": "Dondosha faili ya CSV hapa au bonyeza kuchagua",
+    "dropZoneSubtext": "Kwa juu 1,000 safu, ukubwa wa faili 1 MB",
+    "errorNotCsv": "Tafadhali pakia faili ya .csv",
+    "errorTooLarge": "Faili inazidi kikomo cha 1 MB",
+    "errorEmptyFile": "Faili ya CSV ni tupu au ina kichwa tu",
+    "errorTooManyRows": "Kwa juu safu {max} kwa ingiza",
+    "previewFile": "Onyesho: {name}",
+    "validRows": "{count, plural, one {# safu halali} other {# safu halali}}",
+    "errorRows": "{count, plural, one {# hitilafu} other {# hitilafu}}",
+    "rowError": "Safu {row}, {field}: {message}",
+    "moreErrors": "... na hitilafu {count} zaidi",
+    "cancel": "Ghairi",
+    "close": "Funga",
+    "importing": "Ikiingizwa...",
+    "importCount": "Ingiza {count, plural, one {# mtu} other {# watu}}",
+    "importSuccess": "Ingiza kumalizika!",
+    "importedCount": "{count} kuingizwa",
+    "skippedCount": "{count} kuruhusiwa (kurudia)",
+    "errorCount": "{count, plural, one {# hitilafu} other {# hitilafu}}"
   }
 }

@@ -40,7 +40,8 @@
     "theme": "Teema",
     "dashboard": "Kojelauta",
     "menu": "Valikko",
-    "profile": "Profiili"
+    "profile": "Profiili",
+    "dataImportExport": "Tiedontuonti / Tiedonvienti"
   },
   "home": {
     "title": "Henkilöstöhallintajärjestelmä",
@@ -272,7 +273,11 @@
     "typeSecurity": "Turvallisuus",
     "permissionDenied": "Käyttö estetty: {key}",
     "rateLimited": "Pyyntöraja ylitetty toiminnolle: {action}",
-    "permViewDashboard": "nähdä kojelaudan"
+    "permViewDashboard": "nähdä kojelaudan",
+    "actionImport": "Tuonti",
+    "actionExport": "Vienti",
+    "permImportData": "tuoda tietoja CSV:stä",
+    "permExportData": "viedä tietoja CSV-muodossa"
   },
   "notifications": {
     "personCreated": "Henkilö luotu onnistuneesti",
@@ -298,7 +303,8 @@
     "departmentUpdated": "Osasto päivitetty onnistuneesti",
     "userKickedOut": "{name} on poistettu järjestelmästä",
     "profileNameUpdated": "Näyttönimi päivitetty onnistuneesti",
-    "profileImageUpdated": "Profiilikuva päivitetty onnistuneesti"
+    "profileImageUpdated": "Profiilikuva päivitetty onnistuneesti",
+    "dataImported": "{count, plural, one {# henkilö tuotu onnistuneesti} other {# henkilöä tuotu onnistuneesti}}"
   },
   "tutorial": {
     "checklistTitle": "Demokierros",
@@ -358,5 +364,43 @@
     "setImage": "Aseta kuva",
     "removeImage": "Poista kuva",
     "imageHelp": "Syötä suora linkki kuvaan. Jätä tyhjäksi ja tallenna käyttääksesi OAuth-avatariasi."
+  },
+  "dataIO": {
+    "title": "Tiedontuonti / Tiedonvienti",
+    "exportTitle": "Vie tiedot",
+    "exportDescription": "Lataa tietosi CSV-tiedostoina varmuuskopioinnin tai analyysin tarpeisiin.",
+    "importTitle": "Tuo tiedot",
+    "importDescription": "Lataa CSV-tiedosto lisätäksesi uusia henkilöitä järjestelmään kerralla.",
+    "persons": "Henkilöt",
+    "teams": "Tiimit",
+    "departments": "Osastot",
+    "auditLogs": "Tapahtumaloki",
+    "recordCount": "{count, plural, one {# tietue} other {# tietuetta}}",
+    "downloadCsv": "Lataa CSV-tiedostona",
+    "export": "Vie",
+    "importPersons": "Tuo henkilöt",
+    "importPersonsHelp": "Lataa CSV-tiedosto sarakkeilla: nimi, sähköposti, tehtävänimike (valinnainen). Kaksoiskappaleet jätetään väliin.",
+    "downloadTemplate": "Lataa pohja",
+    "uploadCsv": "Lataa CSV-tiedosto",
+    "importDialogTitle": "Tuo henkilöt CSV-tiedostosta",
+    "dropZoneText": "Pudota CSV-tiedosto tähän tai klikkaa selaamaan",
+    "dropZoneSubtext": "Enintään 1 000 riviä, 1 MB:n tiedostokoko",
+    "errorNotCsv": "Lataa .csv-tiedosto",
+    "errorTooLarge": "Tiedosto ylittää 1 MB:n rajan",
+    "errorEmptyFile": "CSV-tiedosto on tyhjä tai sisältää vain otsikot",
+    "errorTooManyRows": "Enintään {max} riviä tuontia kohti",
+    "previewFile": "Esikatselu: {name}",
+    "validRows": "{count, plural, one {# kelvollinen rivi} other {# kelvolliset rivit}}",
+    "errorRows": "{count, plural, one {# virhe} other {# virhettä}}",
+    "rowError": "Rivi {row}, {field}: {message}",
+    "moreErrors": "... ja {count} lisävirhe(ttä)",
+    "cancel": "Peruuta",
+    "close": "Sulje",
+    "importing": "Tuodaan...",
+    "importCount": "Tuo {count, plural, one {# henkilö} other {# henkilöä}}",
+    "importSuccess": "Tuonti valmis!",
+    "importedCount": "{count} tuotu",
+    "skippedCount": "{count} ohitettu (kaksoiskappaleet)",
+    "errorCount": "{count, plural, one {# virhe} other {# virhettä}}"
   }
 }

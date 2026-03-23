@@ -40,7 +40,8 @@
     "theme": "主题",
     "dashboard": "仪表板",
     "menu": "菜单",
-    "profile": "个人资料"
+    "profile": "个人资料",
+    "dataImportExport": "数据导入/导出"
   },
   "home": {
     "title": "人力资源管理系统",
@@ -272,7 +273,11 @@
     "typeSecurity": "安全",
     "permissionDenied": "权限被拒绝: {key}",
     "rateLimited": "操作超出速率限制: {action}",
-    "permViewDashboard": "查看仪表板"
+    "permViewDashboard": "查看仪表板",
+    "actionImport": "导入",
+    "actionExport": "导出",
+    "permImportData": "从 CSV 导入数据",
+    "permExportData": "导出数据至 CSV"
   },
   "notifications": {
     "personCreated": "人员创建成功",
@@ -298,7 +303,8 @@
     "departmentUpdated": "部门更新成功",
     "userKickedOut": "{name}已被踢出",
     "profileNameUpdated": "显示名称更新成功",
-    "profileImageUpdated": "头像更新成功"
+    "profileImageUpdated": "头像更新成功",
+    "dataImported": "{count, plural, one {# 名人员导入成功} other {# 名人员导入成功}}"
   },
   "tutorial": {
     "checklistTitle": "演示导览",
@@ -358,5 +364,43 @@
     "setImage": "设置图片",
     "removeImage": "移除图片",
     "imageHelp": "输入图片的直接链接。留空并保存将使用您的OAuth头像。"
+  },
+  "dataIO": {
+    "title": "数据导入/导出",
+    "exportTitle": "导出数据",
+    "exportDescription": "将您的数据作为 CSV 文件下载以用于备份或分析。",
+    "importTitle": "导入数据",
+    "importDescription": "上传 CSV 文件以批量将新人员添加到系统中。",
+    "persons": "人员",
+    "teams": "团队",
+    "departments": "部门",
+    "auditLogs": "审计日志",
+    "recordCount": "{count, plural, one {# 条记录} other {# 条记录}}",
+    "downloadCsv": "下载为 CSV",
+    "export": "导出",
+    "importPersons": "导入人员",
+    "importPersonsHelp": "上传包含以下列的 CSV：名称、电子邮箱、职位（可选）。重复的电子邮箱将被跳过。",
+    "downloadTemplate": "下载模板",
+    "uploadCsv": "上传 CSV",
+    "importDialogTitle": "从 CSV 导入人员",
+    "dropZoneText": "在此拖放 CSV 文件或点击浏览",
+    "dropZoneSubtext": "最多 1,000 行，文件大小 1 MB",
+    "errorNotCsv": "请上传 .csv 文件",
+    "errorTooLarge": "文件超过 1 MB 限制",
+    "errorEmptyFile": "CSV 文件为空或仅包含标题",
+    "errorTooManyRows": "每次导入最多 {max} 行",
+    "previewFile": "预览: {name}",
+    "validRows": "{count, plural, one {# 行有效} other {# 行有效}}",
+    "errorRows": "{count, plural, one {# 个错误} other {# 个错误}}",
+    "rowError": "第 {row} 行，{field}: {message}",
+    "moreErrors": "... 以及 {count} 个其他错误",
+    "cancel": "取消",
+    "close": "关闭",
+    "importing": "正在导入...",
+    "importCount": "导入 {count, plural, one {# 个人员} other {# 个人员}}",
+    "importSuccess": "导入完成！",
+    "importedCount": "导入了 {count} 个",
+    "skippedCount": "跳过了 {count} 个（重复）",
+    "errorCount": "{count, plural, one {# 个错误} other {# 个错误}}"
   }
 }

@@ -40,7 +40,8 @@
     "theme": "테마",
     "dashboard": "대시보드",
     "menu": "메뉴",
-    "profile": "프로필"
+    "profile": "프로필",
+    "dataImportExport": "데이터 가져오기 / 내보내기"
   },
   "home": {
     "title": "인사 관리 시스템",
@@ -272,7 +273,11 @@
     "typeSecurity": "보안",
     "permissionDenied": "권한이 거부되었습니다: {key}",
     "rateLimited": "작업에 대한 속도 제한 초과: {action}",
-    "permViewDashboard": "대시보드 보기"
+    "permViewDashboard": "대시보드 보기",
+    "actionImport": "가져오기",
+    "actionExport": "내보내기",
+    "permImportData": "CSV에서 데이터 가져오기",
+    "permExportData": "CSV로 데이터 내보내기"
   },
   "notifications": {
     "personCreated": "직원이 생성되었습니다",
@@ -298,7 +303,8 @@
     "departmentUpdated": "부서가 업데이트되었습니다",
     "userKickedOut": "{name}이(가) 추방되었습니다",
     "profileNameUpdated": "표시 이름이 업데이트되었습니다",
-    "profileImageUpdated": "프로필 사진이 업데이트되었습니다"
+    "profileImageUpdated": "프로필 사진이 업데이트되었습니다",
+    "dataImported": "{count, plural, one {# 명의 인원을 성공적으로 가져왔습니다} other {# 명의 인원을 성공적으로 가져왔습니다}}"
   },
   "tutorial": {
     "checklistTitle": "데모 투어",
@@ -358,5 +364,43 @@
     "setImage": "이미지 설정",
     "removeImage": "이미지 제거",
     "imageHelp": "이미지에 대한 직접 링크를 입력하세요. 비워두고 저장하면 OAuth 아바타가 사용됩니다."
+  },
+  "dataIO": {
+    "title": "데이터 가져오기 / 내보내기",
+    "exportTitle": "데이터 내보내기",
+    "exportDescription": "백업 또는 분석을 위해 데이터를 CSV 파일로 다운로드합니다.",
+    "importTitle": "데이터 가져오기",
+    "importDescription": "CSV 파일을 업로드하여 새 인원을 일괄 추가합니다.",
+    "persons": "인원",
+    "teams": "팀",
+    "departments": "부서",
+    "auditLogs": "감사 로그",
+    "recordCount": "{count, plural, one {# 개의 레코드} other {# 개의 레코드}}",
+    "downloadCsv": "CSV로 다운로드",
+    "export": "내보내기",
+    "importPersons": "인원 가져오기",
+    "importPersonsHelp": "열이 있는 CSV 업로드: 이름, 이메일, 직책(선택사항). 중복된 이메일은 건너뜁니다.",
+    "downloadTemplate": "템플릿 다운로드",
+    "uploadCsv": "CSV 업로드",
+    "importDialogTitle": "CSV에서 인원 가져오기",
+    "dropZoneText": "여기에 CSV 파일을 드롭하거나 클릭하여 찾아보기",
+    "dropZoneSubtext": "최대 1,000행, 1MB 파일 크기",
+    "errorNotCsv": ".csv 파일을 업로드하십시오",
+    "errorTooLarge": "파일이 1MB 제한을 초과합니다",
+    "errorEmptyFile": "CSV 파일이 비어 있거나 헤더만 포함되어 있습니다",
+    "errorTooManyRows": "가져오기당 최대 {max}행",
+    "previewFile": "미리보기: {name}",
+    "validRows": "{count, plural, one {# 개의 유효한 행} other {# 개의 유효한 행}}",
+    "errorRows": "{count, plural, one {# 개의 오류} other {# 개의 오류}}",
+    "rowError": "행 {row}, {field}: {message}",
+    "moreErrors": "... 그리고 {count}개의 오류 더보기",
+    "cancel": "취소",
+    "close": "닫기",
+    "importing": "가져오는 중...",
+    "importCount": "{count, plural, one {# 명을 가져오기} other {# 명을 가져오기}}",
+    "importSuccess": "가져오기 완료됨!",
+    "importedCount": "{count}명을 가져옴",
+    "skippedCount": "{count}명 건너뜀(중복)",
+    "errorCount": "{count, plural, one {# 개의 오류} other {# 개의 오류}}"
   }
 }

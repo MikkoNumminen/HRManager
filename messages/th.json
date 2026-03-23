@@ -40,7 +40,8 @@
     "theme": "ธีม",
     "dashboard": "แดชบอร์ด",
     "menu": "เมนู",
-    "profile": "โปรไฟล์"
+    "profile": "โปรไฟล์",
+    "dataImportExport": "นำเข้า/ส่งออกข้อมูล"
   },
   "home": {
     "title": "ระบบจัดการทรัพยากรบุคคล",
@@ -272,7 +273,11 @@
     "typeSecurity": "ความปลอดภัย",
     "permissionDenied": "ไม่มีสิทธิ์: {key}",
     "rateLimited": "เกินขีดจำกัดคำขอสำหรับการดำเนินการ: {action}",
-    "permViewDashboard": "ดูแดชบอร์ด"
+    "permViewDashboard": "ดูแดชบอร์ด",
+    "actionImport": "นำเข้า",
+    "actionExport": "ส่งออก",
+    "permImportData": "นำเข้าข้อมูลจาก CSV",
+    "permExportData": "ส่งออกข้อมูลเป็น CSV"
   },
   "notifications": {
     "personCreated": "สร้างบุคคลสำเร็จ",
@@ -298,7 +303,8 @@
     "departmentUpdated": "อัปเดตแผนกสำเร็จ",
     "userKickedOut": "{name} ถูกไล่ออกแล้ว",
     "profileNameUpdated": "อัปเดตชื่อที่แสดงสำเร็จ",
-    "profileImageUpdated": "อัปเดตรูปโปรไฟล์สำเร็จ"
+    "profileImageUpdated": "อัปเดตรูปโปรไฟล์สำเร็จ",
+    "dataImported": "{count, plural, one {นำเข้าบุคลากร # คนสำเร็จ} other {นำเข้าบุคลากร # คนสำเร็จ}}"
   },
   "tutorial": {
     "checklistTitle": "ทัวร์สาธิต",
@@ -358,5 +364,43 @@
     "setImage": "ตั้งรูปภาพ",
     "removeImage": "ลบรูปภาพ",
     "imageHelp": "กรอกลิงก์โดยตรงไปยังรูปภาพ เว้นว่างไว้แล้วบันทึกเพื่อใช้รูป OAuth ของคุณ"
+  },
+  "dataIO": {
+    "title": "นำเข้า/ส่งออกข้อมูล",
+    "exportTitle": "ส่งออกข้อมูล",
+    "exportDescription": "ดาวน์โหลดข้อมูลของคุณเป็นไฟล์ CSV สำหรับการสำรองข้อมูลหรือการวิเคราะห์",
+    "importTitle": "นำเข้าข้อมูล",
+    "importDescription": "อัปโหลดไฟล์ CSV เพื่อเพิ่มบุคลากรใหม่เป็นจำนวนมากลงในระบบ",
+    "persons": "บุคลากร",
+    "teams": "ทีม",
+    "departments": "แผนก",
+    "auditLogs": "บันทึกการตรวจสอบ",
+    "recordCount": "{count, plural, one {# บันทึก} other {# บันทึก}}",
+    "downloadCsv": "ดาวน์โหลดเป็น CSV",
+    "export": "ส่งออก",
+    "importPersons": "นำเข้าบุคลากร",
+    "importPersonsHelp": "อัปโหลด CSV ที่มีคอลัมน์: ชื่อ, อีเมล, ตำแหน่ง (ไม่บังคับ) อีเมลที่ซ้ำกันจะถูกข้าม",
+    "downloadTemplate": "ดาวน์โหลดเทมเพลต",
+    "uploadCsv": "อัปโหลด CSV",
+    "importDialogTitle": "นำเข้าบุคลากรจาก CSV",
+    "dropZoneText": "วางไฟล์ CSV ที่นี่หรือคลิกเพื่อเรียกดู",
+    "dropZoneSubtext": "สูงสุด 1,000 แถว ขนาดไฟล์ 1 MB",
+    "errorNotCsv": "โปรดอัปโหลดไฟล์ .csv",
+    "errorTooLarge": "ไฟล์เกินขีด จำกัด 1 MB",
+    "errorEmptyFile": "ไฟล์ CSV ว่างเปล่าหรือมีเพียงส่วนหัว",
+    "errorTooManyRows": "สูงสุด {max} แถวต่อการนำเข้า",
+    "previewFile": "ตัวอย่าง: {name}",
+    "validRows": "{count, plural, one {# แถวที่ถูกต้อง} other {# แถวที่ถูกต้อง}}",
+    "errorRows": "{count, plural, one {# ข้อผิดพลาด} other {# ข้อผิดพลาด}}",
+    "rowError": "แถว {row}, {field}: {message}",
+    "moreErrors": "... และข้อผิดพลาด {count} รายการอื่น",
+    "cancel": "ยกเลิก",
+    "close": "ปิด",
+    "importing": "กำลังนำเข้า...",
+    "importCount": "นำเข้า {count, plural, one {# คน} other {# คน}}",
+    "importSuccess": "การนำเข้าเสร็จสมบูรณ์!",
+    "importedCount": "นำเข้า {count} รายการ",
+    "skippedCount": "ข้าม {count} รายการ (ซ้ำกัน)",
+    "errorCount": "{count, plural, one {# ข้อผิดพลาด} other {# ข้อผิดพลาด}}"
   }
 }

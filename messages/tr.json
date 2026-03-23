@@ -40,7 +40,8 @@
     "theme": "Tema",
     "dashboard": "Gösterge Paneli",
     "menu": "Menü",
-    "profile": "Profil"
+    "profile": "Profil",
+    "dataImportExport": "Veri İçeri Aktar / Dışa Aktar"
   },
   "home": {
     "title": "İnsan Kaynakları Yönetim Sistemi",
@@ -272,7 +273,11 @@
     "typeSecurity": "Güvenlik",
     "permissionDenied": "İzin reddedildi: {key}",
     "rateLimited": "İşlem için hız sınırı aşıldı: {action}",
-    "permViewDashboard": "gösterge panelini görüntüle"
+    "permViewDashboard": "gösterge panelini görüntüle",
+    "actionImport": "İçeri Aktar",
+    "actionExport": "Dışa Aktar",
+    "permImportData": "CSV'den veri içeri aktarmak",
+    "permExportData": "CSV'ye veri dışa aktarmak"
   },
   "notifications": {
     "personCreated": "Kişi başarıyla oluşturuldu",
@@ -298,7 +303,8 @@
     "departmentUpdated": "Departman başarıyla güncellendi",
     "userKickedOut": "{name} atıldı",
     "profileNameUpdated": "Görünen ad başarıyla güncellendi",
-    "profileImageUpdated": "Profil fotoğrafı başarıyla güncellendi"
+    "profileImageUpdated": "Profil fotoğrafı başarıyla güncellendi",
+    "dataImported": "{count, plural, one {# kişi başarıyla içeri aktarıldı} other {# kişi başarıyla içeri aktarıldı}}"
   },
   "tutorial": {
     "checklistTitle": "Demo Turu",
@@ -358,5 +364,43 @@
     "setImage": "Görsel ayarla",
     "removeImage": "Görseli kaldır",
     "imageHelp": "Bir görsele doğrudan bağlantı girin. OAuth avatarınızı kullanmak için boş bırakıp kaydedin."
+  },
+  "dataIO": {
+    "title": "Veri İçeri Aktar / Dışa Aktar",
+    "exportTitle": "Verileri Dışa Aktar",
+    "exportDescription": "Verilerinizi yedekleme veya analiz için CSV dosyaları olarak indirin.",
+    "importTitle": "Verileri İçeri Aktar",
+    "importDescription": "Sisteme toplu olarak yeni kişiler eklemek için bir CSV dosyası yükleyin.",
+    "persons": "Kişiler",
+    "teams": "Ekipler",
+    "departments": "Departmanlar",
+    "auditLogs": "Denetim Günlükleri",
+    "recordCount": "{count, plural, one {# kayıt} other {# kayıt}}",
+    "downloadCsv": "CSV olarak indir",
+    "export": "Dışa aktar",
+    "importPersons": "Kişileri içeri aktar",
+    "importPersonsHelp": "Sütunlar içeren CSV yükleyin: ad, e-posta, pozisyon (isteğe bağlı). Yinelenen e-postalar atlanacaktır.",
+    "downloadTemplate": "Şablonu indir",
+    "uploadCsv": "CSV yükle",
+    "importDialogTitle": "CSV'den kişileri içeri aktar",
+    "dropZoneText": "CSV dosyasını buraya sürükleyin veya gözatmak için tıklayın",
+    "dropZoneSubtext": "Maksimum 1.000 satır, 1 MB dosya boyutu",
+    "errorNotCsv": "Lütfen .csv dosyası yükleyin",
+    "errorTooLarge": "Dosya 1 MB sınırını aşıyor",
+    "errorEmptyFile": "CSV dosyası boş veya yalnızca başlıklar içeriyor",
+    "errorTooManyRows": "İçeri aktarma başına maksimum {max} satır",
+    "previewFile": "Ön izleme: {name}",
+    "validRows": "{count, plural, one {# geçerli satır} other {# geçerli satır}}",
+    "errorRows": "{count, plural, one {# hata} other {# hata}}",
+    "rowError": "Satır {row}, {field}: {message}",
+    "moreErrors": "... ve {count} hata daha",
+    "cancel": "İptal",
+    "close": "Kapat",
+    "importing": "İçeri aktarılıyor...",
+    "importCount": "İçeri Aktar {count, plural, one {# kişi} other {# kişi}}",
+    "importSuccess": "İçeri aktarma tamamlandı!",
+    "importedCount": "{count} içeri aktarıldı",
+    "skippedCount": "{count} atlandı (yinelemeler)",
+    "errorCount": "{count, plural, one {# hata} other {# hata}}"
   }
 }

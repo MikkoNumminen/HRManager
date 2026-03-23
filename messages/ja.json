@@ -40,7 +40,8 @@
     "theme": "テーマ",
     "dashboard": "ダッシュボード",
     "menu": "メニュー",
-    "profile": "プロフィール"
+    "profile": "プロフィール",
+    "dataImportExport": "データのインポート/エクスポート"
   },
   "home": {
     "title": "人事管理システム",
@@ -272,7 +273,11 @@
     "typeSecurity": "セキュリティ",
     "permissionDenied": "権限が拒否されました: {key}",
     "rateLimited": "アクションのレート制限を超えました: {action}",
-    "permViewDashboard": "ダッシュボードを表示"
+    "permViewDashboard": "ダッシュボードを表示",
+    "actionImport": "インポート",
+    "actionExport": "エクスポート",
+    "permImportData": "CSV からのデータインポート",
+    "permExportData": "CSV へのデータエクスポート"
   },
   "notifications": {
     "personCreated": "担当者を作成しました",
@@ -298,7 +303,8 @@
     "departmentUpdated": "部門を更新しました",
     "userKickedOut": "{name}が追放されました",
     "profileNameUpdated": "表示名を更新しました",
-    "profileImageUpdated": "プロフィール画像を更新しました"
+    "profileImageUpdated": "プロフィール画像を更新しました",
+    "dataImported": "{count, plural, one {# 人の人員をインポートしました} other {# 名の人員をインポートしました}}"
   },
   "tutorial": {
     "checklistTitle": "デモツアー",
@@ -358,5 +364,43 @@
     "setImage": "画像を設定",
     "removeImage": "画像を削除",
     "imageHelp": "画像への直接リンクを入力してください。空のまま保存するとOAuthアバターが使用されます。"
+  },
+  "dataIO": {
+    "title": "データのインポート/エクスポート",
+    "exportTitle": "データのエクスポート",
+    "exportDescription": "バックアップまたは分析用に、CSV ファイルとしてデータをダウンロードできます。",
+    "importTitle": "データのインポート",
+    "importDescription": "CSV ファイルをアップロードして、新しい人員を一括してシステムに追加します。",
+    "persons": "人員",
+    "teams": "チーム",
+    "departments": "部門",
+    "auditLogs": "監査ログ",
+    "recordCount": "{count, plural, one {# 件のレコード} other {# 件のレコード}}",
+    "downloadCsv": "CSV としてダウンロード",
+    "export": "エクスポート",
+    "importPersons": "人員をインポート",
+    "importPersonsHelp": "名前、メールアドレス、役職（任意）の列を含む CSV をアップロードします。重複するメールアドレスはスキップされます。",
+    "downloadTemplate": "テンプレートをダウンロード",
+    "uploadCsv": "CSV をアップロード",
+    "importDialogTitle": "CSV から人員をインポート",
+    "dropZoneText": "ここに CSV ファイルをドラッグするか、クリックして参照",
+    "dropZoneSubtext": "最大 1,000 行、1 MB ファイルサイズ",
+    "errorNotCsv": ".csv ファイルをアップロードしてください",
+    "errorTooLarge": "ファイルは 1 MB の制限を超えています",
+    "errorEmptyFile": "CSV ファイルが空または見出しのみが含まれています",
+    "errorTooManyRows": "インポートごとに最大 {max} 行",
+    "previewFile": "プレビュー: {name}",
+    "validRows": "{count, plural, one {# 有効な行} other {# 有効な行}}",
+    "errorRows": "{count, plural, one {# エラー} other {# エラー}}",
+    "rowError": "行 {row}、{field}: {message}",
+    "moreErrors": "... そして {count} 個のエラーがあります",
+    "cancel": "キャンセル",
+    "close": "閉じる",
+    "importing": "インポート中...",
+    "importCount": "{count, plural, one {# 人をインポート} other {# 名をインポート}}",
+    "importSuccess": "インポートが完了しました！",
+    "importedCount": "{count} 件をインポート",
+    "skippedCount": "{count} 件をスキップ（重複）",
+    "errorCount": "{count, plural, one {# エラー} other {# エラー}}"
   }
 }

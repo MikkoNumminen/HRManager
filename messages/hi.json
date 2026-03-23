@@ -40,7 +40,8 @@
     "theme": "थीम",
     "dashboard": "डैशबोर्ड",
     "menu": "मेनू",
-    "profile": "प्रोफ़ाइल"
+    "profile": "प्रोफ़ाइल",
+    "dataImportExport": "डेटा आयात / निर्यात"
   },
   "home": {
     "title": "मानव संसाधन प्रबंधन प्रणाली",
@@ -272,7 +273,11 @@
     "typeSecurity": "सुरक्षा",
     "permissionDenied": "अनुमति अस्वीकृत: {key}",
     "rateLimited": "कार्रवाई के लिए दर सीमा पार: {action}",
-    "permViewDashboard": "डैशबोर्ड देखें"
+    "permViewDashboard": "डैशबोर्ड देखें",
+    "actionImport": "आयात",
+    "actionExport": "निर्यात",
+    "permImportData": "CSV से डेटा आयात करना",
+    "permExportData": "CSV को डेटा निर्यात करना"
   },
   "notifications": {
     "personCreated": "व्यक्ति सफलतापूर्वक बनाया गया",
@@ -298,7 +303,8 @@
     "departmentUpdated": "विभाग सफलतापूर्वक अपडेट किया गया",
     "userKickedOut": "{name} को निकाल दिया गया है",
     "profileNameUpdated": "प्रदर्शन नाम सफलतापूर्वक अपडेट किया गया",
-    "profileImageUpdated": "प्रोफ़ाइल चित्र सफलतापूर्वक अपडेट किया गया"
+    "profileImageUpdated": "प्रोफ़ाइल चित्र सफलतापूर्वक अपडेट किया गया",
+    "dataImported": "{count, plural, one {# व्यक्ति सफलतापूर्वक आयात किया गया} other {# व्यक्ति सफलतापूर्वक आयात किए गए}}"
   },
   "tutorial": {
     "checklistTitle": "डेमो टूर",
@@ -358,5 +364,43 @@
     "setImage": "चित्र सेट करें",
     "removeImage": "चित्र हटाएँ",
     "imageHelp": "चित्र का सीधा लिंक दर्ज करें। खाली छोड़कर सहेजें तो आपका OAuth अवतार उपयोग होगा।"
+  },
+  "dataIO": {
+    "title": "डेटा आयात / निर्यात",
+    "exportTitle": "डेटा निर्यात करें",
+    "exportDescription": "बैकअप या विश्लेषण के लिए अपने डेटा को CSV फ़ाइलों के रूप में डाउनलोड करें।",
+    "importTitle": "डेटा आयात करें",
+    "importDescription": "नए व्यक्तियों को सिस्टम में बल्क में जोड़ने के लिए CSV फ़ाइल अपलोड करें।",
+    "persons": "व्यक्ति",
+    "teams": "टीमें",
+    "departments": "विभाग",
+    "auditLogs": "ऑडिट लॉग",
+    "recordCount": "{count, plural, one {# रिकॉर्ड} other {# रिकॉर्ड}}",
+    "downloadCsv": "CSV के रूप में डाउनलोड करें",
+    "export": "निर्यात",
+    "importPersons": "व्यक्तियों को आयात करें",
+    "importPersonsHelp": "स्तंभों के साथ CSV अपलोड करें: नाम, ईमेल, पद (वैकल्पिक)। डुप्लिकेट ईमेल को छोड़ दिया जाएगा।",
+    "downloadTemplate": "टेम्पलेट डाउनलोड करें",
+    "uploadCsv": "CSV अपलोड करें",
+    "importDialogTitle": "CSV से व्यक्तियों को आयात करें",
+    "dropZoneText": "यहाँ CSV फ़ाइल छोड़ें या ब्राउज़ करने के लिए क्लिक करें",
+    "dropZoneSubtext": "अधिकतम 1,000 पंक्तियाँ, 1 MB फ़ाइल आकार",
+    "errorNotCsv": "कृपया .csv फ़ाइल अपलोड करें",
+    "errorTooLarge": "फ़ाइल 1 MB सीमा से अधिक है",
+    "errorEmptyFile": "CSV फ़ाइल खाली है या केवल शीर्षलेख है",
+    "errorTooManyRows": "प्रति आयात अधिकतम {max} पंक्तियाँ",
+    "previewFile": "पूर्वावलोकन: {name}",
+    "validRows": "{count, plural, one {# वैध पंक्ति} other {# वैध पंक्तियाँ}}",
+    "errorRows": "{count, plural, one {# त्रुटि} other {# त्रुटियाँ}}",
+    "rowError": "पंक्ति {row}, {field}: {message}",
+    "moreErrors": "... और {count} अधिक त्रुटियाँ",
+    "cancel": "रद्द करें",
+    "close": "बंद करें",
+    "importing": "आयात जारी है...",
+    "importCount": "{count, plural, one {# व्यक्ति को आयात करें} other {# व्यक्तियों को आयात करें}}",
+    "importSuccess": "आयात पूर्ण!",
+    "importedCount": "{count} को आयात किया गया",
+    "skippedCount": "{count} को छोड़ा गया (डुप्लिकेट)",
+    "errorCount": "{count, plural, one {# त्रुटि} other {# त्रुटियाँ}}"
   }
 }

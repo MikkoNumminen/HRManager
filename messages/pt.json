@@ -40,7 +40,8 @@
     "theme": "Tema",
     "dashboard": "Painel",
     "menu": "Menu principal",
-    "profile": "Perfil"
+    "profile": "Perfil",
+    "dataImportExport": "Importação / Exportação de dados"
   },
   "home": {
     "title": "Sistema de Gestão de Recursos Humanos",
@@ -272,7 +273,11 @@
     "typeSecurity": "Segurança",
     "permissionDenied": "Permissão negada: {key}",
     "rateLimited": "Limite de requisições excedido para a ação: {action}",
-    "permViewDashboard": "ver o painel"
+    "permViewDashboard": "ver o painel",
+    "actionImport": "Importar",
+    "actionExport": "Exportar",
+    "permImportData": "importar dados do CSV",
+    "permExportData": "exportar dados para CSV"
   },
   "notifications": {
     "personCreated": "Pessoa criada com sucesso",
@@ -298,7 +303,8 @@
     "departmentUpdated": "Departamento atualizado com sucesso",
     "userKickedOut": "{name} foi expulso",
     "profileNameUpdated": "Nome de exibição atualizado com sucesso",
-    "profileImageUpdated": "Foto de perfil atualizada com sucesso"
+    "profileImageUpdated": "Foto de perfil atualizada com sucesso",
+    "dataImported": "{count, plural, one {# pessoa importada com sucesso} other {# pessoas importadas com sucesso}}"
   },
   "tutorial": {
     "checklistTitle": "Visita guiada",
@@ -358,5 +364,43 @@
     "setImage": "Definir imagem",
     "removeImage": "Remover imagem",
     "imageHelp": "Insira um link direto para uma imagem. Deixe vazio e salve para usar seu avatar OAuth."
+  },
+  "dataIO": {
+    "title": "Importação / Exportação de dados",
+    "exportTitle": "Exportar dados",
+    "exportDescription": "Baixe seus dados como arquivos CSV para backup ou análise.",
+    "importTitle": "Importar dados",
+    "importDescription": "Carregue um arquivo CSV para adicionar em massa novas pessoas ao sistema.",
+    "persons": "Pessoas",
+    "teams": "Equipes",
+    "departments": "Departamentos",
+    "auditLogs": "Registros de auditoria",
+    "recordCount": "{count, plural, one {# registro} other {# registros}}",
+    "downloadCsv": "Baixar como CSV",
+    "export": "Exportar",
+    "importPersons": "Importar pessoas",
+    "importPersonsHelp": "Carregue um CSV com colunas: nome, e-mail, cargo (opcional). E-mails duplicados serão ignorados.",
+    "downloadTemplate": "Baixar modelo",
+    "uploadCsv": "Carregar CSV",
+    "importDialogTitle": "Importar pessoas do CSV",
+    "dropZoneText": "Solte um arquivo CSV aqui ou clique para procurar",
+    "dropZoneSubtext": "Máximo 1.000 linhas, tamanho de arquivo de 1 MB",
+    "errorNotCsv": "Carregue um arquivo .csv",
+    "errorTooLarge": "O arquivo excede o limite de 1 MB",
+    "errorEmptyFile": "O arquivo CSV está vazio ou contém apenas cabeçalhos",
+    "errorTooManyRows": "Máximo {max} linhas por importação",
+    "previewFile": "Visualização: {name}",
+    "validRows": "{count, plural, one {# linha válida} other {# linhas válidas}}",
+    "errorRows": "{count, plural, one {# erro} other {# erros}}",
+    "rowError": "Linha {row}, {field}: {message}",
+    "moreErrors": "... e {count} erros a mais",
+    "cancel": "Cancelar",
+    "close": "Fechar",
+    "importing": "Importando...",
+    "importCount": "Importar {count, plural, one {# pessoa} other {# pessoas}}",
+    "importSuccess": "Importação concluída!",
+    "importedCount": "{count} importado(s)",
+    "skippedCount": "{count} ignorado(s) (duplicatas)",
+    "errorCount": "{count, plural, one {# erro} other {# erros}}"
   }
 }

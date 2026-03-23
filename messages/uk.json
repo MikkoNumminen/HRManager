@@ -40,7 +40,8 @@
     "theme": "Тема",
     "dashboard": "Панель",
     "menu": "Меню",
-    "profile": "Профіль"
+    "profile": "Профіль",
+    "dataImportExport": "Імпорт / Експорт даних"
   },
   "home": {
     "title": "Система управління персоналом",
@@ -272,7 +273,11 @@
     "typeSecurity": "Безпека",
     "permissionDenied": "Доступ заборонено: {key}",
     "rateLimited": "Перевищено ліміт запитів для дії: {action}",
-    "permViewDashboard": "переглянути панель"
+    "permViewDashboard": "переглянути панель",
+    "actionImport": "Імпорт",
+    "actionExport": "Експорт",
+    "permImportData": "імпортувати дані з CSV",
+    "permExportData": "експортувати дані в CSV"
   },
   "notifications": {
     "personCreated": "Особу успішно створено",
@@ -298,7 +303,8 @@
     "departmentUpdated": "Відділ успішно оновлено",
     "userKickedOut": "{name} було виключено",
     "profileNameUpdated": "Відображуване ім'я успішно оновлено",
-    "profileImageUpdated": "Фото профілю успішно оновлено"
+    "profileImageUpdated": "Фото профілю успішно оновлено",
+    "dataImported": "{count, plural, one {# співробітник успішно імпортовано} other {# співробітників успішно імпортовано}}"
   },
   "tutorial": {
     "checklistTitle": "Огляд демо",
@@ -358,5 +364,43 @@
     "setImage": "Встановити зображення",
     "removeImage": "Видалити зображення",
     "imageHelp": "Введіть пряме посилання на зображення. Залиште порожнім і збережіть, щоб використовувати аватар OAuth."
+  },
+  "dataIO": {
+    "title": "Імпорт / Експорт даних",
+    "exportTitle": "Експортувати дані",
+    "exportDescription": "Завантажте свої дані як CSV файли для резервного копіювання або аналізу.",
+    "importTitle": "Імпортувати дані",
+    "importDescription": "Завантажте CSV файл для масового додавання нових співробітників до системи.",
+    "persons": "Співробітники",
+    "teams": "Команди",
+    "departments": "Відділи",
+    "auditLogs": "Журнали аудиту",
+    "recordCount": "{count, plural, one {# запис} other {# записів}}",
+    "downloadCsv": "Завантажити як CSV",
+    "export": "Експортувати",
+    "importPersons": "Імпортувати співробітників",
+    "importPersonsHelp": "Завантажте CSV зі стовпцями: ім'я, електронна пошта, посада (необов'язково). Дублюючі електронні адреси будуть пропущені.",
+    "downloadTemplate": "Завантажити шаблон",
+    "uploadCsv": "Завантажити CSV",
+    "importDialogTitle": "Імпортувати співробітників з CSV",
+    "dropZoneText": "Перетягніть CSV файл сюди або натисніть для вибору",
+    "dropZoneSubtext": "Максимум 1000 рядків, розмір файлу 1 МБ",
+    "errorNotCsv": "Будь ласка, завантажте файл .csv",
+    "errorTooLarge": "Файл перевищує ліміт 1 МБ",
+    "errorEmptyFile": "CSV файл порожній або містить лише заголовки",
+    "errorTooManyRows": "Максимум {max} рядків на імпорт",
+    "previewFile": "Попередній перегляд: {name}",
+    "validRows": "{count, plural, one {# коректний рядок} other {# коректних рядків}}",
+    "errorRows": "{count, plural, one {# помилка} other {# помилок}}",
+    "rowError": "Рядок {row}, {field}: {message}",
+    "moreErrors": "... і ще {count} помилок",
+    "cancel": "Скасувати",
+    "close": "Закрити",
+    "importing": "Імпортування...",
+    "importCount": "Імпортувати {count, plural, one {# співробітника} other {# співробітників}}",
+    "importSuccess": "Імпорт завершено!",
+    "importedCount": "{count} імпортовано",
+    "skippedCount": "{count} пропущено (дубліковано)",
+    "errorCount": "{count, plural, one {# помилка} other {# помилок}}"
   }
 }

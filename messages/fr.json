@@ -40,7 +40,8 @@
     "theme": "Thème",
     "dashboard": "Tableau de bord",
     "menu": "Menu principal",
-    "profile": "Profil"
+    "profile": "Profil",
+    "dataImportExport": "Importation / Exportation de données"
   },
   "home": {
     "title": "Système de gestion des ressources humaines",
@@ -272,7 +273,11 @@
     "typeSecurity": "Sécurité",
     "permissionDenied": "Permission refusée : {key}",
     "rateLimited": "Limite de requêtes dépassée pour l'action : {action}",
-    "permViewDashboard": "voir le tableau de bord"
+    "permViewDashboard": "voir le tableau de bord",
+    "actionImport": "Importer",
+    "actionExport": "Exporter",
+    "permImportData": "importer les données depuis CSV",
+    "permExportData": "exporter les données vers CSV"
   },
   "notifications": {
     "personCreated": "Personne créée avec succès",
@@ -298,7 +303,8 @@
     "departmentUpdated": "Département mis à jour avec succès",
     "userKickedOut": "{name} a été exclu",
     "profileNameUpdated": "Nom d'affichage mis à jour avec succès",
-    "profileImageUpdated": "Photo de profil mise à jour avec succès"
+    "profileImageUpdated": "Photo de profil mise à jour avec succès",
+    "dataImported": "{count, plural, one {# personne importée avec succès} other {# personnes importées avec succès}}"
   },
   "tutorial": {
     "checklistTitle": "Visite guidée",
@@ -358,5 +364,43 @@
     "setImage": "Définir l'image",
     "removeImage": "Supprimer l'image",
     "imageHelp": "Entrez un lien direct vers une image. Laissez vide et enregistrez pour utiliser votre avatar OAuth."
+  },
+  "dataIO": {
+    "title": "Importation / Exportation de données",
+    "exportTitle": "Exporter les données",
+    "exportDescription": "Téléchargez vos données sous forme de fichiers CSV pour la sauvegarde ou l'analyse.",
+    "importTitle": "Importer les données",
+    "importDescription": "Téléchargez un fichier CSV pour ajouter en masse de nouvelles personnes au système.",
+    "persons": "Personnes",
+    "teams": "Équipes",
+    "departments": "Départements",
+    "auditLogs": "Journaux d'audit",
+    "recordCount": "{count, plural, one {# enregistrement} other {# enregistrements}}",
+    "downloadCsv": "Télécharger en CSV",
+    "export": "Exporter",
+    "importPersons": "Importer les personnes",
+    "importPersonsHelp": "Téléchargez un CSV avec les colonnes : nom, e-mail, poste (optionnel). Les e-mails en doublon seront ignorés.",
+    "downloadTemplate": "Télécharger le modèle",
+    "uploadCsv": "Télécharger CSV",
+    "importDialogTitle": "Importer les personnes depuis CSV",
+    "dropZoneText": "Déposez un fichier CSV ici ou cliquez pour parcourir",
+    "dropZoneSubtext": "Maximum 1 000 lignes, taille de fichier 1 MB",
+    "errorNotCsv": "Veuillez télécharger un fichier .csv",
+    "errorTooLarge": "Le fichier dépasse la limite de 1 MB",
+    "errorEmptyFile": "Le fichier CSV est vide ou contient uniquement des en-têtes",
+    "errorTooManyRows": "Maximum {max} lignes par importation",
+    "previewFile": "Aperçu : {name}",
+    "validRows": "{count, plural, one {# ligne valide} other {# lignes valides}}",
+    "errorRows": "{count, plural, one {# erreur} other {# erreurs}}",
+    "rowError": "Ligne {row}, {field} : {message}",
+    "moreErrors": "... et {count} autres erreurs",
+    "cancel": "Annuler",
+    "close": "Fermer",
+    "importing": "Importation en cours...",
+    "importCount": "Importer {count, plural, one {# personne} other {# personnes}}",
+    "importSuccess": "Importation terminée !",
+    "importedCount": "{count} importé(s)",
+    "skippedCount": "{count} ignoré(s) (doublons)",
+    "errorCount": "{count, plural, one {# erreur} other {# erreurs}}"
   }
 }
