@@ -16,10 +16,11 @@ function generateNonce(): string {
  *
  * Key decisions:
  * - Nonce-based script-src: only the FOUC prevention script gets a nonce
- * - style-src 'unsafe-inline': required by Emotion (MUI's CSS-in-JS engine)
- *   which injects <style> tags at runtime. Emotion does support nonce-based
- *   styles via createCache({ nonce }), but the nonce must also be set on
- *   every dynamically injected <style> tag — AppRouterCacheProvider handles this.
+ * - style-src uses nonce + 'unsafe-inline' fallback: Emotion/MUI injects <style>
+ *   tags at runtime via AppRouterCacheProvider which sets the nonce on each tag.
+ *   CSP Level 2+ browsers ignore 'unsafe-inline' when a nonce is present,
+ *   giving strict nonce-based enforcement. 'unsafe-inline' remains as a fallback
+ *   for older browsers that don't support nonces.
  * - img-src allows Google and GitHub avatar URLs (OAuth profile pictures)
  * - form-action allows OAuth redirect endpoints
  * - frame-ancestors 'none': this app should never be embedded in an iframe
@@ -28,7 +29,7 @@ function buildCsp(nonce: string): string {
   const directives = [
     "default-src 'self'",
     `script-src 'self' 'nonce-${nonce}'`,
-    `style-src 'self' 'unsafe-inline'`,
+    `style-src 'self' 'nonce-${nonce}' 'unsafe-inline'`,
     "img-src 'self' https://lh3.googleusercontent.com https://avatars.githubusercontent.com data:",
     "font-src 'self'",
     "connect-src 'self'",

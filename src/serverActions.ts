@@ -1005,64 +1005,69 @@ export async function seedMockData(clearExisting: boolean = true) {
     }
   });
 
-  // Seed mock users in a separate transaction — seedPermissions() opens its own
-  // transaction internally, so this must run outside the main transaction to avoid
-  // nested transaction deadlock
-  const mockUserSeeds = [
-    { email: "admin@example.com", name: "Jane Admin", role: "administrator" },
-    { email: "user1@example.com", name: "John User", role: "user" },
-    { email: "user2@example.com", name: "Sarah User", role: "user" },
-    { email: "guest@example.com", name: "Demo Guest", role: "guest" },
-  ];
+  // Seed mock users only for real (non-demo) sessions — the User table has no
+  // sessionId column, so mock users would leak into the global table and be visible
+  // across sessions. Demo sessions only see demo@hrmanager.app via getUsers() anyway.
+  if (!sessionId) {
+    const mockUserSeeds = [
+      { email: "admin@example.com", name: "Jane Admin", role: "administrator" },
+      { email: "user1@example.com", name: "John User", role: "user" },
+      { email: "user2@example.com", name: "Sarah User", role: "user" },
+      { email: "guest@example.com", name: "Demo Guest", role: "guest" },
+    ];
 
-  if (clearExisting) {
-    await prisma.$transaction(async (tx) => {
-      await tx.userPermission.deleteMany({
-        where: { user: { email: { endsWith: "@example.com" } } },
-      });
-      await tx.user.deleteMany({
-        where: { email: { endsWith: "@example.com" } },
-      });
-    });
-  }
-
-  await seedPermissions();
-
-  await prisma.$transaction(async (tx) => {
-    for (const u of mockUserSeeds) {
-      const user = await tx.user.upsert({
-        where: { email: u.email },
-        update: {},
-        create: u,
-      });
-
-      // Give admin@example.com a custom override: grant data:seed
-      if (u.email === "admin@example.com") {
-        const seedPerm = await tx.permission.findUnique({ where: { key: "data:seed" } });
-        if (seedPerm) {
-          await tx.userPermission.upsert({
-            where: { userId_permissionId: { userId: user.id, permissionId: seedPerm.id } },
-            update: { granted: true },
-            create: { userId: user.id, permissionId: seedPerm.id, granted: true },
-          });
-        }
-      }
-
-      // Give user1@example.com a custom override: grant person:create
-      if (u.email === "user1@example.com") {
-        const createPerm = await tx.permission.findUnique({
-          where: { key: "person:create" },
+    if (clearExisting) {
+      await prisma.$transaction(async (tx) => {
+        await tx.userPermission.deleteMany({
+          where: { user: { email: { endsWith: "@example.com" } } },
         });
-        if (createPerm) {
-          await tx.userPermission.upsert({
-            where: { userId_permissionId: { userId: user.id, permissionId: createPerm.id } },
-            update: { granted: true },
-            create: { userId: user.id, permissionId: createPerm.id, granted: true },
+        await tx.user.deleteMany({
+          where: { email: { endsWith: "@example.com" } },
+        });
+      });
+    }
+
+    await seedPermissions();
+
+    await prisma.$transaction(async (tx) => {
+      for (const u of mockUserSeeds) {
+        const user = await tx.user.upsert({
+          where: { email: u.email },
+          update: {},
+          create: u,
+        });
+
+        // Give admin@example.com a custom override: grant data:seed
+        if (u.email === "admin@example.com") {
+          const seedPerm = await tx.permission.findUnique({ where: { key: "data:seed" } });
+          if (seedPerm) {
+            await tx.userPermission.upsert({
+              where: { userId_permissionId: { userId: user.id, permissionId: seedPerm.id } },
+              update: { granted: true },
+              create: { userId: user.id, permissionId: seedPerm.id, granted: true },
+            });
+          }
+        }
+
+        // Give user1@example.com a custom override: grant person:create
+        if (u.email === "user1@example.com") {
+          const createPerm = await tx.permission.findUnique({
+            where: { key: "person:create" },
           });
+          if (createPerm) {
+            await tx.userPermission.upsert({
+              where: { userId_permissionId: { userId: user.id, permissionId: createPerm.id } },
+              update: { granted: true },
+              create: { userId: user.id, permissionId: createPerm.id, granted: true },
+            });
+          }
         }
       }
-    }
-  });
+    });
+  } else {
+    // Demo sessions still need permissions seeded for the permission catalog
+    await seedPermissions();
+  }
 
   await deferAuditLog({
     action: "seed",
