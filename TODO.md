@@ -11,6 +11,8 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 
 > 📋 **Audit research:** Items marked "(found by audit)" have detailed file:line references in memory file `project_audit_findings.md`. Read it before starting any of these tasks.
 
+- 🔴🧠 Playwright E2E test suite — auth flows, CRUD, permissions, import/export, themes, locales [Claude 3, main]
+
 ## Recently Completed
 
 - ✅ Fix all lint warnings — 137 no-node-access + 22 no-unnecessary-act + 1 prefer-to-have-value → zero lint issues
@@ -46,7 +48,6 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 - 🟢⚡ Rate limit boundary/race condition tests — exact boundary, concurrent requests, window expiry
 - 🟡⚡ Dashboard raw SQL query tests — `getDashboardMetrics()` CTEs/window functions untested
 - 🟡⚡ Deferred audit logging edge case tests — write failures, permission denial logging, rate limit hit logging
-- 🔴🧠 Playwright E2E test suite — auth flows, CRUD, permissions, import/export, themes, locales
 
 ### Accessibility (WCAG)
 
@@ -59,4 +60,3 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 - 🟢🧠 Rate limit IP spoofing protection — trusts `x-forwarded-for` without proxy validation
 - 🟢⚡ Demo session cleanup failure logging — silent failures leave stale data
 - 🟡🧠 JWT permission revocation window — permissions valid up to 1h after admin revokes them
-
