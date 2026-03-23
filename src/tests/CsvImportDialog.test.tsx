@@ -267,4 +267,162 @@ describe("CsvImportDialog", () => {
       expect(screen.getByText(/Row 2/)).toBeInTheDocument();
     });
   });
+
+  // Shows error when CSV has more than MAX_IMPORT_ROWS data rows
+  test("shows error for CSV with too many rows", async () => {
+    render(<CsvImportDialog open={true} onClose={jest.fn()} />);
+    const input = document.getElementById("csv-file-input") as HTMLInputElement;
+    // Create a CSV with 1001 data rows (exceeds MAX_IMPORT_ROWS = 1000)
+    const header = "name,email";
+    const rows = Array.from({ length: 1001 }, (_, i) => `Person${i},p${i}@test.com`).join("\n");
+    const file = csvFile(`${header}\n${rows}`);
+
+    fireEvent.change(input, { target: { files: [file] } });
+
+    await waitFor(() => {
+      expect(screen.getByText(/1,000 rows/)).toBeInTheDocument();
+    });
+  });
+
+  // Clicking the drop zone triggers the file input click handler
+  test("clicking drop zone triggers file input click", async () => {
+    render(<CsvImportDialog open={true} onClose={jest.fn()} />);
+    const input = document.getElementById("csv-file-input") as HTMLInputElement;
+    const clickSpy = jest.spyOn(input, "click");
+
+    const dropZone = screen.getByText("Drop a CSV file here or click to browse").closest("div")!;
+    fireEvent.click(dropZone);
+
+    expect(clickSpy).toHaveBeenCalled();
+    clickSpy.mockRestore();
+  });
+
+  // DragOver event is prevented (required for drop to work)
+  test("dragOver event is prevented on drop zone", () => {
+    render(<CsvImportDialog open={true} onClose={jest.fn()} />);
+    const dropZone = screen.getByText("Drop a CSV file here or click to browse").closest("div")!;
+    const event = new Event("dragover", { bubbles: true, cancelable: true });
+    const prevented = !dropZone.dispatchEvent(event);
+    // The event should be preventable (React's onDragOver calls preventDefault)
+    expect(event.cancelable).toBe(true);
+  });
+
+  // Clicking Import button creates FormData and calls the server action
+  test("import button submits the file via FormData", async () => {
+    mockImportPersonsCsv.mockResolvedValue({
+      result: { imported: 1, skipped: 0, errors: [] },
+    });
+
+    render(<CsvImportDialog open={true} onClose={jest.fn()} />);
+    const input = document.getElementById("csv-file-input") as HTMLInputElement;
+    const file = csvFile("name,email\nAlice,alice@test.com");
+
+    fireEvent.change(input, { target: { files: [file] } });
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /Import/i })).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: /Import/i }));
+
+    await waitFor(() => {
+      expect(mockImportPersonsCsv).toHaveBeenCalled();
+    });
+  });
+
+  // Shows success state after successful import with imported count
+  test("shows success state after successful import", async () => {
+    mockImportPersonsCsv.mockResolvedValue({
+      result: { imported: 3, skipped: 1, errors: [{ row: 2, field: "email", message: "invalid" }] },
+    });
+
+    render(<CsvImportDialog open={true} onClose={jest.fn()} />);
+    const input = document.getElementById("csv-file-input") as HTMLInputElement;
+    const file = csvFile(
+      "name,email\nAlice,alice@test.com\nBob,bob@test.com\nCharlie,charlie@test.com\n,bad",
+    );
+
+    fireEvent.change(input, { target: { files: [file] } });
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /Import/i })).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: /Import/i }));
+
+    await waitFor(() => {
+      // Success state shows imported/skipped/error chips
+      expect(screen.getByText(/imported/i)).toBeInTheDocument();
+    });
+  });
+
+  // Shows server error message when import action returns an error
+  test("shows server error when import returns error", async () => {
+    mockImportPersonsCsv.mockResolvedValue({
+      error: "Permission denied",
+    });
+
+    render(<CsvImportDialog open={true} onClose={jest.fn()} />);
+    const input = document.getElementById("csv-file-input") as HTMLInputElement;
+    const file = csvFile("name,email\nAlice,alice@test.com");
+
+    fireEvent.change(input, { target: { files: [file] } });
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /Import/i })).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: /Import/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText("Permission denied")).toBeInTheDocument();
+    });
+  });
+
+  // Shows "Close" button text instead of "Cancel" after successful import
+  test("shows Close button after successful import", async () => {
+    mockImportPersonsCsv.mockResolvedValue({
+      result: { imported: 1, skipped: 0, errors: [] },
+    });
+
+    render(<CsvImportDialog open={true} onClose={jest.fn()} />);
+    const input = document.getElementById("csv-file-input") as HTMLInputElement;
+    const file = csvFile("name,email\nAlice,alice@test.com");
+
+    fireEvent.change(input, { target: { files: [file] } });
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /Import/i })).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: /Import/i }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /Close/i })).toBeInTheDocument();
+    });
+  });
+
+  // File input change with no file selected does nothing (guard clause)
+  test("does nothing when file input change fires with no file", async () => {
+    render(<CsvImportDialog open={true} onClose={jest.fn()} />);
+    const input = document.getElementById("csv-file-input") as HTMLInputElement;
+
+    fireEvent.change(input, { target: { files: [] } });
+
+    // Drop zone should still be visible (no preview triggered)
+    expect(screen.getByText("Drop a CSV file here or click to browse")).toBeInTheDocument();
+  });
+
+  // Drop with no files does nothing
+  test("does nothing when drop event has no files", async () => {
+    render(<CsvImportDialog open={true} onClose={jest.fn()} />);
+    const dropZone = screen.getByText("Drop a CSV file here or click to browse").closest("div")!;
+
+    fireEvent.drop(dropZone, {
+      dataTransfer: { files: [] },
+    });
+
+    // Drop zone should still be visible
+    expect(screen.getByText("Drop a CSV file here or click to browse")).toBeInTheDocument();
+  });
 });

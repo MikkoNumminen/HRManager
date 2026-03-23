@@ -169,6 +169,14 @@ test("extracts first IP from x-forwarded-for with multiple IPs", async () => {
   expect(record?.identifier).toBe("ip:203.0.113.1");
 });
 
+// Falls back to count=1 when $queryRaw returns an empty array (does not throw).
+test("falls back to count 1 when query returns empty result", async () => {
+  const queryRawSpy = jest.spyOn(testPrisma, "$queryRaw").mockResolvedValueOnce([] as never);
+
+  await expect(rateLimit("testAction")).resolves.toBeUndefined();
+  queryRawSpy.mockRestore();
+});
+
 // RateLimitError has correct name property
 test("RateLimitError has correct name and message", () => {
   const error = new RateLimitError();

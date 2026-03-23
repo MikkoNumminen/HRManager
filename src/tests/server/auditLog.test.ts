@@ -191,6 +191,28 @@ describe("logPermissionDenial", () => {
     expect(logs[0].userEmail).toBeNull();
     expect(JSON.parse(logs[0].after!)).toEqual({ permissionKey: "admin:manage_users" });
   });
+
+  // Logs error to console when database write fails (does not throw).
+  test("logs error to console when write fails", async () => {
+    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+    const createSpy = jest
+      .spyOn(testPrisma.auditLog, "create")
+      .mockRejectedValueOnce(new Error("DB write failed"));
+
+    mockAuth.mockResolvedValue({
+      user: { id: "user-err", email: "err@example.com" },
+    });
+
+    await logPermissionDenial("person:delete");
+    await flushAfterCallbacks();
+
+    expect(consoleSpy).toHaveBeenCalledWith(
+      "[audit] Failed to log permission denial:",
+      expect.any(Error),
+    );
+    consoleSpy.mockRestore();
+    createSpy.mockRestore();
+  });
 });
 
 describe("logRateLimitHit", () => {
@@ -223,6 +245,24 @@ describe("logRateLimitHit", () => {
       rateLimitedAction: "auth:signin",
       identifier: "ip:aXA6MTAuMC4w...",
     });
+  });
+
+  // Logs error to console when database write fails (does not throw).
+  test("logs error to console when write fails", async () => {
+    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+    const createSpy = jest
+      .spyOn(testPrisma.auditLog, "create")
+      .mockRejectedValueOnce(new Error("DB write failed"));
+
+    await logRateLimitHit("createPerson", "ip:10.0.0.1");
+    await flushAfterCallbacks();
+
+    expect(consoleSpy).toHaveBeenCalledWith(
+      "[audit] Failed to log rate limit hit:",
+      expect.any(Error),
+    );
+    consoleSpy.mockRestore();
+    createSpy.mockRestore();
   });
 });
 

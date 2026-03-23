@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import DataImportExport from "../components/DataImportExport";
 import { Permissions } from "../schemas";
 import { DataExportCounts } from "../queries";
@@ -240,5 +240,163 @@ describe("DataImportExport", () => {
     const buttons = screen.getAllByRole("button", { name: /Export/i });
     expect(buttons).toHaveLength(4);
     buttons.forEach((btn) => expect(btn).toBeDisabled());
+  });
+
+  // Helper to set up download mocking — must be called AFTER render to avoid interfering with React
+  function setupDownloadMocks() {
+    const mockClick = jest.fn();
+    const fakeLink = { href: "", download: "", click: mockClick } as unknown as HTMLAnchorElement;
+    const originalCreateElement = Document.prototype.createElement;
+
+    const createElementSpy = jest.spyOn(document, "createElement").mockImplementation(function (
+      this: Document,
+      tag: string,
+    ) {
+      if (tag === "a") return fakeLink as unknown as ReturnType<typeof document.createElement>;
+      return originalCreateElement.call(this, tag);
+    });
+    const appendChildSpy = jest
+      .spyOn(document.body, "appendChild")
+      .mockImplementation((node) => node);
+    const removeChildSpy = jest
+      .spyOn(document.body, "removeChild")
+      .mockImplementation((node) => node);
+    const mockCreateObjectURL = jest.fn().mockReturnValue("blob:http://localhost/fake-url");
+    const mockRevokeObjectURL = jest.fn();
+    Object.defineProperty(globalThis, "URL", {
+      value: { createObjectURL: mockCreateObjectURL, revokeObjectURL: mockRevokeObjectURL },
+      writable: true,
+    });
+
+    return {
+      mockClick,
+      fakeLink,
+      mockCreateObjectURL,
+      mockRevokeObjectURL,
+      restore: () => {
+        createElementSpy.mockRestore();
+        appendChildSpy.mockRestore();
+        removeChildSpy.mockRestore();
+      },
+    };
+  }
+
+  // Clicking an export button calls the server action and triggers a file download
+  test("export button calls server action and triggers download", async () => {
+    mockExportPersonsCsv.mockResolvedValue("name,email\nAlice,alice@test.com");
+
+    render(
+      <DataImportExport
+        counts={defaultCounts}
+        permissions={makePermissions({ "data:export": true })}
+      />,
+    );
+
+    // Install download mocks AFTER render so React can create its elements normally
+    const mocks = setupDownloadMocks();
+
+    const buttons = screen.getAllByRole("button", { name: /Export/i });
+    fireEvent.click(buttons[0]); // Click persons export
+
+    await waitFor(() => {
+      expect(mockExportPersonsCsv).toHaveBeenCalled();
+      expect(mocks.mockClick).toHaveBeenCalled();
+      expect(mocks.fakeLink.download).toBe("persons.csv");
+      expect(mocks.mockCreateObjectURL).toHaveBeenCalled();
+      expect(mocks.mockRevokeObjectURL).toHaveBeenCalled();
+    });
+
+    mocks.restore();
+  });
+
+  // Clicking the download template button triggers a CSV template download
+  test("download template triggers file download", () => {
+    render(
+      <DataImportExport
+        counts={defaultCounts}
+        permissions={makePermissions({ "data:import": true })}
+      />,
+    );
+
+    // Install download mocks AFTER render
+    const mocks = setupDownloadMocks();
+
+    fireEvent.click(screen.getByRole("button", { name: /Download Template/i }));
+
+    expect(mocks.mockClick).toHaveBeenCalled();
+    expect(mocks.fakeLink.download).toBe("persons_import_template.csv");
+    expect(mocks.mockCreateObjectURL).toHaveBeenCalled();
+    expect(mocks.mockRevokeObjectURL).toHaveBeenCalled();
+
+    mocks.restore();
+  });
+
+  // Clicking teams export button calls the correct server action
+  test("teams export button calls exportTeamsCsv", async () => {
+    mockExportTeamsCsv.mockResolvedValue("teamName,manager\nEngineering,Alice");
+
+    render(
+      <DataImportExport
+        counts={defaultCounts}
+        permissions={makePermissions({ "data:export": true })}
+      />,
+    );
+
+    const mocks = setupDownloadMocks();
+    const buttons = screen.getAllByRole("button", { name: /Export/i });
+    fireEvent.click(buttons[1]); // Click teams export
+
+    await waitFor(() => {
+      expect(mockExportTeamsCsv).toHaveBeenCalled();
+      expect(mocks.fakeLink.download).toBe("teams.csv");
+    });
+
+    mocks.restore();
+  });
+
+  // Clicking departments export button calls the correct server action
+  test("departments export button calls exportDepartmentsCsv", async () => {
+    mockExportDepartmentsCsv.mockResolvedValue("name,head\nEngineering,Alice");
+
+    render(
+      <DataImportExport
+        counts={defaultCounts}
+        permissions={makePermissions({ "data:export": true })}
+      />,
+    );
+
+    const mocks = setupDownloadMocks();
+    const buttons = screen.getAllByRole("button", { name: /Export/i });
+    fireEvent.click(buttons[2]); // Click departments export
+
+    await waitFor(() => {
+      expect(mockExportDepartmentsCsv).toHaveBeenCalled();
+      expect(mocks.fakeLink.download).toBe("departments.csv");
+    });
+
+    mocks.restore();
+  });
+
+  // Clicking audit logs export button calls the correct server action
+  test("audit logs export button calls exportAuditLogsCsv", async () => {
+    mockExportAuditLogsCsv.mockResolvedValue("action,entityType\ncreate,person");
+
+    render(
+      <DataImportExport
+        counts={defaultCounts}
+        permissions={makePermissions({ "data:export": true, "admin:view_audit_log": true })}
+      />,
+    );
+
+    const mocks = setupDownloadMocks();
+    const buttons = screen.getAllByRole("button", { name: /Export/i });
+    fireEvent.click(buttons[3]); // Click audit logs export
+
+    await waitFor(() => {
+      expect(mockExportAuditLogsCsv).toHaveBeenCalled();
+      expect(mocks.fakeLink.download).toBe("audit_logs.csv");
+    });
+
+    mocks.restore();
   });
 });

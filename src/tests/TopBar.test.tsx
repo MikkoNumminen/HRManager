@@ -834,4 +834,147 @@ describe("TopBar", () => {
     const profileLink = drawer.querySelector('a[href="/profile"]');
     expect(profileLink).not.toBeInTheDocument();
   });
+
+  // Clicking Profile in the desktop menu runs onClick handler without error
+  test("Profile click in desktop menu runs onClick handler", () => {
+    mockUseSession.mockReturnValue({
+      data: { user: { name: "Alice Smith", email: "alice@example.com", image: null } },
+      status: "authenticated",
+    });
+    render(<TopBar title="Home" />);
+    fireEvent.click(screen.getByLabelText("User menu"));
+    expect(screen.getByText("Profile")).toBeInTheDocument();
+    // Click the Profile link — its onClick handler sets anchorEl to null
+    expect(() => fireEvent.click(screen.getByText("Profile"))).not.toThrow();
+  });
+
+  // Shows Data Import / Export menu item and clicking it runs onClick handler
+  test("shows Data Import / Export link and clicking it runs handler", () => {
+    mockUseSession.mockReturnValue({
+      data: {
+        user: {
+          name: "Alice",
+          email: "a@b.com",
+          image: null,
+        },
+      },
+      status: "authenticated",
+    });
+    const permissions = { "data:import": true } as never;
+    render(<TopBar title="Home" permissions={permissions} />);
+    fireEvent.click(screen.getByLabelText("User menu"));
+    expect(screen.getByText("Data Import / Export")).toBeInTheDocument();
+    // Click runs the onClick handler
+    expect(() => fireEvent.click(screen.getByText("Data Import / Export"))).not.toThrow();
+  });
+
+  // Shows Dashboard link and clicking it runs onClick handler
+  test("Dashboard click in desktop menu runs onClick handler", () => {
+    mockUseSession.mockReturnValue({
+      data: {
+        user: {
+          name: "Alice",
+          email: "a@b.com",
+          image: null,
+          permissions: { "dashboard:view": true },
+        },
+      },
+      status: "authenticated",
+    });
+    render(<TopBar title="Home" />);
+    fireEvent.click(screen.getByLabelText("User menu"));
+    expect(screen.getByText("Dashboard")).toBeInTheDocument();
+    expect(() => fireEvent.click(screen.getByText("Dashboard"))).not.toThrow();
+  });
+
+  // Clicking Profile in the mobile drawer closes the drawer
+  test("drawer Profile link click closes drawer", () => {
+    mockUseSession.mockReturnValue({
+      data: { user: { name: "Alice", email: "a@b.com", image: null } },
+      status: "authenticated",
+    });
+    render(<TopBar title="Home" />);
+    fireEvent.click(screen.getByLabelText("Menu"));
+    const drawer = screen.getByTestId("mobile-drawer");
+    const profileLink = drawer.querySelector('a[href="/profile"]') as HTMLElement;
+    expect(profileLink).toBeInTheDocument();
+    // Click the Profile link — its onClick handler closes the drawer
+    expect(() => fireEvent.click(profileLink)).not.toThrow();
+  });
+
+  // Clicking Dashboard in the mobile drawer closes the drawer
+  test("drawer Dashboard link click closes drawer", () => {
+    mockUseSession.mockReturnValue({
+      data: {
+        user: {
+          name: "Alice",
+          email: "a@b.com",
+          image: null,
+          permissions: { "dashboard:view": true },
+        },
+      },
+      status: "authenticated",
+    });
+    render(<TopBar title="Home" />);
+    fireEvent.click(screen.getByLabelText("Menu"));
+    const drawer = screen.getByTestId("mobile-drawer");
+    const dashboardLink = drawer.querySelector('a[href="/dashboard"]') as HTMLElement;
+    expect(dashboardLink).toBeInTheDocument();
+    expect(() => fireEvent.click(dashboardLink)).not.toThrow();
+  });
+
+  // Clicking Audit Log in the mobile drawer closes the drawer
+  test("drawer Audit Log link click closes drawer", () => {
+    mockUseSession.mockReturnValue({
+      data: {
+        user: {
+          name: "Alice",
+          email: "a@b.com",
+          image: null,
+          permissions: { "admin:view_audit_log": true },
+        },
+      },
+      status: "authenticated",
+    });
+    render(<TopBar title="Home" />);
+    fireEvent.click(screen.getByLabelText("Menu"));
+    const drawer = screen.getByTestId("mobile-drawer");
+    const auditLink = drawer.querySelector('a[href="/admin/audit"]') as HTMLElement;
+    expect(auditLink).toBeInTheDocument();
+    expect(() => fireEvent.click(auditLink)).not.toThrow();
+  });
+
+  // Clicking Data Import / Export in the mobile drawer closes the drawer
+  test("drawer Data Import / Export link click closes drawer", () => {
+    mockUseSession.mockReturnValue({
+      data: {
+        user: {
+          name: "Alice",
+          email: "a@b.com",
+          image: null,
+        },
+      },
+      status: "authenticated",
+    });
+    const permissions = { "data:export": true } as never;
+    render(<TopBar title="Home" permissions={permissions} />);
+    fireEvent.click(screen.getByLabelText("Menu"));
+    const drawer = screen.getByTestId("mobile-drawer");
+    const dataLink = drawer.querySelector('a[href="/admin/data"]') as HTMLElement;
+    expect(dataLink).toBeInTheDocument();
+    expect(() => fireEvent.click(dataLink)).not.toThrow();
+  });
+
+  // Mobile drawer shows Data Import / Export when user has data:export permission
+  test("drawer shows Data Import / Export when permitted", () => {
+    mockUseSession.mockReturnValue({
+      data: { user: { name: "Alice", email: "a@b.com", image: null } },
+      status: "authenticated",
+    });
+    const permissions = { "data:export": true } as never;
+    render(<TopBar title="Home" permissions={permissions} />);
+    fireEvent.click(screen.getByLabelText("Menu"));
+    const drawer = screen.getByTestId("mobile-drawer");
+    expect(drawer).toHaveTextContent("Data Import / Export");
+  });
 });

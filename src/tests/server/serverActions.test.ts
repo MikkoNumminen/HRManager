@@ -386,6 +386,18 @@ describe("updatePosition", () => {
       updatePosition(formData({ personID: person.id, name: longPosition })),
     ).rejects.toThrow("characters or less");
   });
+
+  // Accepts "position" as the form data key (alternative to "name").
+  test("reads position from 'position' form data key", async () => {
+    const person = await testPrisma.person.create({
+      data: { name: "Alice", email: "alice@test.com" },
+    });
+
+    await updatePosition(formData({ personID: person.id, position: "Lead Dev" }));
+
+    const updated = await testPrisma.person.findUnique({ where: { id: person.id } });
+    expect(updated!.position).toBe("Lead Dev");
+  });
 });
 
 describe("updateEmail", () => {
@@ -1365,6 +1377,24 @@ describe("seedMockData", () => {
     expect(override).not.toBeNull();
     expect(override!.granted).toBe(true);
   });
+
+  // Demo sessions skip user seeding but still call seedPermissions for the permission catalog.
+  test("calls seedPermissions in demo session without seeding users", async () => {
+    const { seedPermissions } = require("@/permissions");
+    seedPermissions.mockClear();
+    mockGetDemoSessionId.mockResolvedValueOnce("demo-sess-123");
+
+    await seedMockData();
+
+    // seedPermissions is called for the permission catalog even in demo mode
+    expect(seedPermissions).toHaveBeenCalled();
+    // No mock users should be created (User table has no sessionId)
+    const users = await testPrisma.user.findMany();
+    expect(users).toHaveLength(0);
+    // Persons and teams should still be seeded (they have sessionId)
+    const persons = await testPrisma.person.findMany();
+    expect(persons).toHaveLength(6);
+  });
 });
 
 describe("initializePermissions", () => {
@@ -1895,6 +1925,38 @@ describe("kickOutUser", () => {
   // Throws when userId is not a valid UUID format.
   test("throws on invalid UUID", async () => {
     await expect(kickOutUser(formData({ userId: "not-a-uuid" }))).rejects.toThrow();
+  });
+
+  // Demo sessions cannot kick real OAuth users — only the demo user is allowed.
+  test("throws when demo session tries to kick a non-demo user", async () => {
+    mockGetDemoSessionId.mockResolvedValueOnce("demo-sess-123");
+    const realUser = await testPrisma.user.create({
+      data: { email: "real@oauth.com", name: "Real User", role: "user" },
+    });
+
+    await expect(kickOutUser(formData({ userId: realUser.id }))).rejects.toThrow(
+      "Demo sessions cannot manage real users",
+    );
+
+    // Verify user was not deleted
+    const stillExists = await testPrisma.user.findUnique({ where: { id: realUser.id } });
+    expect(stillExists).not.toBeNull();
+  });
+
+  // Users cannot kick themselves out — it would orphan the session.
+  test("throws when user tries to kick themselves", async () => {
+    const user = await testPrisma.user.create({
+      data: { email: "selfkick@test.com", name: "Self Kicker", role: "administrator" },
+    });
+    auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
+
+    await expect(kickOutUser(formData({ userId: user.id }))).rejects.toThrow(
+      "Cannot kick yourself out",
+    );
+
+    // Verify user was not deleted
+    const stillExists = await testPrisma.user.findUnique({ where: { id: user.id } });
+    expect(stillExists).not.toBeNull();
   });
 });
 

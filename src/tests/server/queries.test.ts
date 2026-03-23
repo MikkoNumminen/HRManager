@@ -35,6 +35,7 @@ import {
   getAuditLogs,
   getAuditLogUserEmails,
   getDashboardMetrics,
+  getDataExportCounts,
   getProfile,
 } from "@/queries";
 
@@ -940,6 +941,61 @@ describe("audit log permission checks", () => {
   test("getAuditLogUserEmails throws when permission is denied", async () => {
     hasPermission.mockResolvedValueOnce(false);
     await expect(getAuditLogUserEmails()).rejects.toThrow("Permission denied");
+  });
+
+  // Dashboard metrics are protected — users without dashboard:view get denied.
+  test("getDashboardMetrics throws when permission is denied", async () => {
+    hasPermission.mockResolvedValueOnce(false);
+    await expect(getDashboardMetrics()).rejects.toThrow("Permission denied");
+  });
+});
+
+describe("getDataExportCounts", () => {
+  const { hasPermission } = require("@/permissions");
+
+  beforeEach(async () => {
+    await cleanDb();
+    hasPermission.mockResolvedValue(true);
+  });
+
+  afterEach(() => {
+    hasPermission.mockResolvedValue(true);
+  });
+
+  afterAll(async () => {
+    await cleanDb();
+    await testPrisma.$disconnect();
+  });
+
+  // Returns entity counts for persons, teams, departments, and audit logs.
+  test("returns correct entity counts when authorized", async () => {
+    await testPrisma.person.createMany({
+      data: [
+        { name: "Alice", email: "a@test.com" },
+        { name: "Bob", email: "b@test.com" },
+      ],
+    });
+    await testPrisma.team.create({ data: { teamName: "Alpha" } });
+    await testPrisma.department.create({ data: { name: "Engineering" } });
+    await testPrisma.auditLog.createMany({
+      data: [
+        { action: "create", entityType: "person", userEmail: "a@test.com" },
+        { action: "update", entityType: "team", userEmail: "b@test.com" },
+        { action: "delete", entityType: "department", userEmail: "a@test.com" },
+      ],
+    });
+
+    const counts = await getDataExportCounts();
+    expect(counts.persons).toBe(2);
+    expect(counts.teams).toBe(1);
+    expect(counts.departments).toBe(1);
+    expect(counts.auditLogs).toBe(3);
+  });
+
+  // Throws "Permission denied" when user lacks data:export permission.
+  test("throws when permission is denied", async () => {
+    hasPermission.mockResolvedValueOnce(false);
+    await expect(getDataExportCounts()).rejects.toThrow("Permission denied");
   });
 });
 
