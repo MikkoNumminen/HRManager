@@ -302,7 +302,7 @@ describe("CsvImportDialog", () => {
     render(<CsvImportDialog open={true} onClose={jest.fn()} />);
     const dropZone = screen.getByText("Drop a CSV file here or click to browse").closest("div")!;
     const event = new Event("dragover", { bubbles: true, cancelable: true });
-    const prevented = !dropZone.dispatchEvent(event);
+    const _prevented = !dropZone.dispatchEvent(event);
     // The event should be preventable (React's onDragOver calls preventDefault)
     expect(event.cancelable).toBe(true);
   });
