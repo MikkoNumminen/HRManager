@@ -10,6 +10,8 @@ When "vittu" appears in the user's prompt: max speed, aggressive subagents for i
 
 Every TODO item must have a size estimate: 🟢 small, 🟡 medium, 🔴 large. In text: 🟢 **[S]**, 🟡 **[M]**, 🔴 **[L]**.
 
+Every TODO item must have an LLM marker: ⚡ Sonnet-capable (mechanical, repetitive, well-defined) or 🧠 Opus recommended (architectural, complex reasoning, multi-file). Place after size emoji: `🟢⚡` or `🟡🧠`. After completing a task, assess and tag new items.
+
 **⚠️ MANDATORY: 4 permanent Claude instances: Claude 1, Claude 2, Claude 3, Claude 4.** Names assigned by user — never pick your own. Ask if you don't know. Move tasks to "In Progress" with your name, e.g. `[Claude 1, main]` or `[Claude 3, worktree-name]`. Unmarked work causes collisions. **No exceptions. No silent work.**
 
 ## Commit style

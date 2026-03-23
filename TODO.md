@@ -1,7 +1,7 @@
 # TODO
 
 Shared task list across all Claude Code sessions. After completing a task, note how long it took before removing it.
-Every item must have a size estimate: 🟢 small, 🟡 medium, 🔴 large.
+Every item must have a size estimate: 🟢 small, 🟡 medium, 🔴 large. LLM marker: ⚡ Sonnet, 🧠 Opus.
 In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-name]`, etc.
 4 permanent Claude instances: **Claude 1, Claude 2, Claude 3, Claude 4.**
 
@@ -22,41 +22,41 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 
 ### Features
 
-- 🟢 Global search & filtering on person/team/department tables — no search UI exists
-- 🟢 Employee profile pages — read-only `/employees/[id]` cards, guest-accessible
-- 🟡 Tutorial UX overhaul — no guiding effect on back button, lacks MUI visual guidance (highlighting/effects), guidance boxes appear in wrong positions
-- 🟡 Loading skeletons with Suspense boundaries — no loading states on any pages
-- 🟡 Org chart visualization — interactive hierarchy using existing manager/dept head data
-- 🟡 Bulk actions on tables — multi-select persons/teams and apply batch operations
-- 🟡 Empty state polish — illustrations and CTAs when tables are empty
-- 🔴 Leave/absence management — leave types, requests, balances, approval workflows
-- 🔴 Performance reviews / 360 feedback — review templates, rating scales, feedback cycles
+- 🟢🧠 Global search & filtering on person/team/department tables — no search UI exists
+- 🟢🧠 Employee profile pages — read-only `/employees/[id]` cards, guest-accessible
+- 🟡🧠 Tutorial UX overhaul — no guiding effect on back button, lacks MUI visual guidance (highlighting/effects), guidance boxes appear in wrong positions
+- 🟡⚡ Loading skeletons with Suspense boundaries — no loading states on any pages
+- 🟡🧠 Org chart visualization — interactive hierarchy using existing manager/dept head data
+- 🟡🧠 Bulk actions on tables — multi-select persons/teams and apply batch operations
+- 🟡⚡ Empty state polish — illustrations and CTAs when tables are empty
+- 🔴🧠 Leave/absence management — leave types, requests, balances, approval workflows
+- 🔴🧠 Performance reviews / 360 feedback — review templates, rating scales, feedback cycles
 
 ### Code Quality / Architecture
 
-- 🟡 Server-side pagination — all queries load entire result sets; add skip/take to Prisma queries
-- 🟡 Typed server action errors — replace generic string errors with typed error codes (PERMISSION_DENIED, VALIDATION_ERROR, etc.)
-- 🟡 Translate server action error messages — errors hardcoded in English, bypass i18n
-- 🟡 Memoize expensive components — AuditLogViewer (20KB) and DashboardCharts re-render unnecessarily
-- 🟡 Standardize positions catalog — free-text position field causes inconsistency ("Engineer" vs "Software Engineer")
+- 🟡🧠 Server-side pagination — all queries load entire result sets; add skip/take to Prisma queries
+- 🟡🧠 Typed server action errors — replace generic string errors with typed error codes (PERMISSION_DENIED, VALIDATION_ERROR, etc.)
+- 🟡⚡ Translate server action error messages — errors hardcoded in English, bypass i18n
+- 🟡⚡ Memoize expensive components — AuditLogViewer (20KB) and DashboardCharts re-render unnecessarily
+- 🟡🧠 Standardize positions catalog — free-text position field causes inconsistency ("Engineer" vs "Software Engineer")
 
 ### Testing
 
-- 🟢 CSV import edge case tests — BOM, non-UTF-8, embedded newlines, empty files
-- 🟢 Rate limit boundary/race condition tests — exact boundary, concurrent requests, window expiry
-- 🟡 Dashboard raw SQL query tests — `getDashboardMetrics()` CTEs/window functions untested
-- 🟡 Deferred audit logging edge case tests — write failures, permission denial logging, rate limit hit logging
-- 🔴 Playwright E2E test suite — auth flows, CRUD, permissions, import/export, themes, locales
+- 🟢⚡ CSV import edge case tests — BOM, non-UTF-8, embedded newlines, empty files
+- 🟢⚡ Rate limit boundary/race condition tests — exact boundary, concurrent requests, window expiry
+- 🟡⚡ Dashboard raw SQL query tests — `getDashboardMetrics()` CTEs/window functions untested
+- 🟡⚡ Deferred audit logging edge case tests — write failures, permission denial logging, rate limit hit logging
+- 🔴🧠 Playwright E2E test suite — auth flows, CRUD, permissions, import/export, themes, locales
 
 ### Accessibility (WCAG)
 
-- 🟢 Add `aria-expanded` to collapsible elements — AuditLogViewer filters, mobile nav
-- 🟢 Add `aria-sort` to sorted table columns — screen readers can't detect sort state
-- 🟢 Link form errors via `aria-describedby` — errors shown as text but not associated with inputs
+- 🟢⚡ Add `aria-expanded` to collapsible elements — AuditLogViewer filters, mobile nav
+- 🟢⚡ Add `aria-sort` to sorted table columns — screen readers can't detect sort state
+- 🟢⚡ Link form errors via `aria-describedby` — errors shown as text but not associated with inputs
 
 ### Security
 
-- 🟢 Rate limit IP spoofing protection — trusts `x-forwarded-for` without proxy validation
-- 🟢 Demo session cleanup failure logging — silent failures leave stale data
-- 🟡 JWT permission revocation window — permissions valid up to 1h after admin revokes them
+- 🟢🧠 Rate limit IP spoofing protection — trusts `x-forwarded-for` without proxy validation
+- 🟢⚡ Demo session cleanup failure logging — silent failures leave stale data
+- 🟡🧠 JWT permission revocation window — permissions valid up to 1h after admin revokes them
 
