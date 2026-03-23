@@ -11,13 +11,18 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 
 > 📋 **Audit research:** Items marked "(found by audit)" have detailed file:line references in memory file `project_audit_findings.md`. Read it before starting any of these tasks.
 
-- 🔴🧠 Playwright E2E test suite — auth flows, CRUD, permissions, import/export, themes, locales [Claude 3, main]
+- 🟢⚡ CSV import edge case tests — BOM, non-UTF-8, embedded newlines, empty files [Claude 2, main]
+- 🟢⚡ Rate limit boundary/race condition tests — exact boundary, concurrent requests, window expiry [Claude 2, main]
+- 🟡⚡ Dashboard raw SQL query tests — `getDashboardMetrics()` CTEs/window functions untested [Claude 2, main]
+- 🟡⚡ Deferred audit logging edge case tests — write failures, permission denial logging, rate limit hit logging [Claude 2, main]
+- 🟡⚡ Translate server action error messages — errors hardcoded in English, bypass i18n [Claude 1, main]
+- 🟡⚡ Memoize expensive components — AuditLogViewer (20KB) and DashboardCharts re-render unnecessarily [Claude 1, main]
 
 ## Recently Completed
 
+- ✅ Playwright E2E test suite — 7 new spec files, 40+ tests: dashboard, profile, data I/O, person/team/dept detail editing, form validation, full workflow
+- ✅ WCAG accessibility — aria-expanded (AuditLogViewer, TopBar), aria-sort (Timestamp col), aria-describedby (5 forms)
 - ✅ Fix all lint warnings — 137 no-node-access + 22 no-unnecessary-act + 1 prefer-to-have-value → zero lint issues
-- ✅ MongoDB docs — README, CLAUDE.md, architecture.md all have comprehensive polyglot persistence docs
-- ✅ Fix lint errors + warnings — 3 errors, 31 warnings resolved
 - ✅ MongoDB graceful degradation — app works without MongoDB configured
 
 ## Backlog
@@ -38,22 +43,12 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 
 - 🟡🧠 Server-side pagination — all queries load entire result sets; add skip/take to Prisma queries
 - 🟡🧠 Typed server action errors — replace generic string errors with typed error codes (PERMISSION_DENIED, VALIDATION_ERROR, etc.)
-- 🟡⚡ Translate server action error messages — errors hardcoded in English, bypass i18n
-- 🟡⚡ Memoize expensive components — AuditLogViewer (20KB) and DashboardCharts re-render unnecessarily
+
 - 🟡🧠 Standardize positions catalog — free-text position field causes inconsistency ("Engineer" vs "Software Engineer")
 
 ### Testing
 
-- 🟢⚡ CSV import edge case tests — BOM, non-UTF-8, embedded newlines, empty files
-- 🟢⚡ Rate limit boundary/race condition tests — exact boundary, concurrent requests, window expiry
-- 🟡⚡ Dashboard raw SQL query tests — `getDashboardMetrics()` CTEs/window functions untested
-- 🟡⚡ Deferred audit logging edge case tests — write failures, permission denial logging, rate limit hit logging
-
 ### Accessibility (WCAG)
-
-- 🟢⚡ Add `aria-expanded` to collapsible elements — AuditLogViewer filters, mobile nav
-- 🟢⚡ Add `aria-sort` to sorted table columns — screen readers can't detect sort state
-- 🟢⚡ Link form errors via `aria-describedby` — errors shown as text but not associated with inputs
 
 ### Security
 
