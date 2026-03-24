@@ -10,6 +10,7 @@ import { getDemoSessionId } from "@/demoSession";
 import { MAX_NAME_LENGTH } from "@/schemas";
 import { getTranslations } from "next-intl/server";
 import { safe, validateUUID, type ActionResult } from "@/lib/actionUtils";
+import { invalidateDashboardCache } from "@/lib/cacheInvalidation";
 
 export async function addMember(data: FormData): Promise<ActionResult> {
   return safe(async () => {
@@ -105,6 +106,7 @@ export async function createTeam(data: FormData): Promise<ActionResult> {
     deferAudit(auditEntries);
     revalidatePath("/manageTeams");
     revalidatePath("/");
+    invalidateDashboardCache();
   });
 }
 
@@ -151,6 +153,7 @@ export async function updateTeamName(data: FormData): Promise<ActionResult> {
     deferAudit(auditEntries);
     revalidatePath("/manageTeams");
     revalidatePath("/");
+    invalidateDashboardCache();
   });
 }
 
@@ -199,6 +202,7 @@ export async function removeTeam(data: FormData): Promise<ActionResult> {
     deferAudit(auditEntries);
     revalidatePath("/manageTeams");
     revalidatePath("/");
+    invalidateDashboardCache();
     redirect("/manageTeams");
   });
 }

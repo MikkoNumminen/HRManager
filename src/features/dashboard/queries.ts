@@ -10,6 +10,18 @@ import { hasPermission } from "@/permissions";
 import { getDemoSessionId } from "@/demoSession";
 import { getAuditLogCollection, isMongoAvailable } from "@/mongoDb";
 import { DEMO_EMAIL } from "@/constants";
+import { unstable_cache as nextCache } from "next/cache";
+
+// In test environments, unstable_cache requires incrementalCache (Next.js runtime).
+// Fall back to a passthrough wrapper so tests call the function directly.
+function cache<T extends (...args: never[]) => Promise<unknown>>(
+  fn: T,
+  keyParts?: string[],
+  options?: { revalidate?: number; tags?: string[] },
+): T {
+  if (process.env.NODE_ENV === "test") return fn;
+  return nextCache(fn, keyParts, options) as T;
+}
 
 // Raw SQL result types for dashboard queries (unnamed parameterized queries
 // instead of Prisma Typed SQL named prepared statements — PgBouncer compatible)
@@ -34,13 +46,28 @@ interface GrowthTimelineRow {
   departments: number;
 }
 
+// Cache TTL: 5 minutes. Dashboard data changes infrequently relative to page views.
+// Invalidated via revalidateTag("dashboard") from server actions.
+const CACHE_TTL = 300;
+
 export async function getDashboardMetrics(): Promise<DashboardMetrics> {
   const allowed = await hasPermission("dashboard:view");
   if (!allowed) {
     throw new Error("Permission denied");
   }
   const sessionId = await getDemoSessionId();
+  return fetchDashboardMetricsCached(sessionId);
+}
 
+const fetchDashboardMetricsCached = cache(
+  async (sessionId: string | null): Promise<DashboardMetrics> => {
+    return fetchDashboardMetricsUncached(sessionId);
+  },
+  ["dashboard-metrics"],
+  { revalidate: CACHE_TTL, tags: ["dashboard"] },
+);
+
+async function fetchDashboardMetricsUncached(sessionId: string | null): Promise<DashboardMetrics> {
   const [countsRows, teamSizes, departmentSizes, growthTimeline, recentActivityDocs] =
     await Promise.all([
       prisma.$queryRaw<DashboardCountsRow[]>`
@@ -141,7 +168,18 @@ export async function getOrgChartData(): Promise<OrgChartData> {
   const allowed = await hasPermission("dashboard:view");
   if (!allowed) throw new Error("Permission denied");
   const sessionId = await getDemoSessionId();
+  return fetchOrgChartDataCached(sessionId);
+}
 
+const fetchOrgChartDataCached = cache(
+  async (sessionId: string | null): Promise<OrgChartData> => {
+    return fetchOrgChartDataUncached(sessionId);
+  },
+  ["org-chart-data"],
+  { revalidate: CACHE_TTL, tags: ["dashboard", "org-chart"] },
+);
+
+async function fetchOrgChartDataUncached(sessionId: string | null): Promise<OrgChartData> {
   const [departments, allTeams, allPersons, allMembers] = await Promise.all([
     prisma.department.findMany({
       where: { deletedAt: null, sessionId },

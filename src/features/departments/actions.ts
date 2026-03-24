@@ -10,6 +10,7 @@ import { getDemoSessionId } from "@/demoSession";
 import { MAX_NAME_LENGTH, MAX_DESCRIPTION_LENGTH } from "@/schemas";
 import { getTranslations } from "next-intl/server";
 import { safe, validateUUID, type ActionResult } from "@/lib/actionUtils";
+import { invalidateDashboardCache } from "@/lib/cacheInvalidation";
 
 export async function createDepartment(data: FormData): Promise<ActionResult> {
   return safe(async () => {
@@ -54,6 +55,7 @@ export async function createDepartment(data: FormData): Promise<ActionResult> {
     deferAudit(auditEntries);
     revalidatePath("/manageDepartments");
     revalidatePath("/");
+    invalidateDashboardCache();
   });
 }
 
@@ -105,6 +107,7 @@ export async function removeDepartment(data: FormData): Promise<ActionResult> {
     revalidatePath("/manageDepartments");
     revalidatePath("/manageTeams");
     revalidatePath("/");
+    invalidateDashboardCache();
     redirect("/manageDepartments");
   });
 }
@@ -160,6 +163,7 @@ export async function updateDepartment(data: FormData): Promise<ActionResult> {
     deferAudit(auditEntries);
     revalidatePath("/manageDepartments");
     revalidatePath("/");
+    invalidateDashboardCache();
   });
 }
 
@@ -207,6 +211,7 @@ export async function updateDepartmentHead(data: FormData): Promise<ActionResult
     deferAudit(auditEntries);
     revalidatePath("/manageDepartments");
     revalidatePath("/");
+    invalidateDashboardCache();
     redirect("/manageDepartments");
   });
 }
@@ -253,6 +258,7 @@ export async function assignTeamToDepartment(data: FormData): Promise<ActionResu
     revalidatePath("/manageDepartments");
     revalidatePath("/manageTeams");
     revalidatePath("/");
+    invalidateDashboardCache();
     redirect("/manageDepartments");
   });
 }
@@ -292,6 +298,7 @@ export async function removeTeamFromDepartment(data: FormData): Promise<ActionRe
     revalidatePath("/manageDepartments");
     revalidatePath("/manageTeams");
     revalidatePath("/");
+    invalidateDashboardCache();
     redirect("/manageDepartments");
   });
 }

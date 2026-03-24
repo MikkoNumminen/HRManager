@@ -10,6 +10,7 @@ import { getDemoSessionId } from "@/demoSession";
 import { DEMO_EMAIL } from "@/constants";
 import { getTranslations } from "next-intl/server";
 import { safe, validateUUID, type ActionResult } from "@/lib/actionUtils";
+import { invalidateDashboardCache } from "@/lib/cacheInvalidation";
 import { requireAdminIp } from "@/lib/ipAllowlist";
 import {
   PERSON_SEEDS,
@@ -50,6 +51,7 @@ export async function resetAll(): Promise<ActionResult> {
     });
     deferAudit(auditEntries);
     revalidatePath("/");
+    invalidateDashboardCache();
     revalidatePath("/managePersons");
     revalidatePath("/manageTeams");
     revalidatePath("/manageDepartments");
@@ -321,6 +323,7 @@ export async function seedMockData(clearExisting: boolean = true): Promise<Actio
     });
 
     revalidatePath("/");
+    invalidateDashboardCache();
     revalidatePath("/managePersons");
     revalidatePath("/manageTeams");
     revalidatePath("/manageDepartments");

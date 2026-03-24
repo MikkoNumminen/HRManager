@@ -10,6 +10,7 @@ import { getDemoSessionId } from "@/demoSession";
 import { MAX_NAME_LENGTH, MAX_EMAIL_LENGTH, MAX_POSITION_LENGTH, EmailSchema } from "@/schemas";
 import { getTranslations } from "next-intl/server";
 import { safe, validateUUID, type ActionResult } from "@/lib/actionUtils";
+import { invalidateDashboardCache } from "@/lib/cacheInvalidation";
 
 export async function createPerson(data: FormData): Promise<ActionResult> {
   return safe(async () => {
@@ -65,6 +66,7 @@ export async function createPerson(data: FormData): Promise<ActionResult> {
     deferAudit(auditEntries);
     revalidatePath("/managePersons");
     revalidatePath("/");
+    invalidateDashboardCache();
   });
 }
 
@@ -127,6 +129,7 @@ export async function removePerson(data: FormData): Promise<ActionResult> {
     revalidatePath("/manageTeams");
     revalidatePath("/manageDepartments");
     revalidatePath("/");
+    invalidateDashboardCache();
   });
 }
 
@@ -175,6 +178,7 @@ export async function updatePersonName(data: FormData): Promise<ActionResult> {
     deferAudit(auditEntries);
     revalidatePath("/managePersons");
     revalidatePath("/");
+    invalidateDashboardCache();
   });
 }
 
@@ -231,6 +235,7 @@ export async function updatePosition(data: FormData): Promise<ActionResult> {
     revalidatePath("/managePersons");
     revalidatePath("/positions");
     revalidatePath("/");
+    invalidateDashboardCache();
   });
 }
 
@@ -373,6 +378,7 @@ export async function addManager(data: FormData): Promise<ActionResult> {
     deferAudit(auditEntries);
     revalidatePath("/manageTeams");
     revalidatePath("/");
+    invalidateDashboardCache();
     redirect("/manageTeams");
   });
 }
