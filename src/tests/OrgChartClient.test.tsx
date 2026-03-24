@@ -7,7 +7,15 @@ import type { OrgChartData } from "@/schemas";
 // The mock exposes node/edge counts via data attributes for assertion.
 // ---------------------------------------------------------------------------
 jest.mock("@xyflow/react", () => ({
-  ReactFlow: ({ nodes, edges, children }: any) => (
+  ReactFlow: ({
+    nodes,
+    edges,
+    children,
+  }: {
+    nodes: unknown[];
+    edges: unknown[];
+    children: React.ReactNode;
+  }) => (
     <div data-testid="reactflow" data-nodes={nodes.length} data-edges={edges.length}>
       {children}
     </div>
@@ -15,22 +23,22 @@ jest.mock("@xyflow/react", () => ({
   Background: () => <div data-testid="background" />,
   Controls: () => <div data-testid="controls" />,
   MiniMap: () => <div data-testid="minimap" />,
-  useNodesState: (initial: any) => [initial, jest.fn(), jest.fn()],
-  useEdgesState: (initial: any) => [initial, jest.fn(), jest.fn()],
+  useNodesState: (initial: unknown[]) => [initial, jest.fn(), jest.fn()],
+  useEdgesState: (initial: unknown[]) => [initial, jest.fn(), jest.fn()],
 }));
 
 // ---------------------------------------------------------------------------
 // Mock dagre — graph layout engine that requires a real graph implementation.
 // ---------------------------------------------------------------------------
 jest.mock("dagre", () => {
-  const nodes: Record<string, any> = {};
+  const nodes: Record<string, { x: number; y: number; width?: number; height?: number }> = {};
   let counter = 0;
   return {
     graphlib: {
       Graph: jest.fn().mockImplementation(() => ({
         setDefaultEdgeLabel: jest.fn(),
         setGraph: jest.fn(),
-        setNode: (id: string, dims: any) => {
+        setNode: (id: string, dims: { width?: number; height?: number }) => {
           nodes[id] = { x: counter * 250, y: counter * 100, ...dims };
           counter++;
         },
@@ -319,7 +327,7 @@ describe("OrgChartClient", () => {
     render(<OrgChartClient data={singleDeptData} />);
     const flow = screen.getByTestId("reactflow");
     // org-root(1) + dept(1) + team(1) + persons(2) = 5
-    expect(flow.getAttribute("data-nodes")).toBe("5");
+    expect(flow).toHaveAttribute("data-nodes", "5");
   });
 
   // Verifies edge count: org->dept(1) + dept->team(1) + team->person(2) = 4 edges.
@@ -327,7 +335,7 @@ describe("OrgChartClient", () => {
     render(<OrgChartClient data={singleDeptData} />);
     const flow = screen.getByTestId("reactflow");
     // org->dept(1) + dept->team(1) + team->person1(1) + team->person2(1) = 4
-    expect(flow.getAttribute("data-edges")).toBe("4");
+    expect(flow).toHaveAttribute("data-edges", "4");
   });
 
   // Unassigned teams are counted in the teams chip total.
@@ -360,7 +368,7 @@ describe("OrgChartClient", () => {
     render(<OrgChartClient data={multiDeptData} />);
     const flow = screen.getByTestId("reactflow");
     // org-root(1) + depts(2) + teams(3) + persons(4) = 10
-    expect(flow.getAttribute("data-nodes")).toBe("10");
+    expect(flow).toHaveAttribute("data-nodes", "10");
   });
 
   // Multiple departments produce correct edge count.
@@ -368,7 +376,7 @@ describe("OrgChartClient", () => {
     render(<OrgChartClient data={multiDeptData} />);
     const flow = screen.getByTestId("reactflow");
     // org->dept(2) + dept->team(3) + team->person(4) = 9
-    expect(flow.getAttribute("data-edges")).toBe("9");
+    expect(flow).toHaveAttribute("data-edges", "9");
   });
 
   // Unassigned teams create nodes connected to org root.
@@ -376,9 +384,9 @@ describe("OrgChartClient", () => {
     render(<OrgChartClient data={unassignedTeamsData} />);
     const flow = screen.getByTestId("reactflow");
     // org-root(1) + dept(1) + unassigned-team(1) + person-in-unassigned-team(1) = 4
-    expect(flow.getAttribute("data-nodes")).toBe("4");
+    expect(flow).toHaveAttribute("data-nodes", "4");
     // org->dept(1) + org->unassigned-team(1) + unassigned-team->person(1) = 3
-    expect(flow.getAttribute("data-edges")).toBe("3");
+    expect(flow).toHaveAttribute("data-edges", "3");
   });
 
   // Unassigned persons create nodes connected directly to org root.
@@ -386,9 +394,9 @@ describe("OrgChartClient", () => {
     render(<OrgChartClient data={unassignedPersonsData} />);
     const flow = screen.getByTestId("reactflow");
     // org-root(1) + unassigned-persons(2) = 3
-    expect(flow.getAttribute("data-nodes")).toBe("3");
+    expect(flow).toHaveAttribute("data-nodes", "3");
     // org->person(2) = 2
-    expect(flow.getAttribute("data-edges")).toBe("2");
+    expect(flow).toHaveAttribute("data-edges", "2");
   });
 
   // Mixed data (departments + unassigned teams + unassigned persons) counts correctly.
@@ -408,10 +416,10 @@ describe("OrgChartClient", () => {
     const flow = screen.getByTestId("reactflow");
     // org-root(1) + dept(1) + dept-team(1) + dept-team-members(2)
     //   + unassigned-team(1) + unassigned-team-member(1) + unassigned-person(1) = 8
-    expect(flow.getAttribute("data-nodes")).toBe("8");
+    expect(flow).toHaveAttribute("data-nodes", "8");
     // org->dept(1) + dept->team(1) + team->person(2)
     //   + org->unassigned-team(1) + unassigned-team->member(1) + org->unassigned-person(1) = 7
-    expect(flow.getAttribute("data-edges")).toBe("7");
+    expect(flow).toHaveAttribute("data-edges", "7");
   });
 
   // Empty data still renders the org-root node and ReactFlow with 1 node.
@@ -419,7 +427,7 @@ describe("OrgChartClient", () => {
     render(<OrgChartClient data={emptyData} />);
     const flow = screen.getByTestId("reactflow");
     // Only org-root node
-    expect(flow.getAttribute("data-nodes")).toBe("1");
-    expect(flow.getAttribute("data-edges")).toBe("0");
+    expect(flow).toHaveAttribute("data-nodes", "1");
+    expect(flow).toHaveAttribute("data-edges", "0");
   });
 });

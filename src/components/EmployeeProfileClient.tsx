@@ -15,7 +15,6 @@ interface EmployeeProfileClientProps {
 
 export default function EmployeeProfileClient({ profile }: EmployeeProfileClientProps) {
   const t = useTranslations("employees");
-  const tc = useTranslations("common");
 
   const initials = profile.name
     .split(" ")

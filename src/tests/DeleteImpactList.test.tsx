@@ -5,7 +5,7 @@ describe("DeleteImpactList", () => {
   // Renders nothing when all impact items are empty.
   test("renders nothing when no impacts have items", () => {
     const { container } = render(<DeleteImpactList impacts={[{ label: "Teams", items: [] }]} />);
-    expect(container.firstChild).toBeNull();
+    expect(container).toBeEmptyDOMElement();
   });
 
   // Renders the warning header and impact items when impacts exist.
