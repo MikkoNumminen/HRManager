@@ -79,6 +79,10 @@ graph TD
 
 - **Security headers on every response (CSP)** — Each request gets a unique random nonce. Only scripts and styles tagged with that nonce can execute — even if an attacker injects HTML, the browser blocks it because the injected code doesn't have the secret nonce. Plus X-Frame-Options, X-Content-Type-Options, Referrer-Policy, and Permissions-Policy. _Why nonces? They're harder to bypass than domain allowlists and protect against inline script injection._
 
+- **Two-Factor Authentication (TOTP)** — Optional TOTP-based 2FA using the `otpauth` library. QR code setup flow, 6-digit code verification on login, 10 one-time recovery codes (SHA-256 hashed), and admin reset. Secrets encrypted at rest with AES-256-GCM. A Next.js middleware redirects unverified 2FA users to the verification page. _Why TOTP over SMS? SMS is vulnerable to SIM swapping; TOTP is free, offline, and SOC 2 compliant._
+
+- **Session management with concurrent limits** — Tracks active sessions per user with device/IP info. Max 5 concurrent sessions — oldest gets deactivated when exceeded. "Sign out all other sessions" in profile, admin force-logout per session or per user. JWT tokens carry a `sessionId` checked on every request — deactivated sessions force re-authentication. _Why server-side session tracking with JWTs? Pure JWTs can't be revoked. A lightweight session table gives you force-logout and concurrent limits without abandoning JWT benefits._
+
 - **Demo users can't see real data (session isolation)** — Each "Try Demo" creates a private sandbox with a UUID. All database tables have a `sessionId` column — queries filter by it, so demo data and real data never mix. Sessions auto-expire after 24 hours. _This is a multi-tenancy pattern: hard data isolation without separate databases._
 
 ```mermaid
@@ -150,7 +154,7 @@ graph LR
 
 ### 🧪 Quality
 
-- **1765 tests, 91.9% line coverage** — Unit tests, integration tests against real PostgreSQL + in-memory MongoDB (no database mocks), and 75 Playwright E2E tests covering full user flows. _Why real databases in tests? Mocked tests can pass while production breaks. If your test doesn't hit a real database, it's not testing what you think it's testing._
+- **1814 tests, 91.9% line coverage** — Unit tests, integration tests against real PostgreSQL + in-memory MongoDB (no database mocks), and 75 Playwright E2E tests covering full user flows. _Why real databases in tests? Mocked tests can pass while production breaks. If your test doesn't hit a real database, it's not testing what you think it's testing._
 
 - **Structured logging (Pino)** — JSON logs in production, human-readable in development. `createRequestLogger()` produces child loggers with traceId and userId context for request correlation. Replaces all `console.error/warn` calls. _Why Pino? It's the fastest Node.js logger, and structured JSON logs are parseable by Datadog, Grafana Loki, and CloudWatch without custom parsing rules._
 
@@ -245,6 +249,8 @@ graph LR
 | CSV utils          | 39       | RFC 4180 parsing, import validation, export formatting                                                    |
 | Style tokens       | 37       | Responsive breakpoints, theme tokens, component styles                                                    |
 | Auth callbacks     | 36       | JWT enrichment, permission freshness, demoSessionId ownership, superuser bootstrap                        |
+| Two-factor auth    | 32       | TOTP crypto, setup/verify flow, recovery codes, admin reset, login gating                                 |
+| Session management | 17       | Session tracking, concurrent limits, force-logout, token invalidation, lastActiveAt                       |
 | RBAC logic         | 28       | Resolution, overrides, deny-wins, superuser bypass                                                        |
 | Tutorial config    | 26       | Tour steps, DOM selectors, completion detection                                                           |
 | CSP proxy          | 20       | Nonce generation, header injection, domain allowlists                                                     |
