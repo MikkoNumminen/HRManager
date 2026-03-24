@@ -6,14 +6,20 @@ import { Box, Button, Typography } from "@mui/material";
 import { useActionState, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import ConfirmDialog from "./ConfirmDialog";
+import DeleteImpactList from "./DeleteImpactList";
 import { useSnackbar } from "./SnackbarProvider";
+import type { TeamDeleteImpact } from "@/constants";
 
 type FormState = { error: string | null };
 
-const RemoveTeamForm: React.FC<{ teamID: string }> = ({ teamID }) => {
+const RemoveTeamForm: React.FC<{
+  teamID: string;
+  impact?: TeamDeleteImpact;
+}> = ({ teamID, impact }) => {
   const t = useTranslations("teams");
   const tc = useTranslations("common");
   const tn = useTranslations("notifications");
+  const ti = useTranslations("deleteImpact");
   const { showSnackbar } = useSnackbar();
   const formRef = useRef<HTMLFormElement>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -27,6 +33,19 @@ const RemoveTeamForm: React.FC<{ teamID: string }> = ({ teamID }) => {
     },
     { error: null },
   );
+
+  const impacts = impact
+    ? [
+        {
+          label: ti("teamMembers", { count: impact.memberCount }),
+          items: impact.memberCount > 0 ? [ti("memberCount", { count: impact.memberCount })] : [],
+        },
+        {
+          label: ti("departmentAssignment"),
+          items: impact.departmentName ? [impact.departmentName] : [],
+        },
+      ]
+    : [];
 
   return (
     <Box component="form" action={formAction} ref={formRef} sx={formStyles}>
@@ -52,7 +71,9 @@ const RemoveTeamForm: React.FC<{ teamID: string }> = ({ teamID }) => {
           formRef.current?.requestSubmit();
         }}
         onCancel={() => setDialogOpen(false)}
-      />
+      >
+        <DeleteImpactList impacts={impacts} />
+      </ConfirmDialog>
     </Box>
   );
 };

@@ -7,14 +7,20 @@ import { useRouter } from "next/navigation";
 import { useActionState, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import ConfirmDialog from "./ConfirmDialog";
+import DeleteImpactList from "./DeleteImpactList";
 import { useSnackbar } from "./SnackbarProvider";
+import type { PersonDeleteImpact } from "@/constants";
 
 type FormState = { error: string | null };
 
-const RemovePersonForm: React.FC<{ personID: string }> = ({ personID }) => {
+const RemovePersonForm: React.FC<{
+  personID: string;
+  impact?: PersonDeleteImpact;
+}> = ({ personID, impact }) => {
   const t = useTranslations("persons");
   const tc = useTranslations("common");
   const tn = useTranslations("notifications");
+  const ti = useTranslations("deleteImpact");
   const { showSnackbar } = useSnackbar();
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
@@ -30,6 +36,37 @@ const RemovePersonForm: React.FC<{ personID: string }> = ({ personID }) => {
     },
     { error: null },
   );
+
+  const impacts = impact
+    ? [
+        {
+          label: ti("managedTeams", { count: impact.managedTeams.length }),
+          items: impact.managedTeams.map((t) => t.teamName),
+        },
+        {
+          label: ti("headedDepartments", { count: impact.headedDepartments.length }),
+          items: impact.headedDepartments.map((d) => d.name),
+        },
+        {
+          label: ti("teamMemberships", { count: impact.teamMemberships.length }),
+          items: impact.teamMemberships.map((t) => t.teamName),
+        },
+        {
+          label: ti("leaveRequests", { count: impact.leaveRequests }),
+          items:
+            impact.leaveRequests > 0
+              ? [ti("leaveRequestCount", { count: impact.leaveRequests })]
+              : [],
+        },
+        {
+          label: ti("reviewRequests", { count: impact.reviewRequests }),
+          items:
+            impact.reviewRequests > 0
+              ? [ti("reviewRequestCount", { count: impact.reviewRequests })]
+              : [],
+        },
+      ]
+    : [];
 
   return (
     <Box component="form" action={formAction} ref={formRef} sx={formStyles}>
@@ -55,7 +92,9 @@ const RemovePersonForm: React.FC<{ personID: string }> = ({ personID }) => {
           formRef.current?.requestSubmit();
         }}
         onCancel={() => setDialogOpen(false)}
-      />
+      >
+        <DeleteImpactList impacts={impacts} />
+      </ConfirmDialog>
     </Box>
   );
 };

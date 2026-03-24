@@ -1,7 +1,7 @@
 import UpdateManagerForm from "@/components/UpdateManager";
 import UpdateTeamNameForm from "@/components/UpdateTeamName";
 import RemoveTeamForm from "@/components/RemoveTeam";
-import { getPersons, getTeams } from "@/queries";
+import { getPersons, getTeams, getTeamDeleteImpact } from "@/queries";
 import { Typography } from "@mui/material";
 import AddPeopleToTeam from "@/components/AddPeopleToTeam";
 import RemoveMemberFromTeam from "@/components/RemoveMemberFromTeam";
@@ -32,6 +32,7 @@ export default async function TeamPage({ params }: { params: Promise<{ teamId: s
     return <Typography variant="h4">{t("notFound")}</Typography>;
   }
 
+  const teamImpact = permissions["team:delete"] ? await getTeamDeleteImpact(teamId) : undefined;
   const memberIds = team.members.map((m) => m.personId);
   const managerAndMemberIds = team.teamManagerId ? [team.teamManagerId, ...memberIds] : memberIds;
 
@@ -42,7 +43,7 @@ export default async function TeamPage({ params }: { params: Promise<{ teamId: s
         backHref="/manageTeams"
         permissions={permissions}
       />
-      {permissions["team:delete"] && <RemoveTeamForm teamID={teamId} />}
+      {permissions["team:delete"] && <RemoveTeamForm teamID={teamId} impact={teamImpact} />}
       {permissions["team:update_name"] && (
         <UpdateTeamNameForm teamID={teamId} currentName={team.teamName} />
       )}

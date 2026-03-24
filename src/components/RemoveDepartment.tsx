@@ -6,14 +6,20 @@ import { Box, Button, Typography } from "@mui/material";
 import { useActionState, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import ConfirmDialog from "./ConfirmDialog";
+import DeleteImpactList from "./DeleteImpactList";
 import { useSnackbar } from "./SnackbarProvider";
+import type { DepartmentDeleteImpact } from "@/constants";
 
 type FormState = { error: string | null };
 
-const RemoveDepartmentForm: React.FC<{ departmentID: string }> = ({ departmentID }) => {
+const RemoveDepartmentForm: React.FC<{
+  departmentID: string;
+  impact?: DepartmentDeleteImpact;
+}> = ({ departmentID, impact }) => {
   const t = useTranslations("departments");
   const tc = useTranslations("common");
   const tn = useTranslations("notifications");
+  const ti = useTranslations("deleteImpact");
   const { showSnackbar } = useSnackbar();
   const formRef = useRef<HTMLFormElement>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -27,6 +33,15 @@ const RemoveDepartmentForm: React.FC<{ departmentID: string }> = ({ departmentID
     },
     { error: null },
   );
+
+  const impacts = impact
+    ? [
+        {
+          label: ti("assignedTeams", { count: impact.teams.length }),
+          items: impact.teams.map((t) => t.teamName),
+        },
+      ]
+    : [];
 
   return (
     <Box component="form" action={formAction} ref={formRef} sx={formStyles}>
@@ -52,7 +67,9 @@ const RemoveDepartmentForm: React.FC<{ departmentID: string }> = ({ departmentID
           formRef.current?.requestSubmit();
         }}
         onCancel={() => setDialogOpen(false)}
-      />
+      >
+        <DeleteImpactList impacts={impacts} />
+      </ConfirmDialog>
     </Box>
   );
 };

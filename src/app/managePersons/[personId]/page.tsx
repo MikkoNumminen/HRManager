@@ -3,7 +3,7 @@ import UpdatePersonNameForm from "@/components/UpdatePersonName";
 import UpdateEmailForm from "@/components/UpdateEmail";
 import UpdatePositionForm from "@/components/UpdatePosition";
 import TopBar from "@/components/TopBar";
-import { getPersons, getPositions } from "@/queries";
+import { getPersons, getPositions, getPersonDeleteImpact } from "@/queries";
 import { Typography } from "@mui/material";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
@@ -31,6 +31,8 @@ export default async function PersonPage({ params }: { params: Promise<{ personI
     return <Typography variant="h4">{t("notFound")}</Typography>;
   }
 
+  const impact = permissions["person:delete"] ? await getPersonDeleteImpact(personId) : undefined;
+
   return (
     <>
       <TopBar
@@ -38,7 +40,7 @@ export default async function PersonPage({ params }: { params: Promise<{ personI
         backHref="/managePersons"
         permissions={permissions}
       />
-      {permissions["person:delete"] && <RemovePersonForm personID={personId} />}
+      {permissions["person:delete"] && <RemovePersonForm personID={personId} impact={impact} />}
       {permissions["person:update_name"] && (
         <UpdatePersonNameForm personID={personId} currentName={person.name} />
       )}

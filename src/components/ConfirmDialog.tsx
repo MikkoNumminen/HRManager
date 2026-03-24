@@ -17,6 +17,7 @@ type Props = {
   confirmLabel?: string;
   onConfirm: () => void;
   onCancel: () => void;
+  children?: React.ReactNode;
 };
 
 export default function ConfirmDialog({
@@ -26,6 +27,7 @@ export default function ConfirmDialog({
   confirmLabel = "Confirm",
   onConfirm,
   onCancel,
+  children,
 }: Props) {
   return (
     <Dialog
@@ -52,6 +54,7 @@ export default function ConfirmDialog({
         <DialogContentText id="confirm-dialog-description" sx={{ color: colors.slate400 }}>
           {message}
         </DialogContentText>
+        {children}
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2 }}>
         <Button onClick={onCancel} sx={{ color: colors.slate300 }}>

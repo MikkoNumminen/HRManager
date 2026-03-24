@@ -53,6 +53,9 @@ import {
   getDashboardMetrics,
   getDataExportCounts,
   getProfile,
+  getPersonDeleteImpact,
+  getTeamDeleteImpact,
+  getDepartmentDeleteImpact,
 } from "@/queries";
 
 const { auth } = require("@/auth");
@@ -1459,6 +1462,106 @@ describe("getOrgChartData", () => {
     expect(data.departments).toHaveLength(0);
     expect(data.unassignedTeams).toHaveLength(0);
     expect(data.unassignedPersons).toHaveLength(0);
+  });
+});
+
+describe("getPersonDeleteImpact", () => {
+  beforeEach(async () => {
+    await cleanDb();
+  });
+
+  afterAll(() => cleanDb());
+
+  // Returns empty arrays and zero counts when person has no references.
+  test("returns empty impact for isolated person", async () => {
+    const person = await testPrisma.person.create({ data: { name: "Loner" } });
+    const impact = await getPersonDeleteImpact(person.id);
+    expect(impact.managedTeams).toEqual([]);
+    expect(impact.headedDepartments).toEqual([]);
+    expect(impact.teamMemberships).toEqual([]);
+    expect(impact.leaveRequests).toBe(0);
+    expect(impact.reviewRequests).toBe(0);
+  });
+
+  // Returns managed teams, headed departments, and team memberships.
+  test("returns all references for a well-connected person", async () => {
+    const person = await testPrisma.person.create({ data: { name: "Boss" } });
+    const team = await testPrisma.team.create({
+      data: { teamName: "Alpha", teamManagerId: person.id },
+    });
+    await testPrisma.department.create({
+      data: { name: "Engineering", headId: person.id },
+    });
+    await testPrisma.teamMember.create({
+      data: { personId: person.id, teamId: team.teamId },
+    });
+
+    const impact = await getPersonDeleteImpact(person.id);
+    expect(impact.managedTeams).toHaveLength(1);
+    expect(impact.managedTeams[0].teamName).toBe("Alpha");
+    expect(impact.headedDepartments).toHaveLength(1);
+    expect(impact.headedDepartments[0].name).toBe("Engineering");
+    expect(impact.teamMemberships).toHaveLength(1);
+    expect(impact.teamMemberships[0].teamName).toBe("Alpha");
+  });
+});
+
+describe("getTeamDeleteImpact", () => {
+  beforeEach(async () => {
+    await cleanDb();
+  });
+
+  afterAll(() => cleanDb());
+
+  // Returns zero members and null department for an empty team.
+  test("returns empty impact for isolated team", async () => {
+    const team = await testPrisma.team.create({ data: { teamName: "Empty" } });
+    const impact = await getTeamDeleteImpact(team.teamId);
+    expect(impact.memberCount).toBe(0);
+    expect(impact.departmentName).toBeNull();
+  });
+
+  // Returns member count and department name.
+  test("returns member count and department name", async () => {
+    const dept = await testPrisma.department.create({ data: { name: "HR" } });
+    const team = await testPrisma.team.create({
+      data: { teamName: "Recruiting", departmentId: dept.id },
+    });
+    const person = await testPrisma.person.create({ data: { name: "Alice" } });
+    await testPrisma.teamMember.create({
+      data: { personId: person.id, teamId: team.teamId },
+    });
+
+    const impact = await getTeamDeleteImpact(team.teamId);
+    expect(impact.memberCount).toBe(1);
+    expect(impact.departmentName).toBe("HR");
+  });
+});
+
+describe("getDepartmentDeleteImpact", () => {
+  beforeEach(async () => {
+    await cleanDb();
+  });
+
+  afterAll(() => cleanDb());
+
+  // Returns empty teams array for a department with no teams.
+  test("returns empty impact for isolated department", async () => {
+    const dept = await testPrisma.department.create({ data: { name: "Empty" } });
+    const impact = await getDepartmentDeleteImpact(dept.id);
+    expect(impact.teams).toEqual([]);
+  });
+
+  // Returns teams assigned to the department.
+  test("returns assigned teams", async () => {
+    const dept = await testPrisma.department.create({ data: { name: "Eng" } });
+    await testPrisma.team.create({ data: { teamName: "Backend", departmentId: dept.id } });
+    await testPrisma.team.create({ data: { teamName: "Frontend", departmentId: dept.id } });
+
+    const impact = await getDepartmentDeleteImpact(dept.id);
+    expect(impact.teams).toHaveLength(2);
+    const names = impact.teams.map((t) => t.teamName).sort();
+    expect(names).toEqual(["Backend", "Frontend"]);
   });
 });
 

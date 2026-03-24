@@ -3,7 +3,7 @@ import UpdateDepartmentHeadForm from "@/components/UpdateDepartmentHead";
 import RemoveDepartmentForm from "@/components/RemoveDepartment";
 import AssignTeamToDepartmentForm from "@/components/AssignTeamToDepartment";
 import RemoveTeamFromDepartmentForm from "@/components/RemoveTeamFromDepartment";
-import { getDepartments, getPersons, getTeams } from "@/queries";
+import { getDepartments, getPersons, getTeams, getDepartmentDeleteImpact } from "@/queries";
 import { Typography } from "@mui/material";
 import TopBar from "@/components/TopBar";
 import { auth } from "@/auth";
@@ -40,6 +40,9 @@ export default async function DepartmentPage({
     return <Typography variant="h4">{t("notFound")}</Typography>;
   }
 
+  const deptImpact = permissions["department:delete"]
+    ? await getDepartmentDeleteImpact(departmentId)
+    : undefined;
   const departmentTeamIds = department.teams.map((t) => t.teamId);
   const availableTeams = teams.filter(
     (t) => !t.departmentId || !departmentTeamIds.includes(t.teamId),
@@ -53,7 +56,9 @@ export default async function DepartmentPage({
         backHref="/manageDepartments"
         permissions={permissions}
       />
-      {permissions["department:delete"] && <RemoveDepartmentForm departmentID={departmentId} />}
+      {permissions["department:delete"] && (
+        <RemoveDepartmentForm departmentID={departmentId} impact={deptImpact} />
+      )}
       {permissions["department:update"] && (
         <UpdateDepartmentForm
           departmentID={departmentId}

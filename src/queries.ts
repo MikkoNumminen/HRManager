@@ -40,7 +40,12 @@ import { getDemoSessionId } from "@/demoSession";
 import { getAuditLogCollection, isMongoAvailable } from "@/mongoDb";
 import { Filter } from "mongodb";
 
-import { PAGE_SIZE } from "@/constants";
+import {
+  PAGE_SIZE,
+  PersonDeleteImpact,
+  TeamDeleteImpact,
+  DepartmentDeleteImpact,
+} from "@/constants";
 export { PAGE_SIZE };
 
 export async function getPersons(): Promise<Person[]> {
@@ -994,4 +999,75 @@ export async function getOrgChartData(): Promise<OrgChartData> {
         email: p.email ?? null,
       })),
   });
+}
+
+export async function getPersonDeleteImpact(personId: string): Promise<PersonDeleteImpact> {
+  const sessionId = await getDemoSessionId();
+  const [managedTeams, headedDepartments, teamMemberships, leaveRequests, reviewRequests] =
+    await Promise.all([
+      prisma.team.findMany({
+        where: { teamManagerId: personId, deletedAt: null, sessionId },
+        select: { teamId: true, teamName: true },
+      }),
+      prisma.department.findMany({
+        where: { headId: personId, deletedAt: null, sessionId },
+        select: { id: true, name: true },
+      }),
+      prisma.teamMember.findMany({
+        where: { personId, deletedAt: null, sessionId },
+        select: { team: { select: { teamId: true, teamName: true } } },
+      }),
+      prisma.leaveRequest.count({
+        where: { personId, deletedAt: null, sessionId },
+      }),
+      prisma.reviewRequest.count({
+        where: {
+          OR: [{ subjectId: personId }, { reviewerId: personId }],
+          sessionId,
+        },
+      }),
+    ]);
+
+  return {
+    managedTeams: managedTeams.map((t) => ({ teamId: t.teamId, teamName: t.teamName })),
+    headedDepartments: headedDepartments.map((d) => ({ id: d.id, name: d.name })),
+    teamMemberships: teamMemberships.map((tm) => ({
+      teamId: tm.team.teamId,
+      teamName: tm.team.teamName,
+    })),
+    leaveRequests,
+    reviewRequests,
+  };
+}
+
+export async function getTeamDeleteImpact(teamId: string): Promise<TeamDeleteImpact> {
+  const sessionId = await getDemoSessionId();
+  const [memberCount, team] = await Promise.all([
+    prisma.teamMember.count({
+      where: { teamId, deletedAt: null, sessionId },
+    }),
+    prisma.team.findFirst({
+      where: { teamId, deletedAt: null, sessionId },
+      select: { department: { select: { name: true } } },
+    }),
+  ]);
+
+  return {
+    memberCount,
+    departmentName: team?.department?.name ?? null,
+  };
+}
+
+export async function getDepartmentDeleteImpact(
+  departmentId: string,
+): Promise<DepartmentDeleteImpact> {
+  const sessionId = await getDemoSessionId();
+  const teams = await prisma.team.findMany({
+    where: { departmentId, deletedAt: null, sessionId },
+    select: { teamId: true, teamName: true },
+  });
+
+  return {
+    teams: teams.map((t) => ({ teamId: t.teamId, teamName: t.teamName })),
+  };
 }
