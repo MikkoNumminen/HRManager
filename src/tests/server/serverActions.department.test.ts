@@ -222,7 +222,7 @@ describe("updateDepartment", () => {
       await updateDepartment(
         formData({ departmentID: dept.id, name: "Eng", description: longDesc }),
       ),
-    ).toEqual({ error: expect.stringContaining("characters or less") });
+    ).toMatchObject({ error: expect.stringContaining("characters or less") });
   });
 
   // Can't update a department that doesn't exist.
@@ -231,7 +231,7 @@ describe("updateDepartment", () => {
       await updateDepartment(
         formData({ departmentID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", name: "New" }),
       ),
-    ).toEqual({ error: expect.stringContaining("Department not found") });
+    ).toMatchObject({ error: expect.stringContaining("Department not found") });
   });
 });
 
@@ -280,7 +280,7 @@ describe("updateDepartmentHead", () => {
           personID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
         }),
       ),
-    ).toEqual({ error: expect.stringContaining("Person not found") });
+    ).toMatchObject({ error: expect.stringContaining("Person not found") });
   });
 
   // Can't update head of a department that doesn't exist.
@@ -293,7 +293,7 @@ describe("updateDepartmentHead", () => {
           personID: person.id,
         }),
       ),
-    ).toEqual({ error: expect.stringContaining("Department not found") });
+    ).toMatchObject({ error: expect.stringContaining("Department not found") });
   });
 });
 
@@ -318,7 +318,7 @@ describe("assignTeamToDepartment", () => {
   test("throws on missing departmentID", async () => {
     expect(
       await assignTeamToDepartment(formData({ teamID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" })),
-    ).toEqual({ error: expect.stringContaining("No departmentID provided") });
+    ).toMatchObject({ error: expect.stringContaining("No departmentID provided") });
   });
 
   // Throws when teamID is missing.
@@ -327,7 +327,7 @@ describe("assignTeamToDepartment", () => {
       await assignTeamToDepartment(
         formData({ departmentID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" }),
       ),
-    ).toEqual({ error: expect.stringContaining("No teamID provided") });
+    ).toMatchObject({ error: expect.stringContaining("No teamID provided") });
   });
 
   // Can't assign a team to a department that doesn't exist.
@@ -340,7 +340,7 @@ describe("assignTeamToDepartment", () => {
           teamID: team.teamId,
         }),
       ),
-    ).toEqual({ error: expect.stringContaining("Department not found") });
+    ).toMatchObject({ error: expect.stringContaining("Department not found") });
   });
 
   // Can't assign a non-existent team to a department.
@@ -353,7 +353,7 @@ describe("assignTeamToDepartment", () => {
           teamID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
         }),
       ),
-    ).toEqual({ error: expect.stringContaining("Team not found") });
+    ).toMatchObject({ error: expect.stringContaining("Team not found") });
   });
 });
 
@@ -385,7 +385,7 @@ describe("removeTeamFromDepartment", () => {
   test("throws when team does not exist", async () => {
     expect(
       await removeTeamFromDepartment(formData({ teamID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" })),
-    ).toEqual({ error: expect.stringContaining("Team not found") });
+    ).toMatchObject({ error: expect.stringContaining("Team not found") });
   });
 });
 

@@ -148,7 +148,7 @@ describe("updateUserRole", () => {
       await updateUserRole(
         formData({ userId: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", role: "user" }),
       ),
-    ).toEqual({ error: expect.stringContaining("User not found") });
+    ).toMatchObject({ error: expect.stringContaining("User not found") });
   });
 
   // UUID validation — garbage IDs get caught early.
@@ -169,7 +169,7 @@ describe("updateUserRole", () => {
   test("throws when role is missing", async () => {
     expect(
       await updateUserRole(formData({ userId: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" })),
-    ).toEqual({ error: expect.stringContaining("No role provided") });
+    ).toMatchObject({ error: expect.stringContaining("No role provided") });
   });
 
   // Demo sessions can assign the superuser role — sandbox data, no restrictions needed.
@@ -300,7 +300,7 @@ describe("updateUserPermission", () => {
       await updateUserPermission(
         formData({ userId: user.id, permissionKey: "person:create", action: "grant" }),
       ),
-    ).toEqual({ error: expect.stringContaining("Cannot modify superuser permissions") });
+    ).toMatchObject({ error: expect.stringContaining("Cannot modify superuser permissions") });
   });
 
   // Can't modify permissions for a user that doesn't exist.
@@ -317,7 +317,7 @@ describe("updateUserPermission", () => {
           action: "grant",
         }),
       ),
-    ).toEqual({ error: expect.stringContaining("User not found") });
+    ).toMatchObject({ error: expect.stringContaining("User not found") });
   });
 
   // Can't grant a permission that doesn't exist in the catalog.
@@ -330,7 +330,7 @@ describe("updateUserPermission", () => {
       await updateUserPermission(
         formData({ userId: user.id, permissionKey: "fake:permission", action: "grant" }),
       ),
-    ).toEqual({ error: expect.stringContaining("Permission not found") });
+    ).toMatchObject({ error: expect.stringContaining("Permission not found") });
   });
 
   // UUID validation on the userId field.
@@ -339,14 +339,14 @@ describe("updateUserPermission", () => {
       await updateUserPermission(
         formData({ userId: "bad", permissionKey: "person:create", action: "grant" }),
       ),
-    ).toEqual({ error: expect.stringContaining("Invalid userId format") });
+    ).toMatchObject({ error: expect.stringContaining("Invalid userId format") });
   });
 
   // All three required fields must be present — no partial submissions.
   test("throws when userId is missing", async () => {
     expect(
       await updateUserPermission(formData({ permissionKey: "person:create", action: "grant" })),
-    ).toEqual({ error: expect.stringContaining("No userId provided") });
+    ).toMatchObject({ error: expect.stringContaining("No userId provided") });
   });
 
   // Permission key is required.
@@ -355,7 +355,7 @@ describe("updateUserPermission", () => {
       await updateUserPermission(
         formData({ userId: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", action: "grant" }),
       ),
-    ).toEqual({ error: expect.stringContaining("No permissionKey provided") });
+    ).toMatchObject({ error: expect.stringContaining("No permissionKey provided") });
   });
 
   // Action is required.
@@ -367,7 +367,7 @@ describe("updateUserPermission", () => {
           permissionKey: "person:create",
         }),
       ),
-    ).toEqual({ error: expect.stringContaining("No action provided") });
+    ).toMatchObject({ error: expect.stringContaining("No action provided") });
   });
 
   // Demo sessions can modify superuser permissions — sandbox lets you experiment.

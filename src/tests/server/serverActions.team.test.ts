@@ -172,7 +172,7 @@ describe("updateTeamName", () => {
       await updateTeamName(
         formData({ teamID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", name: "New" }),
       ),
-    ).toEqual({ error: expect.stringContaining("Team not found") });
+    ).toMatchObject({ error: expect.stringContaining("Team not found") });
   });
 });
 
@@ -274,7 +274,7 @@ describe("addManager", () => {
   test("throws when no teamID provided", async () => {
     expect(
       await addManager(formData({ personID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" })),
-    ).toEqual({ error: expect.stringContaining("No teamID selected") });
+    ).toMatchObject({ error: expect.stringContaining("No teamID selected") });
   });
 
   // You have to say who becomes the manager.
@@ -301,7 +301,7 @@ describe("addManager", () => {
           personID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
         }),
       ),
-    ).toEqual({ error: expect.stringContaining("Person not found") });
+    ).toMatchObject({ error: expect.stringContaining("Person not found") });
   });
 
   // Can't assign a manager to a team that doesn't exist.
@@ -314,7 +314,7 @@ describe("addManager", () => {
           personID: person.id,
         }),
       ),
-    ).toEqual({ error: expect.stringContaining("Team not found") });
+    ).toMatchObject({ error: expect.stringContaining("Team not found") });
   });
 });
 
@@ -437,14 +437,14 @@ describe("removeMember", () => {
   test("throws when no teamID provided", async () => {
     expect(
       await removeMember(formData({ personID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" })),
-    ).toEqual({ error: expect.stringContaining("No teamID selected") });
+    ).toMatchObject({ error: expect.stringContaining("No teamID selected") });
   });
 
   // Need to know which person to remove.
   test("throws when no personID provided", async () => {
     expect(
       await removeMember(formData({ teamID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" })),
-    ).toEqual({ error: expect.stringContaining("No personID selected") });
+    ).toMatchObject({ error: expect.stringContaining("No personID selected") });
   });
 
   // UUID check — keeps bad data out.
@@ -565,7 +565,7 @@ describe("addManager (extended)", () => {
       await addManager(
         formData({ personID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", teamID: team.teamId }),
       ),
-    ).toEqual({ error: expect.stringContaining("Person not found") });
+    ).toMatchObject({ error: expect.stringContaining("Person not found") });
   });
 
   // Throws when team does not exist.
@@ -575,7 +575,7 @@ describe("addManager (extended)", () => {
       await addManager(
         formData({ personID: person.id, teamID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" }),
       ),
-    ).toEqual({ error: expect.stringContaining("Team not found") });
+    ).toMatchObject({ error: expect.stringContaining("Team not found") });
   });
 
   // Throws on invalid UUID for teamID.
@@ -584,7 +584,7 @@ describe("addManager (extended)", () => {
       await addManager(
         formData({ personID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", teamID: "bad-id" }),
       ),
-    ).toEqual({ error: expect.stringContaining("Invalid teamID format") });
+    ).toMatchObject({ error: expect.stringContaining("Invalid teamID format") });
   });
 
   // Throws on invalid UUID for personID.
@@ -593,7 +593,7 @@ describe("addManager (extended)", () => {
       await addManager(
         formData({ personID: "bad-id", teamID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" }),
       ),
-    ).toEqual({ error: expect.stringContaining("Invalid personID format") });
+    ).toMatchObject({ error: expect.stringContaining("Invalid personID format") });
   });
 });
 

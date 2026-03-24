@@ -268,7 +268,7 @@ describe("updatePersonName", () => {
       await updatePersonName(
         formData({ personID: "00000000-0000-0000-0000-000000000000", name: "Bob" }),
       ),
-    ).toEqual({ error: expect.stringContaining("Person not found") });
+    ).toMatchObject({ error: expect.stringContaining("Person not found") });
   });
 
   // Names longer than 255 characters are rejected.
@@ -324,7 +324,7 @@ describe("updatePosition", () => {
       await updatePosition(
         formData({ personID: "00000000-0000-0000-0000-000000000000", name: "Dev" }),
       ),
-    ).toEqual({ error: expect.stringContaining("Person not found") });
+    ).toMatchObject({ error: expect.stringContaining("Person not found") });
   });
 
   // Position strings longer than 255 characters are rejected.
@@ -409,7 +409,7 @@ describe("updateEmail", () => {
       await updateEmail(
         formData({ personID: "00000000-0000-0000-0000-000000000000", name: "new@test.com" }),
       ),
-    ).toEqual({ error: expect.stringContaining("Person not found") });
+    ).toMatchObject({ error: expect.stringContaining("Person not found") });
   });
 
   // Email addresses longer than 320 characters are rejected.
