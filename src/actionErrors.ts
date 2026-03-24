@@ -23,6 +23,7 @@ export type ErrorCode =
   | "urlTooLong"
   | "invalidUrlFormat"
   | "invalidUrlProtocol"
+  | "imageUrlDomainNotAllowed"
   | "noteTooLong"
   // Person
   | "noPersonSelected"

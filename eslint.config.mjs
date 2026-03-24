@@ -11,7 +11,7 @@ const eslintConfig = [
   testingLibrary.configs["flat/react"],
   prettierConfig,
   {
-    ignores: ["node_modules/", ".next/", "__mocks__/", "coverage/"],
+    ignores: ["node_modules/", ".next/", "__mocks__/", "coverage/", ".claude/"],
   },
   {
     // Allow underscore-prefixed unused vars (convention for intentionally
