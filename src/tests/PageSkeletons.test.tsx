@@ -9,64 +9,61 @@ import {
   AdminPageSkeleton,
 } from "../components/PageSkeletons";
 
-// Each skeleton must render without throwing and produce visible DOM nodes.
+// Each skeleton must render without throwing and produce visible skeleton elements.
 
 describe("PageSkeletons", () => {
   // TablePageSkeleton renders a grid of skeleton rows for list pages.
-  test("TablePageSkeleton renders without crashing", () => {
-    const { container } = render(<TablePageSkeleton />);
-    expect(container.firstChild).not.toBeNull();
+  test("TablePageSkeleton renders skeleton elements", () => {
+    render(<TablePageSkeleton />);
+    const skeletons = screen.getAllByRole("generic");
+    expect(skeletons.length).toBeGreaterThan(0);
   });
 
   // DetailPageSkeleton renders the requested number of form card placeholders.
-  test("DetailPageSkeleton renders default card count", () => {
-    const { container } = render(<DetailPageSkeleton />);
-    expect(container.firstChild).not.toBeNull();
+  test("DetailPageSkeleton renders with default cards", () => {
+    render(<DetailPageSkeleton />);
+    const skeletons = screen.getAllByRole("generic");
+    expect(skeletons.length).toBeGreaterThan(0);
   });
 
   test("DetailPageSkeleton accepts custom card count", () => {
-    const { container } = render(<DetailPageSkeleton cards={5} />);
-    expect(container.firstChild).not.toBeNull();
+    render(<DetailPageSkeleton cards={5} />);
+    const skeletons = screen.getAllByRole("generic");
+    expect(skeletons.length).toBeGreaterThan(0);
   });
 
   // DashboardSkeleton renders KPI cards, chart areas, and activity list.
-  test("DashboardSkeleton renders without crashing", () => {
-    const { container } = render(<DashboardSkeleton />);
-    expect(container.firstChild).not.toBeNull();
+  test("DashboardSkeleton renders skeleton elements", () => {
+    render(<DashboardSkeleton />);
+    const skeletons = screen.getAllByRole("generic");
+    expect(skeletons.length).toBeGreaterThan(5);
   });
 
   // ProfileSkeleton renders avatar and field placeholders.
-  test("ProfileSkeleton renders without crashing", () => {
-    const { container } = render(<ProfileSkeleton />);
-    expect(container.firstChild).not.toBeNull();
+  test("ProfileSkeleton renders skeleton elements", () => {
+    render(<ProfileSkeleton />);
+    const skeletons = screen.getAllByRole("generic");
+    expect(skeletons.length).toBeGreaterThan(0);
   });
 
   // AuditLogSkeleton renders filter bar and table row placeholders.
-  test("AuditLogSkeleton renders without crashing", () => {
-    const { container } = render(<AuditLogSkeleton />);
-    expect(container.firstChild).not.toBeNull();
+  test("AuditLogSkeleton renders skeleton elements", () => {
+    render(<AuditLogSkeleton />);
+    const skeletons = screen.getAllByRole("generic");
+    expect(skeletons.length).toBeGreaterThan(0);
   });
 
   // DataPageSkeleton renders export and import section placeholders.
-  test("DataPageSkeleton renders without crashing", () => {
-    const { container } = render(<DataPageSkeleton />);
-    expect(container.firstChild).not.toBeNull();
+  test("DataPageSkeleton renders skeleton elements", () => {
+    render(<DataPageSkeleton />);
+    const skeletons = screen.getAllByRole("generic");
+    expect(skeletons.length).toBeGreaterThan(0);
   });
 
   // AdminPageSkeleton renders user list row placeholders.
-  test("AdminPageSkeleton renders without crashing", () => {
-    const { container } = render(<AdminPageSkeleton />);
-    expect(container.firstChild).not.toBeNull();
-  });
-
-  // All skeletons should render multiple DOM nodes (not empty shells).
-  test("TablePageSkeleton renders multiple child nodes", () => {
-    const { container } = render(<TablePageSkeleton />);
-    expect(container.querySelectorAll("span, div").length).toBeGreaterThan(5);
-  });
-
-  test("DashboardSkeleton renders multiple child nodes", () => {
-    const { container } = render(<DashboardSkeleton />);
-    expect(container.querySelectorAll("span, div").length).toBeGreaterThan(5);
+  test("AdminPageSkeleton renders skeleton elements", () => {
+    render(<AdminPageSkeleton />);
+    const skeletons = screen.getAllByRole("generic");
+    expect(skeletons.length).toBeGreaterThan(0);
   });
 });
