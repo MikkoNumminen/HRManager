@@ -144,7 +144,7 @@ graph LR
 
 ### 🧪 Quality
 
-- **1640 tests, 91.9% line coverage** — Unit tests, integration tests against real PostgreSQL + in-memory MongoDB (no database mocks), and 75 Playwright E2E tests covering full user flows. _Why real databases in tests? Mocked tests can pass while production breaks. If your test doesn't hit a real database, it's not testing what you think it's testing._
+- **1671 tests, 91.9% line coverage** — Unit tests, integration tests against real PostgreSQL + in-memory MongoDB (no database mocks), and 75 Playwright E2E tests covering full user flows. _Why real databases in tests? Mocked tests can pass while production breaks. If your test doesn't hit a real database, it's not testing what you think it's testing._
 
 - **Docker-ready** — `docker compose up` starts PostgreSQL + MongoDB + the app. Migrations run automatically, demo login works out of the box. _One command, zero setup, fully working._
 
@@ -241,7 +241,7 @@ graph LR
 | Auth route       | 5        | Rate limiting on auth endpoints, CSRF, GET passthrough                                                    |
 | Reviews UI       | 86       | Cycle management, request table, submit form, templates, question CRUD, confirm dialogs                   |
 | E2E (Playwright) | 75       | Auth, CRUD, detail editing, dashboard, profile, data I/O, form validation, full workflow                  |
-| **Total**        | **1640** | **91.9% line coverage · 83.5% function coverage**                                                         |
+| **Total**        | **1671** | **91.9% line coverage · 83.5% function coverage**                                                         |
 
 ```
 Statements : 90.83%    Branches : 82.47%

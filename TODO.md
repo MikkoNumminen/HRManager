@@ -15,10 +15,9 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 
 ## In Progress
 
-> 📋 **Audit research:** All items below marked "(found by audit)" have detailed file:line references in `AUDIT_REPORT.md`. Read it before starting any of these tasks.
+> 📋 **Audit research:** All items below marked "(found by audit)" have detailed file:line references in `AUDIT_REPORT.md` and `AUDIT_RESULTS.md`. Read before starting any audit-tagged task.
 
 - 🟢⚡ CI pipeline monitoring & auto-fix — watching for failures, fixing build/lint/format issues [Claude 4, main]
-- 🟡🧠 Custom sign-in page — replace NextAuth default unstyled page with MUI dark-themed sign-in [Claude 4, main]
 
 ## Backlog
 
@@ -28,19 +27,64 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 - 🟡🧠 Leave balance carryover / accrual — year-end carryover logic, expiry dates, accrual schedules
 - 🟡🧠 Tutorial UX overhaul — no guiding effect on back button, lacks MUI visual guidance (highlighting/effects), guidance boxes appear in wrong positions
 - 🟢🧠 Bulk actions on tables — multi-select persons/teams and apply batch operations
+- 🟡⚡ Manager approval workflow & escalation — route leave requests to manager; auto-escalate to dept head after 5 days no response; send reminders
+- 🟡⚡ Employee self-service portal — read-only employee view: own profile, team, manager, leave balance, reviews; GDPR-compliant
+- 🟡⚡ Full-text search (cross-entity) — PostgreSQL tsvector across persons/teams/departments/reviews; ranked results; filters
+- 🟡⚡ Document management — upload/store employee contracts, certs; PDF preview; virus scan; soft-delete
+- 🟡⚡ Org chart drag-and-drop — drag person to new team/department; confirm + audit + DB write
+- 🟡⚡ Onboarding/offboarding workflows — checklists per employee; assign tasks to managers; track completion
+- 🟢⚡ Calendar integration (iCal) — generate .ics for approved leave; team calendar export
 
 ### Code Quality / Architecture (found by audit)
 
 - 🟡🧠 Implement permission middleware for queries — inconsistent auth guards across query functions; some check permissions, others rely on caller
 - 🟡🧠 Consolidate duplicate seed data — demoSession.ts (9 persons) and serverActions.ts (6 persons) diverged; extract shared seed definitions to seedData.ts
+- 🟡🧠 Add permission check to `getReviewRequestWithTemplate` — any authenticated user with a UUID can retrieve another user's review assignment (features/reviews/queries.ts)
+- 🟡🧠 Add consistent permission checks to read queries — getPersons, getTeams, getDepartments, getReviewTemplates, getReviewCycles lack explicit auth guards
+- 🟢⚡ Health check endpoints — /health (shallow: app running) + /ready (deep: DB connections live); JSON with version, uptime, dependency status
+- 🟡⚡ Caching layer for dashboard queries — 5-min cache via Redis or revalidateTag; invalidate on data change; monitor hit rate
+- 🟡🧠 OpenTelemetry tracing — instrument request → middleware → query → action → DB; export to Jaeger/Datadog; P95/P99 dashboards
+- 🟡🧠 Background job queue (Bull/Bree) — async processing for emails, report generation, bulk imports; retry + dead-letter queue; admin job dashboard
+- 🟡⚡ Structured logging (Pino/Winston) — JSON-format with traceId, userId, action, duration; aggregate to Datadog/CloudWatch
+- 🟡🧠 WebSocket / real-time updates — live person create, leave request notifications, activity feed via Socket.io
+- 🟡🧠 Feature flags — LaunchDarkly or custom; enable per-user or env; track flag changes in audit log
+- 🟢⚡ MongoDB schema validation ($jsonSchema) — enforce required fields on audit log documents at write-time
+- 🟢⚡ Error tracking (Sentry) — capture unhandled exceptions, server action failures, client errors; grouping + alerts
+- 🔴🧠 Advanced reporting & analytics — turnover rates, headcount trends, leave utilization by dept, review completion; filtered exports; charts
+- 🔴🧠 Data encryption at rest — application-level encryption on sensitive fields; versioned key IDs; key rotation without downtime
+- 🔴🧠 GDPR right-to-deletion policy — anonymize personal data after 7yr, retain audit logs 10yr, soft-delete recovery 30d, user self-service data export
+- 🟡🧠 Database migration rollback — document + test Prisma rollback; test restore-from-backup procedure
+- 🟡🧠 Performance at scale — load test with 10k/100k employees; identify N+1 queries, missing indexes; document scaling cliffs
 
 ### Testing (found by audit)
 
+- 🟡⚡ Visual regression testing — Percy/Chromatic; snapshot all components in all 6 themes; diff on PRs
+- 🟡🧠 Load & performance benchmarks (k6) — 100 concurrent users; performance budgets (dashboard < 2s, mutations < 500ms); CI fails if exceeded
+- 🟡⚡ Mutation testing (Stryker) — mutate code; verify tests catch mutations; target > 80% mutation score
+- 🟢⚡ axe-core accessibility in CI — run axe on every Playwright page; fail CI on WCAG AA violations
+
 ### Accessibility (WCAG)
+
+- 🟢⚡ Keyboard shortcuts — `/` = search, `g`+`d` = dashboard, `g`+`p` = persons, `?` = help; WCAG keyboard navigation throughout
 
 ### Security (found by audit)
 
+- 🔴🧠 Fix demo user role forced to superuser on every login — authorize() callback upserts role: "superuser" on every login, bypassing admin role changes (src/auth.ts)
+- 🔴🧠 JWT callback demoSessionId ownership validation — trusts token.demoSessionId without verifying it belongs to the authenticated user (src/auth.ts:103-105)
 - 🟡🧠 JWT permission revocation window — permissions valid up to 1h after admin revokes them
-- 🟡🧠 Add permission check to `getReviewRequestWithTemplate` — queries.ts:723 allows any authenticated user with a UUID to retrieve another user's review assignment
-- 🟡🧠 Add consistent permission checks to read queries — getPersons, getTeams, getDepartments, getReviewTemplates, getReviewCycles lack explicit auth guards
-- 🟢⚡ Domain-restrict profile image URLs — updateProfileImage accepts any HTTPS URL; restrict to known CDNs or an allowlist (serverActions/profile.ts)
+- 🟡🧠 Two-Factor Authentication (TOTP) — QR code setup, 6-digit codes, recovery codes, audit all 2FA events; SOC 2 requirement
+- 🟡🧠 Session management & concurrent limits — track sessions per device; force-logout on limit exceeded; "Sign out all other sessions" button
+- 🟡🧠 Audit log tamper detection (hash chain) — HMAC-SHA256 chain linking each log entry; verification endpoint; legal evidence integrity
+- 🟡🧠 Add permission check to read queries — getPersons, getTeams, getDepartments, getReviewTemplates, getReviewCycles lack explicit auth guards
+- 🟡🧠 Seed mock user data not env-gated — seedMockData() seeds admin@example.com etc. into global User table without NODE_ENV check (features/admin/actions.ts)
+- 🟡⚡ MongoDB audit log regex injection — userEmail passed directly to $regex without escaping; allows wildcard enumeration (features/audit/queries.ts:26)
+- 🟢⚡ Domain-restrict profile image URLs — updateProfileImage accepts any HTTPS URL; restrict to known CDNs or an allowlist (features/profile/actions.ts)
+- 🟢⚡ Use crypto.timingSafeEqual for CRON_SECRET — timing attack on /api/cron/cleanup; replace === with timingSafeEqual
+- 🟢⚡ CSV formula injection sanitization — strip/quote-escape leading =, +, -, @ in imported CSV cells (features/data/actions.ts)
+- 🟢⚡ IP allowlisting for admin functions — restrict superuser/admin actions to configured IP ranges; log IP-based access events
+
+### DevOps & Infrastructure
+
+- 🟡⚡ Kubernetes manifests & Helm charts — Deployment, Service, Ingress, ConfigMap, Secret; resource limits + readiness probes
+- 🟡⚡ Blue-green deployment strategy — two production environments; switch traffic via LB; zero-downtime upgrades + instant rollback
+- 🟢⚡ Staging environment parity — staging with anonymized production data; deploy-to-staging + E2E before prod
