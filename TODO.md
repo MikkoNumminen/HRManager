@@ -15,18 +15,16 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 
 ## In Progress
 
-> 📋 **Audit research:** Items marked "(found by audit)" have detailed file:line references in memory file `project_audit_findings.md`. Read it before starting any of these tasks.
+> 📋 **Audit research:** All items below marked "(found by audit)" have detailed file:line references in `AUDIT_REPORT.md`. Read it before starting any of these tasks.
 
 - 🟢⚡ CI pipeline monitoring & auto-fix — watching for failures, fixing build/lint/format issues [Claude 4, main]
-- 🟢🧠 Employee profile pages — read-only `/employees/[id]` cards, guest-accessible [Claude 4, main]
-- 🟡🧠 Org chart visualization — interactive hierarchy using existing manager/dept head data [Claude 2, main]
-- 🔴🧠 Full codebase audit — 7-phase read-only analysis → AUDIT_REPORT.md + new TODO items [Claude 1, main]
 
 ## Recently Completed
 
-- ✅ Cascade delete impact warnings — DeleteImpactList component, 3 impact queries, ConfirmDialog children, 10 tests, 1544 total
-- ✅ Audit log TTL + rate limit cleanup — MongoDB TTL index (90-day retention), /api/cron/cleanup route, 7 tests, 1498 total
-- ✅ Server-side pagination — getPagedPersons/Teams/Departments, skip/take Prisma, URL params (?q=&page=), 400ms debounce, MUI Pagination, 1491 tests
+- ✅ Org chart visualization — ReactFlow + dagre, dept→team→member hierarchy, 23 tests (5 query + 18 component), 1544 total (~45min)
+- ✅ Test infrastructure fix — TRUNCATE CASCADE in cleanDb, RateLimitError in 7 mocks, eliminated all flaky FK failures
+- ✅ Employee profile pages — `/employees/[id]` read-only cards, guest-accessible, 3 sections (info/teams/leadership), 13 tests, 18 locales
+- ✅ Cascade delete impact warnings — DeleteImpactList component, 3 impact queries, ConfirmDialog children, 10 tests
 
 ## Backlog
 
@@ -38,12 +36,31 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 - 🟡🧠 Tutorial UX overhaul — no guiding effect on back button, lacks MUI visual guidance (highlighting/effects), guidance boxes appear in wrong positions
 - 🟢🧠 Bulk actions on tables — multi-select persons/teams and apply batch operations
 
-### Code Quality / Architecture
+### Code Quality / Architecture (found by audit)
 
-### Testing
+- 🔴🧠 Split `serverActions.ts` into domain modules — god file at 2,861 lines; split into serverActions.person/team/dept/admin/leave/reviews/data/positions.ts
+- 🟡🧠 Split `queries.ts` into domain modules — 1,073 lines; same domain split pattern as serverActions
+- 🟡🧠 Implement permission middleware for queries — inconsistent auth guards across query functions; some check permissions, others rely on caller
+- 🟡🧠 Consolidate duplicate seed data — demoSession.ts (9 persons) and serverActions.ts (6 persons) diverged; extract shared seed definitions to seedData.ts
+- 🟢⚡ Replace CSV import loop with `createMany` — serverActions.ts:1611 creates up to 1,000 persons via sequential INSERT; use tx.person.createMany()
+- 🟢⚡ Replace seed sequential inserts with `createMany` — demoSession.ts:33–67 and serverActions.ts:1030–1072 use sequential creates inside transactions
+- 🟢⚡ Extract `DEMO_EMAIL` constant — magic string "demo@hrmanager.app" appears in 4 files; add to constants.ts and import everywhere
+- 🟢⚡ Extract `MAX_EXPORT_ROWS` constant — magic `10000` literal at serverActions.ts:1737; add alongside MAX_IMPORT_ROWS in schemas.ts
+- 🟢⚡ Extract rate limit constants to named values — `60*1000`, `30`, `10` in rateLimit.ts:6–8; export as RATE_LIMIT_WINDOW_MS, MAX_REQUESTS_PER_WINDOW, AUTH_MAX_REQUESTS
+- 🟢⚡ Extract URL validator to schemas.ts — inline URL parse + protocol check at serverActions.ts:1517; extract to reusable ImageUrlSchema in schemas.ts
+
+### Testing (found by audit)
+
+- 🟡🧠 Add tests for 5 review client components — ReviewsClient, ReviewCycleDetailClient, ReviewSubmitClient, ReviewTemplateDetailClient, ReviewTemplatesClient have zero tests
+- 🟡🧠 Add tests for MyReviewsClient component — no direct tests; only covered indirectly
+- 🟢⚡ Fix test file naming inconsistencies — PersonCheckBoxList.test.tsx → PersonCheckboxList, PersonTable → PersonsTable, RemovePeople → RemovePerson
+- 🟢⚡ Add permission-denied path tests for queries — hasPermission always mocked to true in queries.test.ts; denial branch never exercised
 
 ### Accessibility (WCAG)
 
-### Security
+### Security (found by audit)
 
 - 🟡🧠 JWT permission revocation window — permissions valid up to 1h after admin revokes them
+- 🟡🧠 Add permission check to `getReviewRequestWithTemplate` — queries.ts:723 allows any authenticated user with a UUID to retrieve another user's review assignment
+- 🟡🧠 Add consistent permission checks to read queries — getPersons, getTeams, getDepartments, getReviewTemplates, getReviewCycles lack explicit auth guards
+- 🟢⚡ Domain-restrict profile image URLs — updateProfileImage accepts any HTTPS URL; restrict to known CDNs or an allowlist (serverActions.ts:1513)
