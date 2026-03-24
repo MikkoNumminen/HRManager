@@ -118,7 +118,7 @@ graph LR
 
 ### 🧪 Quality
 
-- **1401 tests, 99.9% line coverage** — Unit tests, integration tests against real PostgreSQL + in-memory MongoDB (no database mocks), and 75 Playwright E2E tests covering full user flows. _Why real databases in tests? Mocked tests can pass while production breaks. If your test doesn't hit a real database, it's not testing what you think it's testing._
+- **1360 tests, 99.9% line coverage** — Unit tests, integration tests against real PostgreSQL + in-memory MongoDB (no database mocks), and 75 Playwright E2E tests covering full user flows. _Why real databases in tests? Mocked tests can pass while production breaks. If your test doesn't hit a real database, it's not testing what you think it's testing._
 
 - **Docker-ready** — `docker compose up` starts PostgreSQL + MongoDB + the app. Migrations run automatically, demo login works out of the box. _One command, zero setup, fully working._
 
@@ -196,7 +196,7 @@ graph LR
 
 | Layer            | Tests    | What it covers                                                                           |
 | ---------------- | -------- | ---------------------------------------------------------------------------------------- |
-| UI components    | 663      | All 48 components: charts, forms, permission toggles, mobile views, themes               |
+| UI components    | 673      | All 49 components: charts, forms, permission toggles, mobile views, themes, skeletons    |
 | Server actions   | 186      | Every mutation: happy path, errors, permission denials, cascades                         |
 | Zod schemas      | 94       | Validation rules, edge cases, type inference                                             |
 | Prisma queries   | 60       | Real PostgreSQL + MongoDB queries — not mocks                                            |
@@ -213,7 +213,7 @@ graph LR
 | Audit logging    | 11       | Deferred writes, before/after snapshots, security events                                 |
 | Auth route       | 5        | Rate limiting on auth endpoints, CSRF, GET passthrough                                   |
 | E2E (Playwright) | 75       | Auth, CRUD, detail editing, dashboard, profile, data I/O, form validation, full workflow |
-| **Total**        | **1347** | **97.8% line coverage · 95.4% function coverage**                                        |
+| **Total**        | **1357** | **97.8% line coverage · 95.4% function coverage**                                        |
 
 ```
 Statements : 97.58%    Branches : 92.90%
