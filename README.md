@@ -57,7 +57,7 @@ sequenceDiagram
 
 ### 🔐 Security & access control
 
-- **26 permissions, not just 4 roles (granular RBAC)** — Instead of "admin = can do everything," each action has its own permission key (`person:create`, `team:delete`, `data:export`). Any permission can be overridden per-user: grant a regular user `person:create` without promoting them, or deny `team:delete` from an administrator who shouldn't have it. _Why? Simple role checks seem fine until you need exceptions — and every real organization has them._
+- **33 permissions, not just 4 roles (granular RBAC)** — Instead of "admin = can do everything," each action has its own permission key (`person:create`, `team:delete`, `review:manage`). Any permission can be overridden per-user: grant a regular user `person:create` without promoting them, or deny `team:delete` from an administrator who shouldn't have it. _Why? Simple role checks seem fine until you need exceptions — and every real organization has them._
 
 ```mermaid
 graph TD
@@ -116,9 +116,15 @@ graph LR
 
 - **CSV import/export** — Drag-and-drop CSV upload with client-side validation preview and RFC 4180 parsing (the official CSV standard). Export persons, teams, departments, and audit logs. Custom CSV parser with zero external dependencies. _Why no library? Full control over error handling, smaller bundle, and no third-party code in the data pipeline._
 
+### 📋 Performance Reviews / 360 Feedback
+
+- **Full 360-degree review system** — SELF, MANAGER, PEER, and DIRECT*REPORT review types. Configurable question templates with RATING (slider 1–10) and TEXT (free text) question types. Review cycles follow a DRAFT → OPEN → CLOSED lifecycle. \_Why a lifecycle? Drafts let HR build cycles before employees see them; closing locks in responses for archival accuracy.*
+
+- **Configurable templates and cycles** — Administrators create reusable `ReviewTemplate` models, attach questions, then instantiate `ReviewCycle` runs that target specific employees. `ReviewRequest` tracks who owes whom a review; `ReviewSubmission` stores the answers. Four new Prisma models, 11 server actions, 3 permission keys (`review:view`, `review:manage`, `review:submit`), and 6 dedicated routes (`/reviews`, `/reviews/templates`, `/reviews/cycles/[id]`, `/reviews/my-reviews`, etc.). Full audit logging and demo session isolation applied throughout.
+
 ### 🧪 Quality
 
-- **1360 tests, 99.9% line coverage** — Unit tests, integration tests against real PostgreSQL + in-memory MongoDB (no database mocks), and 75 Playwright E2E tests covering full user flows. _Why real databases in tests? Mocked tests can pass while production breaks. If your test doesn't hit a real database, it's not testing what you think it's testing._
+- **1385 tests, 99.9% line coverage** — Unit tests, integration tests against real PostgreSQL + in-memory MongoDB (no database mocks), and 75 Playwright E2E tests covering full user flows. _Why real databases in tests? Mocked tests can pass while production breaks. If your test doesn't hit a real database, it's not testing what you think it's testing._
 
 - **Docker-ready** — `docker compose up` starts PostgreSQL + MongoDB + the app. Migrations run automatically, demo login works out of the box. _One command, zero setup, fully working._
 
@@ -183,7 +189,7 @@ graph LR
 
 | Role          | Access                           | Typical use case                                  |
 | ------------- | -------------------------------- | ------------------------------------------------- |
-| Superuser     | All 26 permissions (immutable)   | System admin — first OAuth user is auto-promoted  |
+| Superuser     | All 33 permissions (immutable)   | System admin — first OAuth user is auto-promoted  |
 | Administrator | All CRUD + dashboard + audit log | Day-to-day management (no admin UI or data reset) |
 | User          | Read-only                        | Regular employee viewing org data                 |
 | Guest         | Read-only (unauthenticated)      | Public visitors browsing without login            |
@@ -197,7 +203,7 @@ graph LR
 | Layer            | Tests    | What it covers                                                                           |
 | ---------------- | -------- | ---------------------------------------------------------------------------------------- |
 | UI components    | 673      | All 49 components: charts, forms, permission toggles, mobile views, themes, skeletons    |
-| Server actions   | 186      | Every mutation: happy path, errors, permission denials, cascades                         |
+| Server actions   | 215      | Every mutation: happy path, errors, permission denials, cascades                         |
 | Zod schemas      | 94       | Validation rules, edge cases, type inference                                             |
 | Prisma queries   | 60       | Real PostgreSQL + MongoDB queries — not mocks                                            |
 | CSV utils        | 39       | RFC 4180 parsing, import validation, export formatting                                   |
@@ -213,7 +219,7 @@ graph LR
 | Audit logging    | 11       | Deferred writes, before/after snapshots, security events                                 |
 | Auth route       | 5        | Rate limiting on auth endpoints, CSRF, GET passthrough                                   |
 | E2E (Playwright) | 75       | Auth, CRUD, detail editing, dashboard, profile, data I/O, form validation, full workflow |
-| **Total**        | **1357** | **97.8% line coverage · 95.4% function coverage**                                        |
+| **Total**        | **1385** | **97.8% line coverage · 95.4% function coverage**                                        |
 
 ```
 Statements : 97.58%    Branches : 92.90%
