@@ -45,7 +45,8 @@
     "dataImportExport": "데이터 가져오기 / 내보내기",
     "performanceReviews": "성과 평가",
     "leaveManagement": "휴가 관리",
-    "positionCatalog": "직위 카탈로그"
+    "positionCatalog": "직위 카탈로그",
+    "orgChart": "조직도"
   },
   "home": {
     "title": "인사 관리 시스템",
@@ -671,5 +672,26 @@
   "positionNotifications": {
     "positionCreated": "직위가 생성되었습니다",
     "positionDeleted": "직위가 삭제되었습니다"
+  },
+  "employees": {
+    "title": "직원 프로필",
+    "notFound": "직원을 찾을 수 없습니다",
+    "teams": "팀",
+    "noTeams": "소속 팀 없음",
+    "leadership": "리더십 역할",
+    "managedTeams": "팀 매니저",
+    "headOfDepartments": "부서장",
+    "memberSince": "가입일",
+    "viewProfile": "프로필 보기"
+  },
+  "orgChart": {
+    "title": "조직도",
+    "heading": "조직도",
+    "organization": "조직",
+    "head": "부서장",
+    "manager": "관리자",
+    "departments": "부서",
+    "teams": "팀",
+    "persons": "직원"
   }
 }

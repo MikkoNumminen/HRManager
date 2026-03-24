@@ -45,7 +45,8 @@
     "dataImportExport": "Dataimport / -export",
     "performanceReviews": "Prestationsbedömningar",
     "leaveManagement": "Ledighetshantering",
-    "positionCatalog": "Positionskatalog"
+    "positionCatalog": "Positionskatalog",
+    "orgChart": "Organisationsschema"
   },
   "home": {
     "title": "Personalhanteringssystem",
@@ -671,5 +672,26 @@
   "positionNotifications": {
     "positionCreated": "Position skapad",
     "positionDeleted": "Position borttagen"
+  },
+  "employees": {
+    "title": "Anställdprofil",
+    "notFound": "Anställd hittades inte",
+    "teams": "Team",
+    "noTeams": "Inte medlem i något team",
+    "leadership": "Ledarskapsroller",
+    "managedTeams": "Teamchef",
+    "headOfDepartments": "Avdelningschef",
+    "memberSince": "Medlem sedan",
+    "viewProfile": "Visa profil"
+  },
+  "orgChart": {
+    "title": "Organisationsschema",
+    "heading": "Organisationsschema",
+    "organization": "Organisation",
+    "head": "Chef",
+    "manager": "Chef",
+    "departments": "Avdelningar",
+    "teams": "Team",
+    "persons": "Personer"
   }
 }

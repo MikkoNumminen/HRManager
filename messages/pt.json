@@ -45,7 +45,8 @@
     "dataImportExport": "Importação / Exportação de dados",
     "performanceReviews": "Avaliações de Desempenho",
     "leaveManagement": "Gestão de Ausências",
-    "positionCatalog": "Catálogo de cargos"
+    "positionCatalog": "Catálogo de cargos",
+    "orgChart": "Organograma"
   },
   "home": {
     "title": "Sistema de Gestão de Recursos Humanos",
@@ -671,5 +672,26 @@
   "positionNotifications": {
     "positionCreated": "Cargo criado",
     "positionDeleted": "Cargo excluído"
+  },
+  "employees": {
+    "title": "Perfil do funcionário",
+    "notFound": "Funcionário não encontrado",
+    "teams": "Equipas",
+    "noTeams": "Não é membro de nenhuma equipa",
+    "leadership": "Funções de liderança",
+    "managedTeams": "Gestor de equipa",
+    "headOfDepartments": "Chefe de departamento",
+    "memberSince": "Membro desde",
+    "viewProfile": "Ver perfil"
+  },
+  "orgChart": {
+    "title": "Organograma",
+    "heading": "Organograma",
+    "organization": "Organização",
+    "head": "Responsável",
+    "manager": "Gerente",
+    "departments": "Departamentos",
+    "teams": "Equipes",
+    "persons": "Pessoas"
   }
 }

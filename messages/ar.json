@@ -45,7 +45,8 @@
     "dataImportExport": "استيراد/تصدير البيانات",
     "performanceReviews": "تقييمات الأداء",
     "leaveManagement": "إدارة الإجازات",
-    "positionCatalog": "كتالوج المناصب"
+    "positionCatalog": "كتالوج المناصب",
+    "orgChart": "الهيكل التنظيمي"
   },
   "home": {
     "title": "نظام إدارة الموارد البشرية",
@@ -671,5 +672,26 @@
   "positionNotifications": {
     "positionCreated": "تم إنشاء المنصب",
     "positionDeleted": "تم حذف المنصب"
+  },
+  "employees": {
+    "title": "ملف الموظف",
+    "notFound": "الموظف غير موجود",
+    "teams": "الفرق",
+    "noTeams": "ليس عضوًا في أي فريق",
+    "leadership": "أدوار قيادية",
+    "managedTeams": "مدير فريق",
+    "headOfDepartments": "رئيس قسم",
+    "memberSince": "عضو منذ",
+    "viewProfile": "عرض الملف"
+  },
+  "orgChart": {
+    "title": "الهيكل التنظيمي",
+    "heading": "الهيكل التنظيمي",
+    "organization": "المنظمة",
+    "head": "الرئيس",
+    "manager": "المدير",
+    "departments": "الأقسام",
+    "teams": "الفرق",
+    "persons": "الأشخاص"
   }
 }

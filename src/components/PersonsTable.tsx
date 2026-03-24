@@ -16,13 +16,19 @@ import {
 import { Person } from "@/schemas";
 import { colors, mobileCardStyles } from "@/muiStyles";
 import { useTranslations } from "next-intl";
+import Link from "next/link";
 
 interface PersonTableProps {
   persons: Person[];
   minimal?: boolean;
+  linkToProfile?: boolean;
 }
 
-const PersonTable: React.FC<PersonTableProps> = ({ persons, minimal = false }) => {
+const PersonTable: React.FC<PersonTableProps> = ({
+  persons,
+  minimal = false,
+  linkToProfile = false,
+}) => {
   const t = useTranslations("persons");
   const tc = useTranslations("common");
   if (minimal) {
@@ -39,7 +45,33 @@ const PersonTable: React.FC<PersonTableProps> = ({ persons, minimal = false }) =
             .join("")
             .toUpperCase()
             .slice(0, 2);
-          return (
+          return linkToProfile ? (
+            <Chip
+              key={person.id}
+              component={Link}
+              href={`/employees/${person.id}`}
+              clickable
+              avatar={
+                <Avatar
+                  sx={{
+                    bgcolor: colors.slate600,
+                    color: `${colors.slate100} !important`,
+                    fontSize: "0.75rem",
+                  }}
+                >
+                  {initials}
+                </Avatar>
+              }
+              label={person.name}
+              variant="outlined"
+              sx={{
+                color: colors.slate100,
+                borderColor: colors.slate300,
+                "& .MuiChip-label": { fontWeight: 500 },
+                "&:hover": { borderColor: colors.green400, color: colors.green400 },
+              }}
+            />
+          ) : (
             <Chip
               key={person.id}
               avatar={
@@ -96,7 +128,25 @@ const PersonTable: React.FC<PersonTableProps> = ({ persons, minimal = false }) =
               ) : (
                 persons.map((person) => (
                   <TableRow key={person.id}>
-                    <TableCell>{person.name}</TableCell>
+                    <TableCell>
+                      {linkToProfile ? (
+                        <Link
+                          href={`/employees/${person.id}`}
+                          style={{ color: "inherit", textDecoration: "none" }}
+                        >
+                          <Typography
+                            component="span"
+                            sx={{
+                              "&:hover": { color: colors.green400, textDecoration: "underline" },
+                            }}
+                          >
+                            {person.name}
+                          </Typography>
+                        </Link>
+                      ) : (
+                        person.name
+                      )}
+                    </TableCell>
                     <TableCell>{person.position ?? ""}</TableCell>
                     <TableCell>{person.email ?? ""}</TableCell>
                     <TableCell>{new Date(person.createdAt).toLocaleString()}</TableCell>
@@ -116,7 +166,24 @@ const PersonTable: React.FC<PersonTableProps> = ({ persons, minimal = false }) =
           : persons.map((person) => (
               <Box key={person.id} sx={mobileCardStyles}>
                 <Typography variant="subtitle1" sx={{ color: colors.slate100, fontWeight: 600 }}>
-                  {person.name}
+                  {linkToProfile ? (
+                    <Link
+                      href={`/employees/${person.id}`}
+                      style={{ color: "inherit", textDecoration: "none" }}
+                    >
+                      <Typography
+                        component="span"
+                        sx={{
+                          fontWeight: 600,
+                          "&:hover": { color: colors.green400, textDecoration: "underline" },
+                        }}
+                      >
+                        {person.name}
+                      </Typography>
+                    </Link>
+                  ) : (
+                    person.name
+                  )}
                 </Typography>
                 {person.position && (
                   <Typography variant="body2" sx={{ color: colors.slate300 }}>

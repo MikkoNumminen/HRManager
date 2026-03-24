@@ -45,7 +45,8 @@
     "dataImportExport": "Data Import / Export",
     "performanceReviews": "Performance Reviews",
     "leaveManagement": "Leave Management",
-    "positionCatalog": "Position Catalog"
+    "positionCatalog": "Position Catalog",
+    "orgChart": "Org Chart"
   },
   "home": {
     "title": "Human Resources Management System",
@@ -671,5 +672,26 @@
   "positionNotifications": {
     "positionCreated": "Position added to catalog",
     "positionDeleted": "Position removed from catalog"
+  },
+  "employees": {
+    "title": "Employee Profile",
+    "notFound": "Employee not found",
+    "teams": "Teams",
+    "noTeams": "Not a member of any team",
+    "leadership": "Leadership Roles",
+    "managedTeams": "Team Manager",
+    "headOfDepartments": "Department Head",
+    "memberSince": "Member since",
+    "viewProfile": "View profile"
+  },
+  "orgChart": {
+    "title": "Org Chart",
+    "heading": "Organization Chart",
+    "organization": "Organization",
+    "head": "Head",
+    "manager": "Manager",
+    "departments": "Departments",
+    "teams": "Teams",
+    "persons": "Persons"
   }
 }

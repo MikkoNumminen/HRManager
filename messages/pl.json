@@ -45,7 +45,8 @@
     "dataImportExport": "Import / Eksport danych",
     "performanceReviews": "Oceny pracownicze",
     "leaveManagement": "Zarządzanie urlopami",
-    "positionCatalog": "Katalog stanowisk"
+    "positionCatalog": "Katalog stanowisk",
+    "orgChart": "Schemat organizacyjny"
   },
   "home": {
     "title": "System Zarządzania Zasobami Ludzkimi",
@@ -671,5 +672,26 @@
   "positionNotifications": {
     "positionCreated": "Stanowisko utworzone",
     "positionDeleted": "Stanowisko usunięte"
+  },
+  "employees": {
+    "title": "Profil pracownika",
+    "notFound": "Nie znaleziono pracownika",
+    "teams": "Zespoły",
+    "noTeams": "Nie należy do żadnego zespołu",
+    "leadership": "Role kierownicze",
+    "managedTeams": "Kierownik zespołu",
+    "headOfDepartments": "Kierownik działu",
+    "memberSince": "Członek od",
+    "viewProfile": "Zobacz profil"
+  },
+  "orgChart": {
+    "title": "Schemat organizacyjny",
+    "heading": "Schemat organizacyjny",
+    "organization": "Organizacja",
+    "head": "Kierownik",
+    "manager": "Kierownik",
+    "departments": "Działy",
+    "teams": "Zespoły",
+    "persons": "Osoby"
   }
 }

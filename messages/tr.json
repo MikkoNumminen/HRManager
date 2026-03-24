@@ -45,7 +45,8 @@
     "dataImportExport": "Veri İçeri Aktar / Dışa Aktar",
     "performanceReviews": "Performans Değerlendirmeleri",
     "leaveManagement": "İzin Yönetimi",
-    "positionCatalog": "Pozisyon kataloğu"
+    "positionCatalog": "Pozisyon kataloğu",
+    "orgChart": "Organizasyon Şeması"
   },
   "home": {
     "title": "İnsan Kaynakları Yönetim Sistemi",
@@ -671,5 +672,26 @@
   "positionNotifications": {
     "positionCreated": "Pozisyon oluşturuldu",
     "positionDeleted": "Pozisyon silindi"
+  },
+  "employees": {
+    "title": "Çalışan Profili",
+    "notFound": "Çalışan bulunamadı",
+    "teams": "Takımlar",
+    "noTeams": "Hiçbir takımın üyesi değil",
+    "leadership": "Liderlik Rolleri",
+    "managedTeams": "Takım Yöneticisi",
+    "headOfDepartments": "Departman Başkanı",
+    "memberSince": "Üyelik başlangıcı",
+    "viewProfile": "Profili görüntüle"
+  },
+  "orgChart": {
+    "title": "Organizasyon Şeması",
+    "heading": "Organizasyon Şeması",
+    "organization": "Organizasyon",
+    "head": "Başkan",
+    "manager": "Yönetici",
+    "departments": "Departmanlar",
+    "teams": "Takımlar",
+    "persons": "Kişiler"
   }
 }

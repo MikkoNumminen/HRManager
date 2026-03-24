@@ -45,7 +45,8 @@
     "dataImportExport": "Importation / Exportation de données",
     "performanceReviews": "Évaluations de performance",
     "leaveManagement": "Gestion des congés",
-    "positionCatalog": "Catalogue des postes"
+    "positionCatalog": "Catalogue des postes",
+    "orgChart": "Organigramme"
   },
   "home": {
     "title": "Système de gestion des ressources humaines",
@@ -671,5 +672,26 @@
   "positionNotifications": {
     "positionCreated": "Poste créé",
     "positionDeleted": "Poste supprimé"
+  },
+  "employees": {
+    "title": "Profil employé",
+    "notFound": "Employé introuvable",
+    "teams": "Équipes",
+    "noTeams": "Membre d'aucune équipe",
+    "leadership": "Rôles de direction",
+    "managedTeams": "Chef d'équipe",
+    "headOfDepartments": "Chef de département",
+    "memberSince": "Membre depuis",
+    "viewProfile": "Voir le profil"
+  },
+  "orgChart": {
+    "title": "Organigramme",
+    "heading": "Organigramme",
+    "organization": "Organisation",
+    "head": "Responsable",
+    "manager": "Responsable",
+    "departments": "Départements",
+    "teams": "Équipes",
+    "persons": "Personnes"
   }
 }

@@ -45,7 +45,8 @@
     "dataImportExport": "データのインポート/エクスポート",
     "performanceReviews": "パフォーマンス評価",
     "leaveManagement": "休暇管理",
-    "positionCatalog": "役職カタログ"
+    "positionCatalog": "役職カタログ",
+    "orgChart": "組織図"
   },
   "home": {
     "title": "人事管理システム",
@@ -671,5 +672,26 @@
   "positionNotifications": {
     "positionCreated": "役職が作成されました",
     "positionDeleted": "役職が削除されました"
+  },
+  "employees": {
+    "title": "従業員プロフィール",
+    "notFound": "従業員が見つかりません",
+    "teams": "チーム",
+    "noTeams": "チームに所属していません",
+    "leadership": "リーダーシップ",
+    "managedTeams": "チームマネージャー",
+    "headOfDepartments": "部門長",
+    "memberSince": "メンバー開始日",
+    "viewProfile": "プロフィールを見る"
+  },
+  "orgChart": {
+    "title": "組織図",
+    "heading": "組織図",
+    "organization": "組織",
+    "head": "責任者",
+    "manager": "マネージャー",
+    "departments": "部門",
+    "teams": "チーム",
+    "persons": "社員"
   }
 }

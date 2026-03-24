@@ -45,7 +45,8 @@
     "dataImportExport": "นำเข้า/ส่งออกข้อมูล",
     "performanceReviews": "การประเมินผลการปฏิบัติงาน",
     "leaveManagement": "การจัดการวันลา",
-    "positionCatalog": "แคตตาล็อกตำแหน่ง"
+    "positionCatalog": "แคตตาล็อกตำแหน่ง",
+    "orgChart": "แผนผังองค์กร"
   },
   "home": {
     "title": "ระบบจัดการทรัพยากรบุคคล",
@@ -671,5 +672,26 @@
   "positionNotifications": {
     "positionCreated": "สร้างตำแหน่งแล้ว",
     "positionDeleted": "ลบตำแหน่งแล้ว"
+  },
+  "employees": {
+    "title": "โปรไฟล์พนักงาน",
+    "notFound": "ไม่พบพนักงาน",
+    "teams": "ทีม",
+    "noTeams": "ไม่ได้เป็นสมาชิกทีมใด",
+    "leadership": "บทบาทผู้นำ",
+    "managedTeams": "หัวหน้าทีม",
+    "headOfDepartments": "หัวหน้าแผนก",
+    "memberSince": "สมาชิกตั้งแต่",
+    "viewProfile": "ดูโปรไฟล์"
+  },
+  "orgChart": {
+    "title": "แผนผังองค์กร",
+    "heading": "แผนผังองค์กร",
+    "organization": "องค์กร",
+    "head": "หัวหน้า",
+    "manager": "ผู้จัดการ",
+    "departments": "แผนก",
+    "teams": "ทีม",
+    "persons": "บุคลากร"
   }
 }

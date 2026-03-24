@@ -322,3 +322,64 @@ export const LeaveBalanceSchema = z.object({
 });
 
 export type LeaveBalance = z.infer<typeof LeaveBalanceSchema>;
+
+export const EmployeeTeamSchema = z.object({
+  teamId: z.string().uuid(),
+  teamName: z.string(),
+});
+
+export const EmployeeDepartmentSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+});
+
+export const EmployeeProfileSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string().min(1).max(MAX_NAME_LENGTH),
+  position: z.string().max(MAX_POSITION_LENGTH).nullable(),
+  email: z.string().email().max(MAX_EMAIL_LENGTH).nullable(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+  teams: z.array(EmployeeTeamSchema),
+  managedTeams: z.array(EmployeeTeamSchema),
+  headOfDepartments: z.array(EmployeeDepartmentSchema),
+});
+
+export type EmployeeProfile = z.infer<typeof EmployeeProfileSchema>;
+
+export const OrgChartMemberSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  position: z.string().nullable(),
+  email: z.string().nullable(),
+});
+
+export type OrgChartMember = z.infer<typeof OrgChartMemberSchema>;
+
+export const OrgChartTeamSchema = z.object({
+  teamId: z.string().uuid(),
+  teamName: z.string(),
+  managerId: z.string().uuid().nullable(),
+  managerName: z.string().nullable(),
+  members: z.array(OrgChartMemberSchema),
+});
+
+export type OrgChartTeam = z.infer<typeof OrgChartTeamSchema>;
+
+export const OrgChartDepartmentSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  headId: z.string().uuid().nullable(),
+  headName: z.string().nullable(),
+  teams: z.array(OrgChartTeamSchema),
+});
+
+export type OrgChartDepartment = z.infer<typeof OrgChartDepartmentSchema>;
+
+export const OrgChartDataSchema = z.object({
+  departments: z.array(OrgChartDepartmentSchema),
+  unassignedTeams: z.array(OrgChartTeamSchema),
+  unassignedPersons: z.array(OrgChartMemberSchema),
+});
+
+export type OrgChartData = z.infer<typeof OrgChartDataSchema>;

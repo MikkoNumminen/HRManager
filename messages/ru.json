@@ -45,7 +45,8 @@
     "dataImportExport": "Импорт / Экспорт данных",
     "performanceReviews": "Оценка эффективности",
     "leaveManagement": "Управление отпусками",
-    "positionCatalog": "Каталог должностей"
+    "positionCatalog": "Каталог должностей",
+    "orgChart": "Оргструктура"
   },
   "home": {
     "title": "Система управления персоналом",
@@ -671,5 +672,26 @@
   "positionNotifications": {
     "positionCreated": "Должность создана",
     "positionDeleted": "Должность удалена"
+  },
+  "employees": {
+    "title": "Профиль сотрудника",
+    "notFound": "Сотрудник не найден",
+    "teams": "Команды",
+    "noTeams": "Не состоит ни в одной команде",
+    "leadership": "Руководящие роли",
+    "managedTeams": "Руководитель команды",
+    "headOfDepartments": "Руководитель отдела",
+    "memberSince": "Участник с",
+    "viewProfile": "Просмотр профиля"
+  },
+  "orgChart": {
+    "title": "Оргструктура",
+    "heading": "Организационная структура",
+    "organization": "Организация",
+    "head": "Руководитель",
+    "manager": "Менеджер",
+    "departments": "Отделы",
+    "teams": "Команды",
+    "persons": "Сотрудники"
   }
 }

@@ -45,7 +45,8 @@
     "dataImportExport": "Імпорт / Експорт даних",
     "performanceReviews": "Оцінка ефективності",
     "leaveManagement": "Управління відпустками",
-    "positionCatalog": "Каталог посад"
+    "positionCatalog": "Каталог посад",
+    "orgChart": "Оргструктура"
   },
   "home": {
     "title": "Система управління персоналом",
@@ -671,5 +672,26 @@
   "positionNotifications": {
     "positionCreated": "Посаду створено",
     "positionDeleted": "Посаду видалено"
+  },
+  "employees": {
+    "title": "Профіль працівника",
+    "notFound": "Працівника не знайдено",
+    "teams": "Команди",
+    "noTeams": "Не є членом жодної команди",
+    "leadership": "Керівні ролі",
+    "managedTeams": "Керівник команди",
+    "headOfDepartments": "Керівник відділу",
+    "memberSince": "Учасник з",
+    "viewProfile": "Переглянути профіль"
+  },
+  "orgChart": {
+    "title": "Оргструктура",
+    "heading": "Організаційна структура",
+    "organization": "Організація",
+    "head": "Керівник",
+    "manager": "Менеджер",
+    "departments": "Відділи",
+    "teams": "Команди",
+    "persons": "Співробітники"
   }
 }

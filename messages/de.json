@@ -45,7 +45,8 @@
     "dataImportExport": "Datenimport / -export",
     "performanceReviews": "Leistungsbeurteilungen",
     "leaveManagement": "Abwesenheitsverwaltung",
-    "positionCatalog": "Positionskatalog"
+    "positionCatalog": "Positionskatalog",
+    "orgChart": "Organigramm"
   },
   "home": {
     "title": "Personalverwaltungssystem",
@@ -671,5 +672,26 @@
   "positionNotifications": {
     "positionCreated": "Position erstellt",
     "positionDeleted": "Position gelöscht"
+  },
+  "employees": {
+    "title": "Mitarbeiterprofil",
+    "notFound": "Mitarbeiter nicht gefunden",
+    "teams": "Teams",
+    "noTeams": "Kein Teammitglied",
+    "leadership": "Führungsrollen",
+    "managedTeams": "Teamleiter",
+    "headOfDepartments": "Abteilungsleiter",
+    "memberSince": "Mitglied seit",
+    "viewProfile": "Profil anzeigen"
+  },
+  "orgChart": {
+    "title": "Organigramm",
+    "heading": "Organigramm",
+    "organization": "Organisation",
+    "head": "Leitung",
+    "manager": "Manager",
+    "departments": "Abteilungen",
+    "teams": "Teams",
+    "persons": "Personen"
   }
 }

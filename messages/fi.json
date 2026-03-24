@@ -45,7 +45,8 @@
     "dataImportExport": "Tiedontuonti / Tiedonvienti",
     "performanceReviews": "Kehityskeskustelut",
     "leaveManagement": "Poissaolohallinta",
-    "positionCatalog": "Nimikekatalogi"
+    "positionCatalog": "Nimikekatalogi",
+    "orgChart": "Organisaatiokaavio"
   },
   "home": {
     "title": "Henkilöstöhallintajärjestelmä",
@@ -671,5 +672,26 @@
   "positionNotifications": {
     "positionCreated": "Nimike luotu",
     "positionDeleted": "Nimike poistettu"
+  },
+  "employees": {
+    "title": "Työntekijäprofiili",
+    "notFound": "Työntekijää ei löytynyt",
+    "teams": "Tiimit",
+    "noTeams": "Ei kuulu mihinkään tiimiin",
+    "leadership": "Johtamisroolit",
+    "managedTeams": "Tiimin vetäjä",
+    "headOfDepartments": "Osaston johtaja",
+    "memberSince": "Jäsen alkaen",
+    "viewProfile": "Näytä profiili"
+  },
+  "orgChart": {
+    "title": "Organisaatiokaavio",
+    "heading": "Organisaatiokaavio",
+    "organization": "Organisaatio",
+    "head": "Johtaja",
+    "manager": "Esimies",
+    "departments": "Osastot",
+    "teams": "Tiimit",
+    "persons": "Henkilöt"
   }
 }

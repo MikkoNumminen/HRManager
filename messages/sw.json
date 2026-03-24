@@ -45,7 +45,8 @@
     "dataImportExport": "Ingiza / Hamisha Data",
     "performanceReviews": "Tathmini za Utendaji",
     "leaveManagement": "Usimamizi wa Likizo",
-    "positionCatalog": "Orodha ya nafasi"
+    "positionCatalog": "Orodha ya nafasi",
+    "orgChart": "Chati ya Shirika"
   },
   "home": {
     "title": "Mfumo wa Usimamizi wa Rasilimali Watu",
@@ -671,5 +672,26 @@
   "positionNotifications": {
     "positionCreated": "Nafasi imeundwa",
     "positionDeleted": "Nafasi imefutwa"
+  },
+  "employees": {
+    "title": "Wasifu wa Mfanyakazi",
+    "notFound": "Mfanyakazi hajapatikana",
+    "teams": "Timu",
+    "noTeams": "Si mwanachama wa timu yoyote",
+    "leadership": "Majukumu ya Uongozi",
+    "managedTeams": "Meneja wa Timu",
+    "headOfDepartments": "Mkuu wa Idara",
+    "memberSince": "Mwanachama tangu",
+    "viewProfile": "Tazama wasifu"
+  },
+  "orgChart": {
+    "title": "Chati ya Shirika",
+    "heading": "Chati ya Shirika",
+    "organization": "Shirika",
+    "head": "Mkuu",
+    "manager": "Meneja",
+    "departments": "Idara",
+    "teams": "Timu",
+    "persons": "Watu"
   }
 }

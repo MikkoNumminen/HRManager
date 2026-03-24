@@ -45,7 +45,8 @@
     "dataImportExport": "डेटा आयात / निर्यात",
     "performanceReviews": "प्रदर्शन समीक्षाएँ",
     "leaveManagement": "अवकाश प्रबंधन",
-    "positionCatalog": "पद सूची"
+    "positionCatalog": "पद सूची",
+    "orgChart": "संगठन चार्ट"
   },
   "home": {
     "title": "मानव संसाधन प्रबंधन प्रणाली",
@@ -671,5 +672,26 @@
   "positionNotifications": {
     "positionCreated": "पद बनाया गया",
     "positionDeleted": "पद हटाया गया"
+  },
+  "employees": {
+    "title": "कर्मचारी प्रोफ़ाइल",
+    "notFound": "कर्मचारी नहीं मिला",
+    "teams": "टीमें",
+    "noTeams": "किसी टीम का सदस्य नहीं",
+    "leadership": "नेतृत्व भूमिकाएँ",
+    "managedTeams": "टीम प्रबंधक",
+    "headOfDepartments": "विभाग प्रमुख",
+    "memberSince": "सदस्य तिथि",
+    "viewProfile": "प्रोफ़ाइल देखें"
+  },
+  "orgChart": {
+    "title": "संगठन चार्ट",
+    "heading": "संगठन चार्ट",
+    "organization": "संगठन",
+    "head": "प्रमुख",
+    "manager": "प्रबंधक",
+    "departments": "विभाग",
+    "teams": "टीमें",
+    "persons": "व्यक्ति"
   }
 }

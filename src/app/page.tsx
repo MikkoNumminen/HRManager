@@ -58,7 +58,7 @@ export default async function Home() {
             <Typography variant="h6" gutterBottom>
               Persons
             </Typography>
-            <PersonTable persons={persons} />
+            <PersonTable persons={persons} linkToProfile />
           </Box>
         )
       ) : (
@@ -66,7 +66,7 @@ export default async function Home() {
           <Typography variant="h6" gutterBottom>
             Persons
           </Typography>
-          <PersonTable persons={persons} minimal />
+          <PersonTable persons={persons} minimal linkToProfile />
         </Box>
       )}
 

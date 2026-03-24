@@ -45,7 +45,8 @@
     "dataImportExport": "数据导入/导出",
     "performanceReviews": "绩效评估",
     "leaveManagement": "假期管理",
-    "positionCatalog": "职位目录"
+    "positionCatalog": "职位目录",
+    "orgChart": "组织架构图"
   },
   "home": {
     "title": "人力资源管理系统",
@@ -671,5 +672,26 @@
   "positionNotifications": {
     "positionCreated": "职位已创建",
     "positionDeleted": "职位已删除"
+  },
+  "employees": {
+    "title": "员工档案",
+    "notFound": "未找到员工",
+    "teams": "团队",
+    "noTeams": "未加入任何团队",
+    "leadership": "领导角色",
+    "managedTeams": "团队经理",
+    "headOfDepartments": "部门主管",
+    "memberSince": "加入日期",
+    "viewProfile": "查看档案"
+  },
+  "orgChart": {
+    "title": "组织架构图",
+    "heading": "组织架构图",
+    "organization": "组织",
+    "head": "负责人",
+    "manager": "经理",
+    "departments": "部门",
+    "teams": "团队",
+    "persons": "员工"
   }
 }
