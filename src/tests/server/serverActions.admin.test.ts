@@ -533,6 +533,24 @@ describe("seedMockData", () => {
     expect(override!.granted).toBe(true);
   });
 
+  // Production environment skips mock user seeding to prevent test accounts in prod DB.
+  test("skips mock user seeding in production environment", async () => {
+    const originalEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = "production";
+    try {
+      await seedMockData();
+
+      // Persons/teams are still seeded (scoped by sessionId)
+      const persons = await testPrisma.person.findMany();
+      expect(persons).toHaveLength(9);
+      // No mock users created in production
+      const users = await testPrisma.user.findMany();
+      expect(users).toHaveLength(0);
+    } finally {
+      process.env.NODE_ENV = originalEnv;
+    }
+  });
+
   // Demo sessions skip user seeding but still call seedPermissions for the permission catalog.
   test("calls seedPermissions in demo session without seeding users", async () => {
     const { seedPermissions } = require("@/permissions");

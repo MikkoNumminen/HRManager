@@ -249,10 +249,11 @@ export async function seedMockData(clearExisting: boolean = true): Promise<Actio
       });
     });
 
-    // Seed mock users only for real (non-demo) sessions — the User table has no
-    // sessionId column, so mock users would leak into the global table and be visible
-    // across sessions. Demo sessions only see demo@hrmanager.app via getUsers() anyway.
-    if (!sessionId) {
+    // Seed mock users only in non-production, non-demo sessions — the User table
+    // has no sessionId column, so mock users would leak into the global table.
+    // In production, skip entirely to prevent test accounts from being created.
+    const isNonProd = process.env.NODE_ENV !== "production";
+    if (!sessionId && isNonProd) {
       const mockUserSeeds = [
         { email: "admin@example.com", name: "Jane Admin", role: "administrator" },
         { email: "user1@example.com", name: "John User", role: "user" },
