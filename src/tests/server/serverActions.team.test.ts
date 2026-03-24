@@ -351,9 +351,12 @@ describe("addMember", () => {
 
   // Have to specify which team to add the member to.
   test("throws when no teamID provided", async () => {
-    expect(await addMember(formData({ personID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" }))).toEqual(
-      { error: expect.stringContaining("No teamID selected") },
-    );
+    expect(
+      await addMember(formData({ personID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" })),
+    ).toMatchObject({
+      error: expect.stringContaining("No teamID selected"),
+      code: "noTeamSelected",
+    });
   });
 
   // Have to specify which person to add.

@@ -17,7 +17,6 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 
 > 📋 **Audit research:** Items marked "(found by audit)" have detailed file:line references in memory file `project_audit_findings.md`. Read it before starting any of these tasks.
 
-- 🔴🧠 Leave/absence management — leave types, requests, balances, approval workflows [Claude 2, main]
 - 🟢⚡ CI pipeline monitoring & auto-fix — watching for failures, fixing build/lint/format issues [Claude 4, main]
 - 🟡🧠 Typed server action errors — replace generic string errors with typed error codes [Claude 3, main]
 - 🟡🧠 Standardize positions catalog — free-text position field causes inconsistency [Claude 3, main]
@@ -25,6 +24,7 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 
 ## Recently Completed
 
+- ✅ Leave/absence management — 3 models, 7 actions, 3 queries, 68 tests, LeaveManager UI, 18 locales
 - ✅ Empty state polish — EmptyState component, 3 tables, 51 locale translations, 3 tests
 - ✅ Demo session cleanup failure logging — 1 line fix in auth.ts
 - ✅ Performance reviews / 360 feedback — 4 models, 11 actions, 6 pages, 29 tests, 1385 total passing
