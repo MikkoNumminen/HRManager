@@ -112,6 +112,8 @@ graph LR
 
 - **Loading skeletons on every page (Suspense boundaries)** — Every route has a `loading.tsx` that renders a pixel-matched MUI Skeleton layout while the async server component fetches data. Next.js automatically wraps these in `<Suspense>` — the shell is streamed instantly and the real content replaces it once ready. _Why skeletons instead of spinners? Spinners tell you "loading"; skeletons show you where the content will land, reducing perceived latency._
 
+- **Client-side search & filtering** — Every data table (persons, teams, departments) has an instant search bar. Type a query and results filter in real-time using `useMemo` — no server round-trips, no debounce needed. Searches across all visible fields including nested data: team members, department teams, manager names. _Why client-side? These tables are small enough to live in memory. Skipping the network keeps filtering instant and eliminates loading states._
+
 - **Polished empty states** — Tables show a contextual icon, heading, and hint when empty. Persons shows a people icon with "Add your first person using the form above"; teams and departments follow the same pattern. Hint text is shown only when the user has create permission. Translated across all 18 locales.
 
 ### 📦 Data operations
@@ -210,26 +212,26 @@ graph LR
 
 ## Testing
 
-| Layer            | Tests    | What it covers                                                                                    |
-| ---------------- | -------- | ------------------------------------------------------------------------------------------------- |
-| UI components    | 696      | All 51 components: charts, forms, permission toggles, mobile views, themes, skeletons, leave mgmt |
-| Server actions   | 253      | Every mutation: happy path, errors, permission denials, cascades, leave approval workflow         |
-| Zod schemas      | 94       | Validation rules, edge cases, type inference                                                      |
-| Prisma queries   | 70       | Real PostgreSQL + MongoDB queries — not mocks                                                     |
-| CSV utils        | 39       | RFC 4180 parsing, import validation, export formatting                                            |
-| Style tokens     | 37       | Responsive breakpoints, theme tokens, component styles                                            |
-| Auth callbacks   | 32       | JWT enrichment, permission freshness, superuser bootstrap                                         |
-| RBAC logic       | 28       | Resolution, overrides, deny-wins, superuser bypass                                                |
-| Tutorial config  | 26       | Tour steps, DOM selectors, completion detection                                                   |
-| CSP proxy        | 20       | Nonce generation, header injection, domain allowlists                                             |
-| Rate limiting    | 18       | Sliding window, race conditions, cleanup                                                          |
-| i18n             | 14       | Locale loading, cookie persistence, Accept-Language detection                                     |
-| Demo session     | 12       | Sandbox creation, isolation, cleanup, expiry                                                      |
-| Theme config     | 12       | All 6 themes, CSS variables, FOUC prevention                                                      |
-| Audit logging    | 11       | Deferred writes, before/after snapshots, security events                                          |
-| Auth route       | 5        | Rate limiting on auth endpoints, CSRF, GET passthrough                                            |
-| E2E (Playwright) | 75       | Auth, CRUD, detail editing, dashboard, profile, data I/O, form validation, full workflow          |
-| **Total**        | **1446** | **97.8% line coverage · 95.4% function coverage**                                                 |
+| Layer            | Tests    | What it covers                                                                                            |
+| ---------------- | -------- | --------------------------------------------------------------------------------------------------------- |
+| UI components    | 734      | All 52 components: charts, forms, permission toggles, mobile views, themes, skeletons, search, leave mgmt |
+| Server actions   | 253      | Every mutation: happy path, errors, permission denials, cascades, leave approval workflow                 |
+| Zod schemas      | 94       | Validation rules, edge cases, type inference                                                              |
+| Prisma queries   | 70       | Real PostgreSQL + MongoDB queries — not mocks                                                             |
+| CSV utils        | 39       | RFC 4180 parsing, import validation, export formatting                                                    |
+| Style tokens     | 37       | Responsive breakpoints, theme tokens, component styles                                                    |
+| Auth callbacks   | 32       | JWT enrichment, permission freshness, superuser bootstrap                                                 |
+| RBAC logic       | 28       | Resolution, overrides, deny-wins, superuser bypass                                                        |
+| Tutorial config  | 26       | Tour steps, DOM selectors, completion detection                                                           |
+| CSP proxy        | 20       | Nonce generation, header injection, domain allowlists                                                     |
+| Rate limiting    | 18       | Sliding window, race conditions, cleanup                                                                  |
+| i18n             | 14       | Locale loading, cookie persistence, Accept-Language detection                                             |
+| Demo session     | 12       | Sandbox creation, isolation, cleanup, expiry                                                              |
+| Theme config     | 12       | All 6 themes, CSS variables, FOUC prevention                                                              |
+| Audit logging    | 11       | Deferred writes, before/after snapshots, security events                                                  |
+| Auth route       | 5        | Rate limiting on auth endpoints, CSRF, GET passthrough                                                    |
+| E2E (Playwright) | 75       | Auth, CRUD, detail editing, dashboard, profile, data I/O, form validation, full workflow                  |
+| **Total**        | **1484** | **97.8% line coverage · 95.4% function coverage**                                                         |
 
 ```
 Statements : 97.58%    Branches : 92.90%
