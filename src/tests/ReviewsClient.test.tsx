@@ -34,6 +34,7 @@ const defaultProps = {
   cycles: [makeCycle()],
   canManage: true,
   canSubmit: true,
+  canView: true,
 };
 
 describe("ReviewsClient", () => {
@@ -160,5 +161,18 @@ describe("ReviewsClient", () => {
     render(<ReviewsClient {...defaultProps} />);
     const link = screen.getByText("My Reviews");
     expect(link.closest("a")).toHaveAttribute("href", "/reviews/my-reviews");
+  });
+
+  // Shows Team Reviews button when canView is true.
+  test("shows Team Reviews button when canView is true", () => {
+    render(<ReviewsClient {...defaultProps} canView={true} />);
+    const link = screen.getByText("Team Reviews");
+    expect(link.closest("a")).toHaveAttribute("href", "/reviews/team-reviews");
+  });
+
+  // Hides Team Reviews button when canView is false.
+  test("hides Team Reviews button when canView is false", () => {
+    render(<ReviewsClient {...defaultProps} canView={false} />);
+    expect(screen.queryByText("Team Reviews")).not.toBeInTheDocument();
   });
 });

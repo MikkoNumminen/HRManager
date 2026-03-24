@@ -16,6 +16,7 @@ import {
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import AssignmentIcon from "@mui/icons-material/Assignment";
+import GroupIcon from "@mui/icons-material/Group";
 import {
   colors,
   formStyles,
@@ -33,6 +34,7 @@ interface Props {
   cycles: ReviewCycle[];
   canManage: boolean;
   canSubmit: boolean;
+  canView: boolean;
 }
 
 type FormState = { error: string | null };
@@ -43,7 +45,7 @@ const statusColors: Record<string, "default" | "success" | "error"> = {
   CLOSED: "error",
 };
 
-export default function ReviewsClient({ cycles, canManage, canSubmit }: Props) {
+export default function ReviewsClient({ cycles, canManage, canSubmit, canView }: Props) {
   const t = useTranslations("reviews");
   const tn = useTranslations("reviewNotifications");
   const { showSnackbar } = useSnackbar();
@@ -124,17 +126,30 @@ export default function ReviewsClient({ cycles, canManage, canSubmit }: Props) {
           <Typography variant="h6" sx={{ color: colors.slate100 }}>
             {t("heading")}
           </Typography>
-          {canSubmit && (
-            <Button
-              component="a"
-              href="/reviews/my-reviews"
-              startIcon={<AssignmentIcon />}
-              sx={smallButtonStyles}
-              size="small"
-            >
-              {t("myReviews")}
-            </Button>
-          )}
+          <Box sx={{ display: "flex", gap: 1 }}>
+            {canView && (
+              <Button
+                component="a"
+                href="/reviews/team-reviews"
+                startIcon={<GroupIcon />}
+                sx={smallButtonStyles}
+                size="small"
+              >
+                {t("teamReviewsTitle")}
+              </Button>
+            )}
+            {canSubmit && (
+              <Button
+                component="a"
+                href="/reviews/my-reviews"
+                startIcon={<AssignmentIcon />}
+                sx={smallButtonStyles}
+                size="small"
+              >
+                {t("myReviews")}
+              </Button>
+            )}
+          </Box>
         </Box>
         {cycles.length === 0 ? (
           <Box sx={{ py: 4, textAlign: "center" }}>

@@ -29,6 +29,7 @@ export default async function ReviewsPage() {
         cycles={cycles}
         canManage={!!permissions["review:manage"]}
         canSubmit={!!permissions["review:submit"]}
+        canView={!!permissions["review:view"] || !!permissions["review:manage"]}
       />
     </>
   );
