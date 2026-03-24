@@ -150,7 +150,7 @@ graph LR
 
 ### 🧪 Quality
 
-- **1763 tests, 91.9% line coverage** — Unit tests, integration tests against real PostgreSQL + in-memory MongoDB (no database mocks), and 75 Playwright E2E tests covering full user flows. _Why real databases in tests? Mocked tests can pass while production breaks. If your test doesn't hit a real database, it's not testing what you think it's testing._
+- **1765 tests, 91.9% line coverage** — Unit tests, integration tests against real PostgreSQL + in-memory MongoDB (no database mocks), and 75 Playwright E2E tests covering full user flows. _Why real databases in tests? Mocked tests can pass while production breaks. If your test doesn't hit a real database, it's not testing what you think it's testing._
 
 - **Structured logging (Pino)** — JSON logs in production, human-readable in development. `createRequestLogger()` produces child loggers with traceId and userId context for request correlation. Replaces all `console.error/warn` calls. _Why Pino? It's the fastest Node.js logger, and structured JSON logs are parseable by Datadog, Grafana Loki, and CloudWatch without custom parsing rules._
 
@@ -244,7 +244,7 @@ graph LR
 | Prisma queries     | 83       | Real PostgreSQL + MongoDB queries — not mocks; includes paged query tests for persons/teams/departments   |
 | CSV utils          | 39       | RFC 4180 parsing, import validation, export formatting                                                    |
 | Style tokens       | 37       | Responsive breakpoints, theme tokens, component styles                                                    |
-| Auth callbacks     | 32       | JWT enrichment, permission freshness, superuser bootstrap                                                 |
+| Auth callbacks     | 36       | JWT enrichment, permission freshness, demoSessionId ownership, superuser bootstrap                        |
 | RBAC logic         | 28       | Resolution, overrides, deny-wins, superuser bypass                                                        |
 | Tutorial config    | 26       | Tour steps, DOM selectors, completion detection                                                           |
 | CSP proxy          | 20       | Nonce generation, header injection, domain allowlists                                                     |
