@@ -1,12 +1,15 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, act, waitFor } from "@testing-library/react";
 import SearchBar from "@/components/SearchBar";
 import OptimisticPersons from "@/components/OptimisticPersons";
 import OptimisticTeams from "@/components/OptimisticTeams";
 import OptimisticDepartments from "@/components/OptimisticDepartments";
 import { Person, CombinedTeam, Department } from "@/schemas";
 
+const mockPush = jest.fn();
+const mockReplace = jest.fn();
+
 jest.mock("next/navigation", () => ({
-  useRouter: jest.fn(() => ({ push: jest.fn() })),
+  useRouter: jest.fn(() => ({ push: mockPush, replace: mockReplace })),
 }));
 
 jest.mock("../serverActions", () => ({
@@ -14,6 +17,20 @@ jest.mock("../serverActions", () => ({
   createTeam: jest.fn(),
   createDepartment: jest.fn(),
 }));
+
+jest.mock("../constants", () => ({
+  PAGE_SIZE: 25,
+}));
+
+beforeEach(() => {
+  jest.clearAllMocks();
+  jest.useFakeTimers();
+});
+
+afterEach(() => {
+  jest.runOnlyPendingTimers();
+  jest.useRealTimers();
+});
 
 // ---------------------------------------------------------------------------
 // SearchBar component tests
@@ -55,9 +72,11 @@ describe("SearchBar", () => {
 });
 
 // ---------------------------------------------------------------------------
-// OptimisticPersons search / filtering tests
+// OptimisticPersons search bar integration tests
+// Search is server-side: typing debounces a router.replace call.
+// The component shows whatever props it receives — no client-side filtering.
 // ---------------------------------------------------------------------------
-describe("OptimisticPersons – search filtering", () => {
+describe("OptimisticPersons – search bar", () => {
   const persons: Person[] = [
     {
       id: "p1",
@@ -75,494 +94,152 @@ describe("OptimisticPersons – search filtering", () => {
       createdAt: new Date("2024-01-02"),
       updatedAt: new Date("2024-01-02"),
     },
-    {
-      id: "p3",
-      name: "Charlie Brown",
-      position: null,
-      email: null,
-      createdAt: new Date("2024-01-03"),
-      updatedAt: new Date("2024-01-03"),
-    },
   ];
 
-  beforeEach(() => jest.clearAllMocks());
+  const defaultProps = { total: 2, page: 1, search: "" };
 
-  // Renders the SearchBar inside the persons page.
+  // Renders the SearchBar inside the persons list component.
   test("renders SearchBar", () => {
-    render(<OptimisticPersons persons={persons} canCreate={false} />);
+    render(<OptimisticPersons persons={persons} canCreate={false} {...defaultProps} />);
     expect(screen.getByPlaceholderText("Search\u2026")).toBeInTheDocument();
   });
 
-  // Shows all persons when the search field is empty.
-  test("shows all persons when search is empty", () => {
-    render(<OptimisticPersons persons={persons} canCreate={false} />);
+  // Shows all persons from props when search is empty (no local filtering).
+  test("shows all persons from props when search is empty", () => {
+    render(<OptimisticPersons persons={persons} canCreate={false} {...defaultProps} />);
     expect(screen.getAllByText("Alice Johnson").length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText("Bob Smith").length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText("Charlie Brown").length).toBeGreaterThanOrEqual(1);
   });
 
-  // Filters persons by name — only matching person should remain visible.
-  test("filters persons by name", async () => {
-    render(<OptimisticPersons persons={persons} canCreate={false} />);
+  // Typing debounces and triggers router.replace with q and page params.
+  test("debounces router.replace after typing in search bar", async () => {
+    render(<OptimisticPersons persons={persons} canCreate={false} {...defaultProps} />);
     fireEvent.change(screen.getByPlaceholderText("Search\u2026"), {
       target: { value: "alice" },
     });
+    expect(mockReplace).not.toHaveBeenCalled();
+    act(() => {
+      jest.advanceTimersByTime(400);
+    });
     await waitFor(() => {
-      expect(screen.getAllByText("Alice Johnson").length).toBeGreaterThanOrEqual(1);
-      expect(screen.queryByText("Bob Smith")).not.toBeInTheDocument();
-      expect(screen.queryByText("Charlie Brown")).not.toBeInTheDocument();
+      expect(mockReplace).toHaveBeenCalledWith(expect.stringMatching(/\/managePersons\?.*q=alice/));
     });
   });
 
-  // Filters persons by email.
-  test("filters persons by email", async () => {
-    render(<OptimisticPersons persons={persons} canCreate={false} />);
+  // Debounced call resets page to 1 when search changes.
+  test("resets page to 1 when search changes", async () => {
+    render(<OptimisticPersons persons={persons} canCreate={false} total={2} page={2} search="" />);
     fireEvent.change(screen.getByPlaceholderText("Search\u2026"), {
-      target: { value: "bob@example" },
+      target: { value: "bob" },
+    });
+    act(() => {
+      jest.advanceTimersByTime(400);
     });
     await waitFor(() => {
-      expect(screen.getAllByText("Bob Smith").length).toBeGreaterThanOrEqual(1);
-      expect(screen.queryByText("Alice Johnson")).not.toBeInTheDocument();
+      expect(mockReplace).toHaveBeenCalledWith(expect.stringMatching(/page=1/));
     });
   });
 
-  // Filters persons by position.
-  test("filters persons by position", async () => {
-    render(<OptimisticPersons persons={persons} canCreate={false} />);
-    fireEvent.change(screen.getByPlaceholderText("Search\u2026"), {
-      target: { value: "designer" },
-    });
-    await waitFor(() => {
-      expect(screen.getAllByText("Bob Smith").length).toBeGreaterThanOrEqual(1);
-      expect(screen.queryByText("Alice Johnson")).not.toBeInTheDocument();
-    });
-  });
-
-  // Search is case-insensitive.
-  test("search is case-insensitive", async () => {
-    render(<OptimisticPersons persons={persons} canCreate={false} />);
-    fireEvent.change(screen.getByPlaceholderText("Search\u2026"), {
-      target: { value: "ALICE" },
-    });
-    await waitFor(() => {
-      expect(screen.getAllByText("Alice Johnson").length).toBeGreaterThanOrEqual(1);
-    });
-  });
-
-  // Returns no results when search term does not match any person.
-  test("shows no persons when search matches nothing", async () => {
-    render(<OptimisticPersons persons={persons} canCreate={false} />);
-    fireEvent.change(screen.getByPlaceholderText("Search\u2026"), {
-      target: { value: "zzzznonexistent" },
-    });
-    await waitFor(() => {
-      expect(screen.queryByText("Alice Johnson")).not.toBeInTheDocument();
-      expect(screen.queryByText("Bob Smith")).not.toBeInTheDocument();
-      expect(screen.queryByText("Charlie Brown")).not.toBeInTheDocument();
-    });
-  });
-
-  // Clearing the search restores all persons.
-  test("clearing search restores all persons", async () => {
-    render(<OptimisticPersons persons={persons} canCreate={false} />);
-    const searchInput = screen.getByPlaceholderText("Search\u2026");
-
-    fireEvent.change(searchInput, { target: { value: "alice" } });
-    await waitFor(() => {
-      expect(screen.queryByText("Bob Smith")).not.toBeInTheDocument();
-    });
-
-    fireEvent.change(searchInput, { target: { value: "" } });
-    await waitFor(() => {
-      expect(screen.getAllByText("Alice Johnson").length).toBeGreaterThanOrEqual(1);
-      expect(screen.getAllByText("Bob Smith").length).toBeGreaterThanOrEqual(1);
-      expect(screen.getAllByText("Charlie Brown").length).toBeGreaterThanOrEqual(1);
-    });
-  });
-
-  // Handles persons with null email and position gracefully.
-  test("does not crash filtering persons with null fields", async () => {
-    render(<OptimisticPersons persons={persons} canCreate={false} />);
-    fireEvent.change(screen.getByPlaceholderText("Search\u2026"), {
-      target: { value: "charlie" },
-    });
-    await waitFor(() => {
-      expect(screen.getAllByText("Charlie Brown").length).toBeGreaterThanOrEqual(1);
-    });
-  });
-
-  // Whitespace-only search shows all persons (trimmed to empty string).
-  test("whitespace-only search shows all persons", async () => {
-    render(<OptimisticPersons persons={persons} canCreate={false} />);
-    fireEvent.change(screen.getByPlaceholderText("Search\u2026"), {
-      target: { value: "   " },
-    });
-    await waitFor(() => {
-      expect(screen.getAllByText("Alice Johnson").length).toBeGreaterThanOrEqual(1);
-      expect(screen.getAllByText("Bob Smith").length).toBeGreaterThanOrEqual(1);
-    });
+  // Reflects the initial search value passed as prop in the input.
+  test("initialises input with search prop value", () => {
+    render(
+      <OptimisticPersons persons={persons} canCreate={false} total={1} page={1} search="alice" />,
+    );
+    expect(screen.getByDisplayValue("alice")).toBeInTheDocument();
   });
 });
 
 // ---------------------------------------------------------------------------
-// OptimisticTeams search / filtering tests
+// OptimisticTeams search bar integration tests
 // ---------------------------------------------------------------------------
-describe("OptimisticTeams – search filtering", () => {
+describe("OptimisticTeams – search bar", () => {
   const teams: CombinedTeam[] = [
     {
       teamId: "t1",
       teamName: "Engineering",
-      teamManagerId: "m1",
-      managerName: "Alice Manager",
-      departmentId: "d1",
-      departmentName: "Tech",
-      createdAt: new Date("2024-01-01"),
-      updatedAt: new Date("2024-01-01"),
-      members: [
-        { personId: "p1", name: "Dev One", email: "dev1@example.com" },
-        { personId: "p2", name: "Dev Two", email: null },
-      ],
-    },
-    {
-      teamId: "t2",
-      teamName: "Design",
       teamManagerId: null,
       managerName: null,
       departmentId: null,
       departmentName: null,
-      createdAt: new Date("2024-01-02"),
-      updatedAt: new Date("2024-01-02"),
-      members: [{ personId: "p3", name: "Artist One", email: "artist@example.com" }],
-    },
-    {
-      teamId: "t3",
-      teamName: "Marketing",
-      teamManagerId: null,
-      managerName: "Bob Lead",
-      departmentId: null,
-      departmentName: "Sales",
-      createdAt: new Date("2024-01-03"),
-      updatedAt: new Date("2024-01-03"),
+      createdAt: new Date("2024-01-01"),
+      updatedAt: new Date("2024-01-01"),
       members: [],
     },
   ];
 
-  beforeEach(() => jest.clearAllMocks());
+  const defaultProps = { total: 1, page: 1, search: "" };
 
-  // Renders the SearchBar inside the teams page.
+  // Renders the SearchBar inside the teams list component.
   test("renders SearchBar", () => {
-    render(<OptimisticTeams teams={teams} canCreate={false} />);
+    render(<OptimisticTeams teams={teams} canCreate={false} {...defaultProps} />);
     expect(screen.getByPlaceholderText("Search\u2026")).toBeInTheDocument();
   });
 
-  // Shows all teams when search is empty.
-  test("shows all teams when search is empty", () => {
-    render(<OptimisticTeams teams={teams} canCreate={false} />);
+  // Shows all teams from props (no local filtering).
+  test("shows all teams from props", () => {
+    render(<OptimisticTeams teams={teams} canCreate={false} {...defaultProps} />);
     expect(screen.getAllByText("Engineering").length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText("Design").length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText("Marketing").length).toBeGreaterThanOrEqual(1);
   });
 
-  // Filters teams by team name.
-  test("filters teams by teamName", async () => {
-    render(<OptimisticTeams teams={teams} canCreate={false} />);
+  // Typing debounces and triggers router.replace for teams.
+  test("debounces router.replace after typing", async () => {
+    render(<OptimisticTeams teams={teams} canCreate={false} {...defaultProps} />);
     fireEvent.change(screen.getByPlaceholderText("Search\u2026"), {
-      target: { value: "engineering" },
+      target: { value: "engi" },
+    });
+    act(() => {
+      jest.advanceTimersByTime(400);
     });
     await waitFor(() => {
-      expect(screen.getAllByText("Engineering").length).toBeGreaterThanOrEqual(1);
-      expect(screen.queryByText("Design")).not.toBeInTheDocument();
-      expect(screen.queryByText("Marketing")).not.toBeInTheDocument();
-    });
-  });
-
-  // Filters teams by manager name.
-  test("filters teams by managerName", async () => {
-    render(<OptimisticTeams teams={teams} canCreate={false} />);
-    fireEvent.change(screen.getByPlaceholderText("Search\u2026"), {
-      target: { value: "alice manager" },
-    });
-    await waitFor(() => {
-      expect(screen.getAllByText("Engineering").length).toBeGreaterThanOrEqual(1);
-      expect(screen.queryByText("Design")).not.toBeInTheDocument();
-    });
-  });
-
-  // Filters teams by department name.
-  test("filters teams by departmentName", async () => {
-    render(<OptimisticTeams teams={teams} canCreate={false} />);
-    fireEvent.change(screen.getByPlaceholderText("Search\u2026"), {
-      target: { value: "sales" },
-    });
-    await waitFor(() => {
-      expect(screen.getAllByText("Marketing").length).toBeGreaterThanOrEqual(1);
-      expect(screen.queryByText("Engineering")).not.toBeInTheDocument();
-      expect(screen.queryByText("Design")).not.toBeInTheDocument();
-    });
-  });
-
-  // Filters teams by member name.
-  test("filters teams by member name", async () => {
-    render(<OptimisticTeams teams={teams} canCreate={false} />);
-    fireEvent.change(screen.getByPlaceholderText("Search\u2026"), {
-      target: { value: "artist one" },
-    });
-    await waitFor(() => {
-      expect(screen.getAllByText("Design").length).toBeGreaterThanOrEqual(1);
-      expect(screen.queryByText("Engineering")).not.toBeInTheDocument();
-    });
-  });
-
-  // Filters teams by member email.
-  test("filters teams by member email", async () => {
-    render(<OptimisticTeams teams={teams} canCreate={false} />);
-    fireEvent.change(screen.getByPlaceholderText("Search\u2026"), {
-      target: { value: "dev1@example" },
-    });
-    await waitFor(() => {
-      expect(screen.getAllByText("Engineering").length).toBeGreaterThanOrEqual(1);
-      expect(screen.queryByText("Design")).not.toBeInTheDocument();
-    });
-  });
-
-  // Search is case-insensitive for teams.
-  test("search is case-insensitive", async () => {
-    render(<OptimisticTeams teams={teams} canCreate={false} />);
-    fireEvent.change(screen.getByPlaceholderText("Search\u2026"), {
-      target: { value: "DESIGN" },
-    });
-    await waitFor(() => {
-      expect(screen.getAllByText("Design").length).toBeGreaterThanOrEqual(1);
-      expect(screen.queryByText("Engineering")).not.toBeInTheDocument();
-    });
-  });
-
-  // Returns no results when search term matches nothing.
-  test("shows no teams when search matches nothing", async () => {
-    render(<OptimisticTeams teams={teams} canCreate={false} />);
-    fireEvent.change(screen.getByPlaceholderText("Search\u2026"), {
-      target: { value: "zzzznonexistent" },
-    });
-    await waitFor(() => {
-      expect(screen.queryByText("Engineering")).not.toBeInTheDocument();
-      expect(screen.queryByText("Design")).not.toBeInTheDocument();
-      expect(screen.queryByText("Marketing")).not.toBeInTheDocument();
-    });
-  });
-
-  // Handles teams with null managerName, departmentName, and member email.
-  test("does not crash filtering teams with null fields", async () => {
-    render(<OptimisticTeams teams={teams} canCreate={false} />);
-    fireEvent.change(screen.getByPlaceholderText("Search\u2026"), {
-      target: { value: "design" },
-    });
-    await waitFor(() => {
-      expect(screen.getAllByText("Design").length).toBeGreaterThanOrEqual(1);
-    });
-  });
-
-  // Clearing the search restores all teams.
-  test("clearing search restores all teams", async () => {
-    render(<OptimisticTeams teams={teams} canCreate={false} />);
-    const searchInput = screen.getByPlaceholderText("Search\u2026");
-
-    fireEvent.change(searchInput, { target: { value: "engineering" } });
-    await waitFor(() => {
-      expect(screen.queryByText("Design")).not.toBeInTheDocument();
-    });
-
-    fireEvent.change(searchInput, { target: { value: "" } });
-    await waitFor(() => {
-      expect(screen.getAllByText("Engineering").length).toBeGreaterThanOrEqual(1);
-      expect(screen.getAllByText("Design").length).toBeGreaterThanOrEqual(1);
-      expect(screen.getAllByText("Marketing").length).toBeGreaterThanOrEqual(1);
+      expect(mockReplace).toHaveBeenCalledWith(expect.stringMatching(/\/manageTeams\?.*q=engi/));
     });
   });
 });
 
 // ---------------------------------------------------------------------------
-// OptimisticDepartments search / filtering tests
+// OptimisticDepartments search bar integration tests
 // ---------------------------------------------------------------------------
-describe("OptimisticDepartments – search filtering", () => {
+describe("OptimisticDepartments – search bar", () => {
   const departments: Department[] = [
     {
       id: "d1",
       name: "Engineering",
-      description: "Software development",
-      headId: "h1",
-      headName: "CTO Jane",
-      createdAt: new Date("2024-01-01"),
-      updatedAt: new Date("2024-01-01"),
-      teams: [
-        { teamId: "t1", teamName: "Backend" },
-        { teamId: "t2", teamName: "Frontend" },
-      ],
-    },
-    {
-      id: "d2",
-      name: "Marketing",
-      description: null,
+      description: "Dev team",
       headId: null,
       headName: null,
-      createdAt: new Date("2024-01-02"),
-      updatedAt: new Date("2024-01-02"),
-      teams: [{ teamId: "t3", teamName: "Social Media" }],
-    },
-    {
-      id: "d3",
-      name: "Human Resources",
-      description: "People operations",
-      headId: "h2",
-      headName: "HR Director",
-      createdAt: new Date("2024-01-03"),
-      updatedAt: new Date("2024-01-03"),
+      createdAt: new Date("2024-01-01"),
+      updatedAt: new Date("2024-01-01"),
       teams: [],
     },
   ];
 
-  beforeEach(() => jest.clearAllMocks());
+  const defaultProps = { total: 1, page: 1, search: "" };
 
-  // Renders the SearchBar inside the departments page.
+  // Renders the SearchBar inside the departments list component.
   test("renders SearchBar", () => {
-    render(<OptimisticDepartments departments={departments} canCreate={false} />);
+    render(<OptimisticDepartments departments={departments} canCreate={false} {...defaultProps} />);
     expect(screen.getByPlaceholderText("Search\u2026")).toBeInTheDocument();
   });
 
-  // Shows all departments when search is empty.
-  test("shows all departments when search is empty", () => {
-    render(<OptimisticDepartments departments={departments} canCreate={false} />);
+  // Shows all departments from props (no local filtering).
+  test("shows all departments from props", () => {
+    render(<OptimisticDepartments departments={departments} canCreate={false} {...defaultProps} />);
     expect(screen.getAllByText("Engineering").length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText("Marketing").length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText("Human Resources").length).toBeGreaterThanOrEqual(1);
   });
 
-  // Filters departments by name.
-  test("filters departments by name", async () => {
-    render(<OptimisticDepartments departments={departments} canCreate={false} />);
+  // Typing debounces and triggers router.replace for departments.
+  test("debounces router.replace after typing", async () => {
+    render(<OptimisticDepartments departments={departments} canCreate={false} {...defaultProps} />);
     fireEvent.change(screen.getByPlaceholderText("Search\u2026"), {
-      target: { value: "engineering" },
+      target: { value: "engi" },
+    });
+    act(() => {
+      jest.advanceTimersByTime(400);
     });
     await waitFor(() => {
-      expect(screen.getAllByText("Engineering").length).toBeGreaterThanOrEqual(1);
-      expect(screen.queryByText("Marketing")).not.toBeInTheDocument();
-      expect(screen.queryByText("Human Resources")).not.toBeInTheDocument();
-    });
-  });
-
-  // Filters departments by description.
-  test("filters departments by description", async () => {
-    render(<OptimisticDepartments departments={departments} canCreate={false} />);
-    fireEvent.change(screen.getByPlaceholderText("Search\u2026"), {
-      target: { value: "people operations" },
-    });
-    await waitFor(() => {
-      expect(screen.getAllByText("Human Resources").length).toBeGreaterThanOrEqual(1);
-      expect(screen.queryByText("Engineering")).not.toBeInTheDocument();
-      expect(screen.queryByText("Marketing")).not.toBeInTheDocument();
-    });
-  });
-
-  // Filters departments by head name.
-  test("filters departments by headName", async () => {
-    render(<OptimisticDepartments departments={departments} canCreate={false} />);
-    fireEvent.change(screen.getByPlaceholderText("Search\u2026"), {
-      target: { value: "cto jane" },
-    });
-    await waitFor(() => {
-      expect(screen.getAllByText("Engineering").length).toBeGreaterThanOrEqual(1);
-      expect(screen.queryByText("Marketing")).not.toBeInTheDocument();
-    });
-  });
-
-  // Filters departments by team name within that department.
-  test("filters departments by team name", async () => {
-    render(<OptimisticDepartments departments={departments} canCreate={false} />);
-    fireEvent.change(screen.getByPlaceholderText("Search\u2026"), {
-      target: { value: "social media" },
-    });
-    await waitFor(() => {
-      expect(screen.getAllByText("Marketing").length).toBeGreaterThanOrEqual(1);
-      expect(screen.queryByText("Engineering")).not.toBeInTheDocument();
-      expect(screen.queryByText("Human Resources")).not.toBeInTheDocument();
-    });
-  });
-
-  // Search is case-insensitive for departments.
-  test("search is case-insensitive", async () => {
-    render(<OptimisticDepartments departments={departments} canCreate={false} />);
-    fireEvent.change(screen.getByPlaceholderText("Search\u2026"), {
-      target: { value: "MARKETING" },
-    });
-    await waitFor(() => {
-      expect(screen.getAllByText("Marketing").length).toBeGreaterThanOrEqual(1);
-      expect(screen.queryByText("Engineering")).not.toBeInTheDocument();
-    });
-  });
-
-  // Returns no results when search term matches nothing.
-  test("shows no departments when search matches nothing", async () => {
-    render(<OptimisticDepartments departments={departments} canCreate={false} />);
-    fireEvent.change(screen.getByPlaceholderText("Search\u2026"), {
-      target: { value: "zzzznonexistent" },
-    });
-    await waitFor(() => {
-      expect(screen.queryByText("Engineering")).not.toBeInTheDocument();
-      expect(screen.queryByText("Marketing")).not.toBeInTheDocument();
-      expect(screen.queryByText("Human Resources")).not.toBeInTheDocument();
-    });
-  });
-
-  // Handles departments with null description, headName, and empty teams.
-  test("does not crash filtering departments with null fields", async () => {
-    render(<OptimisticDepartments departments={departments} canCreate={false} />);
-    fireEvent.change(screen.getByPlaceholderText("Search\u2026"), {
-      target: { value: "marketing" },
-    });
-    await waitFor(() => {
-      expect(screen.getAllByText("Marketing").length).toBeGreaterThanOrEqual(1);
-    });
-  });
-
-  // Clearing the search restores all departments.
-  test("clearing search restores all departments", async () => {
-    render(<OptimisticDepartments departments={departments} canCreate={false} />);
-    const searchInput = screen.getByPlaceholderText("Search\u2026");
-
-    fireEvent.change(searchInput, { target: { value: "engineering" } });
-    await waitFor(() => {
-      expect(screen.queryByText("Marketing")).not.toBeInTheDocument();
-    });
-
-    fireEvent.change(searchInput, { target: { value: "" } });
-    await waitFor(() => {
-      expect(screen.getAllByText("Engineering").length).toBeGreaterThanOrEqual(1);
-      expect(screen.getAllByText("Marketing").length).toBeGreaterThanOrEqual(1);
-      expect(screen.getAllByText("Human Resources").length).toBeGreaterThanOrEqual(1);
-    });
-  });
-
-  // Whitespace-only search shows all departments (trimmed to empty string).
-  test("whitespace-only search shows all departments", async () => {
-    render(<OptimisticDepartments departments={departments} canCreate={false} />);
-    fireEvent.change(screen.getByPlaceholderText("Search\u2026"), {
-      target: { value: "   " },
-    });
-    await waitFor(() => {
-      expect(screen.getAllByText("Engineering").length).toBeGreaterThanOrEqual(1);
-      expect(screen.getAllByText("Marketing").length).toBeGreaterThanOrEqual(1);
-    });
-  });
-
-  // Matching a team name under one department (Backend) does not show unrelated departments.
-  test("filters by nested team name precisely", async () => {
-    render(<OptimisticDepartments departments={departments} canCreate={false} />);
-    fireEvent.change(screen.getByPlaceholderText("Search\u2026"), {
-      target: { value: "backend" },
-    });
-    await waitFor(() => {
-      expect(screen.getAllByText("Engineering").length).toBeGreaterThanOrEqual(1);
-      expect(screen.queryByText("Marketing")).not.toBeInTheDocument();
-      expect(screen.queryByText("Human Resources")).not.toBeInTheDocument();
+      expect(mockReplace).toHaveBeenCalledWith(
+        expect.stringMatching(/\/manageDepartments\?.*q=engi/),
+      );
     });
   });
 });

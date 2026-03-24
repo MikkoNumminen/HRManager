@@ -1,12 +1,16 @@
 import TopBar from "@/components/TopBar";
 import OptimisticDepartments from "@/components/OptimisticDepartments";
-import { getDepartments } from "@/queries";
+import { getPagedDepartments } from "@/queries";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getUserPermissions } from "@/permissions";
 import { getTranslations } from "next-intl/server";
 
-export default async function ManageDepartmentsPage() {
+export default async function ManageDepartmentsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string; q?: string }>;
+}) {
   const session = await auth();
   if (!session) redirect("/");
 
@@ -18,7 +22,9 @@ export default async function ManageDepartmentsPage() {
     permissions["department:assign_team"];
   if (!canManageDepartments) redirect("/");
 
-  const departments = await getDepartments();
+  const { page: pageParam = "1", q = "" } = await searchParams;
+  const page = Math.max(1, parseInt(pageParam, 10) || 1);
+  const { items: departments, total } = await getPagedDepartments({ page, search: q });
   const t = await getTranslations("departments");
 
   return (
@@ -26,6 +32,9 @@ export default async function ManageDepartmentsPage() {
       <TopBar title={t("manageTitle")} backHref="/" permissions={permissions} />
       <OptimisticDepartments
         departments={departments}
+        total={total}
+        page={page}
+        search={q}
         canCreate={permissions["department:create"]}
       />
     </>

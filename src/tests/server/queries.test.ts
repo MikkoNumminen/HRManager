@@ -40,8 +40,11 @@ jest.mock("@/demoSession", () => ({
 
 import {
   getPersons,
+  getPagedPersons,
   getTeams,
+  getPagedTeams,
   getDepartments,
+  getPagedDepartments,
   getUsers,
   getUserById,
   getAllPermissionKeys,
@@ -1250,6 +1253,136 @@ describe("getProfile", () => {
     auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
     const profile = await getProfile();
     expect(profile!.image).toBe("https://example.com/pic.jpg");
+  });
+});
+
+describe("getPagedPersons", () => {
+  beforeEach(async () => {
+    await cleanDb();
+  });
+
+  afterAll(() => cleanDb());
+
+  // Returns empty items and zero total when database is empty.
+  test("returns empty items and total=0 when no persons exist", async () => {
+    const result = await getPagedPersons();
+    expect(result.items).toEqual([]);
+    expect(result.total).toBe(0);
+  });
+
+  // Returns correct page of results with skip/take applied.
+  test("paginates persons with page and pageSize", async () => {
+    for (let i = 1; i <= 5; i++) {
+      await testPrisma.person.create({ data: { name: `Person ${i}` } });
+    }
+    const page1 = await getPagedPersons({ page: 1, pageSize: 3 });
+    expect(page1.items).toHaveLength(3);
+    expect(page1.total).toBe(5);
+
+    const page2 = await getPagedPersons({ page: 2, pageSize: 3 });
+    expect(page2.items).toHaveLength(2);
+    expect(page2.total).toBe(5);
+  });
+
+  // Filters results by name (case-insensitive).
+  test("filters by search term across name, email, position", async () => {
+    await testPrisma.person.create({
+      data: { name: "Alice Dev", email: "alice@example.com", position: "Engineer" },
+    });
+    await testPrisma.person.create({ data: { name: "Bob Ops", email: "bob@example.com" } });
+
+    const result = await getPagedPersons({ search: "alice" });
+    expect(result.items).toHaveLength(1);
+    expect(result.items[0].name).toBe("Alice Dev");
+    expect(result.total).toBe(1);
+  });
+
+  // Isolates persons by sessionId in demo mode.
+  test("isolates persons by sessionId in demo mode", async () => {
+    await testPrisma.person.create({ data: { name: "Demo Person", sessionId: "sess-1" } });
+    await testPrisma.person.create({ data: { name: "Real Person", sessionId: null } });
+
+    mockGetDemoSessionId.mockResolvedValueOnce("sess-1");
+    const result = await getPagedPersons();
+    expect(result.items).toHaveLength(1);
+    expect(result.items[0].name).toBe("Demo Person");
+  });
+});
+
+describe("getPagedTeams", () => {
+  beforeEach(async () => {
+    await cleanDb();
+  });
+
+  afterAll(() => cleanDb());
+
+  // Returns empty items and zero total when database is empty.
+  test("returns empty items and total=0 when no teams exist", async () => {
+    const result = await getPagedTeams();
+    expect(result.items).toEqual([]);
+    expect(result.total).toBe(0);
+  });
+
+  // Paginates teams across multiple pages.
+  test("paginates teams with page and pageSize", async () => {
+    for (let i = 1; i <= 4; i++) {
+      await testPrisma.team.create({ data: { teamName: `Team ${i}` } });
+    }
+    const page1 = await getPagedTeams({ page: 1, pageSize: 2 });
+    expect(page1.items).toHaveLength(2);
+    expect(page1.total).toBe(4);
+
+    const page2 = await getPagedTeams({ page: 2, pageSize: 2 });
+    expect(page2.items).toHaveLength(2);
+  });
+
+  // Filters teams by team name (case-insensitive).
+  test("filters by team name search term", async () => {
+    await testPrisma.team.create({ data: { teamName: "Engineering" } });
+    await testPrisma.team.create({ data: { teamName: "Marketing" } });
+
+    const result = await getPagedTeams({ search: "engi" });
+    expect(result.items).toHaveLength(1);
+    expect(result.items[0].teamName).toBe("Engineering");
+    expect(result.total).toBe(1);
+  });
+});
+
+describe("getPagedDepartments", () => {
+  beforeEach(async () => {
+    await cleanDb();
+  });
+
+  afterAll(() => cleanDb());
+
+  // Returns empty items and zero total when database is empty.
+  test("returns empty items and total=0 when no departments exist", async () => {
+    const result = await getPagedDepartments();
+    expect(result.items).toEqual([]);
+    expect(result.total).toBe(0);
+  });
+
+  // Paginates departments across multiple pages.
+  test("paginates departments with page and pageSize", async () => {
+    for (let i = 1; i <= 5; i++) {
+      await testPrisma.department.create({ data: { name: `Dept ${i}` } });
+    }
+    const page1 = await getPagedDepartments({ page: 1, pageSize: 3 });
+    expect(page1.items).toHaveLength(3);
+    expect(page1.total).toBe(5);
+  });
+
+  // Filters departments by name search term.
+  test("filters by department name search term", async () => {
+    await testPrisma.department.create({
+      data: { name: "Engineering", description: "Builds things" },
+    });
+    await testPrisma.department.create({ data: { name: "HR" } });
+
+    const result = await getPagedDepartments({ search: "engin" });
+    expect(result.items).toHaveLength(1);
+    expect(result.items[0].name).toBe("Engineering");
+    expect(result.total).toBe(1);
   });
 });
 

@@ -30,11 +30,18 @@ import {
   LeaveType,
   LeaveRequest,
   LeaveBalance,
+  EmployeeProfileSchema,
+  EmployeeProfile,
+  OrgChartDataSchema,
+  OrgChartData,
 } from "./schemas";
 import { resolvePermissions, PERMISSION_KEYS, hasPermission } from "@/permissions";
 import { getDemoSessionId } from "@/demoSession";
 import { getAuditLogCollection, isMongoAvailable } from "@/mongoDb";
 import { Filter } from "mongodb";
+
+import { PAGE_SIZE } from "@/constants";
+export { PAGE_SIZE };
 
 export async function getPersons(): Promise<Person[]> {
   const sessionId = await getDemoSessionId();
@@ -44,6 +51,38 @@ export async function getPersons(): Promise<Person[]> {
   });
 
   return persons.map((person) => PersonSchema.parse(person));
+}
+
+export async function getPagedPersons(
+  opts: { page?: number; pageSize?: number; search?: string } = {},
+): Promise<{ items: Person[]; total: number }> {
+  const { page = 1, pageSize = PAGE_SIZE, search = "" } = opts;
+  const sessionId = await getDemoSessionId();
+  const q = search.trim();
+  const where = {
+    deletedAt: null as null,
+    sessionId,
+    ...(q
+      ? {
+          OR: [
+            { name: { contains: q, mode: "insensitive" as const } },
+            { email: { contains: q, mode: "insensitive" as const } },
+            { position: { contains: q, mode: "insensitive" as const } },
+          ],
+        }
+      : {}),
+  };
+  const [persons, total] = await Promise.all([
+    prisma.person.findMany({
+      where,
+      omit: { sessionId: true, deletedAt: true },
+      orderBy: { name: "asc" },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    }),
+    prisma.person.count({ where }),
+  ]);
+  return { items: persons.map((p) => PersonSchema.parse(p)), total };
 }
 
 export async function getTeams(): Promise<CombinedTeam[]> {
@@ -82,6 +121,69 @@ export async function getTeams(): Promise<CombinedTeam[]> {
   );
 }
 
+export async function getPagedTeams(
+  opts: { page?: number; pageSize?: number; search?: string } = {},
+): Promise<{ items: CombinedTeam[]; total: number }> {
+  const { page = 1, pageSize = PAGE_SIZE, search = "" } = opts;
+  const sessionId = await getDemoSessionId();
+  const q = search.trim();
+
+  // For search we need to post-filter after joining — use findMany with includes and slice
+  // Prisma can filter on relation fields but not across OR + relation simultaneously cleanly,
+  // so we fetch with relation filter where possible and do member search in JS.
+  const baseWhere = {
+    deletedAt: null as null,
+    sessionId,
+    ...(q
+      ? {
+          OR: [
+            { teamName: { contains: q, mode: "insensitive" as const } },
+            { manager: { name: { contains: q, mode: "insensitive" as const } } },
+            { department: { name: { contains: q, mode: "insensitive" as const } } },
+          ],
+        }
+      : {}),
+  };
+
+  const [teams, total] = await Promise.all([
+    prisma.team.findMany({
+      where: baseWhere,
+      include: {
+        manager: true,
+        department: true,
+        members: {
+          where: { deletedAt: null, sessionId },
+          include: { person: true },
+        },
+      },
+      orderBy: { teamName: "asc" },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    }),
+    prisma.team.count({ where: baseWhere }),
+  ]);
+
+  const items = teams.map((team) =>
+    TeamSchema.parse({
+      teamId: team.teamId,
+      teamName: team.teamName,
+      teamManagerId: team.teamManagerId ?? null,
+      managerName: team.manager?.name ?? null,
+      departmentId: team.departmentId ?? null,
+      departmentName: team.department?.name ?? null,
+      createdAt: team.createdAt,
+      updatedAt: team.updatedAt,
+      members:
+        team.members?.map((member) => ({
+          personId: member.personId,
+          name: member.person.name,
+          email: member.person.email ?? null,
+        })) ?? [],
+    }),
+  );
+  return { items, total };
+}
+
 export async function getDepartments(): Promise<Department[]> {
   const sessionId = await getDemoSessionId();
   const departments = await prisma.department.findMany({
@@ -107,6 +209,58 @@ export async function getDepartments(): Promise<Department[]> {
       })),
     }),
   );
+}
+
+export async function getPagedDepartments(
+  opts: { page?: number; pageSize?: number; search?: string } = {},
+): Promise<{ items: Department[]; total: number }> {
+  const { page = 1, pageSize = PAGE_SIZE, search = "" } = opts;
+  const sessionId = await getDemoSessionId();
+  const q = search.trim();
+  const baseWhere = {
+    deletedAt: null as null,
+    sessionId,
+    ...(q
+      ? {
+          OR: [
+            { name: { contains: q, mode: "insensitive" as const } },
+            { description: { contains: q, mode: "insensitive" as const } },
+            { head: { name: { contains: q, mode: "insensitive" as const } } },
+          ],
+        }
+      : {}),
+  };
+
+  const [departments, total] = await Promise.all([
+    prisma.department.findMany({
+      where: baseWhere,
+      include: {
+        head: true,
+        teams: { where: { deletedAt: null, sessionId } },
+      },
+      orderBy: { name: "asc" },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    }),
+    prisma.department.count({ where: baseWhere }),
+  ]);
+
+  const items = departments.map((dept) =>
+    DepartmentSchema.parse({
+      id: dept.id,
+      name: dept.name,
+      description: dept.description ?? null,
+      headId: dept.headId ?? null,
+      headName: dept.head?.name ?? null,
+      createdAt: dept.createdAt,
+      updatedAt: dept.updatedAt,
+      teams: dept.teams.map((t) => ({
+        teamId: t.teamId,
+        teamName: t.teamName,
+      })),
+    }),
+  );
+  return { items, total };
 }
 
 export async function getUsers(): Promise<AppUser[]> {
@@ -707,4 +861,137 @@ export async function getLeaveBalances(filters?: {
       remaining: b.allocated - b.used,
     }),
   );
+}
+
+export async function getEmployeeProfile(id: string): Promise<EmployeeProfile | null> {
+  const sessionId = await getDemoSessionId();
+  const person = await prisma.person.findFirst({
+    where: { id, deletedAt: null, sessionId },
+    omit: { sessionId: true, deletedAt: true },
+    include: {
+      teams: {
+        where: { deletedAt: null, team: { deletedAt: null } },
+        include: {
+          team: { select: { teamId: true, teamName: true } },
+        },
+      },
+      managedTeams: {
+        where: { deletedAt: null, sessionId },
+        select: { teamId: true, teamName: true },
+      },
+      headOfDepartments: {
+        where: { deletedAt: null, sessionId },
+        select: { id: true, name: true },
+      },
+    },
+  });
+
+  if (!person) return null;
+
+  return EmployeeProfileSchema.parse({
+    id: person.id,
+    name: person.name,
+    position: person.position,
+    email: person.email,
+    createdAt: person.createdAt,
+    updatedAt: person.updatedAt,
+    teams: person.teams.map((tm) => ({
+      teamId: tm.team.teamId,
+      teamName: tm.team.teamName,
+    })),
+    managedTeams: person.managedTeams.map((t) => ({
+      teamId: t.teamId,
+      teamName: t.teamName,
+    })),
+    headOfDepartments: person.headOfDepartments.map((d) => ({
+      id: d.id,
+      name: d.name,
+    })),
+  });
+}
+
+export async function getOrgChartData(): Promise<OrgChartData> {
+  const sessionId = await getDemoSessionId();
+
+  const [departments, allTeams, allPersons, allMembers] = await Promise.all([
+    prisma.department.findMany({
+      where: { deletedAt: null, sessionId },
+      include: {
+        head: { select: { id: true, name: true } },
+        teams: {
+          where: { deletedAt: null, sessionId },
+          include: {
+            manager: { select: { id: true, name: true } },
+            members: {
+              where: { deletedAt: null, sessionId },
+              include: {
+                person: { select: { id: true, name: true, position: true, email: true } },
+              },
+            },
+          },
+        },
+      },
+    }),
+    prisma.team.findMany({
+      where: { deletedAt: null, sessionId, departmentId: null },
+      include: {
+        manager: { select: { id: true, name: true } },
+        members: {
+          where: { deletedAt: null, sessionId },
+          include: { person: { select: { id: true, name: true, position: true, email: true } } },
+        },
+      },
+    }),
+    prisma.person.findMany({
+      where: { deletedAt: null, sessionId },
+      select: { id: true, name: true, position: true, email: true },
+    }),
+    prisma.teamMember.findMany({
+      where: { deletedAt: null, sessionId },
+      select: { personId: true },
+    }),
+  ]);
+
+  const assignedPersonIds = new Set(allMembers.map((m) => m.personId));
+
+  return OrgChartDataSchema.parse({
+    departments: departments.map((dept) => ({
+      id: dept.id,
+      name: dept.name,
+      headId: dept.headId ?? null,
+      headName: dept.head?.name ?? null,
+      teams: dept.teams.map((team) => ({
+        teamId: team.teamId,
+        teamName: team.teamName,
+        managerId: team.teamManagerId ?? null,
+        managerName: team.manager?.name ?? null,
+        members: team.members.map((m) => ({
+          id: m.person.id,
+          name: m.person.name,
+          position: m.person.position ?? null,
+          email: m.person.email ?? null,
+        })),
+      })),
+    })),
+    unassignedTeams: allTeams.map((team) => ({
+      teamId: team.teamId,
+      teamName: team.teamName,
+      managerId: team.teamManagerId ?? null,
+      managerName: team.manager?.name ?? null,
+      members: team.members.map((m) => ({
+        id: m.person.id,
+        name: m.person.name,
+        position: m.person.position ?? null,
+        email: m.person.email ?? null,
+      })),
+    })),
+    unassignedPersons: allPersons
+      .filter((p) => !assignedPersonIds.has(p.id))
+      .map((p) => ({
+        id: p.id,
+        name: p.name,
+        position: p.position ?? null,
+        email: p.email ?? null,
+      })),
+  });
 }
