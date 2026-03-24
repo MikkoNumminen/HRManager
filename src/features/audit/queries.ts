@@ -4,6 +4,11 @@ import { getDemoSessionId } from "@/demoSession";
 import { getAuditLogCollection, isMongoAvailable } from "@/mongoDb";
 import { Filter } from "mongodb";
 
+// Escape special regex characters to prevent regex injection
+function escapeRegex(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 export async function getAuditLogs(
   filters?: Partial<AuditLogFilter>,
 ): Promise<{ logs: AuditLog[]; total: number }> {
@@ -23,7 +28,10 @@ export async function getAuditLogs(
   const filter: Filter<{ sessionId: string | null }> = { sessionId };
 
   if (userEmail) {
-    (filter as Record<string, unknown>).userEmail = { $regex: userEmail, $options: "i" };
+    (filter as Record<string, unknown>).userEmail = {
+      $regex: escapeRegex(userEmail),
+      $options: "i",
+    };
   }
   if (action) {
     (filter as Record<string, unknown>).action = action;

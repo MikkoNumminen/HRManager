@@ -523,6 +523,24 @@ describe("getAuditLogs", () => {
     expect(result.total).toBe(1);
   });
 
+  // Escapes regex special characters in userEmail filter to prevent injection.
+  test("escapes regex special characters in userEmail filter", async () => {
+    await insertTestAuditLog({
+      action: "create",
+      entityType: "person",
+      userEmail: "alice@example.com",
+    });
+    await insertTestAuditLog({
+      action: "create",
+      entityType: "person",
+      userEmail: "bob@example.com",
+    });
+    // Without escaping, ".*" would match all emails (regex wildcard injection)
+    const result = await getAuditLogs({ userEmail: ".*" });
+    expect(result.logs).toHaveLength(0);
+    expect(result.total).toBe(0);
+  });
+
   // Filters logs by action type.
   test("filters by action", async () => {
     await insertTestAuditLog({
