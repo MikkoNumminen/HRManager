@@ -20,7 +20,7 @@ function cache<T extends (...args: never[]) => Promise<unknown>>(
   options?: { revalidate?: number; tags?: string[] },
 ): T {
   if (process.env.NODE_ENV === "test") return fn;
-  return nextCache(fn, keyParts, options) as T;
+  return nextCache(fn, keyParts, options) as unknown as T;
 }
 
 // Raw SQL result types for dashboard queries (unnamed parameterized queries
