@@ -15,6 +15,7 @@ import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useSnackbar } from "./SnackbarProvider";
 import { UserProfile } from "@/schemas";
+import TwoFactorSetup from "./TwoFactorSetup";
 
 interface ProfileEditorProps {
   profile: UserProfile;
@@ -219,6 +220,9 @@ export default function ProfileEditor({ profile }: ProfileEditorProps) {
           </Button>
         </Box>
       </Box>
+
+      {/* Two-Factor Authentication */}
+      <TwoFactorSetup enabled={profile.twoFactorEnabled} />
 
       {/* Permissions summary */}
       <Box sx={formStyles}>

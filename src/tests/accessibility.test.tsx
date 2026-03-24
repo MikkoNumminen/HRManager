@@ -94,6 +94,10 @@ jest.mock("@/serverActions", () => ({
   deleteReviewCycle: jest.fn(),
   resetAll: jest.fn(),
   seedMockData: jest.fn(),
+  beginTwoFactorSetup: jest.fn(),
+  confirmTwoFactorSetup: jest.fn(),
+  disableTwoFactor: jest.fn(),
+  regenerateRecoveryCodes: jest.fn(),
 }));
 
 jest.mock("../components/CsvImportDialog", () => {
@@ -305,6 +309,7 @@ const baseProfile: UserProfile = {
     "team:create": false,
     "admin:manage_users": false,
   },
+  twoFactorEnabled: false,
 };
 
 const mockPersons: Person[] = [

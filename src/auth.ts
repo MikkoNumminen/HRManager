@@ -114,12 +114,22 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return true;
     },
 
-    async jwt({ token, trigger, user }) {
+    async jwt({ token, trigger, session: sessionUpdate, user }) {
       if (!token.email) return token;
 
       // Persist demoSessionId from authorize() on sign-in
       if (trigger === "signIn" && user?.demoSessionId) {
         token.demoSessionId = user.demoSessionId;
+      }
+
+      // On sign-in, mark 2FA as not yet verified
+      if (trigger === "signIn") {
+        token.twoFactorVerified = false;
+      }
+
+      // Handle session update from client (e.g., after 2FA verification)
+      if (trigger === "update" && sessionUpdate?.twoFactorVerified === true) {
+        token.twoFactorVerified = true;
       }
 
       // --- Session tracking: create a new UserSession on sign-in ---
@@ -193,6 +203,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             permissions: {
               include: { permission: true },
             },
+            twoFactorAuth: {
+              select: { enabled: true },
+            },
           },
         });
 
@@ -216,6 +229,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.userId = dbUser.id;
         token.role = dbUser.role;
         token.permissionsVersion = dbUser.permissionsVersion;
+        token.twoFactorRequired = dbUser.twoFactorAuth?.enabled ?? false;
         const overrides = dbUser.permissions.map((up) => ({
           key: up.permission.key,
           granted: up.granted,
@@ -269,6 +283,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.permissions = token.permissions as Record<string, boolean>;
       if (token.demoSessionId) session.user.demoSessionId = token.demoSessionId as string;
       if (token.sessionId) session.user.sessionId = token.sessionId as string;
+      session.user.twoFactorRequired = (token.twoFactorRequired as boolean) ?? false;
+      session.user.twoFactorVerified = (token.twoFactorVerified as boolean) ?? false;
       return session;
     },
   },

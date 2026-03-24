@@ -14,6 +14,9 @@ export async function getProfile(): Promise<UserProfile | null> {
       permissions: {
         include: { permission: true },
       },
+      twoFactorAuth: {
+        select: { enabled: true },
+      },
     },
   });
 
@@ -28,5 +31,6 @@ export async function getProfile(): Promise<UserProfile | null> {
   return UserProfileSchema.parse({
     ...user,
     resolvedPermissions,
+    twoFactorEnabled: user.twoFactorAuth?.enabled ?? false,
   });
 }

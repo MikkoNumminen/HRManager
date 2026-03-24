@@ -91,6 +91,7 @@ model User {
   permissions        UserPermission[]
   demoSessions       DemoSession[]
   sessions           UserSession[]
+  twoFactorAuth      TwoFactorAuth?
 }
 
 model Permission {
@@ -151,6 +152,19 @@ model UserSession {
 
   @@index([userId, active])
   @@index([lastActiveAt])
+}
+
+model TwoFactorAuth {
+  id              String   @id @default(uuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  encryptedSecret String
+  enabled         Boolean  @default(false)
+  recoveryCodes   String[] @default([])
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userId])
 }
 
 enum QuestionType {

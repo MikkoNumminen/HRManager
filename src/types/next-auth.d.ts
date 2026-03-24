@@ -15,6 +15,8 @@ declare module "next-auth" {
       permissions?: Record<string, boolean>;
       demoSessionId?: string;
       sessionId?: string;
+      twoFactorRequired?: boolean;
+      twoFactorVerified?: boolean;
     };
   }
 }
@@ -27,5 +29,7 @@ declare module "next-auth/jwt" {
     demoSessionId?: string;
     sessionId?: string;
     sessionLastUpdate?: number;
+    twoFactorRequired?: boolean;
+    twoFactorVerified?: boolean;
   }
 }

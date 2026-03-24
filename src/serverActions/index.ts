@@ -74,3 +74,12 @@ export {
   adminForceLogoutSession,
   adminForceLogoutAllSessions,
 } from "../features/sessions/actions";
+export {
+  type TwoFactorSetupResult,
+  beginTwoFactorSetup,
+  confirmTwoFactorSetup,
+  disableTwoFactor,
+  regenerateRecoveryCodes,
+  verifyTwoFactorLogin,
+  adminResetTwoFactor,
+} from "../features/twoFactor/actions";

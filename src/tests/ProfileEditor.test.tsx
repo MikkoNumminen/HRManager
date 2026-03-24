@@ -10,6 +10,10 @@ jest.mock("next/navigation", () => ({
 jest.mock("../serverActions", () => ({
   updateProfileName: jest.fn(),
   updateProfileImage: jest.fn(),
+  beginTwoFactorSetup: jest.fn(),
+  confirmTwoFactorSetup: jest.fn(),
+  disableTwoFactor: jest.fn(),
+  regenerateRecoveryCodes: jest.fn(),
 }));
 
 const baseProfile: UserProfile = {
@@ -26,6 +30,7 @@ const baseProfile: UserProfile = {
     "team:create": false,
     "admin:manage_users": false,
   },
+  twoFactorEnabled: false,
 };
 
 describe("ProfileEditor", () => {

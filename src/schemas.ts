@@ -141,9 +141,24 @@ export const UserProfileSchema = z.object({
   createdAt: z.date(),
   updatedAt: z.date(),
   resolvedPermissions: z.record(z.string(), z.boolean()),
+  twoFactorEnabled: z.boolean().default(false),
 });
 
 export type UserProfile = z.infer<typeof UserProfileSchema>;
+
+export const TwoFactorSetupSchema = z.object({
+  uri: z.string(),
+  secret: z.string(),
+  recoveryCodes: z.array(z.string()),
+});
+
+export type TwoFactorSetup = z.infer<typeof TwoFactorSetupSchema>;
+
+export const TwoFactorVerifySchema = z.object({
+  code: z.string().min(6).max(9), // 6-digit TOTP or XXXX-XXXX recovery code
+});
+
+export type TwoFactorVerify = z.infer<typeof TwoFactorVerifySchema>;
 
 export const PermissionsSchema = z.record(z.string(), z.boolean());
 

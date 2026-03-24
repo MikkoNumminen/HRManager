@@ -40,3 +40,8 @@ export {
   getManagerTeamReviews,
 } from "./features/reviews/queries";
 export { getMyActiveSessions, getUserActiveSessions } from "./features/sessions/queries";
+export {
+  getTwoFactorStatus,
+  isUserTwoFactorEnabled,
+  getUserTwoFactorAuth,
+} from "./features/twoFactor/queries";

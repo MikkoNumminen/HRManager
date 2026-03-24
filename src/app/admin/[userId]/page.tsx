@@ -2,7 +2,12 @@ import TopBar from "@/components/TopBar";
 import UserPermissionEditor from "@/components/UserPermissionEditor";
 import AdminUserSessions from "@/components/AdminUserSessions";
 import { Typography } from "@mui/material";
-import { getUserById, getAllPermissionKeys, getUserActiveSessions } from "@/queries";
+import {
+  getUserById,
+  getAllPermissionKeys,
+  getUserActiveSessions,
+  isUserTwoFactorEnabled,
+} from "@/queries";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getUserPermissions, ROLE_DEFAULTS } from "@/permissions";
@@ -29,10 +34,11 @@ export default async function UserPermissionPage({
     return <Typography variant="h4">{t("notFound")}</Typography>;
   }
 
-  const [user, allPermissionKeys, userSessions] = await Promise.all([
+  const [user, allPermissionKeys, userSessions, userHas2FA] = await Promise.all([
     getUserById(userId),
     getAllPermissionKeys(),
     getUserActiveSessions(userId),
+    isUserTwoFactorEnabled(userId),
   ]);
 
   if (!user) {
@@ -55,6 +61,7 @@ export default async function UserPermissionPage({
         roleDefaults={ROLE_DEFAULTS}
         canAssignPermissions={canAssignPermissions}
         isDemoSession={!!demoSessionId}
+        twoFactorEnabled={userHas2FA}
       />
       <AdminUserSessions sessions={userSessions} userId={userId} userName={user.name} />
     </>

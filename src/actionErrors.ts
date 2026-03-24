@@ -93,6 +93,11 @@ export type ErrorCode =
   | "sessionNotFound"
   | "sessionAlreadyInactive"
   | "cannotDeactivateOwnSession"
+  // Two-factor authentication
+  | "invalidTotpCode"
+  | "invalidTotpSecret"
+  | "twoFactorAlreadyEnabled"
+  | "twoFactorNotEnabled"
   // Generic
   | "invalidId"
   // IP allowlist

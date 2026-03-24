@@ -1,6 +1,11 @@
 "use client";
 
-import { updateUserRole, updateUserPermission, kickOutUser } from "@/serverActions";
+import {
+  updateUserRole,
+  updateUserPermission,
+  kickOutUser,
+  adminResetTwoFactor,
+} from "@/serverActions";
 import {
   colors,
   formButtonContainerStyles,
@@ -44,6 +49,7 @@ interface UserPermissionEditorProps {
   roleDefaults: Record<string, string[]>;
   canAssignPermissions: boolean;
   isDemoSession?: boolean;
+  twoFactorEnabled?: boolean;
 }
 
 type FormState = { error: string | null };
@@ -61,6 +67,7 @@ export default function UserPermissionEditor({
   roleDefaults,
   canAssignPermissions,
   isDemoSession,
+  twoFactorEnabled,
 }: UserPermissionEditorProps) {
   const t = useTranslations("admin");
   const tc = useTranslations("common");
@@ -75,6 +82,8 @@ export default function UserPermissionEditor({
   const [permError, setPermError] = useState<string | null>(null);
   const [kickOutOpen, setKickOutOpen] = useState(false);
   const [kickOutPending, setKickOutPending] = useState(false);
+  const [reset2FAOpen, setReset2FAOpen] = useState(false);
+  const [reset2FAPending, setReset2FAPending] = useState(false);
 
   const roleLabels: Record<string, string> = {
     superuser: t("roleSuperuser"),
@@ -126,6 +135,22 @@ export default function UserPermissionEditor({
     }
     showSnackbar(tn("userKickedOut", { name: user.name ?? user.email }));
     router.push("/admin");
+  };
+
+  const handleReset2FA = async () => {
+    setReset2FAPending(true);
+    const formData = new FormData();
+    formData.set("userId", user.id);
+    const result = await adminResetTwoFactor(formData);
+    if (result?.error) {
+      setPermError(result.error);
+      setReset2FAPending(false);
+      setReset2FAOpen(false);
+      return;
+    }
+    showSnackbar(tn("twoFactorReset", { name: user.name ?? user.email }));
+    setReset2FAOpen(false);
+    setReset2FAPending(false);
   };
 
   const formatKey = (key: string) => {
@@ -359,6 +384,39 @@ export default function UserPermissionEditor({
               {t("dangerZone")}
             </Typography>
           </Box>
+          {twoFactorEnabled && (
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: { xs: "stretch", sm: "center" },
+                justifyContent: "space-between",
+                flexDirection: { xs: "column", sm: "row" },
+                gap: { xs: 1.5, sm: 2 },
+                pb: 2,
+                borderBottom: `1px solid ${colors.slate600}`,
+              }}
+            >
+              <Typography variant="body2" sx={{ color: colors.slate400 }}>
+                {t("reset2FADescription")}
+              </Typography>
+              <Button
+                onClick={() => setReset2FAOpen(true)}
+                disabled={reset2FAPending}
+                sx={{
+                  color: colors.warning,
+                  borderColor: colors.warning,
+                  "&:hover": {
+                    backgroundColor: "rgba(251, 191, 36, 0.1)",
+                    borderColor: colors.warning,
+                  },
+                  minWidth: { xs: "auto", sm: 120 },
+                }}
+                variant="outlined"
+              >
+                {t("reset2FA")}
+              </Button>
+            </Box>
+          )}
           <Box
             sx={{
               display: "flex",
@@ -385,6 +443,14 @@ export default function UserPermissionEditor({
               {t("kickOut")}
             </Button>
           </Box>
+          <ConfirmDialog
+            open={reset2FAOpen}
+            title={t("reset2FATitle")}
+            message={t("reset2FAConfirm", { name: user.name ?? user.email })}
+            confirmLabel={t("reset2FA")}
+            onConfirm={handleReset2FA}
+            onCancel={() => setReset2FAOpen(false)}
+          />
           <ConfirmDialog
             open={kickOutOpen}
             title={t("kickOutTitle")}
