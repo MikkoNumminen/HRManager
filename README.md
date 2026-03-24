@@ -114,6 +114,8 @@ graph LR
 
 - **Server-side pagination & search** — Every management table (persons, teams, departments) uses database-level `skip`/`take` (Prisma) so only one page of results loads at a time. Search is URL-driven (`?q=` + `?page=`) via a 400ms debounced `router.replace` — typing updates local state immediately, the server re-fetches after the debounce. Results are bookmarkable and shareable. _Why server-side? Client-side filtering doesn't scale; pushing skip/take into Prisma means 25 rows per page regardless of org size, and the URL approach means deep links and browser history work naturally._
 
+- **Cascade delete impact warnings** — Before deleting a person, team, or department, the confirmation dialog shows exactly what references will break: managed teams that will lose their manager, departments that will lose their head, team memberships that will be removed, linked leave requests, and review assignments. Fetched server-side and displayed with a warning panel inside the ConfirmDialog. _Why? Accidental deletes in HR systems can cascade in ways users don't expect — showing the blast radius before confirmation prevents "I didn't know that would happen" moments._
+
 - **Polished empty states** — Tables show a contextual icon, heading, and hint when empty. Persons shows a people icon with "Add your first person using the form above"; teams and departments follow the same pattern. Hint text is shown only when the user has create permission. Translated across all 18 locales.
 
 ### 📦 Data operations
@@ -140,7 +142,7 @@ graph LR
 
 ### 🧪 Quality
 
-- **1498 tests, 99.9% line coverage** — Unit tests, integration tests against real PostgreSQL + in-memory MongoDB (no database mocks), and 75 Playwright E2E tests covering full user flows. _Why real databases in tests? Mocked tests can pass while production breaks. If your test doesn't hit a real database, it's not testing what you think it's testing._
+- **1544 tests, 99.9% line coverage** — Unit tests, integration tests against real PostgreSQL + in-memory MongoDB (no database mocks), and 75 Playwright E2E tests covering full user flows. _Why real databases in tests? Mocked tests can pass while production breaks. If your test doesn't hit a real database, it's not testing what you think it's testing._
 
 - **Docker-ready** — `docker compose up` starts PostgreSQL + MongoDB + the app. Migrations run automatically, demo login works out of the box. _One command, zero setup, fully working._
 
@@ -235,7 +237,7 @@ graph LR
 | Audit logging    | 11       | Deferred writes, before/after snapshots, security events                                                  |
 | Auth route       | 5        | Rate limiting on auth endpoints, CSRF, GET passthrough                                                    |
 | E2E (Playwright) | 75       | Auth, CRUD, detail editing, dashboard, profile, data I/O, form validation, full workflow                  |
-| **Total**        | **1491** | **97.8% line coverage · 95.4% function coverage**                                                         |
+| **Total**        | **1544** | **97.8% line coverage · 95.4% function coverage**                                                         |
 
 ```
 Statements : 97.58%    Branches : 92.90%

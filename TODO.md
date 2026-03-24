@@ -20,13 +20,13 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 - 🟢⚡ CI pipeline monitoring & auto-fix — watching for failures, fixing build/lint/format issues [Claude 4, main]
 - 🟢🧠 Employee profile pages — read-only `/employees/[id]` cards, guest-accessible [Claude 4, main]
 - 🟡🧠 Org chart visualization — interactive hierarchy using existing manager/dept head data [Claude 2, main]
-- 🟢🧠 Cascade delete impact warnings — show what references break before deleting a person/team/department [Claude 3, main]
+- 🔴🧠 Full codebase audit — 7-phase read-only analysis → AUDIT_REPORT.md + new TODO items [Claude 1, main]
 
 ## Recently Completed
 
+- ✅ Cascade delete impact warnings — DeleteImpactList component, 3 impact queries, ConfirmDialog children, 10 tests, 1544 total
 - ✅ Audit log TTL + rate limit cleanup — MongoDB TTL index (90-day retention), /api/cron/cleanup route, 7 tests, 1498 total
 - ✅ Server-side pagination — getPagedPersons/Teams/Departments, skip/take Prisma, URL params (?q=&page=), 400ms debounce, MUI Pagination, 1491 tests
-- ✅ Standardize positions catalog — Position model, 2 actions, /positions page, Autocomplete, 18 locales, 15 tests
 
 ## Backlog
 
