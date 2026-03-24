@@ -41,6 +41,30 @@ jest.mock("@/demoSession", () => ({
   getDemoSessionId: jest.fn().mockResolvedValue(null),
 }));
 
+// Mock hash chain — audit log tests don't need real chain integrity
+jest.mock("@/lib/auditHashChain", () => ({
+  computeHash: jest.fn().mockReturnValue("test-hash"),
+  getLatestHash: jest.fn().mockResolvedValue(null),
+}));
+
+// Mock logger — capture structured log calls
+const mockLoggerError = jest.fn();
+jest.mock("@/lib/logger", () => ({
+  __esModule: true,
+  default: {
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: (...args: unknown[]) => mockLoggerError(...args),
+    debug: jest.fn(),
+    child: jest.fn().mockReturnValue({
+      info: jest.fn(),
+      error: jest.fn(),
+      warn: jest.fn(),
+      debug: jest.fn(),
+    }),
+  },
+}));
+
 import {
   logAudit,
   logPermissionDenial,
@@ -189,9 +213,9 @@ describe("logPermissionDenial", () => {
     expect(JSON.parse(logs[0].after!)).toEqual({ permissionKey: "admin:manage_users" });
   });
 
-  // Logs error to console when database write fails (does not throw).
-  test("logs error to console when write fails", async () => {
-    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+  // Logs error via structured logger when database write fails (does not throw).
+  test("logs error via logger when write fails", async () => {
+    mockLoggerError.mockClear();
     const col = getTestAuditLogCollection();
     const insertSpy = jest
       .spyOn(col, "insertOne")
@@ -204,11 +228,10 @@ describe("logPermissionDenial", () => {
     await logPermissionDenial("person:delete");
     await flushAfterCallbacks();
 
-    expect(consoleSpy).toHaveBeenCalledWith(
-      "[audit] Failed to log permission denial:",
-      expect.any(Error),
+    expect(mockLoggerError).toHaveBeenCalledWith(
+      expect.objectContaining({ err: expect.any(Error) }),
+      "Failed to log permission denial",
     );
-    consoleSpy.mockRestore();
     insertSpy.mockRestore();
   });
 });
@@ -245,9 +268,9 @@ describe("logRateLimitHit", () => {
     });
   });
 
-  // Logs error to console when database write fails (does not throw).
-  test("logs error to console when write fails", async () => {
-    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+  // Logs error via structured logger when database write fails (does not throw).
+  test("logs error via logger when write fails", async () => {
+    mockLoggerError.mockClear();
     const col = getTestAuditLogCollection();
     const insertSpy = jest
       .spyOn(col, "insertOne")
@@ -256,11 +279,10 @@ describe("logRateLimitHit", () => {
     await logRateLimitHit("createPerson", "ip:10.0.0.1");
     await flushAfterCallbacks();
 
-    expect(consoleSpy).toHaveBeenCalledWith(
-      "[audit] Failed to log rate limit hit:",
-      expect.any(Error),
+    expect(mockLoggerError).toHaveBeenCalledWith(
+      expect.objectContaining({ err: expect.any(Error) }),
+      "Failed to log rate limit hit",
     );
-    consoleSpy.mockRestore();
     insertSpy.mockRestore();
   });
 });
@@ -343,9 +365,9 @@ describe("deferAudit", () => {
     expect(afterCallbacks).toHaveLength(0);
   });
 
-  // Logs error to console when insertMany fails (does not throw).
-  test("logs error to console when insertMany fails", async () => {
-    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+  // Logs error via structured logger when insertMany fails (does not throw).
+  test("logs error via logger when insertMany fails", async () => {
+    mockLoggerError.mockClear();
     const col = getTestAuditLogCollection();
     const insertManySpy = jest
       .spyOn(col, "insertMany")
@@ -362,11 +384,10 @@ describe("deferAudit", () => {
     ]);
     await flushAfterCallbacks();
 
-    expect(consoleSpy).toHaveBeenCalledWith(
-      "[audit] Failed to write deferred audit entries:",
-      expect.any(Error),
+    expect(mockLoggerError).toHaveBeenCalledWith(
+      expect.objectContaining({ err: expect.any(Error) }),
+      "Failed to write deferred audit entries",
     );
-    consoleSpy.mockRestore();
     insertManySpy.mockRestore();
   });
 });

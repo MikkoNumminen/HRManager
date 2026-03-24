@@ -1,6 +1,7 @@
 import { RateLimitError } from "@/rateLimit";
 import { ActionError, type ErrorCode } from "@/actionErrors";
 import { getTranslations } from "next-intl/server";
+import logger from "@/lib/logger";
 
 /**
  * Server actions return ActionResult so error messages survive Next.js production sanitization.
@@ -16,7 +17,10 @@ export async function safe(fn: () => Promise<void>): Promise<ActionResult> {
     if (error && typeof error === "object" && "digest" in error) throw error;
     if (error instanceof ActionError) return { error: error.message, code: error.code };
     if (error instanceof RateLimitError) return { error: error.message, code: "rateLimited" };
-    if (error instanceof Error) return { error: error.message, code: "unexpectedError" };
+    if (error instanceof Error) {
+      logger.error({ err: error, code: "unexpectedError" }, "Server action failed");
+      return { error: error.message, code: "unexpectedError" };
+    }
     const tErr = await getTranslations("errors");
     return { error: tErr("unexpectedError"), code: "unexpectedError" };
   }

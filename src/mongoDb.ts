@@ -1,4 +1,5 @@
 import { MongoClient, Db, Collection, ObjectId } from "mongodb";
+import logger from "@/lib/logger";
 
 export interface AuditLogDocument {
   _id?: ObjectId;
@@ -101,7 +102,7 @@ export async function ensureAuditLogIndexes(): Promise<void> {
       });
     } catch {
       // Collection already exists but collMod failed for another reason — log and continue
-      console.warn("[mongoDb] Could not apply schema validation to auditLogs collection");
+      logger.warn("Could not apply schema validation to auditLogs collection");
     }
   }
 

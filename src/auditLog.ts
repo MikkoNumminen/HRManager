@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { getDemoSessionId } from "@/demoSession";
 import { AuditActionSchema, AuditEntityTypeSchema } from "@/schemas";
 import { computeHash, getLatestHash } from "@/lib/auditHashChain";
+import logger from "@/lib/logger";
 import { after } from "next/server";
 import { z } from "zod";
 
@@ -118,7 +119,7 @@ export function deferAudit(entries: DeferredAuditEntry[]): void {
       });
       await col.insertMany(docs);
     } catch (error) {
-      console.error("[audit] Failed to write deferred audit entries:", error);
+      logger.error({ err: error }, "Failed to write deferred audit entries");
     }
   });
 }
@@ -158,7 +159,7 @@ export async function logPermissionDenial(permissionKey: string): Promise<void> 
       doc.hash = computeHash(doc);
       await getAuditLogCollection().insertOne(doc);
     } catch (error) {
-      console.error("[audit] Failed to log permission denial:", error);
+      logger.error({ err: error }, "Failed to log permission denial");
     }
   });
 }
@@ -192,7 +193,7 @@ export async function logRateLimitHit(action: string, identifier: string): Promi
       doc.hash = computeHash(doc);
       await getAuditLogCollection().insertOne(doc);
     } catch (error) {
-      console.error("[audit] Failed to log rate limit hit:", error);
+      logger.error({ err: error }, "Failed to log rate limit hit");
     }
   });
 }
