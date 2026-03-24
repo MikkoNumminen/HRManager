@@ -181,6 +181,18 @@ export function AdminPageSkeleton() {
   );
 }
 
+// Org chart page skeleton — full-height canvas placeholder
+export function OrgChartSkeleton() {
+  return (
+    <>
+      <TopBarSkeleton />
+      <Box sx={{ ...pageContainerStyles, height: "calc(100vh - 120px)" }}>
+        <Skeleton variant="rounded" width="100%" height="100%" />
+      </Box>
+    </>
+  );
+}
+
 export function LeaveSkeleton() {
   return (
     <>

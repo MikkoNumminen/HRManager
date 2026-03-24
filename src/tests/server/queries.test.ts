@@ -1386,4 +1386,80 @@ describe("getPagedDepartments", () => {
   });
 });
 
+describe("getOrgChartData", () => {
+  beforeEach(async () => {
+    await cleanDb();
+  });
+
+  // Returns empty departments, teams, and persons when no data exists.
+  test("returns empty data for empty database", async () => {
+    const { getOrgChartData } = await import("@/queries");
+    const data = await getOrgChartData();
+    expect(data.departments).toHaveLength(0);
+    expect(data.unassignedTeams).toHaveLength(0);
+    expect(data.unassignedPersons).toHaveLength(0);
+  });
+
+  // Returns departments with their teams and team members.
+  test("returns department hierarchy with teams and members", async () => {
+    const person = await testPrisma.person.create({
+      data: { name: "Alice", email: "alice@test.com", position: "Developer" },
+    });
+    const dept = await testPrisma.department.create({
+      data: { name: "Engineering" },
+    });
+    const team = await testPrisma.team.create({
+      data: { teamName: "Backend", departmentId: dept.id, teamManagerId: person.id },
+    });
+    await testPrisma.teamMember.create({
+      data: { personId: person.id, teamId: team.teamId },
+    });
+
+    const { getOrgChartData } = await import("@/queries");
+    const data = await getOrgChartData();
+    expect(data.departments).toHaveLength(1);
+    expect(data.departments[0].name).toBe("Engineering");
+    expect(data.departments[0].teams).toHaveLength(1);
+    expect(data.departments[0].teams[0].teamName).toBe("Backend");
+    expect(data.departments[0].teams[0].managerName).toBe("Alice");
+    expect(data.departments[0].teams[0].members).toHaveLength(1);
+    expect(data.departments[0].teams[0].members[0].name).toBe("Alice");
+  });
+
+  // Teams without a department appear in unassignedTeams.
+  test("returns unassigned teams separately", async () => {
+    await testPrisma.team.create({ data: { teamName: "Freelancers" } });
+
+    const { getOrgChartData } = await import("@/queries");
+    const data = await getOrgChartData();
+    expect(data.unassignedTeams).toHaveLength(1);
+    expect(data.unassignedTeams[0].teamName).toBe("Freelancers");
+  });
+
+  // Persons not in any team appear in unassignedPersons.
+  test("returns unassigned persons separately", async () => {
+    await testPrisma.person.create({ data: { name: "Bob", email: "bob@test.com" } });
+
+    const { getOrgChartData } = await import("@/queries");
+    const data = await getOrgChartData();
+    expect(data.unassignedPersons).toHaveLength(1);
+    expect(data.unassignedPersons[0].name).toBe("Bob");
+  });
+
+  // Soft-deleted records are excluded from the org chart.
+  test("excludes soft-deleted records", async () => {
+    await testPrisma.person.create({
+      data: { name: "Deleted", email: "del@test.com", deletedAt: new Date() },
+    });
+    await testPrisma.team.create({ data: { teamName: "Gone", deletedAt: new Date() } });
+    await testPrisma.department.create({ data: { name: "Old", deletedAt: new Date() } });
+
+    const { getOrgChartData } = await import("@/queries");
+    const data = await getOrgChartData();
+    expect(data.departments).toHaveLength(0);
+    expect(data.unassignedTeams).toHaveLength(0);
+    expect(data.unassignedPersons).toHaveLength(0);
+  });
+});
+
 afterAll(() => testPrisma.$disconnect());

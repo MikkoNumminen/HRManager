@@ -210,6 +210,16 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
                       {t("performanceReviews")}
                     </MenuItem>
                   )}
+                  {session?.user?.permissions?.["person:read"] && (
+                    <MenuItem
+                      component={Link}
+                      href="/orgchart"
+                      onClick={() => setAnchorEl(null)}
+                      sx={userMenuItemStyles}
+                    >
+                      {t("orgChart")}
+                    </MenuItem>
+                  )}
                   {session?.user?.permissions?.["dashboard:view"] && (
                     <MenuItem
                       component={Link}
@@ -424,6 +434,21 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
                   }}
                 >
                   <ListItemText primary={t("performanceReviews")} />
+                </ListItemButton>
+              </ListItem>
+            )}
+            {session?.user?.permissions?.["person:read"] && (
+              <ListItem disablePadding>
+                <ListItemButton
+                  component={Link}
+                  href="/orgchart"
+                  onClick={() => setDrawerOpen(false)}
+                  sx={{
+                    color: colors.slate100,
+                    "&:hover": { backgroundColor: colors.hoverOverlay },
+                  }}
+                >
+                  <ListItemText primary={t("orgChart")} />
                 </ListItemButton>
               </ListItem>
             )}
