@@ -1,22 +1,15 @@
 import { prisma } from "@/db";
-import { auth } from "@/auth";
 import {
   PersonSchema,
   TeamSchema,
   DepartmentSchema,
   UserSchema,
-  UserProfileSchema,
-  AuditLogSchema,
-  AuditLogFilterSchema,
   DashboardMetricsSchema,
   DashboardRecentActivitySchema,
   Person,
   CombinedTeam,
   Department,
   AppUser,
-  UserProfile,
-  AuditLog,
-  AuditLogFilter,
   DashboardMetrics,
   ReviewTemplateSchema,
   ReviewCycleSchema,
@@ -38,7 +31,6 @@ import {
 import { resolvePermissions, PERMISSION_KEYS, hasPermission } from "@/permissions";
 import { getDemoSessionId } from "@/demoSession";
 import { getAuditLogCollection, isMongoAvailable } from "@/mongoDb";
-import { Filter } from "mongodb";
 
 import {
   PAGE_SIZE,
@@ -49,6 +41,8 @@ import {
 } from "@/constants";
 export { PAGE_SIZE };
 export { getPositions } from "./features/positions/queries";
+export { getProfile } from "./features/profile/queries";
+export { getAuditLogs, getAuditLogUserEmails } from "./features/audit/queries";
 
 export async function getPersons(): Promise<Person[]> {
   const sessionId = await getDemoSessionId();
@@ -315,67 +309,6 @@ export async function getAllPermissionKeys(): Promise<string[]> {
   return [...PERMISSION_KEYS];
 }
 
-export async function getAuditLogs(
-  filters?: Partial<AuditLogFilter>,
-): Promise<{ logs: AuditLog[]; total: number }> {
-  const allowed = await hasPermission("admin:view_audit_log");
-  if (!allowed) {
-    throw new Error("Permission denied");
-  }
-  const parsed = AuditLogFilterSchema.parse(filters ?? {});
-  const { userEmail, action, entityType, dateFrom, dateTo, page, pageSize } = parsed;
-
-  if (!isMongoAvailable()) {
-    return { logs: [], total: 0 };
-  }
-
-  const sessionId = await getDemoSessionId();
-  const col = getAuditLogCollection();
-  const filter: Filter<{ sessionId: string | null }> = { sessionId };
-
-  if (userEmail) {
-    (filter as Record<string, unknown>).userEmail = { $regex: userEmail, $options: "i" };
-  }
-  if (action) {
-    (filter as Record<string, unknown>).action = action;
-  }
-  if (entityType) {
-    (filter as Record<string, unknown>).entityType = entityType;
-  }
-  if (dateFrom || dateTo) {
-    const createdAtFilter: Record<string, Date> = {};
-    if (dateFrom) createdAtFilter.$gte = dateFrom;
-    if (dateTo) createdAtFilter.$lte = dateTo;
-    (filter as Record<string, unknown>).createdAt = createdAtFilter;
-  }
-
-  const [docs, total] = await Promise.all([
-    col
-      .find(filter)
-      .sort({ createdAt: -1, _id: -1 })
-      .skip((page - 1) * pageSize)
-      .limit(pageSize)
-      .toArray(),
-    col.countDocuments(filter),
-  ]);
-
-  const logs = docs.map((doc) =>
-    AuditLogSchema.parse({
-      id: doc._id!.toString(),
-      userId: doc.userId,
-      userEmail: doc.userEmail,
-      action: doc.action,
-      entityType: doc.entityType,
-      entityId: doc.entityId,
-      before: doc.before,
-      after: doc.after,
-      createdAt: doc.createdAt,
-    }),
-  );
-
-  return { logs, total };
-}
-
 // Raw SQL result types for dashboard queries (unnamed parameterized queries
 // instead of Prisma Typed SQL named prepared statements — PgBouncer compatible)
 interface DashboardCountsRow {
@@ -498,51 +431,6 @@ export async function getDashboardMetrics(): Promise<DashboardMetrics> {
       departments: g.departments ?? 0,
     })),
     recentActivity,
-  });
-}
-
-export async function getAuditLogUserEmails(): Promise<string[]> {
-  const allowed = await hasPermission("admin:view_audit_log");
-  if (!allowed) {
-    throw new Error("Permission denied");
-  }
-  if (!isMongoAvailable()) {
-    return [];
-  }
-  const sessionId = await getDemoSessionId();
-  const col = getAuditLogCollection();
-  const emails = await col.distinct("userEmail", {
-    userEmail: { $ne: null },
-    sessionId,
-  });
-  return (emails as string[]).filter(Boolean).sort();
-}
-
-export async function getProfile(): Promise<UserProfile | null> {
-  const session = await auth();
-  if (!session?.user?.email) return null;
-
-  const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
-    omit: { permissionsVersion: true },
-    include: {
-      permissions: {
-        include: { permission: true },
-      },
-    },
-  });
-
-  if (!user) return null;
-
-  const overrides = user.permissions.map((up) => ({
-    key: up.permission.key,
-    granted: up.granted,
-  }));
-  const resolvedPermissions = await resolvePermissions(user.role, overrides);
-
-  return UserProfileSchema.parse({
-    ...user,
-    resolvedPermissions,
   });
 }
 

@@ -33,7 +33,7 @@ export {
   updateUserPermission,
   kickOutUser,
 } from "./admin";
-export { updateProfileName, updateProfileImage } from "./profile";
+export { updateProfileName, updateProfileImage } from "../features/profile/actions";
 export {
   type ImportResult,
   importPersonsCsv,
@@ -41,7 +41,7 @@ export {
   exportTeamsCsv,
   exportDepartmentsCsv,
   exportAuditLogsCsv,
-} from "./data";
+} from "../features/data/actions";
 export {
   createLeaveType,
   updateLeaveType,
