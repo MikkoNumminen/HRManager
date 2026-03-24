@@ -44,8 +44,65 @@ export function getAuditLogCollection(): Collection<AuditLogDocument> {
 // 90-day retention window for audit logs
 const AUDIT_LOG_TTL_SECONDS = 90 * 24 * 60 * 60;
 
+// $jsonSchema validator — enforces required fields on all audit log writes.
+// Uses "warn" validationAction so invalid documents are logged but not rejected,
+// preventing write failures if the schema evolves before all writers are updated.
+const AUDIT_LOG_SCHEMA = {
+  $jsonSchema: {
+    bsonType: "object",
+    required: ["action", "entityType", "createdAt"],
+    properties: {
+      userId: { bsonType: ["string", "null"] },
+      userEmail: { bsonType: ["string", "null"] },
+      action: {
+        bsonType: "string",
+        description: "The action performed (create, update, delete, etc.)",
+      },
+      entityType: {
+        bsonType: "string",
+        description: "The entity type affected (person, team, department, etc.)",
+      },
+      entityId: { bsonType: ["string", "null"] },
+      before: {
+        bsonType: ["string", "null"],
+        description: "JSON-serialized state before the action",
+      },
+      after: {
+        bsonType: ["string", "null"],
+        description: "JSON-serialized state after the action",
+      },
+      sessionId: { bsonType: ["string", "null"] },
+      createdAt: { bsonType: "date" },
+    },
+  },
+};
+
 export async function ensureAuditLogIndexes(): Promise<void> {
+  const db = getMongoDb();
   const col = getAuditLogCollection();
+
+  // Apply schema validation to the collection
+  try {
+    await db.command({
+      collMod: "auditLogs",
+      validator: AUDIT_LOG_SCHEMA,
+      validationLevel: "moderate",
+      validationAction: "warn",
+    });
+  } catch {
+    // Collection may not exist yet — create it with the validator
+    try {
+      await db.createCollection("auditLogs", {
+        validator: AUDIT_LOG_SCHEMA,
+        validationLevel: "moderate",
+        validationAction: "warn",
+      });
+    } catch {
+      // Collection already exists but collMod failed for another reason — log and continue
+      console.warn("[mongoDb] Could not apply schema validation to auditLogs collection");
+    }
+  }
+
   await Promise.all([
     col.createIndex({ userId: 1 }),
     col.createIndex({ userEmail: 1 }),
