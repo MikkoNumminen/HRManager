@@ -695,16 +695,16 @@
     "persons": "Osoby"
   },
   "deleteImpact": {
-    "managedTeams": "{count, plural, =0 {} one {Zarządza # zespołem (straci kierownika)} other {Zarządza # zespołami (stracą kierownika)}}",
-    "headedDepartments": "{count, plural, =0 {} one {Kieruje # działem (straci kierownika)} other {Kieruje # działami (stracą kierownika)}}",
-    "teamMemberships": "{count, plural, =0 {} one {Członek # zespołu (zostanie usunięty)} other {Członek # zespołów (zostanie usunięty)}}",
-    "leaveRequests": "{count, plural, =0 {} one {# wniosek urlopowy powiązany} other {# wnioski urlopowe powiązane}}",
-    "leaveRequestCount": "{count, plural, one {# wniosek} other {# wnioski}}",
-    "reviewRequests": "{count, plural, =0 {} one {# wniosek o ocenę powiązany} other {# wnioski o ocenę powiązane}}",
-    "reviewRequestCount": "{count, plural, one {# wniosek} other {# wnioski}}",
-    "teamMembers": "{count, plural, =0 {} one {# członek (zostanie usunięty)} other {# członków (zostanie usuniętych)}}",
-    "memberCount": "{count, plural, one {# członek} other {# członków}}",
+    "managedTeams": "{count, plural, =0 {} one {Zarządza # zespołem (straci kierownika)} few {Zarządza # zespołami (stracą kierownika)} many {Zarządza # zespołami (stracą kierownika)} other {Zarządza # zespołami (stracą kierownika)}}",
+    "headedDepartments": "{count, plural, =0 {} one {Kieruje # działem (straci kierownika)} few {Kieruje # działami (stracą kierownika)} many {Kieruje # działami (stracą kierownika)} other {Kieruje # działami (stracą kierownika)}}",
+    "teamMemberships": "{count, plural, =0 {} one {Członek # zespołu (zostanie usunięty)} few {Członek # zespołów (zostanie usunięty)} many {Członek # zespołów (zostanie usunięty)} other {Członek # zespołów (zostanie usunięty)}}",
+    "leaveRequests": "{count, plural, =0 {} one {# wniosek urlopowy powiązany} few {# wnioski urlopowe powiązane} many {# wniosków urlopowych powiązanych} other {# wniosków urlopowych powiązanych}}",
+    "leaveRequestCount": "{count, plural, one {# wniosek} few {# wnioski} many {# wniosków} other {# wniosków}}",
+    "reviewRequests": "{count, plural, =0 {} one {# wniosek o ocenę powiązany} few {# wnioski o ocenę powiązane} many {# wniosków o ocenę powiązanych} other {# wniosków o ocenę powiązanych}}",
+    "reviewRequestCount": "{count, plural, one {# wniosek} few {# wnioski} many {# wniosków} other {# wniosków}}",
+    "teamMembers": "{count, plural, =0 {} one {# członek (zostanie usunięty)} few {# członków (zostanie usuniętych)} many {# członków (zostanie usuniętych)} other {# członków (zostanie usuniętych)}}",
+    "memberCount": "{count, plural, one {# członek} few {# członków} many {# członków} other {# członków}}",
     "departmentAssignment": "Przypisanie do działu (zostanie odłączone)",
-    "assignedTeams": "{count, plural, =0 {} one {# zespół przypisany (zostanie odłączony)} other {# zespoły przypisane (zostaną odłączone)}}"
+    "assignedTeams": "{count, plural, =0 {} one {# zespół przypisany (zostanie odłączony)} few {# zespoły przypisane (zostaną odłączone)} many {# zespołów przypisanych (zostanie odłączonych)} other {# zespołów przypisanych (zostanie odłączonych)}}"
   }
 }

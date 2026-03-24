@@ -695,16 +695,16 @@
     "persons": "الأشخاص"
   },
   "deleteImpact": {
-    "managedTeams": "{count, plural, =0 {} one {يدير فريق # (سيفقد المدير)} other {يدير # فرق (ستفقد المدير)}}",
-    "headedDepartments": "{count, plural, =0 {} one {يرأس قسم # (سيفقد الرئيس)} other {يرأس # أقسام (ستفقد الرئيس)}}",
-    "teamMemberships": "{count, plural, =0 {} one {عضو في فريق # (ستتم الإزالة)} other {عضو في # فرق (ستتم الإزالة)}}",
-    "leaveRequests": "{count, plural, =0 {} one {# طلب إجازة مرتبط} other {# طلبات إجازة مرتبطة}}",
-    "leaveRequestCount": "{count, plural, one {# طلب} other {# طلبات}}",
-    "reviewRequests": "{count, plural, =0 {} one {# طلب تقييم مرتبط} other {# طلبات تقييم مرتبطة}}",
-    "reviewRequestCount": "{count, plural, one {# طلب} other {# طلبات}}",
-    "teamMembers": "{count, plural, =0 {} one {# عضو (ستتم الإزالة)} other {# أعضاء (ستتم الإزالة)}}",
-    "memberCount": "{count, plural, one {# عضو} other {# أعضاء}}",
+    "managedTeams": "{count, plural, =0 {} one {يدير فريقاً واحداً (سيفقد المدير)} two {يدير فريقين (سيفقدان المدير)} few {يدير # فرق (ستفقد المدير)} many {يدير # فريقاً (ستفقد المدير)} other {يدير # فريق (ستفقد المدير)}}",
+    "headedDepartments": "{count, plural, =0 {} one {يرأس قسماً واحداً (سيفقد الرئيس)} two {يرأس قسمين (سيفقدان الرئيس)} few {يرأس # أقسام (ستفقد الرئيس)} many {يرأس # قسماً (ستفقد الرئيس)} other {يرأس # قسم (ستفقد الرئيس)}}",
+    "teamMemberships": "{count, plural, =0 {} one {عضو في فريق واحد (ستتم الإزالة)} two {عضو في فريقين (ستتم الإزالة)} few {عضو في # فرق (ستتم الإزالة)} many {عضو في # فريقاً (ستتم الإزالة)} other {عضو في # فريق (ستتم الإزالة)}}",
+    "leaveRequests": "{count, plural, =0 {} one {طلب إجازة واحد مرتبط} two {طلبا إجازة مرتبطان} few {# طلبات إجازة مرتبطة} many {# طلب إجازة مرتبطاً} other {# طلب إجازة مرتبط}}",
+    "leaveRequestCount": "{count, plural, one {طلب واحد} two {طلبان} few {# طلبات} many {# طلباً} other {# طلب}}",
+    "reviewRequests": "{count, plural, =0 {} one {طلب تقييم واحد مرتبط} two {طلبا تقييم مرتبطان} few {# طلبات تقييم مرتبطة} many {# طلب تقييم مرتبطاً} other {# طلب تقييم مرتبط}}",
+    "reviewRequestCount": "{count, plural, one {طلب واحد} two {طلبان} few {# طلبات} many {# طلباً} other {# طلب}}",
+    "teamMembers": "{count, plural, =0 {} one {عضو واحد (ستتم الإزالة)} two {عضوان (ستتم الإزالة)} few {# أعضاء (ستتم الإزالة)} many {# عضواً (ستتم الإزالة)} other {# عضو (ستتم الإزالة)}}",
+    "memberCount": "{count, plural, one {عضو واحد} two {عضوان} few {# أعضاء} many {# عضواً} other {# عضو}}",
     "departmentAssignment": "تعيين القسم (سيتم فك الارتباط)",
-    "assignedTeams": "{count, plural, =0 {} one {# فريق معيّن (سيتم فك الارتباط)} other {# فرق معيّنة (سيتم فك الارتباط)}}"
+    "assignedTeams": "{count, plural, =0 {} one {فريق واحد معيّن (سيتم فك الارتباط)} two {فريقان معيّنان (سيتم فك الارتباط)} few {# فرق معيّنة (سيتم فك الارتباط)} many {# فريقاً معيّناً (سيتم فك الارتباط)} other {# فريق معيّن (سيتم فك الارتباط)}}"
   }
 }
