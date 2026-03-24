@@ -301,7 +301,11 @@
     "permViewLeave": "visa ledighetsansökningar och saldon",
     "permRequestLeave": "skicka in ledighetsansökningar",
     "permApproveLeave": "godkänna eller avslå ledighetsansökningar",
-    "permManageLeaveTypes": "hantera ledighetstyper"
+    "permManageLeaveTypes": "hantera ledighetstyper",
+    "typeUserSession": "Användarsession",
+    "actionSessionLogin": "Sessionsinloggning",
+    "actionSessionForceLogout": "Tvångsnedloggning av session",
+    "actionSessionConcurrentExceeded": "Gränsen för samtidiga sessioner överskriden"
   },
   "notifications": {
     "personCreated": "Person skapad",
@@ -328,7 +332,10 @@
     "userKickedOut": "{name} har sparkats ut",
     "profileNameUpdated": "Visningsnamn uppdaterat",
     "profileImageUpdated": "Profilbild uppdaterad",
-    "dataImported": "{count, plural, one {# person importerad} other {# personer importerade}}"
+    "dataImported": "{count, plural, one {# person importerad} other {# personer importerade}}",
+    "otherSessionsSignedOut": "Alla andra sessioner har loggats ut",
+    "sessionForceLoggedOut": "Session tvångsnedloggad",
+    "allSessionsForceLoggedOut": "Alla sessioner för {name} har tvångsnedloggats"
   },
   "tutorial": {
     "checklistTitle": "Demoguide",
@@ -502,7 +509,9 @@
     "invalidId": "Ogiltigt ID",
     "invalidYear": "Ogiltigt år",
     "positionAlreadyExists": "Denna position finns redan",
-    "positionNotFound": "Position hittades inte"
+    "positionNotFound": "Position hittades inte",
+    "sessionNotFound": "Sessionen hittades inte",
+    "sessionAlreadyInactive": "Sessionen är redan inaktiv"
   },
   "reviews": {
     "title": "Prestationsbedömningar",
@@ -727,5 +736,18 @@
     "continueGitHub": "Fortsätt med GitHub",
     "errorAccountLinked": "Denna e-post är redan kopplad till en annan leverantör. Logga in med den ursprungliga leverantören.",
     "errorGeneric": "Ett fel uppstod vid inloggning. Försök igen."
+  },
+  "sessions": {
+    "title": "Aktiva sessioner",
+    "description": "Enheter där du för närvarande är inloggad. Du kan logga ut alla andra sessioner för att säkra ditt konto.",
+    "signOutOthers": "Logga ut övriga",
+    "currentSession": "Den här enheten",
+    "noSessions": "Inga aktiva sessioner",
+    "unknownIp": "Okänd IP",
+    "lastActive": "Senast aktiv: {time}",
+    "adminTitle": "Aktiva sessioner",
+    "forceLogout": "Tvångsnedloggning",
+    "forceLogoutAll": "Tvångsnedlogga alla",
+    "noActiveSessions": "Inga aktiva sessioner för den här användaren"
   }
 }

@@ -301,7 +301,11 @@
     "permViewLeave": "Abwesenheitsanträge und -salden einsehen",
     "permRequestLeave": "Abwesenheitsanträge einreichen",
     "permApproveLeave": "Abwesenheitsanträge genehmigen oder ablehnen",
-    "permManageLeaveTypes": "Abwesenheitstypen verwalten"
+    "permManageLeaveTypes": "Abwesenheitstypen verwalten",
+    "typeUserSession": "Benutzersitzung",
+    "actionSessionLogin": "Sitzungsanmeldung",
+    "actionSessionForceLogout": "Erzwungene Sitzungsabmeldung",
+    "actionSessionConcurrentExceeded": "Gleichzeitiges Sitzungslimit überschritten"
   },
   "notifications": {
     "personCreated": "Person erfolgreich erstellt",
@@ -328,7 +332,10 @@
     "userKickedOut": "{name} wurde rausgeworfen",
     "profileNameUpdated": "Anzeigename erfolgreich aktualisiert",
     "profileImageUpdated": "Profilbild erfolgreich aktualisiert",
-    "dataImported": "{count, plural, one {# Person erfolgreich importiert} other {# Personen erfolgreich importiert}}"
+    "dataImported": "{count, plural, one {# Person erfolgreich importiert} other {# Personen erfolgreich importiert}}",
+    "otherSessionsSignedOut": "Alle anderen Sitzungen wurden abgemeldet",
+    "sessionForceLoggedOut": "Sitzung zwangsweise abgemeldet",
+    "allSessionsForceLoggedOut": "Alle Sitzungen von {name} wurden zwangsweise abgemeldet"
   },
   "tutorial": {
     "checklistTitle": "Demo-Rundgang",
@@ -502,7 +509,9 @@
     "invalidId": "Ungültige ID",
     "invalidYear": "Ungültiges Jahr",
     "positionAlreadyExists": "Diese Position existiert bereits",
-    "positionNotFound": "Position nicht gefunden"
+    "positionNotFound": "Position nicht gefunden",
+    "sessionNotFound": "Sitzung nicht gefunden",
+    "sessionAlreadyInactive": "Sitzung ist bereits inaktiv"
   },
   "reviews": {
     "title": "Leistungsbeurteilungen",
@@ -727,5 +736,18 @@
     "continueGitHub": "Weiter mit GitHub",
     "errorAccountLinked": "Diese E-Mail-Adresse ist bereits mit einem anderen Anbieter verknüpft. Bitte melden Sie sich mit dem ursprünglichen Anbieter an.",
     "errorGeneric": "Bei der Anmeldung ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut."
+  },
+  "sessions": {
+    "title": "Aktive Sitzungen",
+    "description": "Geräte, auf denen Sie derzeit angemeldet sind. Sie können alle anderen Sitzungen abmelden, um Ihr Konto zu sichern.",
+    "signOutOthers": "Andere abmelden",
+    "currentSession": "Dieses Gerät",
+    "noSessions": "Keine aktiven Sitzungen",
+    "unknownIp": "Unbekannte IP",
+    "lastActive": "Zuletzt aktiv: {time}",
+    "adminTitle": "Aktive Sitzungen",
+    "forceLogout": "Zwangsabmeldung",
+    "forceLogoutAll": "Alle zwangsweise abmelden",
+    "noActiveSessions": "Keine aktiven Sitzungen für diesen Benutzer"
   }
 }

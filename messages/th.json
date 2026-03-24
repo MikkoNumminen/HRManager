@@ -301,7 +301,11 @@
     "permViewLeave": "ดูคำขอลาและยอดคงเหลือวันลา",
     "permRequestLeave": "ส่งคำขอลา",
     "permApproveLeave": "อนุมัติหรือปฏิเสธคำขอลา",
-    "permManageLeaveTypes": "จัดการประเภทวันลา"
+    "permManageLeaveTypes": "จัดการประเภทวันลา",
+    "typeUserSession": "เซสชันผู้ใช้",
+    "actionSessionLogin": "เข้าสู่ระบบเซสชัน",
+    "actionSessionForceLogout": "บังคับออกจากระบบเซสชัน",
+    "actionSessionConcurrentExceeded": "เกินขีดจำกัดเซสชันพร้อมกัน"
   },
   "notifications": {
     "personCreated": "สร้างบุคคลสำเร็จ",
@@ -328,7 +332,10 @@
     "userKickedOut": "{name} ถูกไล่ออกแล้ว",
     "profileNameUpdated": "อัปเดตชื่อที่แสดงสำเร็จ",
     "profileImageUpdated": "อัปเดตรูปโปรไฟล์สำเร็จ",
-    "dataImported": "{count, plural, one {นำเข้าบุคลากร # คนสำเร็จ} other {นำเข้าบุคลากร # คนสำเร็จ}}"
+    "dataImported": "{count, plural, one {นำเข้าบุคลากร # คนสำเร็จ} other {นำเข้าบุคลากร # คนสำเร็จ}}",
+    "otherSessionsSignedOut": "ออกจากระบบเซสชันอื่นทั้งหมดแล้ว",
+    "sessionForceLoggedOut": "บังคับออกจากระบบเซสชันแล้ว",
+    "allSessionsForceLoggedOut": "บังคับออกจากระบบเซสชันทั้งหมดของ {name} แล้ว"
   },
   "tutorial": {
     "checklistTitle": "ทัวร์สาธิต",
@@ -502,7 +509,9 @@
     "invalidId": "รหัสไม่ถูกต้อง",
     "invalidYear": "ปีไม่ถูกต้อง",
     "positionAlreadyExists": "ตำแหน่งนี้มีอยู่แล้ว",
-    "positionNotFound": "ไม่พบตำแหน่ง"
+    "positionNotFound": "ไม่พบตำแหน่ง",
+    "sessionNotFound": "ไม่พบเซสชัน",
+    "sessionAlreadyInactive": "เซสชันไม่ได้ใช้งานอยู่แล้ว"
   },
   "reviews": {
     "title": "การประเมินผลการปฏิบัติงาน",
@@ -727,5 +736,18 @@
     "continueGitHub": "ดำเนินการต่อด้วย GitHub",
     "errorAccountLinked": "อีเมลนี้เชื่อมต่อกับผู้ให้บริการอื่นแล้ว กรุณาเข้าสู่ระบบด้วยผู้ให้บริการเดิม",
     "errorGeneric": "เกิดข้อผิดพลาดระหว่างเข้าสู่ระบบ กรุณาลองอีกครั้ง"
+  },
+  "sessions": {
+    "title": "เซสชันที่ใช้งานอยู่",
+    "description": "อุปกรณ์ที่คุณกำลังเข้าสู่ระบบอยู่ คุณสามารถออกจากระบบเซสชันอื่นทั้งหมดเพื่อรักษาความปลอดภัยบัญชีของคุณ",
+    "signOutOthers": "ออกจากระบบอื่นๆ",
+    "currentSession": "อุปกรณ์นี้",
+    "noSessions": "ไม่มีเซสชันที่ใช้งานอยู่",
+    "unknownIp": "IP ไม่ทราบ",
+    "lastActive": "ใช้งานล่าสุด: {time}",
+    "adminTitle": "เซสชันที่ใช้งานอยู่",
+    "forceLogout": "บังคับออกจากระบบ",
+    "forceLogoutAll": "บังคับออกจากระบบทั้งหมด",
+    "noActiveSessions": "ไม่มีเซสชันที่ใช้งานอยู่สำหรับผู้ใช้นี้"
   }
 }

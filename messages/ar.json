@@ -301,7 +301,11 @@
     "permViewLeave": "عرض طلبات وأرصدة الإجازات",
     "permRequestLeave": "تقديم طلبات الإجازة",
     "permApproveLeave": "الموافقة على طلبات الإجازة أو رفضها",
-    "permManageLeaveTypes": "إدارة أنواع الإجازات"
+    "permManageLeaveTypes": "إدارة أنواع الإجازات",
+    "typeUserSession": "جلسة المستخدم",
+    "actionSessionLogin": "تسجيل دخول الجلسة",
+    "actionSessionForceLogout": "تسجيل خروج إجباري للجلسة",
+    "actionSessionConcurrentExceeded": "تجاوز الحد الأقصى للجلسات المتزامنة"
   },
   "notifications": {
     "personCreated": "تم إنشاء الشخص بنجاح",
@@ -328,7 +332,10 @@
     "userKickedOut": "تم طرد {name}",
     "profileNameUpdated": "تم تحديث الاسم المعروض بنجاح",
     "profileImageUpdated": "تم تحديث صورة الملف الشخصي بنجاح",
-    "dataImported": "{count, plural, one {تم استيراد شخص واحد بنجاح} other {تم استيراد # أشخاص بنجاح}}"
+    "dataImported": "{count, plural, one {تم استيراد شخص واحد بنجاح} other {تم استيراد # أشخاص بنجاح}}",
+    "otherSessionsSignedOut": "تم تسجيل خروج جميع الجلسات الأخرى",
+    "sessionForceLoggedOut": "تم تسجيل خروج الجلسة بالإجبار",
+    "allSessionsForceLoggedOut": "تم تسجيل خروج جميع جلسات {name} بالإجبار"
   },
   "tutorial": {
     "checklistTitle": "جولة تعريفية",
@@ -502,7 +509,9 @@
     "cannotDeleteNonPendingRequest": "يمكن إلغاء طلبات الإجازة المعلقة فقط",
     "noteTooLong": "يجب أن تكون الملاحظة {max} حرفاً أو أقل",
     "invalidId": "معرّف غير صالح",
-    "invalidYear": "سنة غير صالحة"
+    "invalidYear": "سنة غير صالحة",
+    "sessionNotFound": "الجلسة غير موجودة",
+    "sessionAlreadyInactive": "الجلسة غير نشطة بالفعل"
   },
   "reviews": {
     "title": "تقييمات الأداء",
@@ -727,5 +736,18 @@
     "continueGitHub": "المتابعة مع GitHub",
     "errorAccountLinked": "هذا البريد الإلكتروني مرتبط بالفعل بمزود آخر. يرجى تسجيل الدخول بالمزود الأصلي.",
     "errorGeneric": "حدث خطأ أثناء تسجيل الدخول. يرجى المحاولة مرة أخرى."
+  },
+  "sessions": {
+    "title": "الجلسات النشطة",
+    "description": "الأجهزة التي أنت مسجّل الدخول عليها حالياً. يمكنك تسجيل الخروج من جميع الجلسات الأخرى لتأمين حسابك.",
+    "signOutOthers": "تسجيل خروج الأخريات",
+    "currentSession": "هذا الجهاز",
+    "noSessions": "لا توجد جلسات نشطة",
+    "unknownIp": "عنوان IP غير معروف",
+    "lastActive": "آخر نشاط: {time}",
+    "adminTitle": "الجلسات النشطة",
+    "forceLogout": "تسجيل خروج إجباري",
+    "forceLogoutAll": "تسجيل خروج إجباري للجميع",
+    "noActiveSessions": "لا توجد جلسات نشطة لهذا المستخدم"
   }
 }

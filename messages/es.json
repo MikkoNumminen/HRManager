@@ -301,7 +301,11 @@
     "permViewLeave": "ver solicitudes y saldos de ausencia",
     "permRequestLeave": "enviar solicitudes de ausencia",
     "permApproveLeave": "aprobar o rechazar solicitudes de ausencia",
-    "permManageLeaveTypes": "gestionar tipos de ausencia"
+    "permManageLeaveTypes": "gestionar tipos de ausencia",
+    "typeUserSession": "Sesión de usuario",
+    "actionSessionLogin": "Inicio de sesión",
+    "actionSessionForceLogout": "Cierre de sesión forzado",
+    "actionSessionConcurrentExceeded": "Límite de sesiones simultáneas excedido"
   },
   "notifications": {
     "personCreated": "Persona creada correctamente",
@@ -328,7 +332,10 @@
     "userKickedOut": "{name} ha sido expulsado",
     "profileNameUpdated": "Nombre de visualización actualizado correctamente",
     "profileImageUpdated": "Foto de perfil actualizada correctamente",
-    "dataImported": "{count, plural, one {# persona importada correctamente} other {# personas importadas correctamente}}"
+    "dataImported": "{count, plural, one {# persona importada correctamente} other {# personas importadas correctamente}}",
+    "otherSessionsSignedOut": "Se han cerrado todas las demás sesiones",
+    "sessionForceLoggedOut": "Sesión cerrada forzosamente",
+    "allSessionsForceLoggedOut": "Todas las sesiones de {name} han sido cerradas forzosamente"
   },
   "tutorial": {
     "checklistTitle": "Visita guiada",
@@ -502,7 +509,9 @@
     "invalidId": "ID no válido",
     "invalidYear": "Año no válido",
     "positionAlreadyExists": "Este puesto ya existe",
-    "positionNotFound": "Puesto no encontrado"
+    "positionNotFound": "Puesto no encontrado",
+    "sessionNotFound": "Sesión no encontrada",
+    "sessionAlreadyInactive": "La sesión ya está inactiva"
   },
   "reviews": {
     "title": "Evaluaciones de desempeño",
@@ -727,5 +736,18 @@
     "continueGitHub": "Continuar con GitHub",
     "errorAccountLinked": "Este correo ya está vinculado a otro proveedor. Inicie sesión con el proveedor original.",
     "errorGeneric": "Ocurrió un error durante el inicio de sesión. Inténtelo de nuevo."
+  },
+  "sessions": {
+    "title": "Sesiones activas",
+    "description": "Dispositivos en los que has iniciado sesión actualmente. Puedes cerrar todas las demás sesiones para proteger tu cuenta.",
+    "signOutOthers": "Cerrar otras sesiones",
+    "currentSession": "Este dispositivo",
+    "noSessions": "No hay sesiones activas",
+    "unknownIp": "IP desconocida",
+    "lastActive": "Última actividad: {time}",
+    "adminTitle": "Sesiones activas",
+    "forceLogout": "Forzar cierre de sesión",
+    "forceLogoutAll": "Forzar cierre de todas las sesiones",
+    "noActiveSessions": "No hay sesiones activas para este usuario"
   }
 }

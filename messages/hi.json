@@ -301,7 +301,11 @@
     "permViewLeave": "अवकाश अनुरोध और शेष देखें",
     "permRequestLeave": "अवकाश अनुरोध सबमिट करें",
     "permApproveLeave": "अवकाश अनुरोध स्वीकृत या अस्वीकृत करें",
-    "permManageLeaveTypes": "अवकाश प्रकार प्रबंधित करें"
+    "permManageLeaveTypes": "अवकाश प्रकार प्रबंधित करें",
+    "typeUserSession": "उपयोगकर्ता सत्र",
+    "actionSessionLogin": "सत्र लॉगिन",
+    "actionSessionForceLogout": "सत्र जबरन लॉगआउट",
+    "actionSessionConcurrentExceeded": "एक साथ सत्र सीमा पार"
   },
   "notifications": {
     "personCreated": "व्यक्ति सफलतापूर्वक बनाया गया",
@@ -328,7 +332,10 @@
     "userKickedOut": "{name} को निकाल दिया गया है",
     "profileNameUpdated": "प्रदर्शन नाम सफलतापूर्वक अपडेट किया गया",
     "profileImageUpdated": "प्रोफ़ाइल चित्र सफलतापूर्वक अपडेट किया गया",
-    "dataImported": "{count, plural, one {# व्यक्ति सफलतापूर्वक आयात किया गया} other {# व्यक्ति सफलतापूर्वक आयात किए गए}}"
+    "dataImported": "{count, plural, one {# व्यक्ति सफलतापूर्वक आयात किया गया} other {# व्यक्ति सफलतापूर्वक आयात किए गए}}",
+    "otherSessionsSignedOut": "सभी अन्य सत्र साइन आउट कर दिए गए हैं",
+    "sessionForceLoggedOut": "सत्र जबरन लॉगआउट किया गया",
+    "allSessionsForceLoggedOut": "{name} के सभी सत्र जबरन लॉगआउट किए गए"
   },
   "tutorial": {
     "checklistTitle": "डेमो टूर",
@@ -502,7 +509,9 @@
     "invalidId": "अमान्य आईडी",
     "invalidYear": "अमान्य वर्ष",
     "positionAlreadyExists": "यह पद पहले से मौजूद है",
-    "positionNotFound": "पद नहीं मिला"
+    "positionNotFound": "पद नहीं मिला",
+    "sessionNotFound": "सत्र नहीं मिला",
+    "sessionAlreadyInactive": "सत्र पहले से निष्क्रिय है"
   },
   "reviews": {
     "title": "प्रदर्शन समीक्षाएँ",
@@ -727,5 +736,18 @@
     "continueGitHub": "GitHub से जारी रखें",
     "errorAccountLinked": "यह ईमेल पहले से किसी अन्य प्रदाता से जुड़ा हुआ है। कृपया मूल प्रदाता से साइन इन करें।",
     "errorGeneric": "साइन-इन के दौरान एक त्रुटि हुई। कृपया पुनः प्रयास करें।"
+  },
+  "sessions": {
+    "title": "सक्रिय सत्र",
+    "description": "वे डिवाइस जहाँ आप वर्तमान में साइन इन हैं। अपने खाते को सुरक्षित करने के लिए सभी अन्य सत्र साइन आउट कर सकते हैं।",
+    "signOutOthers": "अन्य साइन आउट करें",
+    "currentSession": "यह डिवाइस",
+    "noSessions": "कोई सक्रिय सत्र नहीं",
+    "unknownIp": "अज्ञात IP",
+    "lastActive": "अंतिम सक्रिय: {time}",
+    "adminTitle": "सक्रिय सत्र",
+    "forceLogout": "जबरन लॉगआउट",
+    "forceLogoutAll": "सभी को जबरन लॉगआउट करें",
+    "noActiveSessions": "इस उपयोगकर्ता के लिए कोई सक्रिय सत्र नहीं"
   }
 }

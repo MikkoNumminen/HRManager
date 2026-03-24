@@ -301,7 +301,11 @@
     "permViewLeave": "kuona maombi na salio za likizo",
     "permRequestLeave": "kuwasilisha maombi ya likizo",
     "permApproveLeave": "kuidhini au kukataa maombi ya likizo",
-    "permManageLeaveTypes": "kusimamia aina za likizo"
+    "permManageLeaveTypes": "kusimamia aina za likizo",
+    "typeUserSession": "Kipindi cha mtumiaji",
+    "actionSessionLogin": "Kuingia kwa kipindi",
+    "actionSessionForceLogout": "Kutoka kwa nguvu kwa kipindi",
+    "actionSessionConcurrentExceeded": "Kikomo cha vipindi vya wakati mmoja kimezidiwa"
   },
   "notifications": {
     "personCreated": "Mtu ameundwa kwa mafanikio",
@@ -328,7 +332,10 @@
     "userKickedOut": "{name} amefukuzwa",
     "profileNameUpdated": "Jina la kuonyesha limesasishwa kwa mafanikio",
     "profileImageUpdated": "Picha ya wasifu imesasishwa kwa mafanikio",
-    "dataImported": "{count, plural, one {# mtu aliingizwa kwa mafanikio} other {# watu waliingizwa kwa mafanikio}}"
+    "dataImported": "{count, plural, one {# mtu aliingizwa kwa mafanikio} other {# watu waliingizwa kwa mafanikio}}",
+    "otherSessionsSignedOut": "Vipindi vingine vyote vimefungwa",
+    "sessionForceLoggedOut": "Kipindi kimefungwa kwa nguvu",
+    "allSessionsForceLoggedOut": "Vipindi vyote vya {name} vimefungwa kwa nguvu"
   },
   "tutorial": {
     "checklistTitle": "Ziara ya Demo",
@@ -502,7 +509,9 @@
     "invalidId": "Kitambulisho si sahihi",
     "invalidYear": "Mwaka si sahihi",
     "positionAlreadyExists": "Nafasi hii tayari ipo",
-    "positionNotFound": "Nafasi haijapatikana"
+    "positionNotFound": "Nafasi haijapatikana",
+    "sessionNotFound": "Kipindi hakikupatikana",
+    "sessionAlreadyInactive": "Kipindi tayari hakifanyi kazi"
   },
   "reviews": {
     "title": "Tathmini za Utendaji",
@@ -727,5 +736,18 @@
     "continueGitHub": "Endelea na GitHub",
     "errorAccountLinked": "Barua pepe hii tayari imeunganishwa na mtoa huduma mwingine. Tafadhali ingia na mtoa huduma wa awali.",
     "errorGeneric": "Hitilafu imetokea wakati wa kuingia. Tafadhali jaribu tena."
+  },
+  "sessions": {
+    "title": "Vipindi Vinavyofanya Kazi",
+    "description": "Vifaa ambavyo umeingia sasa hivi. Unaweza kutoka vipindi vingine vyote ili kulinda akaunti yako.",
+    "signOutOthers": "Toka vipindi vingine",
+    "currentSession": "Kifaa hiki",
+    "noSessions": "Hakuna vipindi vinavyofanya kazi",
+    "unknownIp": "IP isiyojulikana",
+    "lastActive": "Mara ya mwisho kufanya kazi: {time}",
+    "adminTitle": "Vipindi Vinavyofanya Kazi",
+    "forceLogout": "Toka kwa nguvu",
+    "forceLogoutAll": "Toka wote kwa nguvu",
+    "noActiveSessions": "Hakuna vipindi vinavyofanya kazi kwa mtumiaji huyu"
   }
 }

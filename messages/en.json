@@ -170,7 +170,11 @@
     "kickOut": "Kick Out",
     "kickOutTitle": "Kick Out User",
     "kickOutDescription": "Remove this user from the system. They will lose all access and permission overrides.",
-    "kickOutConfirm": "Are you sure you want to kick out {name}? They will lose access and all permission overrides."
+    "kickOutConfirm": "Are you sure you want to kick out {name}? They will lose access and all permission overrides.",
+    "reset2FA": "Reset 2FA",
+    "reset2FATitle": "Reset Two-Factor Authentication",
+    "reset2FADescription": "Remove this user's two-factor authentication. They will need to set it up again.",
+    "reset2FAConfirm": "Are you sure you want to reset two-factor authentication for {name}? They will need to reconfigure their authenticator app."
   },
   "dashboard": {
     "title": "Dashboard",
@@ -356,7 +360,8 @@
     "dataImported": "{count, plural, one {# person imported successfully} other {# persons imported successfully}}",
     "otherSessionsSignedOut": "All other sessions have been signed out",
     "sessionForceLoggedOut": "Session force-logged out",
-    "allSessionsForceLoggedOut": "All sessions for {name} have been force-logged out"
+    "allSessionsForceLoggedOut": "All sessions for {name} have been force-logged out",
+    "twoFactorReset": "Two-factor authentication reset for {name}"
   },
   "dataIO": {
     "title": "Data Import / Export",
@@ -473,7 +478,11 @@
     "invalidId": "Invalid ID",
     "invalidYear": "Invalid year",
     "sessionNotFound": "Session not found",
-    "sessionAlreadyInactive": "Session is already inactive"
+    "sessionAlreadyInactive": "Session is already inactive",
+    "invalidTotpCode": "Invalid verification code. Please try again.",
+    "invalidTotpSecret": "Invalid TOTP secret",
+    "twoFactorAlreadyEnabled": "Two-factor authentication is already enabled",
+    "twoFactorNotEnabled": "Two-factor authentication is not enabled"
   },
   "tutorial": {
     "checklistTitle": "Demo Tour",
@@ -749,5 +758,44 @@
     "continueGitHub": "Continue with GitHub",
     "errorAccountLinked": "This email is already linked to another provider. Please sign in with the original provider.",
     "errorGeneric": "An error occurred during sign-in. Please try again."
+  },
+  "twoFactor": {
+    "title": "Two-Factor Authentication",
+    "description": "Add an extra layer of security to your account by requiring a verification code from your authenticator app.",
+    "enable": "Enable 2FA",
+    "disable": "Disable 2FA",
+    "enabled": "Two-factor authentication enabled",
+    "disabled": "Two-factor authentication disabled",
+    "setupTitle": "Set Up Two-Factor Authentication",
+    "setupError": "Failed to initialize 2FA setup",
+    "stepScan": "Scan QR Code",
+    "stepVerify": "Verify Code",
+    "stepRecovery": "Recovery Codes",
+    "scanInstructions": "Scan this QR code with your authenticator app (Google Authenticator, Authy, 1Password, etc.)",
+    "qrCodeAlt": "QR code for authenticator app",
+    "manualEntry": "Or enter this code manually:",
+    "secretCopied": "Secret copied to clipboard",
+    "next": "Next",
+    "back": "Back",
+    "verifyInstructions": "Enter the 6-digit code from your authenticator app to verify setup.",
+    "codeLabel": "Verification Code",
+    "recoveryCodeLabel": "Recovery Code",
+    "verifyAndEnable": "Verify & Enable",
+    "recoveryWarning": "Save these recovery codes in a secure location. Each code can only be used once. If you lose access to your authenticator app, you can use these codes to sign in.",
+    "copyCodes": "Copy All Codes",
+    "codesCopied": "Recovery codes copied to clipboard",
+    "done": "Done",
+    "disableTitle": "Disable Two-Factor Authentication",
+    "disableInstructions": "Enter your current verification code to disable two-factor authentication. This will remove the extra security layer from your account.",
+    "regenerateTitle": "Regenerate Recovery Codes",
+    "regenerateCodes": "Regenerate Recovery Codes",
+    "regenerateInstructions": "Enter your current verification code to generate new recovery codes. Your existing codes will be invalidated.",
+    "codesRegenerated": "Recovery codes regenerated",
+    "verifyTitle": "Two-Factor Verification",
+    "loginVerifyInstructions": "Enter the 6-digit code from your authenticator app to complete sign-in.",
+    "recoveryInstructions": "Enter one of your recovery codes. Each code can only be used once.",
+    "verify": "Verify",
+    "useRecoveryCode": "Use a recovery code instead",
+    "useAuthenticator": "Use authenticator app instead"
   }
 }

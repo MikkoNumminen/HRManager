@@ -301,7 +301,11 @@
     "permViewLeave": "休暇申請と残高を閲覧する",
     "permRequestLeave": "休暇申請を提出する",
     "permApproveLeave": "休暇申請を承認または却下する",
-    "permManageLeaveTypes": "休暇種別を管理する"
+    "permManageLeaveTypes": "休暇種別を管理する",
+    "typeUserSession": "ユーザーセッション",
+    "actionSessionLogin": "セッションログイン",
+    "actionSessionForceLogout": "セッション強制ログアウト",
+    "actionSessionConcurrentExceeded": "同時セッション数の上限超過"
   },
   "notifications": {
     "personCreated": "担当者を作成しました",
@@ -328,7 +332,10 @@
     "userKickedOut": "{name}が追放されました",
     "profileNameUpdated": "表示名を更新しました",
     "profileImageUpdated": "プロフィール画像を更新しました",
-    "dataImported": "{count, plural, one {# 人の人員をインポートしました} other {# 名の人員をインポートしました}}"
+    "dataImported": "{count, plural, one {# 人の人員をインポートしました} other {# 名の人員をインポートしました}}",
+    "otherSessionsSignedOut": "他のすべてのセッションがサインアウトされました",
+    "sessionForceLoggedOut": "セッションが強制ログアウトされました",
+    "allSessionsForceLoggedOut": "{name} のすべてのセッションが強制ログアウトされました"
   },
   "tutorial": {
     "checklistTitle": "デモツアー",
@@ -502,7 +509,9 @@
     "invalidId": "無効なIDです",
     "invalidYear": "無効な年です",
     "positionAlreadyExists": "この役職は既に存在します",
-    "positionNotFound": "役職が見つかりません"
+    "positionNotFound": "役職が見つかりません",
+    "sessionNotFound": "セッションが見つかりません",
+    "sessionAlreadyInactive": "セッションはすでに無効です"
   },
   "reviews": {
     "title": "パフォーマンス評価",
@@ -727,5 +736,18 @@
     "continueGitHub": "GitHubで続行",
     "errorAccountLinked": "このメールアドレスは既に別のプロバイダーにリンクされています。元のプロバイダーでサインインしてください。",
     "errorGeneric": "サインイン中にエラーが発生しました。もう一度お試しください。"
+  },
+  "sessions": {
+    "title": "アクティブなセッション",
+    "description": "現在サインインしているデバイス。アカウントを保護するため、他のすべてのセッションをサインアウトできます。",
+    "signOutOthers": "他をサインアウト",
+    "currentSession": "このデバイス",
+    "noSessions": "アクティブなセッションはありません",
+    "unknownIp": "不明なIP",
+    "lastActive": "最終アクティブ: {time}",
+    "adminTitle": "アクティブなセッション",
+    "forceLogout": "強制ログアウト",
+    "forceLogoutAll": "すべて強制ログアウト",
+    "noActiveSessions": "このユーザーのアクティブなセッションはありません"
   }
 }

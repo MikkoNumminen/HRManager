@@ -301,7 +301,11 @@
     "permViewLeave": "consulter les demandes et soldes de congé",
     "permRequestLeave": "soumettre des demandes de congé",
     "permApproveLeave": "approuver ou rejeter des demandes de congé",
-    "permManageLeaveTypes": "gérer les types de congé"
+    "permManageLeaveTypes": "gérer les types de congé",
+    "typeUserSession": "Session utilisateur",
+    "actionSessionLogin": "Connexion de session",
+    "actionSessionForceLogout": "Déconnexion forcée de session",
+    "actionSessionConcurrentExceeded": "Limite de sessions simultanées dépassée"
   },
   "notifications": {
     "personCreated": "Personne créée avec succès",
@@ -328,7 +332,10 @@
     "userKickedOut": "{name} a été exclu",
     "profileNameUpdated": "Nom d'affichage mis à jour avec succès",
     "profileImageUpdated": "Photo de profil mise à jour avec succès",
-    "dataImported": "{count, plural, one {# personne importée avec succès} other {# personnes importées avec succès}}"
+    "dataImported": "{count, plural, one {# personne importée avec succès} other {# personnes importées avec succès}}",
+    "otherSessionsSignedOut": "Toutes les autres sessions ont été déconnectées",
+    "sessionForceLoggedOut": "Session déconnectée de force",
+    "allSessionsForceLoggedOut": "Toutes les sessions de {name} ont été déconnectées de force"
   },
   "tutorial": {
     "checklistTitle": "Visite guidée",
@@ -502,7 +509,9 @@
     "invalidId": "Identifiant invalide",
     "invalidYear": "Année invalide",
     "positionAlreadyExists": "Ce poste existe déjà",
-    "positionNotFound": "Poste non trouvé"
+    "positionNotFound": "Poste non trouvé",
+    "sessionNotFound": "Session introuvable",
+    "sessionAlreadyInactive": "La session est déjà inactive"
   },
   "reviews": {
     "title": "Évaluations de performance",
@@ -727,5 +736,18 @@
     "continueGitHub": "Continuer avec GitHub",
     "errorAccountLinked": "Cet e-mail est déjà lié à un autre fournisseur. Veuillez vous connecter avec le fournisseur d'origine.",
     "errorGeneric": "Une erreur s'est produite lors de la connexion. Veuillez réessayer."
+  },
+  "sessions": {
+    "title": "Sessions actives",
+    "description": "Appareils sur lesquels vous êtes actuellement connecté. Vous pouvez déconnecter toutes les autres sessions pour sécuriser votre compte.",
+    "signOutOthers": "Déconnecter les autres",
+    "currentSession": "Cet appareil",
+    "noSessions": "Aucune session active",
+    "unknownIp": "IP inconnue",
+    "lastActive": "Dernière activité : {time}",
+    "adminTitle": "Sessions actives",
+    "forceLogout": "Déconnexion forcée",
+    "forceLogoutAll": "Déconnecter tous de force",
+    "noActiveSessions": "Aucune session active pour cet utilisateur"
   }
 }

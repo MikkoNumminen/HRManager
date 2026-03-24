@@ -301,7 +301,11 @@
     "permViewLeave": "przeglądać wnioski i salda urlopowe",
     "permRequestLeave": "składać wnioski urlopowe",
     "permApproveLeave": "zatwierdzać lub odrzucać wnioski urlopowe",
-    "permManageLeaveTypes": "zarządzać typami urlopów"
+    "permManageLeaveTypes": "zarządzać typami urlopów",
+    "typeUserSession": "Sesja użytkownika",
+    "actionSessionLogin": "Logowanie do sesji",
+    "actionSessionForceLogout": "Wymuszone wylogowanie z sesji",
+    "actionSessionConcurrentExceeded": "Przekroczono limit jednoczesnych sesji"
   },
   "notifications": {
     "personCreated": "Osoba utworzona pomyślnie",
@@ -328,7 +332,10 @@
     "userKickedOut": "{name} został wyrzucony",
     "profileNameUpdated": "Nazwa wyświetlana zaktualizowana pomyślnie",
     "profileImageUpdated": "Zdjęcie profilowe zaktualizowane pomyślnie",
-    "dataImported": "{count, plural, one {# osoba zaimportowana pomyślnie} other {# osób zaimportowanych pomyślnie}}"
+    "dataImported": "{count, plural, one {# osoba zaimportowana pomyślnie} other {# osób zaimportowanych pomyślnie}}",
+    "otherSessionsSignedOut": "Wszystkie inne sesje zostały wylogowane",
+    "sessionForceLoggedOut": "Sesja została wymuszone wylogowana",
+    "allSessionsForceLoggedOut": "Wszystkie sesje użytkownika {name} zostały wymuszone wylogowane"
   },
   "tutorial": {
     "checklistTitle": "Przewodnik demo",
@@ -502,7 +509,9 @@
     "invalidId": "Nieprawidłowy identyfikator",
     "invalidYear": "Nieprawidłowy rok",
     "positionAlreadyExists": "To stanowisko już istnieje",
-    "positionNotFound": "Stanowisko nie znalezione"
+    "positionNotFound": "Stanowisko nie znalezione",
+    "sessionNotFound": "Sesja nie została znaleziona",
+    "sessionAlreadyInactive": "Sesja jest już nieaktywna"
   },
   "reviews": {
     "title": "Oceny pracownicze",
@@ -727,5 +736,18 @@
     "continueGitHub": "Kontynuuj z GitHub",
     "errorAccountLinked": "Ten email jest już powiązany z innym dostawcą. Zaloguj się oryginalnym dostawcą.",
     "errorGeneric": "Wystąpił błąd podczas logowania. Spróbuj ponownie."
+  },
+  "sessions": {
+    "title": "Aktywne sesje",
+    "description": "Urządzenia, na których jesteś obecnie zalogowany. Możesz wylogować wszystkie inne sesje, aby zabezpieczyć konto.",
+    "signOutOthers": "Wyloguj inne",
+    "currentSession": "To urządzenie",
+    "noSessions": "Brak aktywnych sesji",
+    "unknownIp": "Nieznany IP",
+    "lastActive": "Ostatnio aktywny: {time}",
+    "adminTitle": "Aktywne sesje",
+    "forceLogout": "Wymuś wylogowanie",
+    "forceLogoutAll": "Wymuś wylogowanie wszystkich",
+    "noActiveSessions": "Brak aktywnych sesji dla tego użytkownika"
   }
 }

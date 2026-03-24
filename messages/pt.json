@@ -301,7 +301,11 @@
     "permViewLeave": "ver pedidos e saldos de ausência",
     "permRequestLeave": "submeter pedidos de ausência",
     "permApproveLeave": "aprovar ou rejeitar pedidos de ausência",
-    "permManageLeaveTypes": "gerir tipos de ausência"
+    "permManageLeaveTypes": "gerir tipos de ausência",
+    "typeUserSession": "Sessão do utilizador",
+    "actionSessionLogin": "Login de sessão",
+    "actionSessionForceLogout": "Encerramento forçado de sessão",
+    "actionSessionConcurrentExceeded": "Limite de sessões simultâneas excedido"
   },
   "notifications": {
     "personCreated": "Pessoa criada com sucesso",
@@ -328,7 +332,10 @@
     "userKickedOut": "{name} foi expulso",
     "profileNameUpdated": "Nome de exibição atualizado com sucesso",
     "profileImageUpdated": "Foto de perfil atualizada com sucesso",
-    "dataImported": "{count, plural, one {# pessoa importada com sucesso} other {# pessoas importadas com sucesso}}"
+    "dataImported": "{count, plural, one {# pessoa importada com sucesso} other {# pessoas importadas com sucesso}}",
+    "otherSessionsSignedOut": "Todas as outras sessões foram encerradas",
+    "sessionForceLoggedOut": "Sessão encerrada forçosamente",
+    "allSessionsForceLoggedOut": "Todas as sessões de {name} foram encerradas forçosamente"
   },
   "tutorial": {
     "checklistTitle": "Visita guiada",
@@ -502,7 +509,9 @@
     "invalidId": "ID inválido",
     "invalidYear": "Ano inválido",
     "positionAlreadyExists": "Este cargo já existe",
-    "positionNotFound": "Cargo não encontrado"
+    "positionNotFound": "Cargo não encontrado",
+    "sessionNotFound": "Sessão não encontrada",
+    "sessionAlreadyInactive": "A sessão já está inativa"
   },
   "reviews": {
     "title": "Avaliações de Desempenho",
@@ -727,5 +736,18 @@
     "continueGitHub": "Continuar com GitHub",
     "errorAccountLinked": "Este email já está vinculado a outro provedor. Faça login com o provedor original.",
     "errorGeneric": "Ocorreu um erro durante o login. Tente novamente."
+  },
+  "sessions": {
+    "title": "Sessões ativas",
+    "description": "Dispositivos onde está atualmente com sessão iniciada. Pode encerrar todas as outras sessões para proteger a sua conta.",
+    "signOutOthers": "Encerrar outras sessões",
+    "currentSession": "Este dispositivo",
+    "noSessions": "Sem sessões ativas",
+    "unknownIp": "IP desconhecido",
+    "lastActive": "Última atividade: {time}",
+    "adminTitle": "Sessões ativas",
+    "forceLogout": "Forçar encerramento",
+    "forceLogoutAll": "Forçar encerramento de todas",
+    "noActiveSessions": "Sem sessões ativas para este utilizador"
   }
 }

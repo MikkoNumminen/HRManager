@@ -301,7 +301,11 @@
     "permViewLeave": "查看假期申请和余额",
     "permRequestLeave": "提交假期申请",
     "permApproveLeave": "批准或拒绝假期申请",
-    "permManageLeaveTypes": "管理假期类型"
+    "permManageLeaveTypes": "管理假期类型",
+    "typeUserSession": "用户会话",
+    "actionSessionLogin": "会话登录",
+    "actionSessionForceLogout": "强制注销会话",
+    "actionSessionConcurrentExceeded": "超出并发会话限制"
   },
   "notifications": {
     "personCreated": "人员创建成功",
@@ -328,7 +332,10 @@
     "userKickedOut": "{name}已被踢出",
     "profileNameUpdated": "显示名称更新成功",
     "profileImageUpdated": "头像更新成功",
-    "dataImported": "{count, plural, one {# 名人员导入成功} other {# 名人员导入成功}}"
+    "dataImported": "{count, plural, one {# 名人员导入成功} other {# 名人员导入成功}}",
+    "otherSessionsSignedOut": "所有其他会话已退出登录",
+    "sessionForceLoggedOut": "会话已被强制注销",
+    "allSessionsForceLoggedOut": "{name} 的所有会话已被强制注销"
   },
   "tutorial": {
     "checklistTitle": "演示导览",
@@ -502,7 +509,9 @@
     "invalidId": "无效的 ID",
     "invalidYear": "无效的年份",
     "positionAlreadyExists": "该职位已存在",
-    "positionNotFound": "未找到职位"
+    "positionNotFound": "未找到职位",
+    "sessionNotFound": "未找到会话",
+    "sessionAlreadyInactive": "会话已处于非活跃状态"
   },
   "reviews": {
     "title": "绩效评估",
@@ -727,5 +736,18 @@
     "continueGitHub": "使用 GitHub 继续",
     "errorAccountLinked": "此邮箱已关联其他登录方式。请使用原始方式登录。",
     "errorGeneric": "登录时发生错误。请重试。"
+  },
+  "sessions": {
+    "title": "活跃会话",
+    "description": "您当前登录的设备。您可以退出所有其他会话以保护您的账户。",
+    "signOutOthers": "退出其他设备",
+    "currentSession": "此设备",
+    "noSessions": "暂无活跃会话",
+    "unknownIp": "未知IP",
+    "lastActive": "最后活跃：{time}",
+    "adminTitle": "活跃会话",
+    "forceLogout": "强制注销",
+    "forceLogoutAll": "强制注销所有",
+    "noActiveSessions": "该用户暂无活跃会话"
   }
 }

@@ -301,7 +301,11 @@
     "permViewLeave": "nähdä poissaolopynnöt ja -saldot",
     "permRequestLeave": "lähettää poissaolopyyntöjä",
     "permApproveLeave": "hyväksyä tai hylätä poissaolopyyntöjä",
-    "permManageLeaveTypes": "hallita poissaolotyyppejä"
+    "permManageLeaveTypes": "hallita poissaolotyyppejä",
+    "typeUserSession": "Käyttäjäistunto",
+    "actionSessionLogin": "Istuntoon kirjautuminen",
+    "actionSessionForceLogout": "Istunnon pakkokirjautuminen ulos",
+    "actionSessionConcurrentExceeded": "Samanaikaisten istuntojen raja ylitetty"
   },
   "notifications": {
     "personCreated": "Henkilö luotu onnistuneesti",
@@ -328,7 +332,10 @@
     "userKickedOut": "{name} on poistettu järjestelmästä",
     "profileNameUpdated": "Näyttönimi päivitetty onnistuneesti",
     "profileImageUpdated": "Profiilikuva päivitetty onnistuneesti",
-    "dataImported": "{count, plural, one {# henkilö tuotu onnistuneesti} other {# henkilöä tuotu onnistuneesti}}"
+    "dataImported": "{count, plural, one {# henkilö tuotu onnistuneesti} other {# henkilöä tuotu onnistuneesti}}",
+    "otherSessionsSignedOut": "Kaikki muut istunnot on kirjattu ulos",
+    "sessionForceLoggedOut": "Istunto pakkokirjattu ulos",
+    "allSessionsForceLoggedOut": "Kaikki {name}n istunnot on pakkokirjattu ulos"
   },
   "tutorial": {
     "checklistTitle": "Demokierros",
@@ -502,7 +509,9 @@
     "invalidId": "Virheellinen tunnus",
     "invalidYear": "Virheellinen vuosi",
     "positionAlreadyExists": "Tämä nimike on jo olemassa",
-    "positionNotFound": "Nimikettä ei löytynyt"
+    "positionNotFound": "Nimikettä ei löytynyt",
+    "sessionNotFound": "Istuntoa ei löydy",
+    "sessionAlreadyInactive": "Istunto on jo epäaktiivinen"
   },
   "reviews": {
     "title": "Kehityskeskustelut",
@@ -727,5 +736,18 @@
     "continueGitHub": "Jatka GitHubilla",
     "errorAccountLinked": "Tämä sähköposti on jo yhdistetty toiseen palveluntarjoajaan. Kirjaudu sisään alkuperäisellä palveluntarjoajalla.",
     "errorGeneric": "Kirjautumisessa tapahtui virhe. Yritä uudelleen."
+  },
+  "sessions": {
+    "title": "Aktiiviset istunnot",
+    "description": "Laitteet, joilla olet tällä hetkellä kirjautuneena. Voit kirjata ulos kaikki muut istunnot tilin suojaamiseksi.",
+    "signOutOthers": "Kirjaa muut ulos",
+    "currentSession": "Tämä laite",
+    "noSessions": "Ei aktiivisia istuntoja",
+    "unknownIp": "Tuntematon IP",
+    "lastActive": "Viimeksi aktiivinen: {time}",
+    "adminTitle": "Aktiiviset istunnot",
+    "forceLogout": "Pakkokirjautuminen ulos",
+    "forceLogoutAll": "Pakkokirjaa kaikki ulos",
+    "noActiveSessions": "Ei aktiivisia istuntoja tälle käyttäjälle"
   }
 }

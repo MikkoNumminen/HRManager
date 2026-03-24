@@ -301,7 +301,11 @@
     "permViewLeave": "izin taleplerini ve bakiyelerini görüntüle",
     "permRequestLeave": "izin talebi gönder",
     "permApproveLeave": "izin taleplerini onayla veya reddet",
-    "permManageLeaveTypes": "izin türlerini yönet"
+    "permManageLeaveTypes": "izin türlerini yönet",
+    "typeUserSession": "Kullanıcı Oturumu",
+    "actionSessionLogin": "Oturum Girişi",
+    "actionSessionForceLogout": "Oturum Zorla Kapatma",
+    "actionSessionConcurrentExceeded": "Eşzamanlı Oturum Sınırı Aşıldı"
   },
   "notifications": {
     "personCreated": "Kişi başarıyla oluşturuldu",
@@ -328,7 +332,10 @@
     "userKickedOut": "{name} atıldı",
     "profileNameUpdated": "Görünen ad başarıyla güncellendi",
     "profileImageUpdated": "Profil fotoğrafı başarıyla güncellendi",
-    "dataImported": "{count, plural, one {# kişi başarıyla içeri aktarıldı} other {# kişi başarıyla içeri aktarıldı}}"
+    "dataImported": "{count, plural, one {# kişi başarıyla içeri aktarıldı} other {# kişi başarıyla içeri aktarıldı}}",
+    "otherSessionsSignedOut": "Diğer tüm oturumlar kapatıldı",
+    "sessionForceLoggedOut": "Oturum zorla kapatıldı",
+    "allSessionsForceLoggedOut": "{name} adlı kullanıcının tüm oturumları zorla kapatıldı"
   },
   "tutorial": {
     "checklistTitle": "Demo Turu",
@@ -502,7 +509,9 @@
     "invalidId": "Geçersiz kimlik",
     "invalidYear": "Geçersiz yıl",
     "positionAlreadyExists": "Bu pozisyon zaten mevcut",
-    "positionNotFound": "Pozisyon bulunamadı"
+    "positionNotFound": "Pozisyon bulunamadı",
+    "sessionNotFound": "Oturum bulunamadı",
+    "sessionAlreadyInactive": "Oturum zaten etkin değil"
   },
   "reviews": {
     "title": "Performans Değerlendirmeleri",
@@ -727,5 +736,18 @@
     "continueGitHub": "GitHub ile devam et",
     "errorAccountLinked": "Bu e-posta zaten başka bir sağlayıcıya bağlı. Lütfen orijinal sağlayıcı ile giriş yapın.",
     "errorGeneric": "Giriş sırasında bir hata oluştu. Lütfen tekrar deneyin."
+  },
+  "sessions": {
+    "title": "Aktif Oturumlar",
+    "description": "Şu anda oturum açık olan cihazlar. Hesabınızı güvende tutmak için diğer tüm oturumları kapatabilirsiniz.",
+    "signOutOthers": "Diğerlerini Çıkar",
+    "currentSession": "Bu cihaz",
+    "noSessions": "Aktif oturum yok",
+    "unknownIp": "Bilinmeyen IP",
+    "lastActive": "Son aktif: {time}",
+    "adminTitle": "Aktif Oturumlar",
+    "forceLogout": "Zorla Çıkış",
+    "forceLogoutAll": "Tümünü Zorla Çıkar",
+    "noActiveSessions": "Bu kullanıcı için aktif oturum yok"
   }
 }

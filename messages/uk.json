@@ -301,7 +301,11 @@
     "permViewLeave": "переглядати заявки та залишки відпусток",
     "permRequestLeave": "подавати заявки на відпустку",
     "permApproveLeave": "схвалювати або відхиляти заявки на відпустку",
-    "permManageLeaveTypes": "керувати видами відпусток"
+    "permManageLeaveTypes": "керувати видами відпусток",
+    "typeUserSession": "Сесія користувача",
+    "actionSessionLogin": "Вхід до сесії",
+    "actionSessionForceLogout": "Примусовий вихід із сесії",
+    "actionSessionConcurrentExceeded": "Перевищено ліміт одночасних сесій"
   },
   "notifications": {
     "personCreated": "Особу успішно створено",
@@ -328,7 +332,10 @@
     "userKickedOut": "{name} було виключено",
     "profileNameUpdated": "Відображуване ім'я успішно оновлено",
     "profileImageUpdated": "Фото профілю успішно оновлено",
-    "dataImported": "{count, plural, one {# співробітник успішно імпортовано} other {# співробітників успішно імпортовано}}"
+    "dataImported": "{count, plural, one {# співробітник успішно імпортовано} other {# співробітників успішно імпортовано}}",
+    "otherSessionsSignedOut": "Усі інші сесії завершено",
+    "sessionForceLoggedOut": "Сесію примусово завершено",
+    "allSessionsForceLoggedOut": "Усі сесії користувача {name} примусово завершено"
   },
   "tutorial": {
     "checklistTitle": "Огляд демо",
@@ -502,7 +509,9 @@
     "invalidId": "Недійсний ідентифікатор",
     "invalidYear": "Недійсний рік",
     "positionAlreadyExists": "Ця посада вже існує",
-    "positionNotFound": "Посаду не знайдено"
+    "positionNotFound": "Посаду не знайдено",
+    "sessionNotFound": "Сесію не знайдено",
+    "sessionAlreadyInactive": "Сесія вже неактивна"
   },
   "reviews": {
     "title": "Оцінка ефективності",
@@ -727,5 +736,18 @@
     "continueGitHub": "Продовжити з GitHub",
     "errorAccountLinked": "Цей email вже пов'язаний з іншим провайдером. Увійдіть через початковий провайдер.",
     "errorGeneric": "Під час входу сталася помилка. Спробуйте ще раз."
+  },
+  "sessions": {
+    "title": "Активні сесії",
+    "description": "Пристрої, на яких ви зараз увійшли. Ви можете завершити всі інші сесії для захисту облікового запису.",
+    "signOutOthers": "Вийти на інших пристроях",
+    "currentSession": "Цей пристрій",
+    "noSessions": "Немає активних сесій",
+    "unknownIp": "Невідомий IP",
+    "lastActive": "Остання активність: {time}",
+    "adminTitle": "Активні сесії",
+    "forceLogout": "Примусовий вихід",
+    "forceLogoutAll": "Примусово вийти з усіх",
+    "noActiveSessions": "Немає активних сесій для цього користувача"
   }
 }

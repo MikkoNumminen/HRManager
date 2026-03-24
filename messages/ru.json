@@ -301,7 +301,11 @@
     "permViewLeave": "просматривать заявки и остатки отпуска",
     "permRequestLeave": "подавать заявки на отпуск",
     "permApproveLeave": "одобрять или отклонять заявки на отпуск",
-    "permManageLeaveTypes": "управлять видами отпуска"
+    "permManageLeaveTypes": "управлять видами отпуска",
+    "typeUserSession": "Сессия пользователя",
+    "actionSessionLogin": "Вход в сессию",
+    "actionSessionForceLogout": "Принудительный выход из сессии",
+    "actionSessionConcurrentExceeded": "Превышен лимит одновременных сессий"
   },
   "notifications": {
     "personCreated": "Сотрудник успешно создан",
@@ -328,7 +332,10 @@
     "userKickedOut": "{name} был исключён",
     "profileNameUpdated": "Отображаемое имя успешно обновлено",
     "profileImageUpdated": "Фото профиля успешно обновлено",
-    "dataImported": "{count, plural, one {# сотрудник успешно импортирован} other {# сотрудников успешно импортировано}}"
+    "dataImported": "{count, plural, one {# сотрудник успешно импортирован} other {# сотрудников успешно импортировано}}",
+    "otherSessionsSignedOut": "Все остальные сессии завершены",
+    "sessionForceLoggedOut": "Сессия принудительно завершена",
+    "allSessionsForceLoggedOut": "Все сессии пользователя {name} принудительно завершены"
   },
   "tutorial": {
     "checklistTitle": "Обзор демо",
@@ -502,7 +509,9 @@
     "invalidId": "Неверный идентификатор",
     "invalidYear": "Неверный год",
     "positionAlreadyExists": "Эта должность уже существует",
-    "positionNotFound": "Должность не найдена"
+    "positionNotFound": "Должность не найдена",
+    "sessionNotFound": "Сессия не найдена",
+    "sessionAlreadyInactive": "Сессия уже неактивна"
   },
   "reviews": {
     "title": "Оценка эффективности",
@@ -727,5 +736,18 @@
     "continueGitHub": "Продолжить с GitHub",
     "errorAccountLinked": "Этот email уже привязан к другому провайдеру. Войдите через исходный провайдер.",
     "errorGeneric": "Произошла ошибка при входе. Попробуйте снова."
+  },
+  "sessions": {
+    "title": "Активные сессии",
+    "description": "Устройства, на которых вы сейчас вошли в систему. Вы можете завершить все остальные сессии для защиты аккаунта.",
+    "signOutOthers": "Выйти на других устройствах",
+    "currentSession": "Это устройство",
+    "noSessions": "Нет активных сессий",
+    "unknownIp": "Неизвестный IP",
+    "lastActive": "Последняя активность: {time}",
+    "adminTitle": "Активные сессии",
+    "forceLogout": "Принудительный выход",
+    "forceLogoutAll": "Принудительно выйти со всех",
+    "noActiveSessions": "Нет активных сессий для этого пользователя"
   }
 }
