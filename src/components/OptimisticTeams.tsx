@@ -48,7 +48,7 @@ export default function OptimisticTeams({ teams, canCreate }: OptimisticTeamsPro
         <Typography variant="h6" mb={1}>
           {t("heading")}
         </Typography>
-        <EditableTeamsTable combinedTeams={optimisticTeams} />
+        <EditableTeamsTable combinedTeams={optimisticTeams} canCreate={canCreate} />
       </Box>
     </>
   );

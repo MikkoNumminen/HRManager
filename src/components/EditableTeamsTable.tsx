@@ -13,16 +13,19 @@ import {
   Typography,
   Box,
 } from "@mui/material";
+import { GroupsOutlined } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 import { colors, mobileCardClickableStyles } from "@/muiStyles";
 import { CombinedTeam } from "@/schemas";
 import { useTranslations } from "next-intl";
+import EmptyState from "./EmptyState";
 
 interface CombinedTeamProps {
   combinedTeams: CombinedTeam[];
+  canCreate?: boolean;
 }
 
-const EditableTeamsTable: React.FC<CombinedTeamProps> = ({ combinedTeams }) => {
+const EditableTeamsTable: React.FC<CombinedTeamProps> = ({ combinedTeams, canCreate }) => {
   const t = useTranslations("teams");
   const tc = useTranslations("common");
   const router = useRouter();
@@ -32,9 +35,11 @@ const EditableTeamsTable: React.FC<CombinedTeamProps> = ({ combinedTeams }) => {
   };
 
   const emptyMessage = (
-    <Box display="flex" justifyContent="center" alignItems="center" height="100px">
-      <Typography align="center">{t("noTeams")}</Typography>
-    </Box>
+    <EmptyState
+      icon={GroupsOutlined}
+      title={t("noTeams")}
+      subtitle={canCreate ? t("noTeamsHint") : undefined}
+    />
   );
 
   return (

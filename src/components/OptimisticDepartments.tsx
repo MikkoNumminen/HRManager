@@ -50,7 +50,7 @@ export default function OptimisticDepartments({
         <Typography variant="h6" mb={1}>
           {t("heading")}
         </Typography>
-        <EditableDepartmentsTable departments={optimisticDepartments} />
+        <EditableDepartmentsTable departments={optimisticDepartments} canCreate={canCreate} />
       </Box>
     </>
   );

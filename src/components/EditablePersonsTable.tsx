@@ -12,16 +12,19 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import { PeopleOutlined } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 import { colors, mobileCardClickableStyles } from "@/muiStyles";
 import { Person } from "@/schemas";
 import { useTranslations } from "next-intl";
+import EmptyState from "./EmptyState";
 
 interface PersonTableProps {
   persons: Person[];
+  canCreate?: boolean;
 }
 
-const PersonTable: React.FC<PersonTableProps> = ({ persons }) => {
+const PersonTable: React.FC<PersonTableProps> = ({ persons, canCreate }) => {
   const t = useTranslations("persons");
   const tc = useTranslations("common");
   const router = useRouter();
@@ -31,9 +34,11 @@ const PersonTable: React.FC<PersonTableProps> = ({ persons }) => {
   };
 
   const emptyMessage = (
-    <Box display="flex" justifyContent="center" alignItems="center" height="100px">
-      <Typography align="center">{t("noPersons")}</Typography>
-    </Box>
+    <EmptyState
+      icon={PeopleOutlined}
+      title={t("noPersons")}
+      subtitle={canCreate ? t("noPersonsHint") : undefined}
+    />
   );
 
   return (

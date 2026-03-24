@@ -13,16 +13,22 @@ import {
   Typography,
   Box,
 } from "@mui/material";
+import { ApartmentOutlined } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 import { colors, mobileCardClickableStyles } from "@/muiStyles";
 import { Department } from "@/schemas";
 import { useTranslations } from "next-intl";
+import EmptyState from "./EmptyState";
 
 interface EditableDepartmentsTableProps {
   departments: Department[];
+  canCreate?: boolean;
 }
 
-const EditableDepartmentsTable: React.FC<EditableDepartmentsTableProps> = ({ departments }) => {
+const EditableDepartmentsTable: React.FC<EditableDepartmentsTableProps> = ({
+  departments,
+  canCreate,
+}) => {
   const t = useTranslations("departments");
   const tc = useTranslations("common");
   const router = useRouter();
@@ -32,9 +38,11 @@ const EditableDepartmentsTable: React.FC<EditableDepartmentsTableProps> = ({ dep
   };
 
   const emptyMessage = (
-    <Box display="flex" justifyContent="center" alignItems="center" height="100px">
-      <Typography align="center">{t("noDepartments")}</Typography>
-    </Box>
+    <EmptyState
+      icon={ApartmentOutlined}
+      title={t("noDepartments")}
+      subtitle={canCreate ? t("noDepartmentsHint") : undefined}
+    />
   );
 
   return (

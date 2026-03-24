@@ -45,7 +45,7 @@ export default function OptimisticPersons({ persons, canCreate }: OptimisticPers
         <Typography variant="h6" mb={1}>
           {t("heading")}
         </Typography>
-        <PersonTable persons={optimisticPersons} />
+        <PersonTable persons={optimisticPersons} canCreate={canCreate} />
       </Box>
     </>
   );
