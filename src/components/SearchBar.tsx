@@ -20,6 +20,9 @@ export default function SearchBar({ value, onChange }: SearchBarProps) {
       value={value}
       onChange={(e) => onChange(e.target.value)}
       aria-label={t("searchPlaceholder")}
+      inputProps={{
+        "data-keyboard-shortcut": "search",
+      }}
       slotProps={{
         input: {
           startAdornment: (

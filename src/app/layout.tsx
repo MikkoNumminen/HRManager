@@ -7,6 +7,7 @@ import ThemeRegistry from "@/components/ThemeRegistry";
 import SessionProvider from "@/components/SessionProvider";
 import SnackbarProvider from "@/components/SnackbarProvider";
 import TutorialProvider from "@/components/TutorialProvider";
+import KeyboardShortcutsProvider from "@/components/KeyboardShortcutsProvider";
 import TutorialSpotlight from "@/components/TutorialSpotlight";
 import TutorialCelebration from "@/components/TutorialCelebration";
 import TutorialChecklist from "@/components/TutorialChecklist";
@@ -49,24 +50,26 @@ export default async function RootLayout({
             <NextIntlClientProvider locale={locale} messages={messages}>
               <ThemeRegistry>
                 <SnackbarProvider>
-                  <TutorialProvider>
-                    <Box
-                      component="main"
-                      id="main-content"
-                      sx={{
-                        maxWidth: "1280px",
-                        mx: "auto",
-                        px: { xs: 1.5, sm: 2, md: 3 },
-                        pt: 2,
-                        pb: 2,
-                      }}
-                    >
-                      {children}
-                    </Box>
-                    <TutorialSpotlight />
-                    <TutorialCelebration />
-                    <TutorialChecklist />
-                  </TutorialProvider>
+                  <KeyboardShortcutsProvider>
+                    <TutorialProvider>
+                      <Box
+                        component="main"
+                        id="main-content"
+                        sx={{
+                          maxWidth: "1280px",
+                          mx: "auto",
+                          px: { xs: 1.5, sm: 2, md: 3 },
+                          pt: 2,
+                          pb: 2,
+                        }}
+                      >
+                        {children}
+                      </Box>
+                      <TutorialSpotlight />
+                      <TutorialCelebration />
+                      <TutorialChecklist />
+                    </TutorialProvider>
+                  </KeyboardShortcutsProvider>
                 </SnackbarProvider>
               </ThemeRegistry>
             </NextIntlClientProvider>
