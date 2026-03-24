@@ -8,22 +8,27 @@ const adapter = new PrismaPg({
 export const testPrisma = new PrismaClient({ adapter });
 
 export async function cleanDb() {
-  await testPrisma.userPermission.deleteMany();
-  await testPrisma.demoSession.deleteMany();
-  await testPrisma.reviewSubmission.deleteMany();
-  await testPrisma.reviewRequest.deleteMany();
-  await testPrisma.reviewCycle.deleteMany();
-  await testPrisma.reviewTemplate.deleteMany();
-  await testPrisma.leaveRequest.deleteMany();
-  await testPrisma.leaveBalance.deleteMany();
-  await testPrisma.leaveType.deleteMany();
-  await testPrisma.teamMember.deleteMany();
-  await testPrisma.team.deleteMany();
-  await testPrisma.department.deleteMany();
-  await testPrisma.person.deleteMany();
-  await testPrisma.user.deleteMany();
-  await testPrisma.permission.deleteMany();
-  await testPrisma.rateLimit.deleteMany();
+  await testPrisma.$executeRawUnsafe(`
+    TRUNCATE TABLE
+      "UserPermission",
+      "DemoSession",
+      "ReviewSubmission",
+      "ReviewRequest",
+      "ReviewCycle",
+      "ReviewTemplate",
+      "LeaveRequest",
+      "LeaveBalance",
+      "LeaveType",
+      "TeamMember",
+      "Team",
+      "Department",
+      "Person",
+      "Position",
+      "User",
+      "Permission",
+      "RateLimit"
+    CASCADE
+  `);
 }
 
 // Factory: create a test person with optional overrides

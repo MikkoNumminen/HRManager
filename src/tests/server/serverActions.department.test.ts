@@ -41,6 +41,12 @@ jest.mock("@/auditLog", () => ({
 // Rate limiting behavior is tested separately in rateLimit.test.ts.
 jest.mock("@/rateLimit", () => ({
   rateLimit: jest.fn(),
+  RateLimitError: class RateLimitError extends Error {
+    constructor() {
+      super("Too many requests");
+      this.name = "RateLimitError";
+    }
+  },
 }));
 
 // Mock demo session — defaults to null (production mode).
