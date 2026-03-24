@@ -41,7 +41,9 @@ const demoProvider =
             await seedDemoData(demoSession.id);
 
             // Clean up stale sessions in the background — don't block login
-            cleanupStaleDemoSessions().catch(() => {});
+            cleanupStaleDemoSessions().catch((err) => {
+              console.error("[demoSession] cleanupStaleDemoSessions failed:", err);
+            });
 
             return {
               id: user.id,

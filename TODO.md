@@ -19,6 +19,8 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 
 - 🔴🧠 Performance reviews / 360 feedback — review templates, rating scales, feedback cycles [Claude 3, main]
 - 🔴🧠 Leave/absence management — leave types, requests, balances, approval workflows [Claude 2, main]
+- 🟢⚡ CI pipeline monitoring & auto-fix — watching for failures, fixing build/lint/format issues [Claude 4, main]
+- 🟢⚡ Demo session cleanup failure logging — silent failures leave stale data [Claude 1, main]
 
 ## Recently Completed
 
@@ -54,5 +56,4 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 
 ### Security
 
-- 🟢⚡ Demo session cleanup failure logging — silent failures leave stale data
 - 🟡🧠 JWT permission revocation window — permissions valid up to 1h after admin revokes them
