@@ -33,18 +33,13 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 - 🟡⚡ Document management — upload/store employee contracts, certs; PDF preview; virus scan; soft-delete
 - 🟡⚡ Org chart drag-and-drop — drag person to new team/department; confirm + audit + DB write
 - 🟡⚡ Onboarding/offboarding workflows — checklists per employee; assign tasks to managers; track completion
-- 🟢⚡ Calendar integration (iCal) — generate .ics for approved leave; team calendar export
 
 ### Code Quality / Architecture (found by audit)
 
-- 🟢⚡ Health check endpoints — /health (shallow: app running) + /ready (deep: DB connections live); JSON with version, uptime, dependency status
-- 🟡⚡ Caching layer for dashboard queries — 5-min cache via Redis or revalidateTag; invalidate on data change; monitor hit rate
 - 🟡🧠 OpenTelemetry tracing — instrument request → middleware → query → action → DB; export to Jaeger/Datadog; P95/P99 dashboards
 - 🟡🧠 Background job queue (Bull/Bree) — async processing for emails, report generation, bulk imports; retry + dead-letter queue; admin job dashboard
-- 🟡⚡ Structured logging (Pino/Winston) — JSON-format with traceId, userId, action, duration; aggregate to Datadog/CloudWatch
 - 🟡🧠 WebSocket / real-time updates — live person create, leave request notifications, activity feed via Socket.io
 - 🟡🧠 Feature flags — LaunchDarkly or custom; enable per-user or env; track flag changes in audit log
-- 🟢⚡ MongoDB schema validation ($jsonSchema) — enforce required fields on audit log documents at write-time
 - 🟢⚡ Error tracking (Sentry) — capture unhandled exceptions, server action failures, client errors; grouping + alerts
 - 🔴🧠 Advanced reporting & analytics — turnover rates, headcount trends, leave utilization by dept, review completion; filtered exports; charts
 - 🔴🧠 Data encryption at rest — application-level encryption on sensitive fields; versioned key IDs; key rotation without downtime
@@ -60,18 +55,13 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 
 ### Accessibility (WCAG)
 
-- 🟢⚡ Keyboard shortcuts — `/` = search, `g`+`d` = dashboard, `g`+`p` = persons, `?` = help; WCAG keyboard navigation throughout
+_(none remaining)_
 
 ### Security (found by audit)
 
-- 🔴🧠 Fix demo user role forced to superuser on every login — authorize() callback upserts role: "superuser" on every login, bypassing admin role changes (src/auth.ts)
 - 🔴🧠 JWT callback demoSessionId ownership validation — trusts token.demoSessionId without verifying it belongs to the authenticated user (src/auth.ts:103-105)
-- 🟡🧠 JWT permission revocation window — permissions valid up to 1h after admin revokes them
 - 🟡🧠 Two-Factor Authentication (TOTP) — QR code setup, 6-digit codes, recovery codes, audit all 2FA events; SOC 2 requirement
 - 🟡🧠 Session management & concurrent limits — track sessions per device; force-logout on limit exceeded; "Sign out all other sessions" button
-- 🟡🧠 Audit log tamper detection (hash chain) — HMAC-SHA256 chain linking each log entry; verification endpoint; legal evidence integrity
-- 🟡🧠 Seed mock user data not env-gated — seedMockData() seeds admin@example.com etc. into global User table without NODE_ENV check (features/admin/actions.ts)
-- 🟡⚡ MongoDB audit log regex injection — userEmail passed directly to $regex without escaping; allows wildcard enumeration (features/audit/queries.ts:26)
 
 ### DevOps & Infrastructure
 

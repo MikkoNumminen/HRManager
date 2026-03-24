@@ -35,7 +35,9 @@ A full-stack HR management system built to production standards — not as a toy
 
 - **Nothing is ever truly deleted (soft deletes)** — Records get a `deletedAt` timestamp instead of being removed. Partial unique indexes (`WHERE deletedAt IS NULL`) enforce uniqueness only on active records, so a deleted "John Smith" doesn't block creating a new one. Deleting a person cascades to their team memberships and nulls manager references. _Why? In HR systems, you need to answer "who was on this team last quarter?" years later. Hard deletes destroy that history._
 
-- **Every change is recorded forever (immutable audit trail)** — Every mutation logs a before/after JSON snapshot to MongoDB. Writes are deferred via Next.js `after()` — the user gets their response immediately, logging happens in the background. Permission denials and rate limit hits are also logged as security events. A MongoDB TTL index on `createdAt` automatically purges documents older than 90 days — no cron job or manual cleanup needed. _Why? Compliance requires a full history of who changed what, when, and why — and it shouldn't slow down the user to record it._
+- **Every change is recorded forever (immutable audit trail)** — Every mutation logs a before/after JSON snapshot to MongoDB. Writes are deferred via Next.js `after()` — the user gets their response immediately, logging happens in the background. Permission denials and rate limit hits are also logged as security events. A MongoDB TTL index on `createdAt` automatically purges documents older than 90 days — no cron job or manual cleanup needed. Each entry includes an HMAC-SHA256 hash linking it to the previous entry — an admin-only `/api/audit/verify` endpoint walks the chain and reports the first broken link if any entry was tampered with. _Why? Compliance requires a full history of who changed what, when, and why — and it shouldn't slow down the user to record it. The hash chain ensures logs can't be silently modified after the fact._
+
+- **MongoDB schema validation** — The audit log collection enforces a `$jsonSchema` validator with required fields and BSON types. Invalid documents are warned in production (so schema evolution doesn't break writes) and rejected in development. _Why? Schemaless doesn't mean structureless — enforcing shape at the database level catches bugs that application-level validation misses._
 
 ```mermaid
 sequenceDiagram
@@ -108,6 +110,10 @@ graph LR
 
 - **Snackbar notifications** — Global success/error toasts via React context across all 17 form actions. No silent failures, no mystery about what happened.
 
+- **Keyboard shortcuts** — Press `?` to see all shortcuts. `/` focuses search, `g` then `d/p/t/e/l/r/o/a` navigates to any page (chord-based with 1s timeout). Suppressed inside inputs. _Why chords? Single-key shortcuts conflict with typing; a `g` prefix gives 8+ navigation targets without stealing keystrokes from forms._
+
+- **Calendar export (iCal)** — `/api/calendar` exports approved leave requests as an RFC 5545 `.ics` file, importable into Google Calendar, Outlook, or Apple Calendar. Supports `?personId=` filtering. Zero external dependencies — generates the format directly. _Why no library? iCal is a simple text format; a 90-line generator is more maintainable than a dependency._
+
 - **Accessibility (WCAG)** — Semantic landmarks, skip-to-content, ARIA labels, `role="alert"` on errors (screen readers announce immediately), keyboard-navigable tables, and info tooltips with `cursor: "help"`. Automated axe-core testing runs 25 WCAG AA checks across 22 components to catch violations early. _Built into every component from the start, not bolted on afterward._
 
 - **Loading skeletons on every page (Suspense boundaries)** — Every route has a `loading.tsx` that renders a pixel-matched MUI Skeleton layout while the async server component fetches data. Next.js automatically wraps these in `<Suspense>` — the shell is streamed instantly and the real content replaces it once ready. _Why skeletons instead of spinners? Spinners tell you "loading"; skeletons show you where the content will land, reducing perceived latency._
@@ -144,7 +150,13 @@ graph LR
 
 ### 🧪 Quality
 
-- **1696 tests, 91.9% line coverage** — Unit tests, integration tests against real PostgreSQL + in-memory MongoDB (no database mocks), and 75 Playwright E2E tests covering full user flows. _Why real databases in tests? Mocked tests can pass while production breaks. If your test doesn't hit a real database, it's not testing what you think it's testing._
+- **1763 tests, 91.9% line coverage** — Unit tests, integration tests against real PostgreSQL + in-memory MongoDB (no database mocks), and 75 Playwright E2E tests covering full user flows. _Why real databases in tests? Mocked tests can pass while production breaks. If your test doesn't hit a real database, it's not testing what you think it's testing._
+
+- **Structured logging (Pino)** — JSON logs in production, human-readable in development. `createRequestLogger()` produces child loggers with traceId and userId context for request correlation. Replaces all `console.error/warn` calls. _Why Pino? It's the fastest Node.js logger, and structured JSON logs are parseable by Datadog, Grafana Loki, and CloudWatch without custom parsing rules._
+
+- **Health check endpoints** — `/api/health` returns status, version, and uptime (shallow probe for load balancers). `/api/ready` checks PostgreSQL (`SELECT 1`) and MongoDB connectivity, returning 503 with per-dependency error details when degraded. _Why two endpoints? Health checks should be fast and cheap; readiness checks can be slow because they verify real dependencies._
+
+- **Dashboard caching** — `unstable_cache` wraps the two most expensive dashboard queries (metrics and org chart) with a 5-minute TTL and tag-based invalidation. Every mutation that affects dashboard data calls `revalidateTag("dashboard")`. Test-safe — the cache wrapper returns the raw function in test environments. _Why cache? Dashboard queries aggregate across multiple tables with CTEs; caching turns a ~200ms query into a <1ms cache hit for most page loads._
 
 - **Docker-ready** — `docker compose up` starts PostgreSQL + MongoDB + the app. Migrations run automatically, demo login works out of the box. _One command, zero setup, fully working._
 
@@ -203,6 +215,9 @@ graph LR
 | Themes         | `themeConfig.ts`        | CSS custom properties injected before hydration; 6 palettes switchable at runtime                          |
 | i18n           | `messages/*.json`       | 18 locale files synced via AI translation pipeline                                                         |
 | CSV            | `csvUtils.ts`           | RFC 4180 parser/generator with zero dependencies; permission-gated admin page                              |
+| Logging        | `logger.ts` (Pino)      | Structured JSON in production, pretty in dev; child loggers with traceId/userId                            |
+| Caching        | `cacheInvalidation.ts`  | Tag-based `unstable_cache` with 5-min TTL; mutations call `revalidateTag`                                  |
+| Hash chain     | `auditHashChain.ts`     | HMAC-SHA256 linking each audit entry to its predecessor; admin verification endpoint                       |
 
 ---
 
@@ -221,28 +236,34 @@ graph LR
 
 ## Testing
 
-| Layer            | Tests    | What it covers                                                                                            |
-| ---------------- | -------- | --------------------------------------------------------------------------------------------------------- |
-| UI components    | 734      | All 52 components: charts, forms, permission toggles, mobile views, themes, skeletons, search, leave mgmt |
-| Server actions   | 253      | Every mutation: happy path, errors, permission denials, cascades, leave approval workflow                 |
-| Zod schemas      | 94       | Validation rules, edge cases, type inference                                                              |
-| Prisma queries   | 83       | Real PostgreSQL + MongoDB queries — not mocks; includes paged query tests for persons/teams/departments   |
-| CSV utils        | 39       | RFC 4180 parsing, import validation, export formatting                                                    |
-| Style tokens     | 37       | Responsive breakpoints, theme tokens, component styles                                                    |
-| Auth callbacks   | 32       | JWT enrichment, permission freshness, superuser bootstrap                                                 |
-| RBAC logic       | 28       | Resolution, overrides, deny-wins, superuser bypass                                                        |
-| Tutorial config  | 26       | Tour steps, DOM selectors, completion detection                                                           |
-| CSP proxy        | 20       | Nonce generation, header injection, domain allowlists                                                     |
-| Rate limiting    | 18       | Sliding window, race conditions, cleanup                                                                  |
-| i18n             | 14       | Locale loading, cookie persistence, Accept-Language detection                                             |
-| Demo session     | 12       | Sandbox creation, isolation, cleanup, expiry                                                              |
-| Theme config     | 12       | All 6 themes, CSS variables, FOUC prevention                                                              |
-| Audit logging    | 11       | Deferred writes, before/after snapshots, security events                                                  |
-| Auth route       | 5        | Rate limiting on auth endpoints, CSRF, GET passthrough                                                    |
-| Reviews UI       | 86       | Cycle management, request table, submit form, templates, question CRUD, confirm dialogs                   |
-| Accessibility    | 25       | axe-core WCAG AA checks on 22 components — forms, tables, dialogs, skeletons, navigation                  |
-| E2E (Playwright) | 75       | Auth, CRUD, detail editing, dashboard, profile, data I/O, form validation, full workflow                  |
-| **Total**        | **1696** | **91.9% line coverage · 83.5% function coverage**                                                         |
+| Layer              | Tests    | What it covers                                                                                            |
+| ------------------ | -------- | --------------------------------------------------------------------------------------------------------- |
+| UI components      | 734      | All 52 components: charts, forms, permission toggles, mobile views, themes, skeletons, search, leave mgmt |
+| Server actions     | 253      | Every mutation: happy path, errors, permission denials, cascades, leave approval workflow                 |
+| Zod schemas        | 94       | Validation rules, edge cases, type inference                                                              |
+| Prisma queries     | 83       | Real PostgreSQL + MongoDB queries — not mocks; includes paged query tests for persons/teams/departments   |
+| CSV utils          | 39       | RFC 4180 parsing, import validation, export formatting                                                    |
+| Style tokens       | 37       | Responsive breakpoints, theme tokens, component styles                                                    |
+| Auth callbacks     | 32       | JWT enrichment, permission freshness, superuser bootstrap                                                 |
+| RBAC logic         | 28       | Resolution, overrides, deny-wins, superuser bypass                                                        |
+| Tutorial config    | 26       | Tour steps, DOM selectors, completion detection                                                           |
+| CSP proxy          | 20       | Nonce generation, header injection, domain allowlists                                                     |
+| Rate limiting      | 18       | Sliding window, race conditions, cleanup                                                                  |
+| i18n               | 14       | Locale loading, cookie persistence, Accept-Language detection                                             |
+| Demo session       | 12       | Sandbox creation, isolation, cleanup, expiry                                                              |
+| Theme config       | 12       | All 6 themes, CSS variables, FOUC prevention                                                              |
+| Audit logging      | 11       | Deferred writes, before/after snapshots, security events, hash chain integration                          |
+| Hash chain         | 10       | HMAC-SHA256 tamper detection, chain verification, broken link reporting                                   |
+| Health endpoints   | 6        | Shallow health, deep readiness, PostgreSQL + MongoDB connectivity, degraded responses                     |
+| MongoDB schema     | 6        | `$jsonSchema` validation, required fields, BSON types, warn vs strict modes                               |
+| Structured logs    | 4        | Pino logger setup, JSON output, child loggers with context                                                |
+| iCal calendar      | 7        | RFC 5545 generation, DTEND exclusivity, text escaping, CRLF, multiple events                              |
+| Keyboard shortcuts | 8        | Chord navigation, help dialog, input suppression, search focus                                            |
+| Auth route         | 5        | Rate limiting on auth endpoints, CSRF, GET passthrough                                                    |
+| Reviews UI         | 86       | Cycle management, request table, submit form, templates, question CRUD, confirm dialogs                   |
+| Accessibility      | 25       | axe-core WCAG AA checks on 22 components — forms, tables, dialogs, skeletons, navigation                  |
+| E2E (Playwright)   | 75       | Auth, CRUD, detail editing, dashboard, profile, data I/O, form validation, full workflow                  |
+| **Total**          | **1763** | **91.9% line coverage · 83.5% function coverage**                                                         |
 
 ```
 Statements : 90.83%    Branches : 82.47%
@@ -301,16 +322,17 @@ npx prisma migrate dev        # apply schema migrations
 npm run dev                   # start dev server at localhost:3000
 ```
 
-| Variable             | Required | Description                                       |
-| -------------------- | -------- | ------------------------------------------------- |
-| `DATABASE_URL`       | Yes      | PostgreSQL connection string                      |
-| `MONGODB_URL`        | Yes      | MongoDB connection string                         |
-| `AUTH_SECRET`        | Yes      | NextAuth secret (`npx auth secret` generates one) |
-| `AUTH_GOOGLE_ID`     | No       | Google OAuth client ID                            |
-| `AUTH_GOOGLE_SECRET` | No       | Google OAuth client secret                        |
-| `AUTH_GITHUB_ID`     | No       | GitHub OAuth client ID                            |
-| `AUTH_GITHUB_SECRET` | No       | GitHub OAuth client secret                        |
-| `ANTHROPIC_API_KEY`  | No       | Claude API key (for i18n translation agent)       |
+| Variable             | Required | Description                                                   |
+| -------------------- | -------- | ------------------------------------------------------------- |
+| `DATABASE_URL`       | Yes      | PostgreSQL connection string                                  |
+| `MONGODB_URL`        | Yes      | MongoDB connection string                                     |
+| `AUTH_SECRET`        | Yes      | NextAuth secret (`npx auth secret` generates one)             |
+| `AUTH_GOOGLE_ID`     | No       | Google OAuth client ID                                        |
+| `AUTH_GOOGLE_SECRET` | No       | Google OAuth client secret                                    |
+| `AUTH_GITHUB_ID`     | No       | GitHub OAuth client ID                                        |
+| `AUTH_GITHUB_SECRET` | No       | GitHub OAuth client secret                                    |
+| `AUDIT_HMAC_SECRET`  | No       | HMAC key for audit log hash chain (auto-generated if missing) |
+| `ANTHROPIC_API_KEY`  | No       | Claude API key (for i18n translation agent)                   |
 
 ---
 
