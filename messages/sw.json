@@ -576,7 +576,15 @@
     "cycleNotOpen": "Mzunguko huu wa tathmini haujafunguliwa kwa uwasilishaji.",
     "selectSubject": "Chagua mtu wa kutathiminiwa",
     "selectReviewer": "Chagua mtathimini",
-    "templates": "Violezo"
+    "templates": "Violezo",
+    "teamReviewsTitle": "Tathmini za timu",
+    "teamReviewsHeading": "Tathmini za timu yako",
+    "noManagedTeams": "Hakuna data ya tathmini ya timu",
+    "noManagedTeamsHint": "Husimamai timu yoyote, au timu zako hazina shughuli za tathmini.",
+    "employee": "Mfanyakazi",
+    "statusSubmitted": "Imewasilishwa",
+    "statusPending": "Inasubiri",
+    "selectCycle": "Chagua mzunguko"
   },
   "leave": {
     "title": "Usimamizi wa Likizo",
@@ -706,5 +714,14 @@
     "memberCount": "{count, plural, one {mwanachama #} other {wanachama #}}",
     "departmentAssignment": "Ugawanyaji wa idara (utatenganishwa)",
     "assignedTeams": "{count, plural, =0 {} one {Timu # imegawiwa (itatenganishwa)} other {Timu # zimegawiwa (zitatenganishwa)}}"
+  },
+  "signIn": {
+    "subtitle": "Usimamizi wa Rasilimali Watu",
+    "tryDemo": "Jaribu Demo — Hakuna akaunti inayohitajika",
+    "or": "au",
+    "continueGoogle": "Endelea na Google",
+    "continueGitHub": "Endelea na GitHub",
+    "errorAccountLinked": "Barua pepe hii tayari imeunganishwa na mtoa huduma mwingine. Tafadhali ingia na mtoa huduma wa awali.",
+    "errorGeneric": "Hitilafu imetokea wakati wa kuingia. Tafadhali jaribu tena."
   }
 }

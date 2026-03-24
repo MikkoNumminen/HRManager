@@ -576,7 +576,15 @@
     "cycleNotOpen": "Den här bedömningscykeln är inte öppen för inlämningar.",
     "selectSubject": "Välj bedömd person",
     "selectReviewer": "Välj bedömare",
-    "templates": "Mallar"
+    "templates": "Mallar",
+    "teamReviewsTitle": "Teamutvärderingar",
+    "teamReviewsHeading": "Ditt teams utvärderingar",
+    "noManagedTeams": "Inga teamutvärderingsdata",
+    "noManagedTeamsHint": "Du hanterar inga team eller dina team har ingen utvärderingsaktivitet.",
+    "employee": "Anställd",
+    "statusSubmitted": "Inskickad",
+    "statusPending": "Väntande",
+    "selectCycle": "Välj cykel"
   },
   "leave": {
     "title": "Ledighetshantering",
@@ -706,5 +714,14 @@
     "memberCount": "{count, plural, one {# medlem} other {# medlemmar}}",
     "departmentAssignment": "Avdelningstilldelning (kopplas bort)",
     "assignedTeams": "{count, plural, =0 {} one {# team tilldelat (kopplas bort)} other {# team tilldelade (kopplas bort)}}"
+  },
+  "signIn": {
+    "subtitle": "Personalhantering",
+    "tryDemo": "Testa demo — Inget konto krävs",
+    "or": "eller",
+    "continueGoogle": "Fortsätt med Google",
+    "continueGitHub": "Fortsätt med GitHub",
+    "errorAccountLinked": "Denna e-post är redan kopplad till en annan leverantör. Logga in med den ursprungliga leverantören.",
+    "errorGeneric": "Ett fel uppstod vid inloggning. Försök igen."
   }
 }

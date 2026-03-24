@@ -576,7 +576,15 @@
     "cycleNotOpen": "Este ciclo de avaliação não está aberto para submissões.",
     "selectSubject": "Selecionar avaliado",
     "selectReviewer": "Selecionar avaliador",
-    "templates": "Modelos"
+    "templates": "Modelos",
+    "teamReviewsTitle": "Avaliações da equipe",
+    "teamReviewsHeading": "Avaliações da sua equipe",
+    "noManagedTeams": "Sem dados de avaliação da equipe",
+    "noManagedTeamsHint": "Você não gerencia nenhuma equipe ou suas equipes não têm atividade de avaliação.",
+    "employee": "Funcionário",
+    "statusSubmitted": "Enviado",
+    "statusPending": "Pendente",
+    "selectCycle": "Selecionar ciclo"
   },
   "leave": {
     "title": "Gestão de Ausências",
@@ -706,5 +714,14 @@
     "memberCount": "{count, plural, one {# membro} other {# membros}}",
     "departmentAssignment": "Atribuição de departamento (será desvinculada)",
     "assignedTeams": "{count, plural, =0 {} one {# equipa atribuída (será desvinculada)} other {# equipas atribuídas (serão desvinculadas)}}"
+  },
+  "signIn": {
+    "subtitle": "Gestão de Recursos Humanos",
+    "tryDemo": "Experimentar Demo — Sem conta necessária",
+    "or": "ou",
+    "continueGoogle": "Continuar com Google",
+    "continueGitHub": "Continuar com GitHub",
+    "errorAccountLinked": "Este email já está vinculado a outro provedor. Faça login com o provedor original.",
+    "errorGeneric": "Ocorreu um erro durante o login. Tente novamente."
   }
 }

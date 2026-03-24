@@ -576,7 +576,15 @@
     "cycleNotOpen": "Ce cycle d'évaluation n'est pas ouvert aux soumissions.",
     "selectSubject": "Sélectionner la personne évaluée",
     "selectReviewer": "Sélectionner l'évaluateur",
-    "templates": "Modèles"
+    "templates": "Modèles",
+    "teamReviewsTitle": "Évaluations d'équipe",
+    "teamReviewsHeading": "Évaluations de votre équipe",
+    "noManagedTeams": "Aucune donnée d'évaluation d'équipe",
+    "noManagedTeamsHint": "Vous ne gérez aucune équipe ou vos équipes n'ont aucune activité d'évaluation.",
+    "employee": "Employé",
+    "statusSubmitted": "Soumis",
+    "statusPending": "En attente",
+    "selectCycle": "Sélectionner le cycle"
   },
   "leave": {
     "title": "Gestion des congés",
@@ -706,5 +714,14 @@
     "memberCount": "{count, plural, one {# membre} other {# membres}}",
     "departmentAssignment": "Affectation de département (sera dissociée)",
     "assignedTeams": "{count, plural, =0 {} one {# équipe assignée (sera dissociée)} other {# équipes assignées (seront dissociées)}}"
+  },
+  "signIn": {
+    "subtitle": "Gestion des Ressources Humaines",
+    "tryDemo": "Essayer la démo — Sans compte",
+    "or": "ou",
+    "continueGoogle": "Continuer avec Google",
+    "continueGitHub": "Continuer avec GitHub",
+    "errorAccountLinked": "Cet e-mail est déjà lié à un autre fournisseur. Veuillez vous connecter avec le fournisseur d'origine.",
+    "errorGeneric": "Une erreur s'est produite lors de la connexion. Veuillez réessayer."
   }
 }

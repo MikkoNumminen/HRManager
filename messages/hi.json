@@ -576,7 +576,15 @@
     "cycleNotOpen": "यह समीक्षा चक्र प्रस्तुतियों के लिए खुला नहीं है।",
     "selectSubject": "समीक्षा विषय चुनें",
     "selectReviewer": "समीक्षक चुनें",
-    "templates": "टेम्पलेट"
+    "templates": "टेम्पलेट",
+    "teamReviewsTitle": "टीम समीक्षाएं",
+    "teamReviewsHeading": "आपकी टीम की समीक्षाएं",
+    "noManagedTeams": "कोई टीम समीक्षा डेटा नहीं",
+    "noManagedTeamsHint": "आप किसी टीम का प्रबंधन नहीं करते, या आपकी टीमों में कोई समीक्षा गतिविधि नहीं है।",
+    "employee": "कर्मचारी",
+    "statusSubmitted": "प्रस्तुत",
+    "statusPending": "लंबित",
+    "selectCycle": "चक्र चुनें"
   },
   "leave": {
     "title": "अवकाश प्रबंधन",
@@ -706,5 +714,14 @@
     "memberCount": "{count, plural, one {# सदस्य} other {# सदस्य}}",
     "departmentAssignment": "विभाग असाइनमेंट (अनलिंक किया जाएगा)",
     "assignedTeams": "{count, plural, =0 {} one {# टीम असाइन (अनलिंक की जाएगी)} other {# टीमें असाइन (अनलिंक की जाएंगी)}}"
+  },
+  "signIn": {
+    "subtitle": "मानव संसाधन प्रबंधन",
+    "tryDemo": "डेमो आज़माएं — खाते की ज़रूरत नहीं",
+    "or": "या",
+    "continueGoogle": "Google से जारी रखें",
+    "continueGitHub": "GitHub से जारी रखें",
+    "errorAccountLinked": "यह ईमेल पहले से किसी अन्य प्रदाता से जुड़ा हुआ है। कृपया मूल प्रदाता से साइन इन करें।",
+    "errorGeneric": "साइन-इन के दौरान एक त्रुटि हुई। कृपया पुनः प्रयास करें।"
   }
 }

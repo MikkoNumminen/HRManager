@@ -576,7 +576,15 @@
     "cycleNotOpen": "Dieser Bewertungszyklus ist nicht für Einreichungen geöffnet.",
     "selectSubject": "Person auswählen",
     "selectReviewer": "Bewerter auswählen",
-    "templates": "Vorlagen"
+    "templates": "Vorlagen",
+    "teamReviewsTitle": "Teambewertungen",
+    "teamReviewsHeading": "Bewertungen Ihres Teams",
+    "noManagedTeams": "Keine Teambewertungsdaten",
+    "noManagedTeamsHint": "Sie verwalten keine Teams oder Ihre Teams haben keine Bewertungsaktivität.",
+    "employee": "Mitarbeiter",
+    "statusSubmitted": "Eingereicht",
+    "statusPending": "Ausstehend",
+    "selectCycle": "Zyklus auswählen"
   },
   "leave": {
     "title": "Abwesenheitsverwaltung",
@@ -706,5 +714,14 @@
     "memberCount": "{count, plural, one {# Mitglied} other {# Mitglieder}}",
     "departmentAssignment": "Abteilungszuweisung (wird getrennt)",
     "assignedTeams": "{count, plural, =0 {} one {# Team zugewiesen (wird getrennt)} other {# Teams zugewiesen (werden getrennt)}}"
+  },
+  "signIn": {
+    "subtitle": "Personalverwaltung",
+    "tryDemo": "Demo testen — Kein Konto nötig",
+    "or": "oder",
+    "continueGoogle": "Weiter mit Google",
+    "continueGitHub": "Weiter mit GitHub",
+    "errorAccountLinked": "Diese E-Mail-Adresse ist bereits mit einem anderen Anbieter verknüpft. Bitte melden Sie sich mit dem ursprünglichen Anbieter an.",
+    "errorGeneric": "Bei der Anmeldung ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut."
   }
 }

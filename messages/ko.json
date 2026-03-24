@@ -576,7 +576,15 @@
     "cycleNotOpen": "이 평가 주기는 제출을 받지 않습니다.",
     "selectSubject": "평가 대상자 선택",
     "selectReviewer": "평가자 선택",
-    "templates": "템플릿"
+    "templates": "템플릿",
+    "teamReviewsTitle": "팀 리뷰",
+    "teamReviewsHeading": "팀의 리뷰",
+    "noManagedTeams": "팀 리뷰 데이터 없음",
+    "noManagedTeamsHint": "관리하는 팀이 없거나 팀에 리뷰 활동이 없습니다.",
+    "employee": "직원",
+    "statusSubmitted": "제출됨",
+    "statusPending": "대기 중",
+    "selectCycle": "주기 선택"
   },
   "leave": {
     "title": "휴가 관리",
@@ -706,5 +714,14 @@
     "memberCount": "{count, plural, other {#명}}",
     "departmentAssignment": "부서 배정 (연결 해제됩니다)",
     "assignedTeams": "{count, plural, =0 {} other {#개 팀 배정됨 (연결 해제됩니다)}}"
+  },
+  "signIn": {
+    "subtitle": "인사 관리 시스템",
+    "tryDemo": "데모 체험 — 계정 불필요",
+    "or": "또는",
+    "continueGoogle": "Google로 계속",
+    "continueGitHub": "GitHub로 계속",
+    "errorAccountLinked": "이 이메일은 이미 다른 공급자에 연결되어 있습니다. 원래 공급자로 로그인하세요.",
+    "errorGeneric": "로그인 중 오류가 발생했습니다. 다시 시도해주세요."
   }
 }

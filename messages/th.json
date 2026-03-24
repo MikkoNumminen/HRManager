@@ -576,7 +576,15 @@
     "cycleNotOpen": "รอบการประเมินนี้ยังไม่เปิดรับการส่ง",
     "selectSubject": "เลือกผู้ถูกประเมิน",
     "selectReviewer": "เลือกผู้ประเมิน",
-    "templates": "แม่แบบ"
+    "templates": "แม่แบบ",
+    "teamReviewsTitle": "รีวิวทีม",
+    "teamReviewsHeading": "รีวิวของทีมคุณ",
+    "noManagedTeams": "ไม่มีข้อมูลรีวิวทีม",
+    "noManagedTeamsHint": "คุณไม่ได้จัดการทีมใด หรือทีมของคุณไม่มีกิจกรรมรีวิว",
+    "employee": "พนักงาน",
+    "statusSubmitted": "ส่งแล้ว",
+    "statusPending": "รอดำเนินการ",
+    "selectCycle": "เลือกรอบ"
   },
   "leave": {
     "title": "การจัดการวันลา",
@@ -706,5 +714,14 @@
     "memberCount": "{count, plural, other {# คน}}",
     "departmentAssignment": "การมอบหมายแผนก (จะถูกยกเลิก)",
     "assignedTeams": "{count, plural, =0 {} other {# ทีมที่มอบหมาย (จะถูกยกเลิก)}}"
+  },
+  "signIn": {
+    "subtitle": "ระบบบริหารทรัพยากรบุคคล",
+    "tryDemo": "ทดลองใช้ — ไม่ต้องสมัคร",
+    "or": "หรือ",
+    "continueGoogle": "ดำเนินการต่อด้วย Google",
+    "continueGitHub": "ดำเนินการต่อด้วย GitHub",
+    "errorAccountLinked": "อีเมลนี้เชื่อมต่อกับผู้ให้บริการอื่นแล้ว กรุณาเข้าสู่ระบบด้วยผู้ให้บริการเดิม",
+    "errorGeneric": "เกิดข้อผิดพลาดระหว่างเข้าสู่ระบบ กรุณาลองอีกครั้ง"
   }
 }

@@ -58,6 +58,7 @@ const demoProvider =
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [Google, GitHub, ...demoProvider],
+  pages: { signIn: "/auth/signin" },
   session: { strategy: "jwt" },
   callbacks: {
     async signIn({ user }) {

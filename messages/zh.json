@@ -576,7 +576,15 @@
     "cycleNotOpen": "此评估周期不接受提交。",
     "selectSubject": "选择被评估人",
     "selectReviewer": "选择评估人",
-    "templates": "模板"
+    "templates": "模板",
+    "teamReviewsTitle": "团队评审",
+    "teamReviewsHeading": "你的团队评审",
+    "noManagedTeams": "无团队评审数据",
+    "noManagedTeamsHint": "您未管理任何团队，或您的团队没有评审活动。",
+    "employee": "员工",
+    "statusSubmitted": "已提交",
+    "statusPending": "待处理",
+    "selectCycle": "选择周期"
   },
   "leave": {
     "title": "假期管理",
@@ -706,5 +714,14 @@
     "memberCount": "{count, plural, other {#名}}",
     "departmentAssignment": "部门分配（将被解除关联）",
     "assignedTeams": "{count, plural, =0 {} other {#个团队已分配（将被解除关联）}}"
+  },
+  "signIn": {
+    "subtitle": "人力资源管理系统",
+    "tryDemo": "试用演示 — 无需账户",
+    "or": "或",
+    "continueGoogle": "使用 Google 继续",
+    "continueGitHub": "使用 GitHub 继续",
+    "errorAccountLinked": "此邮箱已关联其他登录方式。请使用原始方式登录。",
+    "errorGeneric": "登录时发生错误。请重试。"
   }
 }

@@ -576,7 +576,15 @@
     "cycleNotOpen": "دورة التقييم هذه غير مفتوحة للتقديمات.",
     "selectSubject": "اختر الشخص المُقيَّم",
     "selectReviewer": "اختر المقيِّم",
-    "templates": "القوالب"
+    "templates": "القوالب",
+    "teamReviewsTitle": "مراجعات الفريق",
+    "teamReviewsHeading": "مراجعات فريقك",
+    "noManagedTeams": "لا توجد بيانات مراجعة الفريق",
+    "noManagedTeamsHint": "أنت لا تدير أي فرق، أو ليس لدى فرقك نشاط مراجعة.",
+    "employee": "الموظف",
+    "statusSubmitted": "مقدم",
+    "statusPending": "معلق",
+    "selectCycle": "اختر الدورة"
   },
   "leave": {
     "title": "إدارة الإجازات",
@@ -706,5 +714,14 @@
     "memberCount": "{count, plural, one {عضو واحد} two {عضوان} few {# أعضاء} many {# عضواً} other {# عضو}}",
     "departmentAssignment": "تعيين القسم (سيتم فك الارتباط)",
     "assignedTeams": "{count, plural, =0 {} one {فريق واحد معيّن (سيتم فك الارتباط)} two {فريقان معيّنان (سيتم فك الارتباط)} few {# فرق معيّنة (سيتم فك الارتباط)} many {# فريقاً معيّناً (سيتم فك الارتباط)} other {# فريق معيّن (سيتم فك الارتباط)}}"
+  },
+  "signIn": {
+    "subtitle": "إدارة الموارد البشرية",
+    "tryDemo": "جرب العرض التوضيحي — بدون حساب",
+    "or": "أو",
+    "continueGoogle": "المتابعة مع Google",
+    "continueGitHub": "المتابعة مع GitHub",
+    "errorAccountLinked": "هذا البريد الإلكتروني مرتبط بالفعل بمزود آخر. يرجى تسجيل الدخول بالمزود الأصلي.",
+    "errorGeneric": "حدث خطأ أثناء تسجيل الدخول. يرجى المحاولة مرة أخرى."
   }
 }

@@ -576,7 +576,15 @@
     "cycleNotOpen": "This review cycle is not open for submissions.",
     "selectSubject": "Select subject",
     "selectReviewer": "Select reviewer",
-    "templates": "Templates"
+    "templates": "Templates",
+    "teamReviewsTitle": "Team Reviews",
+    "teamReviewsHeading": "Your Team's Reviews",
+    "noManagedTeams": "No team review data",
+    "noManagedTeamsHint": "You don't manage any teams, or your teams have no review activity.",
+    "employee": "Employee",
+    "statusSubmitted": "Submitted",
+    "statusPending": "Pending",
+    "selectCycle": "Select Cycle"
   },
   "leave": {
     "title": "Leave Management",
@@ -706,5 +714,14 @@
     "memberCount": "{count, plural, one {# member} other {# members}}",
     "departmentAssignment": "Department assignment (will be unlinked)",
     "assignedTeams": "{count, plural, =0 {} one {# team assigned (will be unlinked)} other {# teams assigned (will be unlinked)}}"
+  },
+  "signIn": {
+    "subtitle": "Human Resource Management",
+    "tryDemo": "Try Demo — No Account Needed",
+    "or": "or",
+    "continueGoogle": "Continue with Google",
+    "continueGitHub": "Continue with GitHub",
+    "errorAccountLinked": "This email is already linked to another provider. Please sign in with the original provider.",
+    "errorGeneric": "An error occurred during sign-in. Please try again."
   }
 }

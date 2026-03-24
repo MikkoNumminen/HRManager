@@ -576,7 +576,15 @@
     "cycleNotOpen": "Этот цикл оценки не открыт для отправки.",
     "selectSubject": "Выбрать оцениваемого",
     "selectReviewer": "Выбрать оценщика",
-    "templates": "Шаблоны"
+    "templates": "Шаблоны",
+    "teamReviewsTitle": "Отзывы команды",
+    "teamReviewsHeading": "Отзывы вашей команды",
+    "noManagedTeams": "Нет данных об отзывах команды",
+    "noManagedTeamsHint": "Вы не управляете командами или в ваших командах нет активности отзывов.",
+    "employee": "Сотрудник",
+    "statusSubmitted": "Отправлено",
+    "statusPending": "Ожидание",
+    "selectCycle": "Выбрать цикл"
   },
   "leave": {
     "title": "Управление отпусками",
@@ -706,5 +714,14 @@
     "memberCount": "{count, plural, one {# участник} few {# участника} many {# участников} other {# участников}}",
     "departmentAssignment": "Привязка к отделу (будет удалена)",
     "assignedTeams": "{count, plural, =0 {} one {# команда назначена (будет отвязана)} few {# команды назначены (будут отвязаны)} many {# команд назначено (будут отвязаны)} other {# команд назначено (будут отвязаны)}}"
+  },
+  "signIn": {
+    "subtitle": "Управление персоналом",
+    "tryDemo": "Попробовать демо — Без регистрации",
+    "or": "или",
+    "continueGoogle": "Продолжить с Google",
+    "continueGitHub": "Продолжить с GitHub",
+    "errorAccountLinked": "Этот email уже привязан к другому провайдеру. Войдите через исходный провайдер.",
+    "errorGeneric": "Произошла ошибка при входе. Попробуйте снова."
   }
 }
