@@ -695,16 +695,16 @@
     "persons": "Osoby"
   },
   "deleteImpact": {
-    "managedTeams": "{count, plural, =0 {} one {Manages # team (will lose manager)} other {Manages # teams (will lose manager)}}",
-    "headedDepartments": "{count, plural, =0 {} one {Heads # department (will lose head)} other {Heads # departments (will lose head)}}",
-    "teamMemberships": "{count, plural, =0 {} one {Member of # team (will be removed)} other {Member of # teams (will be removed)}}",
-    "leaveRequests": "{count, plural, =0 {} one {# leave request linked} other {# leave requests linked}}",
-    "leaveRequestCount": "{count, plural, one {# request} other {# requests}}",
-    "reviewRequests": "{count, plural, =0 {} one {# review request linked} other {# review requests linked}}",
-    "reviewRequestCount": "{count, plural, one {# request} other {# requests}}",
-    "teamMembers": "{count, plural, =0 {} one {# member (will be removed)} other {# members (will be removed)}}",
-    "memberCount": "{count, plural, one {# member} other {# members}}",
-    "departmentAssignment": "Department assignment (will be unlinked)",
-    "assignedTeams": "{count, plural, =0 {} one {# team assigned (will be unlinked)} other {# teams assigned (will be unlinked)}}"
+    "managedTeams": "{count, plural, =0 {} one {Zarządza # zespołem (straci kierownika)} other {Zarządza # zespołami (stracą kierownika)}}",
+    "headedDepartments": "{count, plural, =0 {} one {Kieruje # działem (straci kierownika)} other {Kieruje # działami (stracą kierownika)}}",
+    "teamMemberships": "{count, plural, =0 {} one {Członek # zespołu (zostanie usunięty)} other {Członek # zespołów (zostanie usunięty)}}",
+    "leaveRequests": "{count, plural, =0 {} one {# wniosek urlopowy powiązany} other {# wnioski urlopowe powiązane}}",
+    "leaveRequestCount": "{count, plural, one {# wniosek} other {# wnioski}}",
+    "reviewRequests": "{count, plural, =0 {} one {# wniosek o ocenę powiązany} other {# wnioski o ocenę powiązane}}",
+    "reviewRequestCount": "{count, plural, one {# wniosek} other {# wnioski}}",
+    "teamMembers": "{count, plural, =0 {} one {# członek (zostanie usunięty)} other {# członków (zostanie usuniętych)}}",
+    "memberCount": "{count, plural, one {# członek} other {# członków}}",
+    "departmentAssignment": "Przypisanie do działu (zostanie odłączone)",
+    "assignedTeams": "{count, plural, =0 {} one {# zespół przypisany (zostanie odłączony)} other {# zespoły przypisane (zostaną odłączone)}}"
   }
 }

@@ -689,22 +689,22 @@
     "heading": "조직도",
     "organization": "조직",
     "head": "부서장",
-    "manager": "관리자",
+    "manager": "매니저",
     "departments": "부서",
     "teams": "팀",
     "persons": "직원"
   },
   "deleteImpact": {
-    "managedTeams": "{count, plural, =0 {} one {Manages # team (will lose manager)} other {Manages # teams (will lose manager)}}",
-    "headedDepartments": "{count, plural, =0 {} one {Heads # department (will lose head)} other {Heads # departments (will lose head)}}",
-    "teamMemberships": "{count, plural, =0 {} one {Member of # team (will be removed)} other {Member of # teams (will be removed)}}",
-    "leaveRequests": "{count, plural, =0 {} one {# leave request linked} other {# leave requests linked}}",
-    "leaveRequestCount": "{count, plural, one {# request} other {# requests}}",
-    "reviewRequests": "{count, plural, =0 {} one {# review request linked} other {# review requests linked}}",
-    "reviewRequestCount": "{count, plural, one {# request} other {# requests}}",
-    "teamMembers": "{count, plural, =0 {} one {# member (will be removed)} other {# members (will be removed)}}",
-    "memberCount": "{count, plural, one {# member} other {# members}}",
-    "departmentAssignment": "Department assignment (will be unlinked)",
-    "assignedTeams": "{count, plural, =0 {} one {# team assigned (will be unlinked)} other {# teams assigned (will be unlinked)}}"
+    "managedTeams": "{count, plural, =0 {} other {#개 팀 관리 중 (매니저가 제거됩니다)}}",
+    "headedDepartments": "{count, plural, =0 {} other {#개 부서 책임 (부서장이 제거됩니다)}}",
+    "teamMemberships": "{count, plural, =0 {} other {#개 팀 소속 (제거됩니다)}}",
+    "leaveRequests": "{count, plural, =0 {} other {#개 휴가 요청 연결됨}}",
+    "leaveRequestCount": "{count, plural, other {#개 요청}}",
+    "reviewRequests": "{count, plural, =0 {} other {#개 평가 요청 연결됨}}",
+    "reviewRequestCount": "{count, plural, other {#개 요청}}",
+    "teamMembers": "{count, plural, =0 {} other {#명 멤버 (제거됩니다)}}",
+    "memberCount": "{count, plural, other {#명}}",
+    "departmentAssignment": "부서 배정 (연결 해제됩니다)",
+    "assignedTeams": "{count, plural, =0 {} other {#개 팀 배정됨 (연결 해제됩니다)}}"
   }
 }

@@ -689,22 +689,22 @@
     "heading": "Organigrama",
     "organization": "Organización",
     "head": "Responsable",
-    "manager": "Gerente",
+    "manager": "Responsable",
     "departments": "Departamentos",
     "teams": "Equipos",
     "persons": "Personas"
   },
   "deleteImpact": {
-    "managedTeams": "{count, plural, =0 {} one {Manages # team (will lose manager)} other {Manages # teams (will lose manager)}}",
-    "headedDepartments": "{count, plural, =0 {} one {Heads # department (will lose head)} other {Heads # departments (will lose head)}}",
-    "teamMemberships": "{count, plural, =0 {} one {Member of # team (will be removed)} other {Member of # teams (will be removed)}}",
-    "leaveRequests": "{count, plural, =0 {} one {# leave request linked} other {# leave requests linked}}",
-    "leaveRequestCount": "{count, plural, one {# request} other {# requests}}",
-    "reviewRequests": "{count, plural, =0 {} one {# review request linked} other {# review requests linked}}",
-    "reviewRequestCount": "{count, plural, one {# request} other {# requests}}",
-    "teamMembers": "{count, plural, =0 {} one {# member (will be removed)} other {# members (will be removed)}}",
-    "memberCount": "{count, plural, one {# member} other {# members}}",
-    "departmentAssignment": "Department assignment (will be unlinked)",
-    "assignedTeams": "{count, plural, =0 {} one {# team assigned (will be unlinked)} other {# teams assigned (will be unlinked)}}"
+    "managedTeams": "{count, plural, =0 {} one {Gestiona # equipo (perderá responsable)} other {Gestiona # equipos (perderán responsable)}}",
+    "headedDepartments": "{count, plural, =0 {} one {Dirige # departamento (perderá jefe)} other {Dirige # departamentos (perderán jefe)}}",
+    "teamMemberships": "{count, plural, =0 {} one {Miembro de # equipo (será eliminado)} other {Miembro de # equipos (será eliminado)}}",
+    "leaveRequests": "{count, plural, =0 {} one {# solicitud de permiso vinculada} other {# solicitudes de permiso vinculadas}}",
+    "leaveRequestCount": "{count, plural, one {# solicitud} other {# solicitudes}}",
+    "reviewRequests": "{count, plural, =0 {} one {# solicitud de evaluación vinculada} other {# solicitudes de evaluación vinculadas}}",
+    "reviewRequestCount": "{count, plural, one {# solicitud} other {# solicitudes}}",
+    "teamMembers": "{count, plural, =0 {} one {# miembro (será eliminado)} other {# miembros (serán eliminados)}}",
+    "memberCount": "{count, plural, one {# miembro} other {# miembros}}",
+    "departmentAssignment": "Asignación de departamento (será desvinculada)",
+    "assignedTeams": "{count, plural, =0 {} one {# equipo asignado (será desvinculado)} other {# equipos asignados (serán desvinculados)}}"
   }
 }

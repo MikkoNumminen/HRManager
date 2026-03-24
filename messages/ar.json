@@ -695,16 +695,16 @@
     "persons": "الأشخاص"
   },
   "deleteImpact": {
-    "managedTeams": "{count, plural, =0 {} one {Manages # team (will lose manager)} other {Manages # teams (will lose manager)}}",
-    "headedDepartments": "{count, plural, =0 {} one {Heads # department (will lose head)} other {Heads # departments (will lose head)}}",
-    "teamMemberships": "{count, plural, =0 {} one {Member of # team (will be removed)} other {Member of # teams (will be removed)}}",
-    "leaveRequests": "{count, plural, =0 {} one {# leave request linked} other {# leave requests linked}}",
-    "leaveRequestCount": "{count, plural, one {# request} other {# requests}}",
-    "reviewRequests": "{count, plural, =0 {} one {# review request linked} other {# review requests linked}}",
-    "reviewRequestCount": "{count, plural, one {# request} other {# requests}}",
-    "teamMembers": "{count, plural, =0 {} one {# member (will be removed)} other {# members (will be removed)}}",
-    "memberCount": "{count, plural, one {# member} other {# members}}",
-    "departmentAssignment": "Department assignment (will be unlinked)",
-    "assignedTeams": "{count, plural, =0 {} one {# team assigned (will be unlinked)} other {# teams assigned (will be unlinked)}}"
+    "managedTeams": "{count, plural, =0 {} one {يدير فريق # (سيفقد المدير)} other {يدير # فرق (ستفقد المدير)}}",
+    "headedDepartments": "{count, plural, =0 {} one {يرأس قسم # (سيفقد الرئيس)} other {يرأس # أقسام (ستفقد الرئيس)}}",
+    "teamMemberships": "{count, plural, =0 {} one {عضو في فريق # (ستتم الإزالة)} other {عضو في # فرق (ستتم الإزالة)}}",
+    "leaveRequests": "{count, plural, =0 {} one {# طلب إجازة مرتبط} other {# طلبات إجازة مرتبطة}}",
+    "leaveRequestCount": "{count, plural, one {# طلب} other {# طلبات}}",
+    "reviewRequests": "{count, plural, =0 {} one {# طلب تقييم مرتبط} other {# طلبات تقييم مرتبطة}}",
+    "reviewRequestCount": "{count, plural, one {# طلب} other {# طلبات}}",
+    "teamMembers": "{count, plural, =0 {} one {# عضو (ستتم الإزالة)} other {# أعضاء (ستتم الإزالة)}}",
+    "memberCount": "{count, plural, one {# عضو} other {# أعضاء}}",
+    "departmentAssignment": "تعيين القسم (سيتم فك الارتباط)",
+    "assignedTeams": "{count, plural, =0 {} one {# فريق معيّن (سيتم فك الارتباط)} other {# فرق معيّنة (سيتم فك الارتباط)}}"
   }
 }

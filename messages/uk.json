@@ -689,22 +689,22 @@
     "heading": "Організаційна структура",
     "organization": "Організація",
     "head": "Керівник",
-    "manager": "Менеджер",
+    "manager": "Керівник",
     "departments": "Відділи",
     "teams": "Команди",
     "persons": "Співробітники"
   },
   "deleteImpact": {
-    "managedTeams": "{count, plural, =0 {} one {Manages # team (will lose manager)} other {Manages # teams (will lose manager)}}",
-    "headedDepartments": "{count, plural, =0 {} one {Heads # department (will lose head)} other {Heads # departments (will lose head)}}",
-    "teamMemberships": "{count, plural, =0 {} one {Member of # team (will be removed)} other {Member of # teams (will be removed)}}",
-    "leaveRequests": "{count, plural, =0 {} one {# leave request linked} other {# leave requests linked}}",
-    "leaveRequestCount": "{count, plural, one {# request} other {# requests}}",
-    "reviewRequests": "{count, plural, =0 {} one {# review request linked} other {# review requests linked}}",
-    "reviewRequestCount": "{count, plural, one {# request} other {# requests}}",
-    "teamMembers": "{count, plural, =0 {} one {# member (will be removed)} other {# members (will be removed)}}",
-    "memberCount": "{count, plural, one {# member} other {# members}}",
-    "departmentAssignment": "Department assignment (will be unlinked)",
-    "assignedTeams": "{count, plural, =0 {} one {# team assigned (will be unlinked)} other {# teams assigned (will be unlinked)}}"
+    "managedTeams": "{count, plural, =0 {} one {Керує # командою (втратить керівника)} other {Керує # командами (втратять керівника)}}",
+    "headedDepartments": "{count, plural, =0 {} one {Очолює # відділ (втратить керівника)} other {Очолює # відділів (втратять керівника)}}",
+    "teamMemberships": "{count, plural, =0 {} one {Учасник # команди (буде видалено)} other {Учасник # команд (буде видалено)}}",
+    "leaveRequests": "{count, plural, =0 {} one {# запит на відпустку пов'язано} other {# запитів на відпустку пов'язано}}",
+    "leaveRequestCount": "{count, plural, one {# запит} other {# запитів}}",
+    "reviewRequests": "{count, plural, =0 {} one {# запит на оцінку пов'язано} other {# запитів на оцінку пов'язано}}",
+    "reviewRequestCount": "{count, plural, one {# запит} other {# запитів}}",
+    "teamMembers": "{count, plural, =0 {} one {# учасник (буде видалено)} other {# учасників (буде видалено)}}",
+    "memberCount": "{count, plural, one {# учасник} other {# учасників}}",
+    "departmentAssignment": "Призначення відділу (буде від'єднано)",
+    "assignedTeams": "{count, plural, =0 {} one {# команда призначена (буде від'єднана)} other {# команд призначено (буде від'єднано)}}"
   }
 }

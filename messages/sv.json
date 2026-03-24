@@ -695,16 +695,16 @@
     "persons": "Personer"
   },
   "deleteImpact": {
-    "managedTeams": "{count, plural, =0 {} one {Manages # team (will lose manager)} other {Manages # teams (will lose manager)}}",
-    "headedDepartments": "{count, plural, =0 {} one {Heads # department (will lose head)} other {Heads # departments (will lose head)}}",
-    "teamMemberships": "{count, plural, =0 {} one {Member of # team (will be removed)} other {Member of # teams (will be removed)}}",
-    "leaveRequests": "{count, plural, =0 {} one {# leave request linked} other {# leave requests linked}}",
-    "leaveRequestCount": "{count, plural, one {# request} other {# requests}}",
-    "reviewRequests": "{count, plural, =0 {} one {# review request linked} other {# review requests linked}}",
-    "reviewRequestCount": "{count, plural, one {# request} other {# requests}}",
-    "teamMembers": "{count, plural, =0 {} one {# member (will be removed)} other {# members (will be removed)}}",
-    "memberCount": "{count, plural, one {# member} other {# members}}",
-    "departmentAssignment": "Department assignment (will be unlinked)",
-    "assignedTeams": "{count, plural, =0 {} one {# team assigned (will be unlinked)} other {# teams assigned (will be unlinked)}}"
+    "managedTeams": "{count, plural, =0 {} one {Leder # team (förlorar chef)} other {Leder # team (förlorar chef)}}",
+    "headedDepartments": "{count, plural, =0 {} one {Leder # avdelning (förlorar chef)} other {Leder # avdelningar (förlorar chef)}}",
+    "teamMemberships": "{count, plural, =0 {} one {Medlem i # team (tas bort)} other {Medlem i # team (tas bort)}}",
+    "leaveRequests": "{count, plural, =0 {} one {# ledighetsansökan kopplad} other {# ledighetsansökningar kopplade}}",
+    "leaveRequestCount": "{count, plural, one {# ansökan} other {# ansökningar}}",
+    "reviewRequests": "{count, plural, =0 {} one {# utvärdering kopplad} other {# utvärderingar kopplade}}",
+    "reviewRequestCount": "{count, plural, one {# ansökan} other {# ansökningar}}",
+    "teamMembers": "{count, plural, =0 {} one {# medlem (tas bort)} other {# medlemmar (tas bort)}}",
+    "memberCount": "{count, plural, one {# medlem} other {# medlemmar}}",
+    "departmentAssignment": "Avdelningstilldelning (kopplas bort)",
+    "assignedTeams": "{count, plural, =0 {} one {# team tilldelat (kopplas bort)} other {# team tilldelade (kopplas bort)}}"
   }
 }

@@ -695,16 +695,16 @@
     "persons": "व्यक्ति"
   },
   "deleteImpact": {
-    "managedTeams": "{count, plural, =0 {} one {Manages # team (will lose manager)} other {Manages # teams (will lose manager)}}",
-    "headedDepartments": "{count, plural, =0 {} one {Heads # department (will lose head)} other {Heads # departments (will lose head)}}",
-    "teamMemberships": "{count, plural, =0 {} one {Member of # team (will be removed)} other {Member of # teams (will be removed)}}",
-    "leaveRequests": "{count, plural, =0 {} one {# leave request linked} other {# leave requests linked}}",
-    "leaveRequestCount": "{count, plural, one {# request} other {# requests}}",
-    "reviewRequests": "{count, plural, =0 {} one {# review request linked} other {# review requests linked}}",
-    "reviewRequestCount": "{count, plural, one {# request} other {# requests}}",
-    "teamMembers": "{count, plural, =0 {} one {# member (will be removed)} other {# members (will be removed)}}",
-    "memberCount": "{count, plural, one {# member} other {# members}}",
-    "departmentAssignment": "Department assignment (will be unlinked)",
-    "assignedTeams": "{count, plural, =0 {} one {# team assigned (will be unlinked)} other {# teams assigned (will be unlinked)}}"
+    "managedTeams": "{count, plural, =0 {} one {# टीम का प्रबंधन (प्रबंधक खो देगी)} other {# टीमों का प्रबंधन (प्रबंधक खो देंगी)}}",
+    "headedDepartments": "{count, plural, =0 {} one {# विभाग का नेतृत्व (प्रमुख खो देगा)} other {# विभागों का नेतृत्व (प्रमुख खो देंगे)}}",
+    "teamMemberships": "{count, plural, =0 {} one {# टीम का सदस्य (हटाया जाएगा)} other {# टीमों का सदस्य (हटाया जाएगा)}}",
+    "leaveRequests": "{count, plural, =0 {} one {# छुट्टी अनुरोध जुड़ा} other {# छुट्टी अनुरोध जुड़े}}",
+    "leaveRequestCount": "{count, plural, one {# अनुरोध} other {# अनुरोध}}",
+    "reviewRequests": "{count, plural, =0 {} one {# समीक्षा अनुरोध जुड़ा} other {# समीक्षा अनुरोध जुड़े}}",
+    "reviewRequestCount": "{count, plural, one {# अनुरोध} other {# अनुरोध}}",
+    "teamMembers": "{count, plural, =0 {} one {# सदस्य (हटाया जाएगा)} other {# सदस्य (हटाए जाएंगे)}}",
+    "memberCount": "{count, plural, one {# सदस्य} other {# सदस्य}}",
+    "departmentAssignment": "विभाग असाइनमेंट (अनलिंक किया जाएगा)",
+    "assignedTeams": "{count, plural, =0 {} one {# टीम असाइन (अनलिंक की जाएगी)} other {# टीमें असाइन (अनलिंक की जाएंगी)}}"
   }
 }

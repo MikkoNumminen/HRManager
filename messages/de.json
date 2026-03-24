@@ -676,7 +676,7 @@
   "employees": {
     "title": "Mitarbeiterprofil",
     "notFound": "Mitarbeiter nicht gefunden",
-    "teams": "Teams",
+    "teams": "Mannschaften",
     "noTeams": "Kein Teammitglied",
     "leadership": "Führungsrollen",
     "managedTeams": "Teamleiter",
@@ -689,22 +689,22 @@
     "heading": "Organigramm",
     "organization": "Organisation",
     "head": "Leitung",
-    "manager": "Manager",
+    "manager": "Teamleiter",
     "departments": "Abteilungen",
-    "teams": "Teams",
+    "teams": "Mannschaften",
     "persons": "Personen"
   },
   "deleteImpact": {
-    "managedTeams": "{count, plural, =0 {} one {Manages # team (will lose manager)} other {Manages # teams (will lose manager)}}",
-    "headedDepartments": "{count, plural, =0 {} one {Heads # department (will lose head)} other {Heads # departments (will lose head)}}",
-    "teamMemberships": "{count, plural, =0 {} one {Member of # team (will be removed)} other {Member of # teams (will be removed)}}",
-    "leaveRequests": "{count, plural, =0 {} one {# leave request linked} other {# leave requests linked}}",
-    "leaveRequestCount": "{count, plural, one {# request} other {# requests}}",
-    "reviewRequests": "{count, plural, =0 {} one {# review request linked} other {# review requests linked}}",
-    "reviewRequestCount": "{count, plural, one {# request} other {# requests}}",
-    "teamMembers": "{count, plural, =0 {} one {# member (will be removed)} other {# members (will be removed)}}",
-    "memberCount": "{count, plural, one {# member} other {# members}}",
-    "departmentAssignment": "Department assignment (will be unlinked)",
-    "assignedTeams": "{count, plural, =0 {} one {# team assigned (will be unlinked)} other {# teams assigned (will be unlinked)}}"
+    "managedTeams": "{count, plural, =0 {} one {Leitet # Team (verliert Manager)} other {Leitet # Teams (verlieren Manager)}}",
+    "headedDepartments": "{count, plural, =0 {} one {Leitet # Abteilung (verliert Leiter)} other {Leitet # Abteilungen (verlieren Leiter)}}",
+    "teamMemberships": "{count, plural, =0 {} one {Mitglied in # Team (wird entfernt)} other {Mitglied in # Teams (wird entfernt)}}",
+    "leaveRequests": "{count, plural, =0 {} one {# Urlaubsantrag verknüpft} other {# Urlaubsanträge verknüpft}}",
+    "leaveRequestCount": "{count, plural, one {# Antrag} other {# Anträge}}",
+    "reviewRequests": "{count, plural, =0 {} one {# Bewertungsanfrage verknüpft} other {# Bewertungsanfragen verknüpft}}",
+    "reviewRequestCount": "{count, plural, one {# Anfrage} other {# Anfragen}}",
+    "teamMembers": "{count, plural, =0 {} one {# Mitglied (wird entfernt)} other {# Mitglieder (werden entfernt)}}",
+    "memberCount": "{count, plural, one {# Mitglied} other {# Mitglieder}}",
+    "departmentAssignment": "Abteilungszuweisung (wird getrennt)",
+    "assignedTeams": "{count, plural, =0 {} one {# Team zugewiesen (wird getrennt)} other {# Teams zugewiesen (werden getrennt)}}"
   }
 }

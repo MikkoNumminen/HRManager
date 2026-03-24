@@ -695,16 +695,16 @@
     "persons": "Henkilöt"
   },
   "deleteImpact": {
-    "managedTeams": "{count, plural, =0 {} one {Manages # team (will lose manager)} other {Manages # teams (will lose manager)}}",
-    "headedDepartments": "{count, plural, =0 {} one {Heads # department (will lose head)} other {Heads # departments (will lose head)}}",
-    "teamMemberships": "{count, plural, =0 {} one {Member of # team (will be removed)} other {Member of # teams (will be removed)}}",
-    "leaveRequests": "{count, plural, =0 {} one {# leave request linked} other {# leave requests linked}}",
-    "leaveRequestCount": "{count, plural, one {# request} other {# requests}}",
-    "reviewRequests": "{count, plural, =0 {} one {# review request linked} other {# review requests linked}}",
-    "reviewRequestCount": "{count, plural, one {# request} other {# requests}}",
-    "teamMembers": "{count, plural, =0 {} one {# member (will be removed)} other {# members (will be removed)}}",
-    "memberCount": "{count, plural, one {# member} other {# members}}",
-    "departmentAssignment": "Department assignment (will be unlinked)",
-    "assignedTeams": "{count, plural, =0 {} one {# team assigned (will be unlinked)} other {# teams assigned (will be unlinked)}}"
+    "managedTeams": "{count, plural, =0 {} one {Johtaa # tiimiä (menettää esimiehen)} other {Johtaa # tiimiä (menettävät esimiehen)}}",
+    "headedDepartments": "{count, plural, =0 {} one {Johtaa # osastoa (menettää johtajan)} other {Johtaa # osastoa (menettävät johtajan)}}",
+    "teamMemberships": "{count, plural, =0 {} one {Jäsen # tiimissä (poistetaan)} other {Jäsen # tiimissä (poistetaan)}}",
+    "leaveRequests": "{count, plural, =0 {} one {# lomapyyntö linkitetty} other {# lomapyyntöä linkitetty}}",
+    "leaveRequestCount": "{count, plural, one {# pyyntö} other {# pyyntöä}}",
+    "reviewRequests": "{count, plural, =0 {} one {# arviointipyyntö linkitetty} other {# arviointipyyntöä linkitetty}}",
+    "reviewRequestCount": "{count, plural, one {# pyyntö} other {# pyyntöä}}",
+    "teamMembers": "{count, plural, =0 {} one {# jäsen (poistetaan)} other {# jäsentä (poistetaan)}}",
+    "memberCount": "{count, plural, one {# jäsen} other {# jäsentä}}",
+    "departmentAssignment": "Osastomääritys (irrotetaan)",
+    "assignedTeams": "{count, plural, =0 {} one {# tiimi määritetty (irrotetaan)} other {# tiimiä määritetty (irrotetaan)}}"
   }
 }
