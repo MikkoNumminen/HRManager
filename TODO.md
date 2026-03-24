@@ -17,20 +17,19 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 
 > 📋 **Audit research:** Items marked "(found by audit)" have detailed file:line references in memory file `project_audit_findings.md`. Read it before starting any of these tasks.
 
-- 🔴🧠 Performance reviews / 360 feedback — review templates, rating scales, feedback cycles [Claude 3, main]
 - 🔴🧠 Leave/absence management — leave types, requests, balances, approval workflows [Claude 2, main]
 - 🟢⚡ CI pipeline monitoring & auto-fix — watching for failures, fixing build/lint/format issues [Claude 4, main]
-- 🟢⚡ Demo session cleanup failure logging — silent failures leave stale data [Claude 1, main]
+- 🟡🧠 Typed server action errors — replace generic string errors with typed error codes [Claude 3, main]
+- 🟡🧠 Standardize positions catalog — free-text position field causes inconsistency [Claude 3, main]
+- 🟡🧠 Server-side pagination — all queries load entire result sets; add skip/take to Prisma queries [Claude 3, main]
 
 ## Recently Completed
 
+- ✅ Empty state polish — EmptyState component, 3 tables, 51 locale translations, 3 tests
+- ✅ Demo session cleanup failure logging — 1 line fix in auth.ts
+- ✅ Performance reviews / 360 feedback — 4 models, 11 actions, 6 pages, 29 tests, 1385 total passing
 - ✅ Loading skeletons with Suspense boundaries — PageSkeletons.tsx, 12 loading.tsx files, 10 tests
-
-- ✅ Playwright E2E test suite — 7 new spec files, 75 total tests (was 34): dashboard, profile, data I/O, detail editing, validation, full workflow
-- ✅ Translate server action errors — 48-key errors namespace, 18 locales, next-intl/server mock for tests
-- ✅ Memoize expensive components — React.memo on AuditLogViewer + DashboardCharts, useCallback on helpers
-- ✅ Rate limit IP spoofing protection — x-forwarded-for proxy validation
-- ✅ WCAG accessibility — aria-expanded (AuditLogViewer, TopBar), aria-sort (Timestamp col), aria-describedby (5 forms)
+- ✅ Playwright E2E test suite — 7 new spec files, 75 total tests (was 34)
 
 ## Backlog
 
@@ -41,14 +40,8 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 - 🟡🧠 Tutorial UX overhaul — no guiding effect on back button, lacks MUI visual guidance (highlighting/effects), guidance boxes appear in wrong positions
 - 🟡🧠 Org chart visualization — interactive hierarchy using existing manager/dept head data
 - 🟡🧠 Bulk actions on tables — multi-select persons/teams and apply batch operations
-- 🟡⚡ Empty state polish — illustrations and CTAs when tables are empty
 
 ### Code Quality / Architecture
-
-- 🟡🧠 Server-side pagination — all queries load entire result sets; add skip/take to Prisma queries
-- 🟡🧠 Typed server action errors — replace generic string errors with typed error codes (PERMISSION_DENIED, VALIDATION_ERROR, etc.)
-
-- 🟡🧠 Standardize positions catalog — free-text position field causes inconsistency ("Engineer" vs "Software Engineer")
 
 ### Testing
 
