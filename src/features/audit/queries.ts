@@ -1,4 +1,3 @@
-import { prisma } from "@/db";
 import { AuditLogSchema, AuditLogFilterSchema, AuditLog, AuditLogFilter } from "@/schemas";
 import { hasPermission } from "@/permissions";
 import { getDemoSessionId } from "@/demoSession";
