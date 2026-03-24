@@ -323,15 +323,46 @@ describe("auth.ts callbacks", () => {
   });
 
   describe("jwt callback — demoSessionId", () => {
-    // Persists demoSessionId from user on signIn trigger.
-    test("persists demoSessionId from user on signIn", async () => {
+    // Persists demoSessionId from user on signIn when ownership is valid.
+    test("persists demoSessionId from user on signIn when session belongs to user", async () => {
+      const dbUser = await testPrisma.user.create({
+        data: { email: "demo@hrmanager.app", name: "Demo", role: "superuser" },
+      });
+      const demoSession = await testPrisma.demoSession.create({
+        data: { userId: dbUser.id },
+      });
+      const token = { email: "demo@hrmanager.app" };
+      const user = { demoSessionId: demoSession.id };
+      const result = await callbacks.jwt({ token, trigger: "signIn", user });
+      expect(result.demoSessionId).toBe(demoSession.id);
+    });
+
+    // Strips demoSessionId when it belongs to a different user.
+    test("strips demoSessionId when session belongs to another user", async () => {
+      const owner = await testPrisma.user.create({
+        data: { email: "owner@example.com", name: "Owner", role: "superuser" },
+      });
+      const attacker = await testPrisma.user.create({
+        data: { email: "attacker@example.com", name: "Attacker", role: "user" },
+      });
+      const demoSession = await testPrisma.demoSession.create({
+        data: { userId: owner.id },
+      });
+      // Attacker's token has owner's demoSessionId
+      const token = { email: "attacker@example.com", demoSessionId: demoSession.id };
+      const result = await callbacks.jwt({ token, trigger: "signIn", user: {} });
+      expect(result.demoSessionId).toBeUndefined();
+    });
+
+    // Strips demoSessionId when it doesn't exist in the database.
+    test("strips demoSessionId when session does not exist", async () => {
       await testPrisma.user.create({
         data: { email: "demo@hrmanager.app", name: "Demo", role: "superuser" },
       });
       const token = { email: "demo@hrmanager.app" };
-      const user = { demoSessionId: "demo-sess-123" };
+      const user = { demoSessionId: "nonexistent-session-id" };
       const result = await callbacks.jwt({ token, trigger: "signIn", user });
-      expect(result.demoSessionId).toBe("demo-sess-123");
+      expect(result.demoSessionId).toBeUndefined();
     });
 
     // Does not set demoSessionId when user has none (OAuth user).

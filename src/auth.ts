@@ -123,6 +123,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return token;
         }
 
+        // Verify demoSessionId ownership — reject if it doesn't belong to this user
+        if (token.demoSessionId) {
+          const ownsSession = await prisma.demoSession.findFirst({
+            where: { id: token.demoSessionId as string, userId: dbUser.id },
+            select: { id: true },
+          });
+          if (!ownsSession) delete token.demoSessionId;
+        }
+
         token.userId = dbUser.id;
         token.role = dbUser.role;
         token.permissionsVersion = dbUser.permissionsVersion;
