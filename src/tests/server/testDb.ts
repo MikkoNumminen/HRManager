@@ -10,6 +10,13 @@ export const testPrisma = new PrismaClient({ adapter });
 export async function cleanDb() {
   await testPrisma.userPermission.deleteMany();
   await testPrisma.demoSession.deleteMany();
+  await testPrisma.reviewSubmission.deleteMany();
+  await testPrisma.reviewRequest.deleteMany();
+  await testPrisma.reviewCycle.deleteMany();
+  await testPrisma.reviewTemplate.deleteMany();
+  await testPrisma.leaveRequest.deleteMany();
+  await testPrisma.leaveBalance.deleteMany();
+  await testPrisma.leaveType.deleteMany();
   await testPrisma.teamMember.deleteMany();
   await testPrisma.team.deleteMany();
   await testPrisma.department.deleteMany();

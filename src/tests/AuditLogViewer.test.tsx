@@ -366,7 +366,11 @@ describe("AuditLogViewer", () => {
 
   // Describes creating an unknown entity type as a generic new record.
   test("describes unknown entity creation as generic new record", () => {
-    const log = makelog({ action: "create", entityType: "widget", after: "{}" });
+    const log = makelog({
+      action: "create",
+      entityType: "widget" as AuditLog["entityType"],
+      after: "{}",
+    });
     render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
     expect(screen.getAllByText("New record created").length).toBeGreaterThan(0);
   });
@@ -414,7 +418,7 @@ describe("AuditLogViewer", () => {
   test("describes unknown entity deletion as generic record deleted", () => {
     const log = makelog({
       action: "delete",
-      entityType: "widget",
+      entityType: "widget" as AuditLog["entityType"],
       before: "{}",
       after: null,
     });
@@ -474,7 +478,7 @@ describe("AuditLogViewer", () => {
   test("describes unknown entity update as generic record updated", () => {
     const log = makelog({
       action: "update",
-      entityType: "widget",
+      entityType: "widget" as AuditLog["entityType"],
       before: "{}",
       after: "{}",
     });
@@ -510,14 +514,14 @@ describe("AuditLogViewer", () => {
 
   // Shows a dash for completely unknown actions.
   test("shows dash for unknown action type", () => {
-    const log = makelog({ action: "archive", before: null, after: null });
+    const log = makelog({ action: "archive" as AuditLog["action"], before: null, after: null });
     render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
     expect(screen.getAllByText("-").length).toBeGreaterThan(0);
   });
 
   // Shows the raw entity type string when it has no label mapping.
   test("shows raw entity type for unmapped types", () => {
-    const log = makelog({ entityType: "customWidget" });
+    const log = makelog({ entityType: "customWidget" as AuditLog["entityType"] });
     render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
     expect(screen.getAllByText("customWidget").length).toBeGreaterThan(0);
   });
@@ -531,7 +535,7 @@ describe("AuditLogViewer", () => {
 
   // Uses fallback color for unknown action types on action chip.
   test("renders action chip with fallback color for unknown action", () => {
-    const log = makelog({ action: "archive" });
+    const log = makelog({ action: "archive" as AuditLog["action"] });
     render(<AuditLogViewer logs={[log]} {...defaultProps} total={1} />);
     expect(screen.getAllByText("archive").length).toBeGreaterThan(0);
   });
