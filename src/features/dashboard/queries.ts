@@ -14,7 +14,7 @@ import { unstable_cache as nextCache } from "next/cache";
 
 // In test environments, unstable_cache requires incrementalCache (Next.js runtime).
 // Fall back to a passthrough wrapper so tests call the function directly.
-function cache<T extends (...args: never[]) => Promise<unknown>>(
+function cache<T extends (...args: any[]) => Promise<any>>(
   fn: T,
   keyParts?: string[],
   options?: { revalidate?: number; tags?: string[] },
