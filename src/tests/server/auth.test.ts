@@ -342,7 +342,7 @@ describe("auth.ts callbacks", () => {
       const owner = await testPrisma.user.create({
         data: { email: "owner@example.com", name: "Owner", role: "superuser" },
       });
-      const attacker = await testPrisma.user.create({
+      const _attacker = await testPrisma.user.create({
         data: { email: "attacker@example.com", name: "Attacker", role: "user" },
       });
       const demoSession = await testPrisma.demoSession.create({
