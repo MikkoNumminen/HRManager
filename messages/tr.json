@@ -518,7 +518,7 @@
     "questionType": "Tür",
     "typeRating": "Derecelendirme ölçeği",
     "typeText": "Serbest metin",
-    "scaleMin": "Min",
+    "scaleMin": "Min.",
     "scaleMax": "Maks",
     "required": "Zorunlu",
     "createCycle": "Döngü Oluştur",

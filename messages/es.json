@@ -589,7 +589,7 @@
     "enterName": "Nombre del tipo de ausencia",
     "enterDescription": "Descripción (opcional)",
     "defaultDays": "Días predeterminados por año",
-    "color": "Color",
+    "color": "Código de color",
     "createRequest": "Enviar solicitud de ausencia",
     "selectPerson": "Seleccionar persona",
     "selectLeaveType": "Seleccionar tipo de ausencia",
