@@ -20,17 +20,14 @@ const demoProvider =
           async authorize() {
             let user = await prisma.user.findUnique({ where: { email: DEMO_EMAIL } });
             if (!user) {
+              // First demo login — create with superuser so the demo is fully functional.
+              // Subsequent logins respect whatever role admins have assigned.
               user = await prisma.user.create({
                 data: {
                   email: DEMO_EMAIL,
                   name: "Demo User",
                   role: "superuser",
                 },
-              });
-            } else if (user.role !== "superuser") {
-              user = await prisma.user.update({
-                where: { email: DEMO_EMAIL },
-                data: { role: "superuser" },
               });
             }
 

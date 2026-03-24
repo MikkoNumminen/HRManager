@@ -423,8 +423,8 @@ describe("auth.ts callbacks", () => {
       expect(count).toBe(1);
     });
 
-    // Upgrades existing demo user to superuser if they have a lower role.
-    test("upgrades existing demo user to superuser on login", async () => {
+    // Respects admin-assigned role on subsequent logins (does not force superuser).
+    test("preserves admin-assigned role on subsequent demo logins", async () => {
       await testPrisma.user.create({
         data: { email: "demo@hrmanager.app", name: "Demo User", role: "administrator" },
       });
@@ -433,7 +433,8 @@ describe("auth.ts callbacks", () => {
       const dbUser = await testPrisma.user.findUnique({
         where: { email: "demo@hrmanager.app" },
       });
-      expect(dbUser!.role).toBe("superuser");
+      // Role should NOT be overwritten to superuser — admin's choice is respected
+      expect(dbUser!.role).toBe("administrator");
     });
 
     // Returns id, email, and name in the result.
