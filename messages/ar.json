@@ -666,7 +666,7 @@
     "enterPositionName": "أدخل اسم المنصب",
     "noPositions": "لا توجد مناصب",
     "noPositionsHint": "أضف أول منصب باستخدام النموذج أعلاه",
-    "positionCount": "{count} مناصب"
+    "positionCount": "{count, plural, =0 {لا توجد مناصب} one {منصب واحد} two {منصبان} few {# مناصب} many {# منصب} other {# منصب}}"
   },
   "positionNotifications": {
     "positionCreated": "تم إنشاء المنصب",

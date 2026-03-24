@@ -666,7 +666,7 @@
     "enterPositionName": "Syötä nimikkeen nimi",
     "noPositions": "Ei nimikkeitä",
     "noPositionsHint": "Lisää ensimmäinen nimike yllä olevalla lomakkeella",
-    "positionCount": "{count} nimikettä"
+    "positionCount": "{count, plural, =0 {Ei tehtävänimikkeitä} one {1 tehtävänimike} other {# tehtävänimikettä}}"
   },
   "positionNotifications": {
     "positionCreated": "Nimike luotu",

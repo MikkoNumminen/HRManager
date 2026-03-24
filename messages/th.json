@@ -666,7 +666,7 @@
     "enterPositionName": "ป้อนชื่อตำแหน่ง",
     "noPositions": "ไม่มีตำแหน่ง",
     "noPositionsHint": "เพิ่มตำแหน่งแรกของคุณโดยใช้แบบฟอร์มด้านบน",
-    "positionCount": "{count} ตำแหน่ง"
+    "positionCount": "{count, plural, other {# ตำแหน่ง}}"
   },
   "positionNotifications": {
     "positionCreated": "สร้างตำแหน่งแล้ว",

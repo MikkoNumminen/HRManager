@@ -60,6 +60,9 @@ export type ErrorCode =
   | "csvFileTooLarge"
   | "csvEmpty"
   | "csvTooManyRows"
+  // Position catalog
+  | "positionAlreadyExists"
+  | "positionNotFound"
   // Leave management
   | "leaveTypeAlreadyExists"
   | "leaveTypeNotFound"

@@ -8,18 +8,20 @@ import {
   textFieldStyles,
 } from "@/muiStyles";
 import { updatePosition } from "@/serverActions";
-import { Box, Button, TextField, Tooltip, Typography } from "@mui/material";
+import { Autocomplete, Box, Button, TextField, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useSnackbar } from "./SnackbarProvider";
+import type { Position } from "@/schemas";
 
 type FormState = { error: string | null };
 
-const UpdatePositionForm: React.FC<{ personID: string; currentPosition?: string }> = ({
-  personID,
-  currentPosition,
-}) => {
+const UpdatePositionForm: React.FC<{
+  personID: string;
+  currentPosition?: string;
+  positions: Position[];
+}> = ({ personID, currentPosition, positions }) => {
   const t = useTranslations("persons");
   const tc = useTranslations("common");
   const tn = useTranslations("notifications");
@@ -40,6 +42,8 @@ const UpdatePositionForm: React.FC<{ personID: string; currentPosition?: string 
     { error: null },
   );
 
+  const positionOptions = positions.map((p) => p.name);
+
   return (
     <Box component="form" action={formAction} sx={formStyles}>
       <Typography variant="h5">{t("changePosition")}</Typography>
@@ -49,16 +53,16 @@ const UpdatePositionForm: React.FC<{ personID: string; currentPosition?: string 
         </Typography>
       )}
       <input type="hidden" name="personID" value={personID} />
-      <Tooltip title={tc("required")} placement="right" arrow>
-        <TextField
-          label={t("enterNewPosition")}
-          name="position"
-          size="small"
-          value={newPosition}
-          onChange={(e) => setNewPosition(e.target.value)}
-          sx={textFieldStyles}
-        />
-      </Tooltip>
+      <input type="hidden" name="position" value={newPosition} />
+      <Autocomplete
+        freeSolo
+        options={positionOptions}
+        value={newPosition}
+        onInputChange={(_e, value) => setNewPosition(value)}
+        renderInput={(params) => (
+          <TextField {...params} label={t("enterNewPosition")} size="small" sx={textFieldStyles} />
+        )}
+      />
       <Box sx={formButtonContainerStyles}>
         <Button
           type="submit"

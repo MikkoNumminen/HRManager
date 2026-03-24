@@ -666,7 +666,7 @@
     "enterPositionName": "Ange positionsnamn",
     "noPositions": "Inga positioner",
     "noPositionsHint": "Lägg till din första position med formuläret ovan",
-    "positionCount": "{count} positioner"
+    "positionCount": "{count, plural, =0 {Inga befattningar} one {1 befattning} other {# befattningar}}"
   },
   "positionNotifications": {
     "positionCreated": "Position skapad",

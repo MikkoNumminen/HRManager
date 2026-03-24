@@ -666,7 +666,7 @@
     "enterPositionName": "Positionsname eingeben",
     "noPositions": "Keine Positionen",
     "noPositionsHint": "Fügen Sie Ihre erste Position mit dem obigen Formular hinzu",
-    "positionCount": "{count} Positionen"
+    "positionCount": "{count, plural, =0 {Keine Positionen} one {1 Position} other {# Positionen}}"
   },
   "positionNotifications": {
     "positionCreated": "Position erstellt",

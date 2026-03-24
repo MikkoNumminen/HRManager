@@ -666,7 +666,7 @@
     "enterPositionName": "Введіть назву посади",
     "noPositions": "Немає посад",
     "noPositionsHint": "Додайте першу посаду за допомогою форми вище",
-    "positionCount": "{count} посад"
+    "positionCount": "{count, plural, =0 {Немає посад} one {1 посада} few {# посади} many {# посад} other {# посади}}"
   },
   "positionNotifications": {
     "positionCreated": "Посаду створено",

@@ -666,7 +666,7 @@
     "enterPositionName": "役職名を入力",
     "noPositions": "役職なし",
     "noPositionsHint": "上のフォームから最初の役職を追加してください",
-    "positionCount": "{count}件の役職"
+    "positionCount": "{count, plural, other {# 件の役職}}"
   },
   "positionNotifications": {
     "positionCreated": "役職が作成されました",

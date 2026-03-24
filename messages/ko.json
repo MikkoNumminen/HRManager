@@ -666,7 +666,7 @@
     "enterPositionName": "직위명 입력",
     "noPositions": "직위 없음",
     "noPositionsHint": "위의 양식을 사용하여 첫 번째 직위를 추가하세요",
-    "positionCount": "{count}개 직위"
+    "positionCount": "{count, plural, other {# 개 직위}}"
   },
   "positionNotifications": {
     "positionCreated": "직위가 생성되었습니다",

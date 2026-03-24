@@ -666,7 +666,7 @@
     "enterPositionName": "Ingiza jina la nafasi",
     "noPositions": "Hakuna nafasi",
     "noPositionsHint": "Ongeza nafasi yako ya kwanza kwa kutumia fomu hapo juu",
-    "positionCount": "Nafasi {count}"
+    "positionCount": "{count, plural, =0 {Hakuna nyadhifa} one {Nyadhifa 1} other {Nyadhifa #}}"
   },
   "positionNotifications": {
     "positionCreated": "Nafasi imeundwa",

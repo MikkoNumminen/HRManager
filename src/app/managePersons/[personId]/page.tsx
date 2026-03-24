@@ -3,7 +3,7 @@ import UpdatePersonNameForm from "@/components/UpdatePersonName";
 import UpdateEmailForm from "@/components/UpdateEmail";
 import UpdatePositionForm from "@/components/UpdatePosition";
 import TopBar from "@/components/TopBar";
-import { getPersons } from "@/queries";
+import { getPersons, getPositions } from "@/queries";
 import { Typography } from "@mui/material";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
@@ -24,7 +24,7 @@ export default async function PersonPage({ params }: { params: Promise<{ personI
     return <Typography variant="h4">{t("notFound")}</Typography>;
   }
 
-  const persons = await getPersons();
+  const [persons, positions] = await Promise.all([getPersons(), getPositions()]);
   const person = persons.find((p) => p.id === personId);
 
   if (!person) {
@@ -43,7 +43,11 @@ export default async function PersonPage({ params }: { params: Promise<{ personI
         <UpdatePersonNameForm personID={personId} currentName={person.name} />
       )}
       {permissions["person:update_position"] && (
-        <UpdatePositionForm personID={personId} currentPosition={person.position || undefined} />
+        <UpdatePositionForm
+          personID={personId}
+          currentPosition={person.position || undefined}
+          positions={positions}
+        />
       )}
       {permissions["person:update_email"] && (
         <UpdateEmailForm personID={personId} currentEmail={person.email || undefined} />

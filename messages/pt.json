@@ -666,7 +666,7 @@
     "enterPositionName": "Inserir nome do cargo",
     "noPositions": "Nenhum cargo",
     "noPositionsHint": "Adicione seu primeiro cargo usando o formulário acima",
-    "positionCount": "{count} cargos"
+    "positionCount": "{count, plural, =0 {Nenhum cargo} one {1 cargo} other {# cargos}}"
   },
   "positionNotifications": {
     "positionCreated": "Cargo criado",

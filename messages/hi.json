@@ -666,7 +666,7 @@
     "enterPositionName": "पद का नाम दर्ज करें",
     "noPositions": "कोई पद नहीं",
     "noPositionsHint": "ऊपर दिए गए फॉर्म से अपना पहला पद जोड़ें",
-    "positionCount": "{count} पद"
+    "positionCount": "{count, plural, =0 {कोई पद नहीं} one {1 पद} other {# पद}}"
   },
   "positionNotifications": {
     "positionCreated": "पद बनाया गया",

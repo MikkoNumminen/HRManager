@@ -666,7 +666,7 @@
     "enterPositionName": "Pozisyon adını girin",
     "noPositions": "Pozisyon yok",
     "noPositionsHint": "Yukarıdaki formu kullanarak ilk pozisyonunuzu ekleyin",
-    "positionCount": "{count} pozisyon"
+    "positionCount": "{count, plural, =0 {Pozisyon yok} one {1 pozisyon} other {# pozisyon}}"
   },
   "positionNotifications": {
     "positionCreated": "Pozisyon oluşturuldu",

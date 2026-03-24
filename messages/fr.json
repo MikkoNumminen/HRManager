@@ -666,7 +666,7 @@
     "enterPositionName": "Entrer le nom du poste",
     "noPositions": "Aucun poste",
     "noPositionsHint": "Ajoutez votre premier poste avec le formulaire ci-dessus",
-    "positionCount": "{count} postes"
+    "positionCount": "{count, plural, =0 {Aucun poste} one {1 poste} other {# postes}}"
   },
   "positionNotifications": {
     "positionCreated": "Poste créé",

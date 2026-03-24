@@ -72,6 +72,7 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
   const canReset = permissions?.["data:reset"];
   const canDataIO = permissions?.["data:import"] || permissions?.["data:export"];
   const canLeave = permissions?.["leave:view"];
+  const canPositions = permissions?.["position:manage"];
   const demoEnabled = process.env.NEXT_PUBLIC_DEMO_LOGIN !== "false";
 
   const handleSeed = (clearExisting: boolean) => {
@@ -259,6 +260,16 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
                       sx={userMenuItemStyles}
                     >
                       {t("leaveManagement")}
+                    </MenuItem>
+                  )}
+                  {canPositions && (
+                    <MenuItem
+                      component={Link}
+                      href="/positions"
+                      onClick={() => setAnchorEl(null)}
+                      sx={userMenuItemStyles}
+                    >
+                      {t("positionCatalog")}
                     </MenuItem>
                   )}
                   {canSeed && (
@@ -490,6 +501,21 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
                   }}
                 >
                   <ListItemText primary={t("leaveManagement")} />
+                </ListItemButton>
+              </ListItem>
+            )}
+            {canPositions && (
+              <ListItem disablePadding>
+                <ListItemButton
+                  component={Link}
+                  href="/positions"
+                  onClick={() => setDrawerOpen(false)}
+                  sx={{
+                    color: colors.slate100,
+                    "&:hover": { backgroundColor: colors.hoverOverlay },
+                  }}
+                >
+                  <ListItemText primary={t("positionCatalog")} />
                 </ListItemButton>
               </ListItem>
             )}

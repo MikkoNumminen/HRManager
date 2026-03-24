@@ -226,6 +226,19 @@ model ReviewSubmission {
   updatedAt   DateTime      @updatedAt
 }
 
+model Position {
+  id        String    @id @default(uuid())
+  name      String
+  sessionId String?
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([name, sessionId])
+  @@index([deletedAt])
+  @@index([sessionId])
+}
+
 model LeaveType {
   id             String         @id @default(uuid())
   name           String

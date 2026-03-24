@@ -36,6 +36,7 @@ export const PERMISSION_KEYS = [
   "leave:request",
   "leave:approve",
   "leave:manage_types",
+  "position:manage",
 ] as const;
 
 export type PermissionKey = (typeof PERMISSION_KEYS)[number];
@@ -71,6 +72,7 @@ export const ROLE_DEFAULTS: Record<string, PermissionKey[]> = {
     "leave:request",
     "leave:approve",
     "leave:manage_types",
+    "position:manage",
   ],
   user: [
     "person:read",
@@ -131,6 +133,7 @@ function formatPermissionDescription(key: PermissionKey): string {
     "leave:request": "Submit leave requests",
     "leave:approve": "Approve or reject leave requests",
     "leave:manage_types": "Create and manage leave types",
+    "position:manage": "Create and manage position catalog",
   };
   return descriptions[key];
 }

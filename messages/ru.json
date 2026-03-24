@@ -666,7 +666,7 @@
     "enterPositionName": "Введите название должности",
     "noPositions": "Нет должностей",
     "noPositionsHint": "Добавьте первую должность с помощью формы выше",
-    "positionCount": "{count} должностей"
+    "positionCount": "{count, plural, =0 {Нет должностей} one {1 должность} few {# должности} many {# должностей} other {# должности}}"
   },
   "positionNotifications": {
     "positionCreated": "Должность создана",

@@ -666,7 +666,7 @@
     "enterPositionName": "输入职位名称",
     "noPositions": "暂无职位",
     "noPositionsHint": "使用上方表单添加第一个职位",
-    "positionCount": "{count} 个职位"
+    "positionCount": "{count, plural, other {# 个职位}}"
   },
   "positionNotifications": {
     "positionCreated": "职位已创建",
