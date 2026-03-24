@@ -429,3 +429,27 @@ test("concurrent requests at limit — correct number of errors thrown", async (
   expect(fulfilled).toBe(5);
   expect(rejected).toBe(5);
 });
+
+describe("exported rate limit constants", () => {
+  // Pull the constants in after all the mocks are set up at module level.
+  let constants: typeof import("@/rateLimit");
+
+  beforeAll(async () => {
+    constants = await import("@/rateLimit");
+  });
+
+  // The window should be 60 seconds — short enough to prevent abuse, long enough for normal use.
+  test("RATE_LIMIT_WINDOW_MS is 60 seconds", () => {
+    expect(constants.RATE_LIMIT_WINDOW_MS).toBe(60 * 1000);
+  });
+
+  // Standard authenticated users get 30 requests per window.
+  test("MAX_REQUESTS_PER_WINDOW is 30", () => {
+    expect(constants.MAX_REQUESTS_PER_WINDOW).toBe(30);
+  });
+
+  // Auth endpoints are stricter — 10 per window — to limit brute-force attempts.
+  test("AUTH_MAX_REQUESTS is 10", () => {
+    expect(constants.AUTH_MAX_REQUESTS).toBe(10);
+  });
+});

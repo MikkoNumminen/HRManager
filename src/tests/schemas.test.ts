@@ -17,6 +17,8 @@ import {
   DashboardRecentActivitySchema,
   DashboardMetricsSchema,
   MAX_URL_LENGTH,
+  ImageUrlSchema,
+  MAX_EXPORT_ROWS,
 } from "@/schemas";
 
 const VALID_UUID = "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11";
@@ -773,5 +775,52 @@ describe("MAX_URL_LENGTH", () => {
   // The URL max length constant should be 2048 characters (standard browser URL limit).
   test("is 2048", () => {
     expect(MAX_URL_LENGTH).toBe(2048);
+  });
+});
+
+describe("ImageUrlSchema", () => {
+  // A valid HTTPS URL should pass without errors.
+  test("accepts a valid https URL", () => {
+    expect(() => ImageUrlSchema.parse("https://example.com/avatar.png")).not.toThrow();
+  });
+
+  // A valid HTTP URL should also be accepted.
+  test("accepts a valid http URL", () => {
+    expect(() => ImageUrlSchema.parse("http://example.com/img.jpg")).not.toThrow();
+  });
+
+  // Non-http/https protocols (ftp, javascript, etc.) must be rejected.
+  test("rejects non-http protocol", () => {
+    const result = ImageUrlSchema.safeParse("ftp://example.com/file.png");
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0]?.message).toBe("invalidUrlProtocol");
+  });
+
+  // Completely malformed strings that cannot be parsed as URLs must be rejected.
+  test("rejects invalid URL format", () => {
+    const result = ImageUrlSchema.safeParse("not-a-url");
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0]?.message).toBe("invalidUrlFormat");
+  });
+
+  // An empty string should not be parsed as a URL — schema rejects it.
+  test("rejects empty string", () => {
+    const result = ImageUrlSchema.safeParse("");
+    expect(result.success).toBe(false);
+  });
+
+  // A URL exceeding MAX_URL_LENGTH characters should fail with the urlTooLong message.
+  test("rejects URL that exceeds MAX_URL_LENGTH", () => {
+    const longUrl = "https://example.com/" + "a".repeat(MAX_URL_LENGTH);
+    const result = ImageUrlSchema.safeParse(longUrl);
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0]?.message).toBe("urlTooLong");
+  });
+});
+
+describe("MAX_EXPORT_ROWS", () => {
+  // The export row cap should be 10 000 — enough for any realistic HR dataset.
+  test("is 10000", () => {
+    expect(MAX_EXPORT_ROWS).toBe(10000);
   });
 });

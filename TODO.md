@@ -51,4 +51,4 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 - 🟡🧠 JWT permission revocation window — permissions valid up to 1h after admin revokes them
 - 🟡🧠 Add permission check to `getReviewRequestWithTemplate` — queries.ts:723 allows any authenticated user with a UUID to retrieve another user's review assignment
 - 🟡🧠 Add consistent permission checks to read queries — getPersons, getTeams, getDepartments, getReviewTemplates, getReviewCycles lack explicit auth guards
-- 🟢⚡ Domain-restrict profile image URLs — updateProfileImage accepts any HTTPS URL; restrict to known CDNs or an allowlist (serverActions.ts:1513)
+- 🟢⚡ Domain-restrict profile image URLs — updateProfileImage accepts any HTTPS URL; restrict to known CDNs or an allowlist (serverActions/profile.ts)

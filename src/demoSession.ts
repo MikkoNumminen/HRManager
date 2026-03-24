@@ -29,11 +29,9 @@ export async function seedDemoData(sessionId: string): Promise<void> {
       { name: "Henry Chen", position: "Data Analyst", email: "henry@example.com" },
       { name: "Ivy Santos", position: "HR Coordinator", email: "ivy@example.com" },
     ];
-    const persons = [];
-    for (const p of personSeeds) {
-      const person = await tx.person.create({ data: { ...p, sessionId } });
-      persons.push(person);
-    }
+    const persons = await tx.person.createManyAndReturn({
+      data: personSeeds.map((p) => ({ ...p, sessionId })),
+    });
     const [alice, bob, carol, dave, eve, frank, grace, henry, ivy] = persons;
 
     const teamSeeds = [
@@ -43,11 +41,9 @@ export async function seedDemoData(sessionId: string): Promise<void> {
       { teamName: "Data Analytics", teamManagerId: henry.id },
       { teamName: "People & Culture", teamManagerId: ivy.id },
     ];
-    const teams = [];
-    for (const t of teamSeeds) {
-      const team = await tx.team.create({ data: { ...t, sessionId } });
-      teams.push(team);
-    }
+    const teams = await tx.team.createManyAndReturn({
+      data: teamSeeds.map((t) => ({ ...t, sessionId })),
+    });
     const [engineering, design, platform, dataAnalytics, peopleCulture] = teams;
 
     const memberships = [
@@ -62,9 +58,7 @@ export async function seedDemoData(sessionId: string): Promise<void> {
       { personId: henry.id, teamId: dataAnalytics.teamId },
       { personId: ivy.id, teamId: peopleCulture.teamId },
     ];
-    for (const m of memberships) {
-      await tx.teamMember.create({ data: { ...m, sessionId } });
-    }
+    await tx.teamMember.createMany({ data: memberships.map((m) => ({ ...m, sessionId })) });
 
     const departmentSeeds = [
       {

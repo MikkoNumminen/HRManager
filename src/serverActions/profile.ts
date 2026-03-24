@@ -5,7 +5,7 @@ import { auth } from "@/auth";
 import { captureAuditContext, deferAudit, DeferredAuditEntry } from "@/auditLog";
 import { rateLimit } from "@/rateLimit";
 import { ActionError } from "@/actionErrors";
-import { MAX_NAME_LENGTH, MAX_URL_LENGTH } from "@/schemas";
+import { MAX_NAME_LENGTH, MAX_URL_LENGTH, ImageUrlSchema } from "@/schemas";
 import { getTranslations } from "next-intl/server";
 import { safe, type ActionResult } from "./_shared";
 
@@ -58,17 +58,14 @@ export async function updateProfileImage(data: FormData): Promise<ActionResult> 
     const trimmed = image.trim();
 
     if (trimmed.length > 0) {
-      if (trimmed.length > MAX_URL_LENGTH) {
+      const urlResult = ImageUrlSchema.safeParse(trimmed);
+      if (!urlResult.success) {
+        const msg = urlResult.error.issues[0]?.message;
+        if (msg === "invalidUrlProtocol")
+          throw new ActionError("invalidUrlProtocol", t("invalidUrlProtocol"));
+        if (msg === "invalidUrlFormat")
+          throw new ActionError("invalidUrlFormat", t("invalidUrlFormat"));
         throw new ActionError("urlTooLong", t("urlTooLong", { max: MAX_URL_LENGTH }));
-      }
-      let parsedUrl: URL | null = null;
-      try {
-        parsedUrl = new URL(trimmed);
-      } catch {
-        throw new ActionError("invalidUrlFormat", t("invalidUrlFormat"));
-      }
-      if (!["http:", "https:"].includes(parsedUrl.protocol)) {
-        throw new ActionError("invalidUrlProtocol", t("invalidUrlProtocol"));
       }
     }
 

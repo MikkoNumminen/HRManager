@@ -66,7 +66,7 @@ export async function seedMockData(clearExisting: boolean = true): Promise<Actio
         await prisma.person.deleteMany({ where: sessionWhere });
       }
 
-      // Upsert persons — find existing by email or create new
+      // Batch upsert persons — find all existing by email, create only missing ones
       const personSeeds = [
         { name: "Alice Johnson", position: "Engineering Manager", email: "alice@example.com" },
         { name: "Bob Williams", position: "Senior Developer", email: "bob@example.com" },
@@ -75,33 +75,49 @@ export async function seedMockData(clearExisting: boolean = true): Promise<Actio
         { name: "Eve Thompson", position: "QA Engineer", email: "eve@example.com" },
         { name: "Frank Lee", position: "Product Owner", email: "frank@example.com" },
       ];
-      const persons = [];
-      for (const p of personSeeds) {
-        const existing = await prisma.person.findFirst({
-          where: { email: p.email, deletedAt: null, sessionId },
+      const personEmails = personSeeds.map((p) => p.email);
+      const existingPersons = await prisma.person.findMany({
+        where: { email: { in: personEmails }, deletedAt: null, sessionId },
+      });
+      const existingPersonEmails = new Set(existingPersons.map((p) => p.email));
+      const missingPersonSeeds = personSeeds.filter((p) => !existingPersonEmails.has(p.email));
+      if (missingPersonSeeds.length > 0) {
+        await prisma.person.createMany({
+          data: missingPersonSeeds.map((p) => ({ ...p, sessionId })),
         });
-        const person = existing ?? (await prisma.person.create({ data: { ...p, sessionId } }));
-        persons.push(person);
       }
-      const [alice, bob, carol, dave, eve, frank] = persons;
+      const persons = await prisma.person.findMany({
+        where: { email: { in: personEmails }, deletedAt: null, sessionId },
+      });
+      const personByEmail = new Map(persons.map((p) => [p.email, p]));
+      const [alice, bob, carol, dave, eve, frank] = personSeeds.map(
+        (p) => personByEmail.get(p.email)!,
+      );
 
-      // Upsert teams — find existing by name or create new
+      // Batch upsert teams — find all existing by name, create only missing ones
       const teamSeeds = [
         { teamName: "Engineering", teamManagerId: alice.id },
         { teamName: "Design", teamManagerId: carol.id },
         { teamName: "Platform", teamManagerId: dave.id },
       ];
-      const teams = [];
-      for (const t of teamSeeds) {
-        const existing = await prisma.team.findFirst({
-          where: { teamName: t.teamName, deletedAt: null, sessionId },
+      const teamNames = teamSeeds.map((t) => t.teamName);
+      const existingTeams = await prisma.team.findMany({
+        where: { teamName: { in: teamNames }, deletedAt: null, sessionId },
+      });
+      const existingTeamNames = new Set(existingTeams.map((t) => t.teamName));
+      const missingTeamSeeds = teamSeeds.filter((t) => !existingTeamNames.has(t.teamName));
+      if (missingTeamSeeds.length > 0) {
+        await prisma.team.createMany({
+          data: missingTeamSeeds.map((t) => ({ ...t, sessionId })),
         });
-        const team = existing ?? (await prisma.team.create({ data: { ...t, sessionId } }));
-        teams.push(team);
       }
-      const [engineering, design, platform] = teams;
+      const teams = await prisma.team.findMany({
+        where: { teamName: { in: teamNames }, deletedAt: null, sessionId },
+      });
+      const teamByName = new Map(teams.map((t) => [t.teamName, t]));
+      const [engineering, design, platform] = teamSeeds.map((t) => teamByName.get(t.teamName)!);
 
-      // Add members — skip if already a member
+      // Add members — skip if already a member (batch check then batch insert)
       const memberships = [
         { personId: alice.id, teamId: engineering.teamId },
         { personId: bob.id, teamId: engineering.teamId },
@@ -111,13 +127,20 @@ export async function seedMockData(clearExisting: boolean = true): Promise<Actio
         { personId: dave.id, teamId: platform.teamId },
         { personId: bob.id, teamId: platform.teamId },
       ];
-      for (const m of memberships) {
-        const existing = await prisma.teamMember.findFirst({
-          where: { personId: m.personId, teamId: m.teamId, deletedAt: null },
+      const existingMembers = await prisma.teamMember.findMany({
+        where: {
+          OR: memberships.map((m) => ({ personId: m.personId, teamId: m.teamId })),
+          deletedAt: null,
+        },
+      });
+      const existingMemberKeys = new Set(existingMembers.map((m) => `${m.personId}:${m.teamId}`));
+      const missingMemberships = memberships.filter(
+        (m) => !existingMemberKeys.has(`${m.personId}:${m.teamId}`),
+      );
+      if (missingMemberships.length > 0) {
+        await prisma.teamMember.createMany({
+          data: missingMemberships.map((m) => ({ ...m, sessionId })),
         });
-        if (!existing) {
-          await prisma.teamMember.create({ data: { ...m, sessionId } });
-        }
       }
 
       // Upsert departments and assign teams

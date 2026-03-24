@@ -3,9 +3,9 @@ import { headers } from "next/headers";
 import { auth } from "@/auth";
 import { logRateLimitHit } from "@/auditLog";
 
-const WINDOW_MS = 60 * 1000; // 1 minute
-const MAX_REQUESTS = 30; // 30 requests per window
-const AUTH_MAX_REQUESTS = 10; // 10 requests per window for auth endpoints
+export const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute
+export const MAX_REQUESTS_PER_WINDOW = 30; // 30 requests per window
+export const AUTH_MAX_REQUESTS = 10; // 10 requests per window for auth endpoints
 
 export class RateLimitError extends Error {
   constructor() {
@@ -49,7 +49,7 @@ async function checkRateLimit(
   maxRequests: number,
 ): Promise<void> {
   const now = new Date();
-  const windowStart = new Date(now.getTime() - WINDOW_MS);
+  const windowStart = new Date(now.getTime() - RATE_LIMIT_WINDOW_MS);
 
   // Atomic rate limit check using raw SQL to prevent TOCTOU race conditions.
   // A single upsert+conditional increment ensures two concurrent requests
@@ -78,7 +78,7 @@ async function checkRateLimit(
 
 export async function rateLimit(action: string): Promise<void> {
   const identifier = await getIdentifier();
-  await checkRateLimit(identifier, action, MAX_REQUESTS);
+  await checkRateLimit(identifier, action, MAX_REQUESTS_PER_WINDOW);
 }
 
 export async function rateLimitAuth(action: string): Promise<void> {
@@ -87,7 +87,7 @@ export async function rateLimitAuth(action: string): Promise<void> {
 }
 
 export async function cleanupExpiredRateLimits(): Promise<number> {
-  const windowStart = new Date(Date.now() - WINDOW_MS);
+  const windowStart = new Date(Date.now() - RATE_LIMIT_WINDOW_MS);
   const result = await prisma.rateLimit.deleteMany({
     where: { windowStart: { lt: windowStart } },
   });

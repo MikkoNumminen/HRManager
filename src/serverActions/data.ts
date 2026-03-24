@@ -5,7 +5,7 @@ import { requirePermission } from "@/permissions";
 import { captureAuditContext, deferAudit, deferAuditLog, DeferredAuditEntry } from "@/auditLog";
 import { rateLimit } from "@/rateLimit";
 import { getDemoSessionId } from "@/demoSession";
-import { MAX_IMPORT_ROWS, MAX_IMPORT_FILE_SIZE } from "@/schemas";
+import { MAX_IMPORT_ROWS, MAX_IMPORT_FILE_SIZE, MAX_EXPORT_ROWS } from "@/schemas";
 import { parseCSV, generateCSV, validatePersonImportRows } from "@/csvUtils";
 import { getTranslations } from "next-intl/server";
 import type { ErrorCode } from "@/actionErrors";
@@ -66,15 +66,15 @@ export async function importPersonsCsv(
     const ctx = await captureAuditContext();
     const auditEntries: DeferredAuditEntry[] = [];
     await prisma.$transaction(async (tx) => {
-      for (const row of valid) {
-        const person = await tx.person.create({
-          data: {
-            name: row.name,
-            email: row.email,
-            position: row.position ?? null,
-            sessionId,
-          },
-        });
+      const created = await tx.person.createManyAndReturn({
+        data: valid.map((row) => ({
+          name: row.name,
+          email: row.email,
+          position: row.position ?? null,
+          sessionId,
+        })),
+      });
+      for (const person of created) {
         auditEntries.push({
           ...ctx,
           action: "import",
@@ -82,8 +82,8 @@ export async function importPersonsCsv(
           entityId: person.id,
           after: { name: person.name, email: person.email, position: person.position },
         });
-        imported++;
       }
+      imported = created.length;
     });
     deferAudit(auditEntries);
   }
@@ -192,7 +192,6 @@ export async function exportAuditLogsCsv(): Promise<string> {
   await rateLimit("exportAuditLogsCsv");
 
   const sessionId = await getDemoSessionId();
-  const MAX_EXPORT_ROWS = 10000;
   const { getAuditLogCollection, isMongoAvailable } = await import("@/mongoDb");
   const logs = isMongoAvailable()
     ? await getAuditLogCollection()
