@@ -8,6 +8,7 @@ import {
   requirePermission,
   seedPermissions,
 } from "../permissions";
+import { ActionError } from "../actionErrors";
 
 const mockAuth = jest.fn();
 jest.mock("../auth", () => ({
@@ -294,8 +295,8 @@ describe("requirePermission", () => {
     await expect(requirePermission("person:create")).resolves.not.toThrow();
   });
 
-  // Throws "Permission denied" when the user lacks the requested permission.
-  test("throws when permission is denied", async () => {
+  // Throws ActionError with code "permissionDenied" when the user lacks the requested permission.
+  test("throws ActionError with permissionDenied code when permission is denied", async () => {
     mockAuth.mockResolvedValue({ user: { email: "alice@test.com" } });
     mockFindUnique.mockResolvedValue({
       id: "123",
@@ -303,16 +304,19 @@ describe("requirePermission", () => {
       permissions: [],
     });
 
-    await expect(requirePermission("person:create")).rejects.toThrow(
-      "Permission denied: person:create",
-    );
+    const error = await requirePermission("person:create").catch((e) => e);
+    expect(error).toBeInstanceOf(ActionError);
+    expect((error as ActionError).code).toBe("permissionDenied");
+    expect(error.message).toBe("Permission denied: person:create");
   });
 
-  // Throws when there's no session at all (guest).
-  test("throws for unauthenticated user", async () => {
+  // Throws ActionError for unauthenticated user (guest has no permissions).
+  test("throws ActionError for unauthenticated user", async () => {
     mockAuth.mockResolvedValue(null);
 
-    await expect(requirePermission("person:create")).rejects.toThrow("Permission denied");
+    const error = await requirePermission("person:create").catch((e) => e);
+    expect(error).toBeInstanceOf(ActionError);
+    expect((error as ActionError).code).toBe("permissionDenied");
   });
 });
 

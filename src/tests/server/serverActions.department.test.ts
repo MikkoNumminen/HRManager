@@ -107,14 +107,14 @@ describe("createDepartment", () => {
 
   // Throws when name is empty.
   test("throws on empty name", async () => {
-    expect(await createDepartment(formData({ name: "" }))).toEqual({
+    expect(await createDepartment(formData({ name: "" }))).toMatchObject({
       error: expect.stringContaining("Invalid Name"),
     });
   });
 
   // Throws when name is missing.
   test("throws on missing name", async () => {
-    expect(await createDepartment(formData({}))).toEqual({
+    expect(await createDepartment(formData({}))).toMatchObject({
       error: expect.stringContaining("Invalid Name"),
     });
   });
@@ -122,7 +122,7 @@ describe("createDepartment", () => {
   // Department names have a length limit.
   test("throws when name exceeds max length", async () => {
     const longName = "A".repeat(256);
-    expect(await createDepartment(formData({ name: longName }))).toEqual({
+    expect(await createDepartment(formData({ name: longName }))).toMatchObject({
       error: expect.stringContaining("characters or less"),
     });
   });
@@ -130,7 +130,7 @@ describe("createDepartment", () => {
   // Department descriptions have a length limit.
   test("throws when description exceeds max length", async () => {
     const longDesc = "A".repeat(1001);
-    expect(await createDepartment(formData({ name: "Eng", description: longDesc }))).toEqual({
+    expect(await createDepartment(formData({ name: "Eng", description: longDesc }))).toMatchObject({
       error: expect.stringContaining("characters or less"),
     });
   });
@@ -160,14 +160,14 @@ describe("removeDepartment", () => {
 
   // Throws when no departmentID is provided.
   test("throws on missing departmentID", async () => {
-    expect(await removeDepartment(formData({}))).toEqual({
+    expect(await removeDepartment(formData({}))).toMatchObject({
       error: expect.stringContaining("No departmentID selected"),
     });
   });
 
   // Throws on invalid UUID.
   test("throws on invalid UUID", async () => {
-    expect(await removeDepartment(formData({ departmentID: "bad" }))).toEqual({
+    expect(await removeDepartment(formData({ departmentID: "bad" }))).toMatchObject({
       error: expect.stringContaining("Invalid departmentID format"),
     });
   });
@@ -193,14 +193,14 @@ describe("updateDepartment", () => {
   // Throws when name is empty.
   test("throws on empty name", async () => {
     const dept = await createTestDepartment({ name: "Eng" });
-    expect(await updateDepartment(formData({ departmentID: dept.id, name: "" }))).toEqual({
+    expect(await updateDepartment(formData({ departmentID: dept.id, name: "" }))).toMatchObject({
       error: expect.stringContaining("Department name is required"),
     });
   });
 
   // Throws when departmentID is missing.
   test("throws on missing departmentID", async () => {
-    expect(await updateDepartment(formData({ name: "X" }))).toEqual({
+    expect(await updateDepartment(formData({ name: "X" }))).toMatchObject({
       error: expect.stringContaining("No departmentID provided"),
     });
   });
@@ -209,9 +209,9 @@ describe("updateDepartment", () => {
   test("throws when name exceeds max length", async () => {
     const dept = await createTestDepartment({ name: "Eng" });
     const longName = "A".repeat(256);
-    expect(await updateDepartment(formData({ departmentID: dept.id, name: longName }))).toEqual({
-      error: expect.stringContaining("characters or less"),
-    });
+    expect(
+      await updateDepartment(formData({ departmentID: dept.id, name: longName })),
+    ).toMatchObject({ error: expect.stringContaining("characters or less") });
   });
 
   // Department descriptions have a length limit.
@@ -265,7 +265,7 @@ describe("updateDepartmentHead", () => {
 
   // Throws when departmentID is missing.
   test("throws on missing departmentID", async () => {
-    expect(await updateDepartmentHead(formData({}))).toEqual({
+    expect(await updateDepartmentHead(formData({}))).toMatchObject({
       error: expect.stringContaining("No departmentID provided"),
     });
   });
@@ -376,7 +376,7 @@ describe("removeTeamFromDepartment", () => {
 
   // Throws when teamID is missing.
   test("throws on missing teamID", async () => {
-    expect(await removeTeamFromDepartment(formData({}))).toEqual({
+    expect(await removeTeamFromDepartment(formData({}))).toMatchObject({
       error: expect.stringContaining("No teamID provided"),
     });
   });

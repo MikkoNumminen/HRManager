@@ -5,7 +5,8 @@ import { redirect } from "next/navigation";
 import { requirePermission, seedPermissions } from "@/permissions";
 import { auth } from "@/auth";
 import { captureAuditContext, deferAudit, deferAuditLog, DeferredAuditEntry } from "@/auditLog";
-import { rateLimit } from "@/rateLimit";
+import { rateLimit, RateLimitError } from "@/rateLimit";
+import { ActionError, type ErrorCode } from "@/actionErrors";
 import { getDemoSessionId } from "@/demoSession";
 import {
   MAX_NAME_LENGTH,
@@ -22,8 +23,11 @@ import {
 import { parseCSV, generateCSV, validatePersonImportRows } from "@/csvUtils";
 import { getTranslations } from "next-intl/server";
 
-/** Server actions return ActionResult so error messages survive Next.js production sanitization. */
-export type ActionResult = { error: string } | undefined;
+/**
+ * Server actions return ActionResult so error messages survive Next.js production sanitization.
+ * The `code` field lets callers react programmatically to specific error types.
+ */
+export type ActionResult = { error: string; code: ErrorCode } | undefined;
 
 async function safe(fn: () => Promise<void>): Promise<ActionResult> {
   try {
@@ -31,9 +35,11 @@ async function safe(fn: () => Promise<void>): Promise<ActionResult> {
   } catch (error) {
     // Re-throw Next.js internal errors (redirect, notFound) so they work normally
     if (error && typeof error === "object" && "digest" in error) throw error;
-    if (error instanceof Error) return { error: error.message };
+    if (error instanceof ActionError) return { error: error.message, code: error.code };
+    if (error instanceof RateLimitError) return { error: error.message, code: "rateLimited" };
+    if (error instanceof Error) return { error: error.message, code: "unexpectedError" };
     const tErr = await getTranslations("errors");
-    return { error: tErr("unexpectedError") };
+    return { error: tErr("unexpectedError"), code: "unexpectedError" };
   }
 }
 
@@ -41,7 +47,7 @@ const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12
 
 function validateUUID(value: string, fieldName: string): void {
   if (!UUID_REGEX.test(value)) {
-    throw new Error(`Invalid ${fieldName} format`);
+    throw new ActionError("invalidId", `Invalid ${fieldName} format`);
   }
 }
 
@@ -52,21 +58,21 @@ export async function createPerson(data: FormData): Promise<ActionResult> {
     await rateLimit("createPerson");
     const name = data.get("name")?.valueOf();
     if (typeof name !== "string" || name.trim().length === 0) {
-      throw new Error(t("invalidName"));
+      throw new ActionError("invalidName", t("invalidName"));
     }
     if (name.trim().length > MAX_NAME_LENGTH) {
-      throw new Error(t("nameTooLong", { max: MAX_NAME_LENGTH }));
+      throw new ActionError("nameTooLong", t("nameTooLong", { max: MAX_NAME_LENGTH }));
     }
 
     const email = data.get("email")?.valueOf();
     if (typeof email !== "string" || email.trim().length === 0) {
-      throw new Error(t("emailRequired"));
+      throw new ActionError("emailRequired", t("emailRequired"));
     }
     if (email.trim().length > MAX_EMAIL_LENGTH) {
-      throw new Error(t("emailTooLong", { max: MAX_EMAIL_LENGTH }));
+      throw new ActionError("emailTooLong", t("emailTooLong", { max: MAX_EMAIL_LENGTH }));
     }
     if (!EmailSchema.safeParse(email).success) {
-      throw new Error(t("invalidEmailFormat"));
+      throw new ActionError("invalidEmailFormat", t("invalidEmailFormat"));
     }
 
     const sessionId = await getDemoSessionId();
@@ -77,7 +83,7 @@ export async function createPerson(data: FormData): Promise<ActionResult> {
         where: { email, deletedAt: null, sessionId },
       });
       if (existingPerson) {
-        throw new Error(t("emailAlreadyExists"));
+        throw new ActionError("emailAlreadyExists", t("emailAlreadyExists"));
       }
 
       const person = await tx.person.create({
@@ -109,7 +115,7 @@ export async function removePerson(data: FormData): Promise<ActionResult> {
     await rateLimit("removePerson");
     const personIDs = data.getAll("personID").filter((v): v is string => typeof v === "string");
     if (personIDs.length === 0) {
-      throw new Error(t("noPersonSelected"));
+      throw new ActionError("noPersonSelected", t("noPersonSelected"));
     }
     personIDs.forEach((id) => validateUUID(id, "personID"));
 
@@ -171,16 +177,16 @@ export async function updatePersonName(data: FormData): Promise<ActionResult> {
     await rateLimit("updatePersonName");
     const personID = data.get("personID")?.toString();
     if (!personID) {
-      throw new Error(t("noPersonProvided"));
+      throw new ActionError("noPersonProvided", t("noPersonProvided"));
     }
     validateUUID(personID, "personID");
 
     const newName = data.get("name")?.toString().trim();
     if (!newName) {
-      throw new Error(t("newNameRequired"));
+      throw new ActionError("newNameRequired", t("newNameRequired"));
     }
     if (newName.length > MAX_NAME_LENGTH) {
-      throw new Error(t("nameTooLong", { max: MAX_NAME_LENGTH }));
+      throw new ActionError("nameTooLong", t("nameTooLong", { max: MAX_NAME_LENGTH }));
     }
 
     const sessionId = await getDemoSessionId();
@@ -191,7 +197,7 @@ export async function updatePersonName(data: FormData): Promise<ActionResult> {
         where: { id: personID, sessionId },
       });
       if (!personBefore) {
-        throw new Error(t("personNotFound"));
+        throw new ActionError("personNotFound", t("personNotFound"));
       }
       await tx.person.updateMany({
         where: { id: personID, sessionId },
@@ -219,16 +225,16 @@ export async function updatePosition(data: FormData): Promise<ActionResult> {
     await rateLimit("updatePosition");
     const personID = data.get("personID")?.toString();
     if (!personID) {
-      throw new Error(t("noPersonProvided"));
+      throw new ActionError("noPersonProvided", t("noPersonProvided"));
     }
     validateUUID(personID, "personID");
 
     const newPosition = (data.get("position") ?? data.get("name"))?.toString().trim();
     if (!newPosition) {
-      throw new Error(t("positionRequired"));
+      throw new ActionError("positionRequired", t("positionRequired"));
     }
     if (newPosition.length > MAX_POSITION_LENGTH) {
-      throw new Error(t("positionTooLong", { max: MAX_POSITION_LENGTH }));
+      throw new ActionError("positionTooLong", t("positionTooLong", { max: MAX_POSITION_LENGTH }));
     }
 
     const sessionId = await getDemoSessionId();
@@ -239,7 +245,7 @@ export async function updatePosition(data: FormData): Promise<ActionResult> {
         where: { id: personID, sessionId },
       });
       if (!personBefore) {
-        throw new Error(t("personNotFound"));
+        throw new ActionError("personNotFound", t("personNotFound"));
       }
       await tx.person.updateMany({
         where: { id: personID, sessionId },
@@ -267,19 +273,19 @@ export async function updateEmail(data: FormData): Promise<ActionResult> {
     await rateLimit("updateEmail");
     const personID = data.get("personID")?.toString();
     if (!personID) {
-      throw new Error(t("noPersonSelected"));
+      throw new ActionError("noPersonSelected", t("noPersonSelected"));
     }
     validateUUID(personID, "personID");
 
     const newEmail = (data.get("email") ?? data.get("name"))?.toString().trim();
     if (!newEmail) {
-      throw new Error(t("newEmailRequired"));
+      throw new ActionError("newEmailRequired", t("newEmailRequired"));
     }
     if (newEmail.length > MAX_EMAIL_LENGTH) {
-      throw new Error(t("emailTooLong", { max: MAX_EMAIL_LENGTH }));
+      throw new ActionError("emailTooLong", t("emailTooLong", { max: MAX_EMAIL_LENGTH }));
     }
     if (!EmailSchema.safeParse(newEmail).success) {
-      throw new Error(t("invalidEmailFormat"));
+      throw new ActionError("invalidEmailFormat", t("invalidEmailFormat"));
     }
 
     const sessionId = await getDemoSessionId();
@@ -290,14 +296,14 @@ export async function updateEmail(data: FormData): Promise<ActionResult> {
         where: { email: newEmail, deletedAt: null, sessionId },
       });
       if (existingPerson && existingPerson.id !== personID) {
-        throw new Error(t("emailAlreadyExists"));
+        throw new ActionError("emailAlreadyExists", t("emailAlreadyExists"));
       }
 
       const personBefore = await tx.person.findFirst({
         where: { id: personID, sessionId },
       });
       if (!personBefore) {
-        throw new Error(t("personNotFound"));
+        throw new ActionError("personNotFound", t("personNotFound"));
       }
       await tx.person.updateMany({
         where: { id: personID, sessionId },
@@ -326,10 +332,10 @@ export async function addManager(data: FormData): Promise<ActionResult> {
     const personID = data.get("personID")?.toString();
 
     if (teamIDs.length === 0) {
-      throw new Error(t("noTeamSelected"));
+      throw new ActionError("noTeamSelected", t("noTeamSelected"));
     }
     if (!personID) {
-      throw new Error(t("noPersonProvided"));
+      throw new ActionError("noPersonProvided", t("noPersonProvided"));
     }
     teamIDs.forEach((id) => validateUUID(id, "teamID"));
     validateUUID(personID, "personID");
@@ -340,13 +346,13 @@ export async function addManager(data: FormData): Promise<ActionResult> {
     await prisma.$transaction(async (tx) => {
       const person = await tx.person.findFirst({ where: { id: personID, sessionId } });
       if (!person) {
-        throw new Error(t("personNotFound"));
+        throw new ActionError("personNotFound", t("personNotFound"));
       }
 
       for (const teamID of teamIDs) {
         const teamBefore = await tx.team.findFirst({ where: { teamId: teamID, sessionId } });
         if (!teamBefore) {
-          throw new Error(t("teamNotFound"));
+          throw new ActionError("teamNotFound", t("teamNotFound"));
         }
         await tx.team.updateMany({
           where: { teamId: teamID, sessionId },
@@ -412,10 +418,10 @@ export async function addMember(data: FormData): Promise<ActionResult> {
     const personID = data.get("personID")?.toString();
 
     if (!teamID) {
-      throw new Error(t("noTeamSelected"));
+      throw new ActionError("noTeamSelected", t("noTeamSelected"));
     }
     if (!personID) {
-      throw new Error(t("noPersonSelected"));
+      throw new ActionError("noPersonSelected", t("noPersonSelected"));
     }
     validateUUID(teamID, "teamID");
     validateUUID(personID, "personID");
@@ -429,7 +435,7 @@ export async function addMember(data: FormData): Promise<ActionResult> {
       });
 
       if (existingMember && !existingMember.deletedAt) {
-        throw new Error(t("alreadyMember"));
+        throw new ActionError("alreadyMember", t("alreadyMember"));
       }
 
       let member;
@@ -469,10 +475,10 @@ export async function createTeam(data: FormData): Promise<ActionResult> {
     await rateLimit("createTeam");
     const name = data.get("name")?.valueOf();
     if (typeof name !== "string" || name.trim().length === 0) {
-      throw new Error(t("invalidName"));
+      throw new ActionError("invalidName", t("invalidName"));
     }
     if (name.trim().length > MAX_NAME_LENGTH) {
-      throw new Error(t("nameTooLong", { max: MAX_NAME_LENGTH }));
+      throw new ActionError("nameTooLong", t("nameTooLong", { max: MAX_NAME_LENGTH }));
     }
 
     const sessionId = await getDemoSessionId();
@@ -507,16 +513,16 @@ export async function updateTeamName(data: FormData): Promise<ActionResult> {
     await rateLimit("updateTeamName");
     const teamID = data.get("teamID")?.toString();
     if (!teamID) {
-      throw new Error(t("noTeamProvided"));
+      throw new ActionError("noTeamProvided", t("noTeamProvided"));
     }
     validateUUID(teamID, "teamID");
 
     const newName = data.get("name")?.toString().trim();
     if (!newName) {
-      throw new Error(t("teamNameRequired"));
+      throw new ActionError("teamNameRequired", t("teamNameRequired"));
     }
     if (newName.length > MAX_NAME_LENGTH) {
-      throw new Error(t("nameTooLong", { max: MAX_NAME_LENGTH }));
+      throw new ActionError("nameTooLong", t("nameTooLong", { max: MAX_NAME_LENGTH }));
     }
 
     const sessionId = await getDemoSessionId();
@@ -525,7 +531,7 @@ export async function updateTeamName(data: FormData): Promise<ActionResult> {
     await prisma.$transaction(async (tx) => {
       const teamBefore = await tx.team.findFirst({ where: { teamId: teamID, sessionId } });
       if (!teamBefore) {
-        throw new Error(t("teamNotFound"));
+        throw new ActionError("teamNotFound", t("teamNotFound"));
       }
       await tx.team.updateMany({
         where: { teamId: teamID, sessionId },
@@ -553,7 +559,7 @@ export async function removeTeam(data: FormData): Promise<ActionResult> {
     await rateLimit("removeTeam");
     const teamIDs = data.getAll("teamID").filter((v): v is string => typeof v === "string");
     if (teamIDs.length === 0) {
-      throw new Error(t("noTeamSelected"));
+      throw new ActionError("noTeamSelected", t("noTeamSelected"));
     }
     teamIDs.forEach((id) => validateUUID(id, "teamID"));
 
@@ -604,10 +610,10 @@ export async function removeMember(data: FormData): Promise<ActionResult> {
     const personID = data.get("personID")?.toString();
 
     if (!teamID) {
-      throw new Error(t("noTeamSelected"));
+      throw new ActionError("noTeamSelected", t("noTeamSelected"));
     }
     if (!personID) {
-      throw new Error(t("noPersonSelected"));
+      throw new ActionError("noPersonSelected", t("noPersonSelected"));
     }
     validateUUID(teamID, "teamID");
     validateUUID(personID, "personID");
@@ -626,7 +632,7 @@ export async function removeMember(data: FormData): Promise<ActionResult> {
       });
 
       if (!existingMember) {
-        throw new Error(t("notMember"));
+        throw new ActionError("notMember", t("notMember"));
       }
 
       await tx.teamMember.update({
@@ -670,15 +676,18 @@ export async function createDepartment(data: FormData): Promise<ActionResult> {
     await rateLimit("createDepartment");
     const name = data.get("name")?.valueOf();
     if (typeof name !== "string" || name.trim().length === 0) {
-      throw new Error(t("invalidName"));
+      throw new ActionError("invalidName", t("invalidName"));
     }
     if (name.trim().length > MAX_NAME_LENGTH) {
-      throw new Error(t("nameTooLong", { max: MAX_NAME_LENGTH }));
+      throw new ActionError("nameTooLong", t("nameTooLong", { max: MAX_NAME_LENGTH }));
     }
 
     const description = data.get("description")?.toString().trim() || null;
     if (description && description.length > MAX_DESCRIPTION_LENGTH) {
-      throw new Error(t("descriptionTooLong", { max: MAX_DESCRIPTION_LENGTH }));
+      throw new ActionError(
+        "descriptionTooLong",
+        t("descriptionTooLong", { max: MAX_DESCRIPTION_LENGTH }),
+      );
     }
 
     const sessionId = await getDemoSessionId();
@@ -715,7 +724,7 @@ export async function removeDepartment(data: FormData): Promise<ActionResult> {
       .getAll("departmentID")
       .filter((v): v is string => typeof v === "string");
     if (departmentIDs.length === 0) {
-      throw new Error(t("noDepartmentSelected"));
+      throw new ActionError("noDepartmentSelected", t("noDepartmentSelected"));
     }
     departmentIDs.forEach((id) => validateUUID(id, "departmentID"));
 
@@ -765,21 +774,24 @@ export async function updateDepartment(data: FormData): Promise<ActionResult> {
     await rateLimit("updateDepartment");
     const departmentID = data.get("departmentID")?.toString();
     if (!departmentID) {
-      throw new Error(t("noDepartmentProvided"));
+      throw new ActionError("noDepartmentProvided", t("noDepartmentProvided"));
     }
     validateUUID(departmentID, "departmentID");
 
     const name = data.get("name")?.toString().trim();
     if (!name) {
-      throw new Error(t("departmentNameRequired"));
+      throw new ActionError("departmentNameRequired", t("departmentNameRequired"));
     }
     if (name.length > MAX_NAME_LENGTH) {
-      throw new Error(t("nameTooLong", { max: MAX_NAME_LENGTH }));
+      throw new ActionError("nameTooLong", t("nameTooLong", { max: MAX_NAME_LENGTH }));
     }
 
     const description = data.get("description")?.toString().trim() || null;
     if (description && description.length > MAX_DESCRIPTION_LENGTH) {
-      throw new Error(t("descriptionTooLong", { max: MAX_DESCRIPTION_LENGTH }));
+      throw new ActionError(
+        "descriptionTooLong",
+        t("descriptionTooLong", { max: MAX_DESCRIPTION_LENGTH }),
+      );
     }
 
     const sessionId = await getDemoSessionId();
@@ -788,7 +800,7 @@ export async function updateDepartment(data: FormData): Promise<ActionResult> {
     await prisma.$transaction(async (tx) => {
       const deptBefore = await tx.department.findFirst({ where: { id: departmentID, sessionId } });
       if (!deptBefore) {
-        throw new Error(t("departmentNotFound"));
+        throw new ActionError("departmentNotFound", t("departmentNotFound"));
       }
       await tx.department.updateMany({
         where: { id: departmentID, sessionId },
@@ -818,7 +830,7 @@ export async function updateDepartmentHead(data: FormData): Promise<ActionResult
     const personID = data.get("personID")?.toString() || null;
 
     if (!departmentID) {
-      throw new Error(t("noDepartmentProvided"));
+      throw new ActionError("noDepartmentProvided", t("noDepartmentProvided"));
     }
     validateUUID(departmentID, "departmentID");
     if (personID) validateUUID(personID, "personID");
@@ -830,12 +842,12 @@ export async function updateDepartmentHead(data: FormData): Promise<ActionResult
       if (personID) {
         const person = await tx.person.findFirst({ where: { id: personID, sessionId } });
         if (!person) {
-          throw new Error(t("personNotFound"));
+          throw new ActionError("personNotFound", t("personNotFound"));
         }
       }
       const deptBefore = await tx.department.findFirst({ where: { id: departmentID, sessionId } });
       if (!deptBefore) {
-        throw new Error(t("departmentNotFound"));
+        throw new ActionError("departmentNotFound", t("departmentNotFound"));
       }
       await tx.department.updateMany({
         where: { id: departmentID, sessionId },
@@ -865,8 +877,8 @@ export async function assignTeamToDepartment(data: FormData): Promise<ActionResu
     const departmentID = data.get("departmentID")?.toString();
     const teamID = data.get("teamID")?.toString();
 
-    if (!departmentID) throw new Error(t("noDepartmentProvided"));
-    if (!teamID) throw new Error(t("noTeamProvided"));
+    if (!departmentID) throw new ActionError("noDepartmentProvided", t("noDepartmentProvided"));
+    if (!teamID) throw new ActionError("noTeamProvided", t("noTeamProvided"));
     validateUUID(departmentID, "departmentID");
     validateUUID(teamID, "teamID");
 
@@ -876,11 +888,11 @@ export async function assignTeamToDepartment(data: FormData): Promise<ActionResu
     await prisma.$transaction(async (tx) => {
       const department = await tx.department.findFirst({ where: { id: departmentID, sessionId } });
       if (!department) {
-        throw new Error(t("departmentNotFound"));
+        throw new ActionError("departmentNotFound", t("departmentNotFound"));
       }
       const teamBefore = await tx.team.findFirst({ where: { teamId: teamID, sessionId } });
       if (!teamBefore) {
-        throw new Error(t("teamNotFound"));
+        throw new ActionError("teamNotFound", t("teamNotFound"));
       }
       await tx.team.updateMany({
         where: { teamId: teamID, sessionId },
@@ -910,7 +922,7 @@ export async function removeTeamFromDepartment(data: FormData): Promise<ActionRe
     await rateLimit("removeTeamFromDepartment");
     const teamID = data.get("teamID")?.toString();
 
-    if (!teamID) throw new Error(t("noTeamProvided"));
+    if (!teamID) throw new ActionError("noTeamProvided", t("noTeamProvided"));
     validateUUID(teamID, "teamID");
 
     const sessionId = await getDemoSessionId();
@@ -919,7 +931,7 @@ export async function removeTeamFromDepartment(data: FormData): Promise<ActionRe
     await prisma.$transaction(async (tx) => {
       const teamBefore = await tx.team.findFirst({ where: { teamId: teamID, sessionId } });
       if (!teamBefore) {
-        throw new Error(t("teamNotFound"));
+        throw new ActionError("teamNotFound", t("teamNotFound"));
       }
       await tx.team.updateMany({
         where: { teamId: teamID, sessionId },
@@ -1285,8 +1297,8 @@ export async function updateUserRole(data: FormData): Promise<ActionResult> {
     const userId = data.get("userId")?.toString();
     const newRole = data.get("role")?.toString();
 
-    if (!userId) throw new Error(t("noUserProvided"));
-    if (!newRole) throw new Error(t("noRoleProvided"));
+    if (!userId) throw new ActionError("noUserProvided", t("noUserProvided"));
+    if (!newRole) throw new ActionError("noRoleProvided", t("noRoleProvided"));
     validateUUID(userId, "userId");
 
     const demoSessionId = await getDemoSessionId();
@@ -1294,13 +1306,13 @@ export async function updateUserRole(data: FormData): Promise<ActionResult> {
       ? ["superuser", "administrator", "user", "guest"]
       : ["administrator", "user", "guest"];
     if (!validRoles.includes(newRole)) {
-      throw new Error(t("invalidRole"));
+      throw new ActionError("invalidRole", t("invalidRole"));
     }
 
     const targetUser = await prisma.user.findUnique({ where: { id: userId } });
-    if (!targetUser) throw new Error(t("userNotFound"));
+    if (!targetUser) throw new ActionError("userNotFound", t("userNotFound"));
     if (!demoSessionId && targetUser.role === "superuser") {
-      throw new Error(t("cannotChangeSuperuserRole"));
+      throw new ActionError("cannotChangeSuperuserRole", t("cannotChangeSuperuserRole"));
     }
 
     const ctx = await captureAuditContext();
@@ -1334,20 +1346,23 @@ export async function updateUserPermission(data: FormData): Promise<ActionResult
     const permissionKey = data.get("permissionKey")?.toString();
     const action = data.get("action")?.toString();
 
-    if (!userId) throw new Error(t("noUserProvided"));
-    if (!permissionKey) throw new Error(t("noPermissionProvided"));
-    if (!action) throw new Error(t("noActionProvided"));
+    if (!userId) throw new ActionError("noUserProvided", t("noUserProvided"));
+    if (!permissionKey) throw new ActionError("noPermissionProvided", t("noPermissionProvided"));
+    if (!action) throw new ActionError("noActionProvided", t("noActionProvided"));
     validateUUID(userId, "userId");
 
     const demoSessionId = await getDemoSessionId();
     const targetUser = await prisma.user.findUnique({ where: { id: userId } });
-    if (!targetUser) throw new Error(t("userNotFound"));
+    if (!targetUser) throw new ActionError("userNotFound", t("userNotFound"));
     if (!demoSessionId && targetUser.role === "superuser") {
-      throw new Error(t("cannotModifySuperuserPermissions"));
+      throw new ActionError(
+        "cannotModifySuperuserPermissions",
+        t("cannotModifySuperuserPermissions"),
+      );
     }
 
     const permission = await prisma.permission.findUnique({ where: { key: permissionKey } });
-    if (!permission) throw new Error(t("permissionNotFound"));
+    if (!permission) throw new ActionError("permissionNotFound", t("permissionNotFound"));
 
     const ctx = await captureAuditContext();
     const auditEntries: DeferredAuditEntry[] = [];
@@ -1401,24 +1416,24 @@ export async function kickOutUser(data: FormData): Promise<ActionResult> {
     await rateLimit("kickOutUser");
 
     const userId = data.get("userId")?.toString();
-    if (!userId) throw new Error(t("noUserProvided"));
+    if (!userId) throw new ActionError("noUserProvided", t("noUserProvided"));
     validateUUID(userId, "userId");
 
     const session = await auth();
     const demoSessionId = await getDemoSessionId();
 
     const targetUser = await prisma.user.findUnique({ where: { id: userId } });
-    if (!targetUser) throw new Error(t("userNotFound"));
+    if (!targetUser) throw new ActionError("userNotFound", t("userNotFound"));
     if (targetUser.role === "superuser") {
-      throw new Error(t("cannotKickSuperuser"));
+      throw new ActionError("cannotKickSuperuser", t("cannotKickSuperuser"));
     }
     // Demo sessions can only kick the demo user — prevent deleting real OAuth users
     if (demoSessionId && targetUser.email !== "demo@hrmanager.app") {
-      throw new Error(t("demoCannotManageUsers"));
+      throw new ActionError("demoCannotManageUsers", t("demoCannotManageUsers"));
     }
     // Prevent self-kick — deleting your own user orphans the session
     if (session?.user?.id === userId) {
-      throw new Error(t("cannotKickYourself"));
+      throw new ActionError("cannotKickYourself", t("cannotKickYourself"));
     }
 
     const ctx = await captureAuditContext();
@@ -1443,17 +1458,17 @@ export async function updateProfileName(data: FormData): Promise<ActionResult> {
   return safe(async () => {
     const t = await getTranslations("errors");
     const session = await auth();
-    if (!session?.user?.id) throw new Error(t("notAuthenticated"));
+    if (!session?.user?.id) throw new ActionError("notAuthenticated", t("notAuthenticated"));
     await rateLimit("updateProfileName");
 
     const name = data.get("name")?.toString();
-    if (!name || name.trim().length === 0) throw new Error(t("nameRequired"));
+    if (!name || name.trim().length === 0) throw new ActionError("nameRequired", t("nameRequired"));
     if (name.trim().length > MAX_NAME_LENGTH) {
-      throw new Error(t("nameTooLong", { max: MAX_NAME_LENGTH }));
+      throw new ActionError("nameTooLong", t("nameTooLong", { max: MAX_NAME_LENGTH }));
     }
 
     const user = await prisma.user.findUnique({ where: { id: session.user.id } });
-    if (!user) throw new Error(t("userNotFound"));
+    if (!user) throw new ActionError("userNotFound", t("userNotFound"));
 
     const ctx = await captureAuditContext();
     const auditEntries: DeferredAuditEntry[] = [];
@@ -1481,7 +1496,7 @@ export async function updateProfileImage(data: FormData): Promise<ActionResult> 
   return safe(async () => {
     const t = await getTranslations("errors");
     const session = await auth();
-    if (!session?.user?.id) throw new Error(t("notAuthenticated"));
+    if (!session?.user?.id) throw new ActionError("notAuthenticated", t("notAuthenticated"));
     await rateLimit("updateProfileImage");
 
     const image = data.get("image")?.toString() ?? "";
@@ -1489,21 +1504,21 @@ export async function updateProfileImage(data: FormData): Promise<ActionResult> 
 
     if (trimmed.length > 0) {
       if (trimmed.length > MAX_URL_LENGTH) {
-        throw new Error(t("urlTooLong", { max: MAX_URL_LENGTH }));
+        throw new ActionError("urlTooLong", t("urlTooLong", { max: MAX_URL_LENGTH }));
       }
       let parsedUrl: URL | null = null;
       try {
         parsedUrl = new URL(trimmed);
       } catch {
-        throw new Error(t("invalidUrlFormat"));
+        throw new ActionError("invalidUrlFormat", t("invalidUrlFormat"));
       }
       if (!["http:", "https:"].includes(parsedUrl.protocol)) {
-        throw new Error(t("invalidUrlProtocol"));
+        throw new ActionError("invalidUrlProtocol", t("invalidUrlProtocol"));
       }
     }
 
     const user = await prisma.user.findUnique({ where: { id: session.user.id } });
-    if (!user) throw new Error(t("userNotFound"));
+    if (!user) throw new ActionError("userNotFound", t("userNotFound"));
 
     const newImage = trimmed.length > 0 ? trimmed : null;
 
@@ -1536,32 +1551,32 @@ export interface ImportResult {
 }
 
 export async function importPersonsCsv(
-  _prevState: { error?: string; result?: ImportResult } | null,
+  _prevState: { error?: string; code?: ErrorCode; result?: ImportResult } | null,
   data: FormData,
-): Promise<{ error?: string; result?: ImportResult }> {
+): Promise<{ error?: string; code?: ErrorCode; result?: ImportResult }> {
   await requirePermission("data:import");
   await rateLimit("importPersonsCsv");
   const t = await getTranslations("errors");
 
   const file = data.get("file");
   if (!(file instanceof File) || file.size === 0) {
-    return { error: t("csvNoFile") };
+    return { error: t("csvNoFile"), code: "csvNoFile" };
   }
   if (!file.name.endsWith(".csv")) {
-    return { error: t("csvNotCsvFile") };
+    return { error: t("csvNotCsvFile"), code: "csvNotCsvFile" };
   }
   if (file.size > MAX_IMPORT_FILE_SIZE) {
-    return { error: t("csvFileTooLarge") };
+    return { error: t("csvFileTooLarge"), code: "csvFileTooLarge" };
   }
 
   const text = await file.text();
   const rows = parseCSV(text);
 
   if (rows.length <= 1) {
-    return { error: t("csvEmpty") };
+    return { error: t("csvEmpty"), code: "csvEmpty" };
   }
   if (rows.length - 1 > MAX_IMPORT_ROWS) {
-    return { error: t("csvTooManyRows", { max: MAX_IMPORT_ROWS }) };
+    return { error: t("csvTooManyRows", { max: MAX_IMPORT_ROWS }), code: "csvTooManyRows" };
   }
 
   const sessionId = await getDemoSessionId();
@@ -1744,19 +1759,24 @@ export async function createLeaveType(data: FormData): Promise<ActionResult> {
     await rateLimit("createLeaveType");
 
     const name = data.get("name")?.valueOf();
-    if (typeof name !== "string" || name.trim().length === 0) throw new Error(t("invalidName"));
+    if (typeof name !== "string" || name.trim().length === 0)
+      throw new ActionError("invalidName", t("invalidName"));
     if (name.trim().length > MAX_NAME_LENGTH)
-      throw new Error(t("nameTooLong", { max: MAX_NAME_LENGTH }));
+      throw new ActionError("nameTooLong", t("nameTooLong", { max: MAX_NAME_LENGTH }));
 
     const description = data.get("description")?.valueOf();
     const descStr =
       typeof description === "string" && description.trim().length > 0 ? description.trim() : null;
     if (descStr && descStr.length > MAX_DESCRIPTION_LENGTH)
-      throw new Error(t("descriptionTooLong", { max: MAX_DESCRIPTION_LENGTH }));
+      throw new ActionError(
+        "descriptionTooLong",
+        t("descriptionTooLong", { max: MAX_DESCRIPTION_LENGTH }),
+      );
 
     const defaultDaysStr = data.get("defaultDays")?.valueOf();
     const defaultDays = typeof defaultDaysStr === "string" ? parseInt(defaultDaysStr, 10) : 0;
-    if (isNaN(defaultDays) || defaultDays < 0) throw new Error(t("invalidDaysValue"));
+    if (isNaN(defaultDays) || defaultDays < 0)
+      throw new ActionError("invalidDaysValue", t("invalidDaysValue"));
 
     const color = (data.get("color")?.valueOf() as string) ?? "#1976d2";
 
@@ -1767,7 +1787,7 @@ export async function createLeaveType(data: FormData): Promise<ActionResult> {
       const existing = await tx.leaveType.findFirst({
         where: { name: name.trim(), deletedAt: null, sessionId },
       });
-      if (existing) throw new Error(t("leaveTypeAlreadyExists"));
+      if (existing) throw new ActionError("leaveTypeAlreadyExists", t("leaveTypeAlreadyExists"));
 
       const leaveType = await tx.leaveType.create({
         data: { name: name.trim(), description: descStr, defaultDays, color, sessionId },
@@ -1792,13 +1812,14 @@ export async function updateLeaveType(data: FormData): Promise<ActionResult> {
     await rateLimit("updateLeaveType");
 
     const id = data.get("id")?.valueOf();
-    if (typeof id !== "string") throw new Error(t("invalidId"));
+    if (typeof id !== "string") throw new ActionError("invalidId", t("invalidId"));
     validateUUID(id, "leaveTypeId");
 
     const name = data.get("name")?.valueOf();
-    if (typeof name !== "string" || name.trim().length === 0) throw new Error(t("invalidName"));
+    if (typeof name !== "string" || name.trim().length === 0)
+      throw new ActionError("invalidName", t("invalidName"));
     if (name.trim().length > MAX_NAME_LENGTH)
-      throw new Error(t("nameTooLong", { max: MAX_NAME_LENGTH }));
+      throw new ActionError("nameTooLong", t("nameTooLong", { max: MAX_NAME_LENGTH }));
 
     const description = data.get("description")?.valueOf();
     const descStr =
@@ -1806,7 +1827,8 @@ export async function updateLeaveType(data: FormData): Promise<ActionResult> {
 
     const defaultDaysStr = data.get("defaultDays")?.valueOf();
     const defaultDays = typeof defaultDaysStr === "string" ? parseInt(defaultDaysStr, 10) : 0;
-    if (isNaN(defaultDays) || defaultDays < 0) throw new Error(t("invalidDaysValue"));
+    if (isNaN(defaultDays) || defaultDays < 0)
+      throw new ActionError("invalidDaysValue", t("invalidDaysValue"));
 
     const color = (data.get("color")?.valueOf() as string) ?? "#1976d2";
 
@@ -1817,12 +1839,12 @@ export async function updateLeaveType(data: FormData): Promise<ActionResult> {
       const existing = await tx.leaveType.findFirst({
         where: { id, deletedAt: null, sessionId },
       });
-      if (!existing) throw new Error(t("leaveTypeNotFound"));
+      if (!existing) throw new ActionError("leaveTypeNotFound", t("leaveTypeNotFound"));
 
       const duplicate = await tx.leaveType.findFirst({
         where: { name: name.trim(), deletedAt: null, sessionId, NOT: { id } },
       });
-      if (duplicate) throw new Error(t("leaveTypeAlreadyExists"));
+      if (duplicate) throw new ActionError("leaveTypeAlreadyExists", t("leaveTypeAlreadyExists"));
 
       await tx.leaveType.update({
         where: { id },
@@ -1849,7 +1871,7 @@ export async function deleteLeaveType(data: FormData): Promise<ActionResult> {
     await rateLimit("deleteLeaveType");
 
     const id = data.get("id")?.valueOf();
-    if (typeof id !== "string") throw new Error(t("invalidId"));
+    if (typeof id !== "string") throw new ActionError("invalidId", t("invalidId"));
     validateUUID(id, "leaveTypeId");
 
     const sessionId = await getDemoSessionId();
@@ -1860,7 +1882,7 @@ export async function deleteLeaveType(data: FormData): Promise<ActionResult> {
       const existing = await tx.leaveType.findFirst({
         where: { id, deletedAt: null, sessionId },
       });
-      if (!existing) throw new Error(t("leaveTypeNotFound"));
+      if (!existing) throw new ActionError("leaveTypeNotFound", t("leaveTypeNotFound"));
 
       await tx.leaveType.update({ where: { id }, data: { deletedAt: now } });
       auditEntries.push({
@@ -1883,32 +1905,35 @@ export async function createLeaveRequest(data: FormData): Promise<ActionResult> 
     await rateLimit("createLeaveRequest");
 
     const personId = data.get("personId")?.valueOf();
-    if (typeof personId !== "string") throw new Error(t("noPersonSelected"));
+    if (typeof personId !== "string")
+      throw new ActionError("noPersonSelected", t("noPersonSelected"));
     validateUUID(personId, "personId");
 
     const leaveTypeId = data.get("leaveTypeId")?.valueOf();
-    if (typeof leaveTypeId !== "string") throw new Error(t("leaveTypeRequired"));
+    if (typeof leaveTypeId !== "string")
+      throw new ActionError("leaveTypeRequired", t("leaveTypeRequired"));
     validateUUID(leaveTypeId, "leaveTypeId");
 
     const startDateStr = data.get("startDate")?.valueOf();
     const endDateStr = data.get("endDate")?.valueOf();
     if (typeof startDateStr !== "string" || typeof endDateStr !== "string")
-      throw new Error(t("invalidDateRange"));
+      throw new ActionError("invalidDateRange", t("invalidDateRange"));
 
     const startDate = new Date(startDateStr);
     const endDate = new Date(endDateStr);
     if (isNaN(startDate.getTime()) || isNaN(endDate.getTime()))
-      throw new Error(t("invalidDateRange"));
-    if (endDate < startDate) throw new Error(t("endDateBeforeStartDate"));
+      throw new ActionError("invalidDateRange", t("invalidDateRange"));
+    if (endDate < startDate)
+      throw new ActionError("endDateBeforeStartDate", t("endDateBeforeStartDate"));
 
     const daysStr = data.get("days")?.valueOf();
     const days = typeof daysStr === "string" ? parseInt(daysStr, 10) : 0;
-    if (isNaN(days) || days < 1) throw new Error(t("invalidDaysValue"));
+    if (isNaN(days) || days < 1) throw new ActionError("invalidDaysValue", t("invalidDaysValue"));
 
     const note = data.get("note")?.valueOf();
     const noteStr = typeof note === "string" && note.trim().length > 0 ? note.trim() : null;
     if (noteStr && noteStr.length > MAX_LEAVE_NOTE_LENGTH)
-      throw new Error(t("noteTooLong", { max: MAX_LEAVE_NOTE_LENGTH }));
+      throw new ActionError("noteTooLong", t("noteTooLong", { max: MAX_LEAVE_NOTE_LENGTH }));
 
     const sessionId = await getDemoSessionId();
     const ctx = await captureAuditContext();
@@ -1917,12 +1942,12 @@ export async function createLeaveRequest(data: FormData): Promise<ActionResult> 
       const person = await tx.person.findFirst({
         where: { id: personId, deletedAt: null, sessionId },
       });
-      if (!person) throw new Error(t("personNotFound"));
+      if (!person) throw new ActionError("personNotFound", t("personNotFound"));
 
       const leaveType = await tx.leaveType.findFirst({
         where: { id: leaveTypeId, deletedAt: null, sessionId },
       });
-      if (!leaveType) throw new Error(t("leaveTypeNotFound"));
+      if (!leaveType) throw new ActionError("leaveTypeNotFound", t("leaveTypeNotFound"));
 
       // Check for overlapping leave requests
       const overlapping = await tx.leaveRequest.findFirst({
@@ -1935,7 +1960,8 @@ export async function createLeaveRequest(data: FormData): Promise<ActionResult> 
           endDate: { gte: startDate },
         },
       });
-      if (overlapping) throw new Error(t("leaveRequestOverlapping"));
+      if (overlapping)
+        throw new ActionError("leaveRequestOverlapping", t("leaveRequestOverlapping"));
 
       // Check balance
       const year = startDate.getFullYear();
@@ -1943,7 +1969,7 @@ export async function createLeaveRequest(data: FormData): Promise<ActionResult> 
         where: { personId_leaveTypeId_year: { personId, leaveTypeId, year } },
       });
       if (balance && balance.allocated - balance.used < days)
-        throw new Error(t("insufficientLeaveBalance"));
+        throw new ActionError("insufficientLeaveBalance", t("insufficientLeaveBalance"));
 
       const request = await tx.leaveRequest.create({
         data: {
@@ -1982,11 +2008,12 @@ export async function reviewLeaveRequest(data: FormData): Promise<ActionResult> 
     await rateLimit("reviewLeaveRequest");
 
     const id = data.get("id")?.valueOf();
-    if (typeof id !== "string") throw new Error(t("invalidId"));
+    if (typeof id !== "string") throw new ActionError("invalidId", t("invalidId"));
     validateUUID(id, "leaveRequestId");
 
     const action = data.get("action")?.valueOf();
-    if (action !== "approved" && action !== "rejected") throw new Error(t("invalidLeaveAction"));
+    if (action !== "approved" && action !== "rejected")
+      throw new ActionError("invalidLeaveAction", t("invalidLeaveAction"));
 
     const reviewerId = data.get("reviewerId")?.valueOf();
     const reviewerIdStr = typeof reviewerId === "string" ? reviewerId : null;
@@ -1996,7 +2023,7 @@ export async function reviewLeaveRequest(data: FormData): Promise<ActionResult> 
     const reviewNoteStr =
       typeof reviewNote === "string" && reviewNote.trim().length > 0 ? reviewNote.trim() : null;
     if (reviewNoteStr && reviewNoteStr.length > MAX_LEAVE_NOTE_LENGTH)
-      throw new Error(t("noteTooLong", { max: MAX_LEAVE_NOTE_LENGTH }));
+      throw new ActionError("noteTooLong", t("noteTooLong", { max: MAX_LEAVE_NOTE_LENGTH }));
 
     const sessionId = await getDemoSessionId();
     const ctx = await captureAuditContext();
@@ -2006,7 +2033,7 @@ export async function reviewLeaveRequest(data: FormData): Promise<ActionResult> 
         where: { id, deletedAt: null, sessionId, status: "pending" },
         include: { person: true, leaveType: true },
       });
-      if (!request) throw new Error(t("leaveRequestNotFound"));
+      if (!request) throw new ActionError("leaveRequestNotFound", t("leaveRequestNotFound"));
 
       await tx.leaveRequest.update({
         where: { id },
@@ -2068,7 +2095,7 @@ export async function deleteLeaveRequest(data: FormData): Promise<ActionResult> 
     await rateLimit("deleteLeaveRequest");
 
     const id = data.get("id")?.valueOf();
-    if (typeof id !== "string") throw new Error(t("invalidId"));
+    if (typeof id !== "string") throw new ActionError("invalidId", t("invalidId"));
     validateUUID(id, "leaveRequestId");
 
     const sessionId = await getDemoSessionId();
@@ -2080,8 +2107,9 @@ export async function deleteLeaveRequest(data: FormData): Promise<ActionResult> 
         where: { id, deletedAt: null, sessionId },
         include: { person: true, leaveType: true },
       });
-      if (!request) throw new Error(t("leaveRequestNotFound"));
-      if (request.status !== "pending") throw new Error(t("cannotDeleteNonPendingRequest"));
+      if (!request) throw new ActionError("leaveRequestNotFound", t("leaveRequestNotFound"));
+      if (request.status !== "pending")
+        throw new ActionError("cannotDeleteNonPendingRequest", t("cannotDeleteNonPendingRequest"));
 
       await tx.leaveRequest.update({ where: { id }, data: { deletedAt: now } });
       auditEntries.push({
@@ -2110,20 +2138,24 @@ export async function allocateLeaveBalance(data: FormData): Promise<ActionResult
     await rateLimit("allocateLeaveBalance");
 
     const personId = data.get("personId")?.valueOf();
-    if (typeof personId !== "string") throw new Error(t("noPersonSelected"));
+    if (typeof personId !== "string")
+      throw new ActionError("noPersonSelected", t("noPersonSelected"));
     validateUUID(personId, "personId");
 
     const leaveTypeId = data.get("leaveTypeId")?.valueOf();
-    if (typeof leaveTypeId !== "string") throw new Error(t("leaveTypeRequired"));
+    if (typeof leaveTypeId !== "string")
+      throw new ActionError("leaveTypeRequired", t("leaveTypeRequired"));
     validateUUID(leaveTypeId, "leaveTypeId");
 
     const yearStr = data.get("year")?.valueOf();
     const year = typeof yearStr === "string" ? parseInt(yearStr, 10) : new Date().getFullYear();
-    if (isNaN(year) || year < 2000 || year > 2100) throw new Error(t("invalidYear"));
+    if (isNaN(year) || year < 2000 || year > 2100)
+      throw new ActionError("invalidYear", t("invalidYear"));
 
     const allocatedStr = data.get("allocated")?.valueOf();
     const allocated = typeof allocatedStr === "string" ? parseInt(allocatedStr, 10) : 0;
-    if (isNaN(allocated) || allocated < 0) throw new Error(t("invalidDaysValue"));
+    if (isNaN(allocated) || allocated < 0)
+      throw new ActionError("invalidDaysValue", t("invalidDaysValue"));
 
     const sessionId = await getDemoSessionId();
     const ctx = await captureAuditContext();
@@ -2132,12 +2164,12 @@ export async function allocateLeaveBalance(data: FormData): Promise<ActionResult
       const person = await tx.person.findFirst({
         where: { id: personId, deletedAt: null, sessionId },
       });
-      if (!person) throw new Error(t("personNotFound"));
+      if (!person) throw new ActionError("personNotFound", t("personNotFound"));
 
       const leaveType = await tx.leaveType.findFirst({
         where: { id: leaveTypeId, deletedAt: null, sessionId },
       });
-      if (!leaveType) throw new Error(t("leaveTypeNotFound"));
+      if (!leaveType) throw new ActionError("leaveTypeNotFound", t("leaveTypeNotFound"));
 
       const balance = await tx.leaveBalance.upsert({
         where: { personId_leaveTypeId_year: { personId, leaveTypeId, year } },
@@ -2177,13 +2209,13 @@ export async function createReviewTemplate(data: FormData): Promise<ActionResult
     const description = data.get("description");
 
     if (typeof name !== "string" || name.trim().length === 0) {
-      throw new Error(t("invalidName"));
+      throw new ActionError("invalidName", t("invalidName"));
     }
     if (name.trim().length > MAX_NAME_LENGTH) {
-      throw new Error(t("nameTooLong", { max: MAX_NAME_LENGTH }));
+      throw new ActionError("nameTooLong", t("nameTooLong", { max: MAX_NAME_LENGTH }));
     }
     if (description !== null && typeof description !== "string") {
-      throw new Error(t("unexpectedError"));
+      throw new ActionError("unexpectedError", t("unexpectedError"));
     }
 
     const sessionId = await getDemoSessionId();
@@ -2223,7 +2255,7 @@ export async function deleteReviewTemplate(data: FormData): Promise<ActionResult
 
     const templateId = data.get("templateId");
     if (typeof templateId !== "string" || !templateId.trim()) {
-      throw new Error(t("unexpectedError"));
+      throw new ActionError("unexpectedError", t("unexpectedError"));
     }
 
     const sessionId = await getDemoSessionId();
@@ -2234,7 +2266,7 @@ export async function deleteReviewTemplate(data: FormData): Promise<ActionResult
       const template = await tx.reviewTemplate.findFirst({
         where: { id: templateId, deletedAt: null, sessionId },
       });
-      if (!template) throw new Error(t("reviewTemplateNotFound"));
+      if (!template) throw new ActionError("reviewTemplateNotFound", t("reviewTemplateNotFound"));
 
       await tx.reviewTemplate.update({
         where: { id: templateId },
@@ -2270,13 +2302,13 @@ export async function addReviewQuestion(data: FormData): Promise<ActionResult> {
     const requiredRaw = data.get("required");
 
     if (typeof templateId !== "string" || !templateId.trim()) {
-      throw new Error(t("unexpectedError"));
+      throw new ActionError("unexpectedError", t("unexpectedError"));
     }
     if (typeof text !== "string" || text.trim().length === 0) {
-      throw new Error(t("invalidName"));
+      throw new ActionError("invalidName", t("invalidName"));
     }
     if (type !== "RATING" && type !== "TEXT") {
-      throw new Error(t("invalidQuestionType"));
+      throw new ActionError("invalidQuestionType", t("invalidQuestionType"));
     }
 
     const scaleMin = scaleMinRaw ? parseInt(String(scaleMinRaw), 10) : null;
@@ -2291,7 +2323,7 @@ export async function addReviewQuestion(data: FormData): Promise<ActionResult> {
       const template = await tx.reviewTemplate.findFirst({
         where: { id: templateId, deletedAt: null, sessionId },
       });
-      if (!template) throw new Error(t("reviewTemplateNotFound"));
+      if (!template) throw new ActionError("reviewTemplateNotFound", t("reviewTemplateNotFound"));
 
       const existingQuestions = Array.isArray(template.questions)
         ? (template.questions as ReviewQuestion[])
@@ -2335,10 +2367,10 @@ export async function removeReviewQuestion(data: FormData): Promise<ActionResult
     const questionId = data.get("questionId");
 
     if (typeof templateId !== "string" || !templateId.trim()) {
-      throw new Error(t("unexpectedError"));
+      throw new ActionError("unexpectedError", t("unexpectedError"));
     }
     if (typeof questionId !== "string" || !questionId.trim()) {
-      throw new Error(t("unexpectedError"));
+      throw new ActionError("unexpectedError", t("unexpectedError"));
     }
 
     const sessionId = await getDemoSessionId();
@@ -2349,7 +2381,7 @@ export async function removeReviewQuestion(data: FormData): Promise<ActionResult
       const template = await tx.reviewTemplate.findFirst({
         where: { id: templateId, deletedAt: null, sessionId },
       });
-      if (!template) throw new Error(t("reviewTemplateNotFound"));
+      if (!template) throw new ActionError("reviewTemplateNotFound", t("reviewTemplateNotFound"));
 
       const existingQuestions = Array.isArray(template.questions)
         ? (template.questions as ReviewQuestion[])
@@ -2389,19 +2421,19 @@ export async function createReviewCycle(data: FormData): Promise<ActionResult> {
     const endDateRaw = data.get("endDate");
 
     if (typeof name !== "string" || name.trim().length === 0) {
-      throw new Error(t("invalidName"));
+      throw new ActionError("invalidName", t("invalidName"));
     }
     if (name.trim().length > MAX_NAME_LENGTH) {
-      throw new Error(t("nameTooLong", { max: MAX_NAME_LENGTH }));
+      throw new ActionError("nameTooLong", t("nameTooLong", { max: MAX_NAME_LENGTH }));
     }
 
     const startDate = startDateRaw ? new Date(String(startDateRaw)) : null;
     const endDate = endDateRaw ? new Date(String(endDateRaw)) : null;
     if (!startDate || isNaN(startDate.getTime())) {
-      throw new Error(t("unexpectedError"));
+      throw new ActionError("unexpectedError", t("unexpectedError"));
     }
     if (!endDate || isNaN(endDate.getTime())) {
-      throw new Error(t("unexpectedError"));
+      throw new ActionError("unexpectedError", t("unexpectedError"));
     }
 
     const resolvedTemplateId =
@@ -2416,7 +2448,7 @@ export async function createReviewCycle(data: FormData): Promise<ActionResult> {
         const tpl = await tx.reviewTemplate.findFirst({
           where: { id: resolvedTemplateId, deletedAt: null, sessionId },
         });
-        if (!tpl) throw new Error(t("reviewTemplateNotFound"));
+        if (!tpl) throw new ActionError("reviewTemplateNotFound", t("reviewTemplateNotFound"));
       }
 
       const cycle = await tx.reviewCycle.create({
@@ -2452,7 +2484,7 @@ export async function deleteReviewCycle(data: FormData): Promise<ActionResult> {
 
     const cycleId = data.get("cycleId");
     if (typeof cycleId !== "string" || !cycleId.trim()) {
-      throw new Error(t("unexpectedError"));
+      throw new ActionError("unexpectedError", t("unexpectedError"));
     }
 
     const sessionId = await getDemoSessionId();
@@ -2463,7 +2495,7 @@ export async function deleteReviewCycle(data: FormData): Promise<ActionResult> {
       const cycle = await tx.reviewCycle.findFirst({
         where: { id: cycleId, deletedAt: null, sessionId },
       });
-      if (!cycle) throw new Error(t("reviewCycleNotFound"));
+      if (!cycle) throw new ActionError("reviewCycleNotFound", t("reviewCycleNotFound"));
 
       await tx.reviewCycle.update({
         where: { id: cycleId },
@@ -2492,7 +2524,7 @@ export async function openReviewCycle(data: FormData): Promise<ActionResult> {
 
     const cycleId = data.get("cycleId");
     if (typeof cycleId !== "string" || !cycleId.trim()) {
-      throw new Error(t("unexpectedError"));
+      throw new ActionError("unexpectedError", t("unexpectedError"));
     }
 
     const sessionId = await getDemoSessionId();
@@ -2503,8 +2535,9 @@ export async function openReviewCycle(data: FormData): Promise<ActionResult> {
       const cycle = await tx.reviewCycle.findFirst({
         where: { id: cycleId, deletedAt: null, sessionId },
       });
-      if (!cycle) throw new Error(t("reviewCycleNotFound"));
-      if (cycle.status !== "DRAFT") throw new Error(t("reviewCycleNotDraft"));
+      if (!cycle) throw new ActionError("reviewCycleNotFound", t("reviewCycleNotFound"));
+      if (cycle.status !== "DRAFT")
+        throw new ActionError("reviewCycleNotDraft", t("reviewCycleNotDraft"));
 
       await tx.reviewCycle.update({
         where: { id: cycleId },
@@ -2535,7 +2568,7 @@ export async function closeReviewCycle(data: FormData): Promise<ActionResult> {
 
     const cycleId = data.get("cycleId");
     if (typeof cycleId !== "string" || !cycleId.trim()) {
-      throw new Error(t("unexpectedError"));
+      throw new ActionError("unexpectedError", t("unexpectedError"));
     }
 
     const sessionId = await getDemoSessionId();
@@ -2546,9 +2579,11 @@ export async function closeReviewCycle(data: FormData): Promise<ActionResult> {
       const cycle = await tx.reviewCycle.findFirst({
         where: { id: cycleId, deletedAt: null, sessionId },
       });
-      if (!cycle) throw new Error(t("reviewCycleNotFound"));
-      if (cycle.status === "CLOSED") throw new Error(t("reviewCycleAlreadyClosed"));
-      if (cycle.status !== "OPEN") throw new Error(t("reviewCycleNotOpen"));
+      if (!cycle) throw new ActionError("reviewCycleNotFound", t("reviewCycleNotFound"));
+      if (cycle.status === "CLOSED")
+        throw new ActionError("reviewCycleAlreadyClosed", t("reviewCycleAlreadyClosed"));
+      if (cycle.status !== "OPEN")
+        throw new ActionError("reviewCycleNotOpen", t("reviewCycleNotOpen"));
 
       await tx.reviewCycle.update({
         where: { id: cycleId },
@@ -2583,16 +2618,16 @@ export async function addReviewRequest(data: FormData): Promise<ActionResult> {
     const type = data.get("type");
 
     if (typeof cycleId !== "string" || !cycleId.trim()) {
-      throw new Error(t("unexpectedError"));
+      throw new ActionError("unexpectedError", t("unexpectedError"));
     }
     if (typeof subjectId !== "string" || !subjectId.trim()) {
-      throw new Error(t("noPersonSelected"));
+      throw new ActionError("noPersonSelected", t("noPersonSelected"));
     }
     if (typeof reviewerId !== "string" || !reviewerId.trim()) {
-      throw new Error(t("noPersonSelected"));
+      throw new ActionError("noPersonSelected", t("noPersonSelected"));
     }
     if (!["SELF", "MANAGER", "PEER", "DIRECT_REPORT"].includes(String(type))) {
-      throw new Error(t("unexpectedError"));
+      throw new ActionError("unexpectedError", t("unexpectedError"));
     }
 
     const sessionId = await getDemoSessionId();
@@ -2603,7 +2638,7 @@ export async function addReviewRequest(data: FormData): Promise<ActionResult> {
       const cycle = await tx.reviewCycle.findFirst({
         where: { id: cycleId, deletedAt: null, sessionId },
       });
-      if (!cycle) throw new Error(t("reviewCycleNotFound"));
+      if (!cycle) throw new ActionError("reviewCycleNotFound", t("reviewCycleNotFound"));
 
       const existing = await tx.reviewRequest.findUnique({
         where: {
@@ -2615,7 +2650,7 @@ export async function addReviewRequest(data: FormData): Promise<ActionResult> {
           },
         },
       });
-      if (existing) throw new Error(t("reviewAlreadyExists"));
+      if (existing) throw new ActionError("reviewAlreadyExists", t("reviewAlreadyExists"));
 
       const req = await tx.reviewRequest.create({
         data: {
@@ -2652,7 +2687,7 @@ export async function removeReviewRequest(data: FormData): Promise<ActionResult>
     const cycleId = data.get("cycleId");
 
     if (typeof requestId !== "string" || !requestId.trim()) {
-      throw new Error(t("unexpectedError"));
+      throw new ActionError("unexpectedError", t("unexpectedError"));
     }
 
     const sessionId = await getDemoSessionId();
@@ -2663,7 +2698,7 @@ export async function removeReviewRequest(data: FormData): Promise<ActionResult>
       const req = await tx.reviewRequest.findFirst({
         where: { id: requestId, sessionId },
       });
-      if (!req) throw new Error(t("reviewRequestNotFound"));
+      if (!req) throw new ActionError("reviewRequestNotFound", t("reviewRequestNotFound"));
 
       await tx.reviewRequest.delete({ where: { id: requestId } });
 
@@ -2693,7 +2728,7 @@ export async function submitReview(data: FormData): Promise<ActionResult> {
     const answersRaw = data.get("answers");
 
     if (typeof requestId !== "string" || !requestId.trim()) {
-      throw new Error(t("unexpectedError"));
+      throw new ActionError("unexpectedError", t("unexpectedError"));
     }
 
     let answers: Array<{
@@ -2705,7 +2740,7 @@ export async function submitReview(data: FormData): Promise<ActionResult> {
       try {
         answers = JSON.parse(answersRaw);
       } catch {
-        throw new Error(t("unexpectedError"));
+        throw new ActionError("unexpectedError", t("unexpectedError"));
       }
     }
 
@@ -2718,9 +2753,11 @@ export async function submitReview(data: FormData): Promise<ActionResult> {
         where: { id: requestId, sessionId },
         include: { cycle: true },
       });
-      if (!req) throw new Error(t("reviewRequestNotFound"));
-      if (req.status === "SUBMITTED") throw new Error(t("reviewAlreadySubmitted"));
-      if (req.cycle.status !== "OPEN") throw new Error(t("reviewCycleNotOpen"));
+      if (!req) throw new ActionError("reviewRequestNotFound", t("reviewRequestNotFound"));
+      if (req.status === "SUBMITTED")
+        throw new ActionError("reviewAlreadySubmitted", t("reviewAlreadySubmitted"));
+      if (req.cycle.status !== "OPEN")
+        throw new ActionError("reviewCycleNotOpen", t("reviewCycleNotOpen"));
 
       const submission = await tx.reviewSubmission.create({
         data: {

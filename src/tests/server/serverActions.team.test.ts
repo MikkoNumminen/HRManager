@@ -100,14 +100,14 @@ describe("createTeam", () => {
 
   // A team with no name is not a team — you have to call it something.
   test("throws on empty name", async () => {
-    expect(await createTeam(formData({ name: "" }))).toEqual({
+    expect(await createTeam(formData({ name: "" }))).toMatchObject({
       error: expect.stringContaining("Invalid Name"),
     });
   });
 
   // Spaces alone don't count as a team name, just like with person names.
   test("throws on whitespace-only name", async () => {
-    expect(await createTeam(formData({ name: "   " }))).toEqual({
+    expect(await createTeam(formData({ name: "   " }))).toMatchObject({
       error: expect.stringContaining("Invalid Name"),
     });
   });
@@ -115,7 +115,7 @@ describe("createTeam", () => {
   // Team names have a length limit to prevent abuse.
   test("throws when team name exceeds max length", async () => {
     const longName = "A".repeat(256);
-    expect(await createTeam(formData({ name: longName }))).toEqual({
+    expect(await createTeam(formData({ name: longName }))).toMatchObject({
       error: expect.stringContaining("characters or less"),
     });
   });
@@ -137,14 +137,14 @@ describe("updateTeamName", () => {
 
   // We need to know WHICH team to rename — can't do it without an ID.
   test("throws when no teamID provided", async () => {
-    expect(await updateTeamName(formData({ name: "New Name" }))).toEqual({
+    expect(await updateTeamName(formData({ name: "New Name" }))).toMatchObject({
       error: expect.stringContaining("No teamID provided"),
     });
   });
 
   // The ID has to be a proper UUID, not some random string.
   test("throws on invalid UUID", async () => {
-    expect(await updateTeamName(formData({ teamID: "bad", name: "New Name" }))).toEqual({
+    expect(await updateTeamName(formData({ teamID: "bad", name: "New Name" }))).toMatchObject({
       error: expect.stringContaining("Invalid teamID format"),
     });
   });
@@ -152,7 +152,7 @@ describe("updateTeamName", () => {
   // You can't set a team's name to nothing — names are required.
   test("throws when name is empty", async () => {
     const team = await createTestTeam({ teamName: "Engineering" });
-    expect(await updateTeamName(formData({ teamID: team.teamId, name: "" }))).toEqual({
+    expect(await updateTeamName(formData({ teamID: team.teamId, name: "" }))).toMatchObject({
       error: expect.stringContaining("New team name is missing"),
     });
   });
@@ -161,7 +161,7 @@ describe("updateTeamName", () => {
   test("throws when new name exceeds max length", async () => {
     const team = await createTestTeam({ teamName: "Eng" });
     const longName = "A".repeat(256);
-    expect(await updateTeamName(formData({ teamID: team.teamId, name: longName }))).toEqual({
+    expect(await updateTeamName(formData({ teamID: team.teamId, name: longName }))).toMatchObject({
       error: expect.stringContaining("characters or less"),
     });
   });
@@ -210,14 +210,14 @@ describe("removeTeam", () => {
 
   // Can't delete nothing — you have to actually select a team first.
   test("throws when no teamID provided", async () => {
-    expect(await removeTeam(formData({}))).toEqual({
+    expect(await removeTeam(formData({}))).toMatchObject({
       error: expect.stringContaining("No teamID selected"),
     });
   });
 
   // Team IDs are UUIDs — random strings won't fly.
   test("throws on invalid UUID", async () => {
-    expect(await removeTeam(formData({ teamID: "invalid" }))).toEqual({
+    expect(await removeTeam(formData({ teamID: "invalid" }))).toMatchObject({
       error: expect.stringContaining("Invalid teamID format"),
     });
   });
@@ -279,14 +279,14 @@ describe("addManager", () => {
 
   // You have to say who becomes the manager.
   test("throws when no personID provided", async () => {
-    expect(await addManager(formData({ teamID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" }))).toEqual({
-      error: expect.stringContaining("No personID provided"),
-    });
+    expect(
+      await addManager(formData({ teamID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" })),
+    ).toMatchObject({ error: expect.stringContaining("No personID provided") });
   });
 
   // Garbage IDs get caught before they hit the database.
   test("throws on invalid UUID", async () => {
-    expect(await addManager(formData({ teamID: "bad", personID: "bad" }))).toEqual({
+    expect(await addManager(formData({ teamID: "bad", personID: "bad" }))).toMatchObject({
       error: expect.stringContaining("Invalid"),
     });
   });
@@ -344,7 +344,7 @@ describe("addMember", () => {
       data: { personId: person.id, teamId: team.teamId },
     });
 
-    expect(await addMember(formData({ teamID: team.teamId, personID: person.id }))).toEqual({
+    expect(await addMember(formData({ teamID: team.teamId, personID: person.id }))).toMatchObject({
       error: expect.stringContaining("Person is already a member of the team"),
     });
   });
@@ -358,14 +358,14 @@ describe("addMember", () => {
 
   // Have to specify which person to add.
   test("throws when no personID provided", async () => {
-    expect(await addMember(formData({ teamID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" }))).toEqual({
-      error: expect.stringContaining("No personID selected"),
-    });
+    expect(
+      await addMember(formData({ teamID: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" })),
+    ).toMatchObject({ error: expect.stringContaining("No personID selected") });
   });
 
   // UUID validation — same as every other action.
   test("throws on invalid UUID", async () => {
-    expect(await addMember(formData({ teamID: "x", personID: "y" }))).toEqual({
+    expect(await addMember(formData({ teamID: "x", personID: "y" }))).toMatchObject({
       error: expect.stringContaining("Invalid"),
     });
   });
@@ -428,9 +428,9 @@ describe("removeMember", () => {
     const person = await createTestPerson({ name: "Alice", email: "alice@test.com" });
     const team = await createTestTeam({ teamName: "Team A" });
 
-    expect(await removeMember(formData({ teamID: team.teamId, personID: person.id }))).toEqual({
-      error: expect.stringContaining("Person is not a member of the team"),
-    });
+    expect(
+      await removeMember(formData({ teamID: team.teamId, personID: person.id })),
+    ).toMatchObject({ error: expect.stringContaining("Person is not a member of the team") });
   });
 
   // Need to know which team to remove the member from.
@@ -449,7 +449,7 @@ describe("removeMember", () => {
 
   // UUID check — keeps bad data out.
   test("throws on invalid UUID", async () => {
-    expect(await removeMember(formData({ teamID: "x", personID: "y" }))).toEqual({
+    expect(await removeMember(formData({ teamID: "x", personID: "y" }))).toMatchObject({
       error: expect.stringContaining("Invalid"),
     });
   });
@@ -545,7 +545,7 @@ describe("addManager (extended)", () => {
   // Throws when no teamID is provided.
   test("throws when no teamID provided", async () => {
     const person = await createTestPerson({ name: "Alice", email: "alice@test.com" });
-    expect(await addManager(formData({ personID: person.id }))).toEqual({
+    expect(await addManager(formData({ personID: person.id }))).toMatchObject({
       error: expect.stringContaining("No teamID selected"),
     });
   });
@@ -553,7 +553,7 @@ describe("addManager (extended)", () => {
   // Throws when no personID is provided.
   test("throws when no personID provided", async () => {
     const team = await createTestTeam({ teamName: "Eng" });
-    expect(await addManager(formData({ teamID: team.teamId }))).toEqual({
+    expect(await addManager(formData({ teamID: team.teamId }))).toMatchObject({
       error: expect.stringContaining("No personID provided"),
     });
   });

@@ -100,35 +100,35 @@ describe("createPerson", () => {
 
   // You can't add a person with no name — that's just a blank row.
   test("throws on empty name", async () => {
-    expect(await createPerson(formData({ name: "", email: "x@test.com" }))).toEqual({
+    expect(await createPerson(formData({ name: "", email: "x@test.com" }))).toMatchObject({
       error: expect.stringContaining("Invalid Name"),
     });
   });
 
   // Spaces don't count as a name either. Nice try though.
   test("throws on whitespace-only name", async () => {
-    expect(await createPerson(formData({ name: "   ", email: "x@test.com" }))).toEqual({
+    expect(await createPerson(formData({ name: "   ", email: "x@test.com" }))).toMatchObject({
       error: expect.stringContaining("Invalid Name"),
     });
   });
 
   // Email is required — we use it as a unique identifier and for contact info.
   test("throws on missing email", async () => {
-    expect(await createPerson(formData({ name: "Alice" }))).toEqual({
+    expect(await createPerson(formData({ name: "Alice" }))).toMatchObject({
       error: expect.stringContaining("Email is required"),
     });
   });
 
   // An empty string is not an email address.
   test("throws on empty email", async () => {
-    expect(await createPerson(formData({ name: "Alice", email: "" }))).toEqual({
+    expect(await createPerson(formData({ name: "Alice", email: "" }))).toMatchObject({
       error: expect.stringContaining("Email is required"),
     });
   });
 
   // "not-an-email" doesn't have an @ sign — the regex catches this.
   test("throws on invalid email format", async () => {
-    expect(await createPerson(formData({ name: "Alice", email: "not-an-email" }))).toEqual({
+    expect(await createPerson(formData({ name: "Alice", email: "not-an-email" }))).toMatchObject({
       error: expect.stringContaining("Invalid email format"),
     });
   });
@@ -137,7 +137,7 @@ describe("createPerson", () => {
   // but we check first to give a friendly error message.
   test("throws on duplicate email", async () => {
     await createPerson(formData({ name: "Alice", email: "dup@test.com" }));
-    expect(await createPerson(formData({ name: "Bob", email: "dup@test.com" }))).toEqual({
+    expect(await createPerson(formData({ name: "Bob", email: "dup@test.com" }))).toMatchObject({
       error: expect.stringContaining("A person with this email already exists"),
     });
   });
@@ -153,7 +153,7 @@ describe("createPerson", () => {
   // Names longer than 255 characters are rejected to prevent abuse and DB bloat.
   test("throws when name exceeds max length", async () => {
     const longName = "A".repeat(256);
-    expect(await createPerson(formData({ name: longName, email: "long@test.com" }))).toEqual({
+    expect(await createPerson(formData({ name: longName, email: "long@test.com" }))).toMatchObject({
       error: expect.stringContaining("characters or less"),
     });
   });
@@ -161,7 +161,7 @@ describe("createPerson", () => {
   // Email addresses longer than 320 characters are rejected.
   test("throws when email exceeds max length", async () => {
     const longEmail = "a".repeat(315) + "@test.com";
-    expect(await createPerson(formData({ name: "Alice", email: longEmail }))).toEqual({
+    expect(await createPerson(formData({ name: "Alice", email: longEmail }))).toMatchObject({
       error: expect.stringContaining("characters or less"),
     });
   });
@@ -213,14 +213,14 @@ describe("removePerson", () => {
 
   // If the form is submitted without selecting anyone, we should get a clear error.
   test("throws when no personID provided", async () => {
-    expect(await removePerson(formData({}))).toEqual({
+    expect(await removePerson(formData({}))).toMatchObject({
       error: expect.stringContaining("No personID selected"),
     });
   });
 
   // IDs have to be valid UUIDs — this stops someone from injecting garbage into the query.
   test("throws on invalid UUID", async () => {
-    expect(await removePerson(formData({ personID: "bad-id" }))).toEqual({
+    expect(await removePerson(formData({ personID: "bad-id" }))).toMatchObject({
       error: expect.stringContaining("Invalid personID format"),
     });
   });
@@ -242,14 +242,14 @@ describe("updatePersonName", () => {
 
   // We need to know WHOSE name to update — can't do it without an ID.
   test("throws when no personID provided", async () => {
-    expect(await updatePersonName(formData({ name: "Bob" }))).toEqual({
+    expect(await updatePersonName(formData({ name: "Bob" }))).toMatchObject({
       error: expect.stringContaining("No personID provided"),
     });
   });
 
   // The ID has to be a proper UUID, not some random string.
   test("throws on invalid UUID", async () => {
-    expect(await updatePersonName(formData({ personID: "bad", name: "Bob" }))).toEqual({
+    expect(await updatePersonName(formData({ personID: "bad", name: "Bob" }))).toMatchObject({
       error: expect.stringContaining("Invalid personID format"),
     });
   });
@@ -257,7 +257,7 @@ describe("updatePersonName", () => {
   // You can't set someone's name to nothing — names are required.
   test("throws when name is empty", async () => {
     const person = await createTestPerson({ name: "Alice", email: "alice@test.com" });
-    expect(await updatePersonName(formData({ personID: person.id, name: "" }))).toEqual({
+    expect(await updatePersonName(formData({ personID: person.id, name: "" }))).toMatchObject({
       error: expect.stringContaining("New name is missing"),
     });
   });
@@ -275,9 +275,9 @@ describe("updatePersonName", () => {
   test("throws when name exceeds max length", async () => {
     const person = await createTestPerson({ name: "Alice", email: "alice@test.com" });
     const longName = "A".repeat(256);
-    expect(await updatePersonName(formData({ personID: person.id, name: longName }))).toEqual({
-      error: expect.stringContaining("characters or less"),
-    });
+    expect(await updatePersonName(formData({ personID: person.id, name: longName }))).toMatchObject(
+      { error: expect.stringContaining("characters or less") },
+    );
   });
 });
 
@@ -297,14 +297,14 @@ describe("updatePosition", () => {
 
   // We need to know WHOSE position to update — can't do it without an ID.
   test("throws when no personID provided", async () => {
-    expect(await updatePosition(formData({ name: "Dev" }))).toEqual({
+    expect(await updatePosition(formData({ name: "Dev" }))).toMatchObject({
       error: expect.stringContaining("No personID provided"),
     });
   });
 
   // The ID has to be a proper UUID, not some random string.
   test("throws on invalid UUID", async () => {
-    expect(await updatePosition(formData({ personID: "bad", name: "Dev" }))).toEqual({
+    expect(await updatePosition(formData({ personID: "bad", name: "Dev" }))).toMatchObject({
       error: expect.stringContaining("Invalid personID format"),
     });
   });
@@ -313,7 +313,7 @@ describe("updatePosition", () => {
   // and there's no UI flow for deliberately blanking out a position.
   test("throws when position is empty", async () => {
     const person = await createTestPerson({ name: "Alice", email: "alice@test.com" });
-    expect(await updatePosition(formData({ personID: person.id, name: "" }))).toEqual({
+    expect(await updatePosition(formData({ personID: person.id, name: "" }))).toMatchObject({
       error: expect.stringContaining("New position is missing"),
     });
   });
@@ -331,9 +331,9 @@ describe("updatePosition", () => {
   test("throws when position exceeds max length", async () => {
     const person = await createTestPerson({ name: "Alice", email: "alice@test.com" });
     const longPosition = "A".repeat(256);
-    expect(await updatePosition(formData({ personID: person.id, name: longPosition }))).toEqual({
-      error: expect.stringContaining("characters or less"),
-    });
+    expect(
+      await updatePosition(formData({ personID: person.id, name: longPosition })),
+    ).toMatchObject({ error: expect.stringContaining("characters or less") });
   });
 
   // Accepts "position" as the form data key (alternative to "name").
@@ -367,7 +367,7 @@ describe("updateEmail", () => {
     const p1 = await createTestPerson({ name: "Alice", email: "alice@test.com" });
     await createTestPerson({ name: "Bob", email: "taken@test.com" });
 
-    expect(await updateEmail(formData({ personID: p1.id, name: "taken@test.com" }))).toEqual({
+    expect(await updateEmail(formData({ personID: p1.id, name: "taken@test.com" }))).toMatchObject({
       error: expect.stringContaining("A person with this email already exists"),
     });
   });
@@ -375,7 +375,7 @@ describe("updateEmail", () => {
   // The new email has to actually look like an email address.
   test("throws on invalid email format", async () => {
     const person = await createTestPerson({ name: "Alice", email: "alice@test.com" });
-    expect(await updateEmail(formData({ personID: person.id, name: "not-valid" }))).toEqual({
+    expect(await updateEmail(formData({ personID: person.id, name: "not-valid" }))).toMatchObject({
       error: expect.stringContaining("Invalid email format"),
     });
   });
@@ -384,21 +384,21 @@ describe("updateEmail", () => {
   // that would need a different operation entirely.
   test("throws when email is empty", async () => {
     const person = await createTestPerson({ name: "Alice", email: "alice@test.com" });
-    expect(await updateEmail(formData({ personID: person.id, name: "" }))).toEqual({
+    expect(await updateEmail(formData({ personID: person.id, name: "" }))).toMatchObject({
       error: expect.stringContaining("New Email is missing"),
     });
   });
 
   // Need to know whose email to update — can't do it without an ID.
   test("throws when no personID provided", async () => {
-    expect(await updateEmail(formData({ name: "a@b.com" }))).toEqual({
+    expect(await updateEmail(formData({ name: "a@b.com" }))).toMatchObject({
       error: expect.stringContaining("No personID selected"),
     });
   });
 
   // Same UUID check as everywhere else — no garbage IDs allowed.
   test("throws on invalid UUID", async () => {
-    expect(await updateEmail(formData({ personID: "nope", name: "a@b.com" }))).toEqual({
+    expect(await updateEmail(formData({ personID: "nope", name: "a@b.com" }))).toMatchObject({
       error: expect.stringContaining("Invalid personID format"),
     });
   });
@@ -416,7 +416,7 @@ describe("updateEmail", () => {
   test("throws when email exceeds max length", async () => {
     const person = await createTestPerson({ name: "Alice", email: "alice@test.com" });
     const longEmail = "a".repeat(315) + "@test.com";
-    expect(await updateEmail(formData({ personID: person.id, name: longEmail }))).toEqual({
+    expect(await updateEmail(formData({ personID: person.id, name: longEmail }))).toMatchObject({
       error: expect.stringContaining("characters or less"),
     });
   });

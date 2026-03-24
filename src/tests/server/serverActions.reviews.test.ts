@@ -106,13 +106,13 @@ describe("createReviewTemplate", () => {
   // An empty name string must be rejected — the template would be unidentifiable.
   test("returns error on empty name", async () => {
     const result = await createReviewTemplate(formData({ name: "" }));
-    expect(result).toEqual({ error: expect.any(String) });
+    expect(result).toMatchObject({ error: expect.any(String) });
   });
 
   // Submitting the form without a name field at all must also be rejected.
   test("returns error on missing name", async () => {
     const result = await createReviewTemplate(formData({}));
-    expect(result).toEqual({ error: expect.any(String) });
+    expect(result).toMatchObject({ error: expect.any(String) });
   });
 });
 
@@ -137,7 +137,7 @@ describe("deleteReviewTemplate", () => {
     const result = await deleteReviewTemplate(
       formData({ templateId: "00000000-0000-0000-0000-000000000000" }),
     );
-    expect(result).toEqual({ error: expect.any(String) });
+    expect(result).toMatchObject({ error: expect.any(String) });
   });
 });
 
@@ -195,7 +195,7 @@ describe("addReviewQuestion", () => {
         type: "RATING",
       }),
     );
-    expect(result).toEqual({ error: expect.any(String) });
+    expect(result).toMatchObject({ error: expect.any(String) });
   });
 
   // Only RATING and TEXT are valid question types; anything else is rejected.
@@ -207,7 +207,7 @@ describe("addReviewQuestion", () => {
     const result = await addReviewQuestion(
       formData({ templateId: template.id, text: "Q", type: "INVALID" }),
     );
-    expect(result).toEqual({ error: expect.any(String) });
+    expect(result).toMatchObject({ error: expect.any(String) });
   });
 });
 
@@ -246,7 +246,7 @@ describe("removeReviewQuestion", () => {
         questionId: "00000000-0000-0000-0000-000000000001",
       }),
     );
-    expect(result).toEqual({ error: expect.any(String) });
+    expect(result).toMatchObject({ error: expect.any(String) });
   });
 });
 
@@ -272,7 +272,7 @@ describe("createReviewCycle", () => {
     const result = await createReviewCycle(
       formData({ startDate: "2026-01-01", endDate: "2026-03-31" }),
     );
-    expect(result).toEqual({ error: expect.any(String) });
+    expect(result).toMatchObject({ error: expect.any(String) });
   });
 });
 
@@ -336,7 +336,7 @@ describe("openReviewCycle / closeReviewCycle", () => {
     await openReviewCycle(formData({ cycleId: cycle.id }));
     const result = await openReviewCycle(formData({ cycleId: cycle.id }));
 
-    expect(result).toEqual({ error: expect.any(String) });
+    expect(result).toMatchObject({ error: expect.any(String) });
   });
 
   // Closing an OPEN cycle marks it as complete; no new submissions are accepted.
@@ -371,7 +371,7 @@ describe("openReviewCycle / closeReviewCycle", () => {
     });
 
     const result = await closeReviewCycle(formData({ cycleId: cycle.id }));
-    expect(result).toEqual({ error: expect.any(String) });
+    expect(result).toMatchObject({ error: expect.any(String) });
   });
 });
 
@@ -447,7 +447,7 @@ describe("addReviewRequest", () => {
       type: "PEER",
     });
     const result = await addReviewRequest(fd2);
-    expect(result).toEqual({ error: expect.any(String) });
+    expect(result).toMatchObject({ error: expect.any(String) });
   });
 
   // Referencing a cycle that doesn't exist must return a clear error.
@@ -467,7 +467,7 @@ describe("addReviewRequest", () => {
         type: "PEER",
       }),
     );
-    expect(result).toEqual({ error: expect.any(String) });
+    expect(result).toMatchObject({ error: expect.any(String) });
   });
 });
 
@@ -514,7 +514,7 @@ describe("removeReviewRequest", () => {
     const result = await removeReviewRequest(
       formData({ requestId: "00000000-0000-0000-0000-000000000000" }),
     );
-    expect(result).toEqual({ error: expect.any(String) });
+    expect(result).toMatchObject({ error: expect.any(String) });
   });
 });
 
@@ -594,7 +594,7 @@ describe("submitReview", () => {
     await submitReview(formData({ requestId: request.id, answers }));
 
     const result = await submitReview(formData({ requestId: request.id, answers }));
-    expect(result).toEqual({ error: expect.any(String) });
+    expect(result).toMatchObject({ error: expect.any(String) });
   });
 
   // Submissions are only accepted while the cycle is OPEN; a DRAFT cycle must reject them.
@@ -628,7 +628,7 @@ describe("submitReview", () => {
     const result = await submitReview(
       formData({ requestId: request.id, answers: JSON.stringify([]) }),
     );
-    expect(result).toEqual({ error: expect.any(String) });
+    expect(result).toMatchObject({ error: expect.any(String) });
   });
 });
 

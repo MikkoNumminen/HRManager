@@ -126,7 +126,7 @@ describe("updateUserRole", () => {
       data: { email: "alice@test.com", name: "Alice", role: "user" },
     });
 
-    expect(await updateUserRole(formData({ userId: user.id, role: "superuser" }))).toEqual({
+    expect(await updateUserRole(formData({ userId: user.id, role: "superuser" }))).toMatchObject({
       error: expect.stringContaining("Invalid role"),
     });
   });
@@ -137,7 +137,7 @@ describe("updateUserRole", () => {
       data: { email: "super@test.com", name: "Super", role: "superuser" },
     });
 
-    expect(await updateUserRole(formData({ userId: user.id, role: "user" }))).toEqual({
+    expect(await updateUserRole(formData({ userId: user.id, role: "user" }))).toMatchObject({
       error: expect.stringContaining("Cannot change the superuser's role"),
     });
   });
@@ -153,14 +153,14 @@ describe("updateUserRole", () => {
 
   // UUID validation — garbage IDs get caught early.
   test("throws on invalid UUID", async () => {
-    expect(await updateUserRole(formData({ userId: "bad-id", role: "user" }))).toEqual({
+    expect(await updateUserRole(formData({ userId: "bad-id", role: "user" }))).toMatchObject({
       error: expect.stringContaining("Invalid userId format"),
     });
   });
 
   // Both fields are required — no partial submissions.
   test("throws when userId is missing", async () => {
-    expect(await updateUserRole(formData({ role: "user" }))).toEqual({
+    expect(await updateUserRole(formData({ role: "user" }))).toMatchObject({
       error: expect.stringContaining("No userId provided"),
     });
   });
@@ -584,7 +584,7 @@ describe("kickOutUser", () => {
       data: { email: "super@test.com", name: "Super", role: "superuser" },
     });
 
-    expect(await kickOutUser(formData({ userId: superuser.id }))).toEqual({
+    expect(await kickOutUser(formData({ userId: superuser.id }))).toMatchObject({
       error: expect.stringContaining("Cannot kick out the superuser"),
     });
 
@@ -595,21 +595,21 @@ describe("kickOutUser", () => {
 
   // Throws when no userId is provided in the form data.
   test("throws on missing userId", async () => {
-    expect(await kickOutUser(formData({}))).toEqual({
+    expect(await kickOutUser(formData({}))).toMatchObject({
       error: expect.stringContaining("No userId provided"),
     });
   });
 
   // Throws when the userId doesn't match any user in the database.
   test("throws on non-existent user", async () => {
-    expect(await kickOutUser(formData({ userId: "00000000-0000-0000-0000-000000000000" }))).toEqual(
-      { error: expect.stringContaining("User not found") },
-    );
+    expect(
+      await kickOutUser(formData({ userId: "00000000-0000-0000-0000-000000000000" })),
+    ).toMatchObject({ error: expect.stringContaining("User not found"), code: "userNotFound" });
   });
 
   // Throws when userId is not a valid UUID format.
   test("throws on invalid UUID", async () => {
-    expect(await kickOutUser(formData({ userId: "not-a-uuid" }))).toEqual({
+    expect(await kickOutUser(formData({ userId: "not-a-uuid" }))).toMatchObject({
       error: expect.any(String),
     });
   });
@@ -621,7 +621,7 @@ describe("kickOutUser", () => {
       data: { email: "real@oauth.com", name: "Real User", role: "user" },
     });
 
-    expect(await kickOutUser(formData({ userId: realUser.id }))).toEqual({
+    expect(await kickOutUser(formData({ userId: realUser.id }))).toMatchObject({
       error: expect.stringContaining("Demo sessions cannot manage real users"),
     });
 
@@ -637,7 +637,7 @@ describe("kickOutUser", () => {
     });
     auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
 
-    expect(await kickOutUser(formData({ userId: user.id }))).toEqual({
+    expect(await kickOutUser(formData({ userId: user.id }))).toMatchObject({
       error: expect.stringContaining("Cannot kick yourself out"),
     });
 

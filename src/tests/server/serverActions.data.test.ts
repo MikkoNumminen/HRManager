@@ -143,7 +143,7 @@ describe("updateProfileName", () => {
       data: { email: "alice@test.com", name: "Alice", role: "user" },
     });
     auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
-    expect(await updateProfileName(formData({ name: "" }))).toEqual({
+    expect(await updateProfileName(formData({ name: "" }))).toMatchObject({
       error: expect.stringContaining("Name is required"),
     });
   });
@@ -154,7 +154,7 @@ describe("updateProfileName", () => {
       data: { email: "alice@test.com", name: "Alice", role: "user" },
     });
     auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
-    expect(await updateProfileName(formData({ name: "   " }))).toEqual({
+    expect(await updateProfileName(formData({ name: "   " }))).toMatchObject({
       error: expect.stringContaining("Name is required"),
     });
   });
@@ -166,7 +166,7 @@ describe("updateProfileName", () => {
     });
     auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
     const longName = "A".repeat(256);
-    expect(await updateProfileName(formData({ name: longName }))).toEqual({
+    expect(await updateProfileName(formData({ name: longName }))).toMatchObject({
       error: expect.stringContaining("characters or less"),
     });
   });
@@ -174,7 +174,7 @@ describe("updateProfileName", () => {
   // Unauthenticated users can't update a profile — no session, no go.
   test("throws when not authenticated", async () => {
     auth.mockResolvedValueOnce(null);
-    expect(await updateProfileName(formData({ name: "Hacker" }))).toEqual({
+    expect(await updateProfileName(formData({ name: "Hacker" }))).toMatchObject({
       error: expect.stringContaining("Not authenticated"),
     });
   });
@@ -182,7 +182,7 @@ describe("updateProfileName", () => {
   // Session with missing user id should also fail.
   test("throws when session has no user id", async () => {
     auth.mockResolvedValueOnce({ user: { email: "alice@test.com" } });
-    expect(await updateProfileName(formData({ name: "Alice" }))).toEqual({
+    expect(await updateProfileName(formData({ name: "Alice" }))).toMatchObject({
       error: expect.stringContaining("Not authenticated"),
     });
   });
@@ -192,7 +192,7 @@ describe("updateProfileName", () => {
     auth.mockResolvedValueOnce({
       user: { id: "00000000-0000-0000-0000-000000000000", email: "ghost@test.com" },
     });
-    expect(await updateProfileName(formData({ name: "Ghost" }))).toEqual({
+    expect(await updateProfileName(formData({ name: "Ghost" }))).toMatchObject({
       error: expect.stringContaining("User not found"),
     });
   });
@@ -203,7 +203,7 @@ describe("updateProfileName", () => {
       data: { email: "alice@test.com", name: "Alice", role: "user" },
     });
     auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
-    expect(await updateProfileName(formData({}))).toEqual({
+    expect(await updateProfileName(formData({}))).toMatchObject({
       error: expect.stringContaining("Name is required"),
     });
   });
@@ -275,7 +275,7 @@ describe("updateProfileImage", () => {
       data: { email: "alice@test.com", name: "Alice", role: "user" },
     });
     auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
-    expect(await updateProfileImage(formData({ image: "javascript:alert(1)" }))).toEqual({
+    expect(await updateProfileImage(formData({ image: "javascript:alert(1)" }))).toMatchObject({
       error: expect.stringContaining("protocol"),
     });
   });
@@ -286,9 +286,9 @@ describe("updateProfileImage", () => {
       data: { email: "alice@test.com", name: "Alice", role: "user" },
     });
     auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
-    expect(await updateProfileImage(formData({ image: "ftp://example.com/pic.jpg" }))).toEqual({
-      error: expect.stringContaining("protocol"),
-    });
+    expect(
+      await updateProfileImage(formData({ image: "ftp://example.com/pic.jpg" })),
+    ).toMatchObject({ error: expect.stringContaining("protocol") });
   });
 
   // Completely invalid URLs that can't be parsed should be rejected.
@@ -297,7 +297,7 @@ describe("updateProfileImage", () => {
       data: { email: "alice@test.com", name: "Alice", role: "user" },
     });
     auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
-    expect(await updateProfileImage(formData({ image: "not a url" }))).toEqual({
+    expect(await updateProfileImage(formData({ image: "not a url" }))).toMatchObject({
       error: expect.stringContaining("Invalid URL format"),
     });
   });
@@ -309,7 +309,7 @@ describe("updateProfileImage", () => {
     });
     auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
     const longUrl = "https://example.com/" + "a".repeat(2040);
-    expect(await updateProfileImage(formData({ image: longUrl }))).toEqual({
+    expect(await updateProfileImage(formData({ image: longUrl }))).toMatchObject({
       error: expect.stringContaining("characters or less"),
     });
   });
@@ -317,9 +317,9 @@ describe("updateProfileImage", () => {
   // Unauthenticated users can't change profile pictures.
   test("throws when not authenticated", async () => {
     auth.mockResolvedValueOnce(null);
-    expect(await updateProfileImage(formData({ image: "https://example.com/pic.jpg" }))).toEqual({
-      error: expect.stringContaining("Not authenticated"),
-    });
+    expect(
+      await updateProfileImage(formData({ image: "https://example.com/pic.jpg" })),
+    ).toMatchObject({ error: expect.stringContaining("Not authenticated") });
   });
 
   // If the user was deleted after login, fail gracefully.
@@ -327,9 +327,9 @@ describe("updateProfileImage", () => {
     auth.mockResolvedValueOnce({
       user: { id: "00000000-0000-0000-0000-000000000000", email: "ghost@test.com" },
     });
-    expect(await updateProfileImage(formData({ image: "https://example.com/pic.jpg" }))).toEqual({
-      error: expect.stringContaining("User not found"),
-    });
+    expect(
+      await updateProfileImage(formData({ image: "https://example.com/pic.jpg" })),
+    ).toMatchObject({ error: expect.stringContaining("User not found") });
   });
 
   // http URLs (not just https) should be accepted.
