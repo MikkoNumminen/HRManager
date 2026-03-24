@@ -2,9 +2,7 @@
  * Barrel re-export — all server actions are available from "@/serverActions"
  * so existing imports across 68+ files continue working unchanged.
  *
- * Domain modules:
- *   person.ts, team.ts, department.ts, admin.ts, profile.ts,
- *   data.ts, leave.ts, reviews.ts, positions.ts
+ * All domain modules now live in src/features/<domain>/actions.ts
  */
 
 export type { ActionResult } from "./_shared";
@@ -15,8 +13,14 @@ export {
   updatePosition,
   updateEmail,
   addManager,
-} from "./person";
-export { addMember, createTeam, updateTeamName, removeTeam, removeMember } from "./team";
+} from "../features/persons/actions";
+export {
+  addMember,
+  createTeam,
+  updateTeamName,
+  removeTeam,
+  removeMember,
+} from "../features/teams/actions";
 export {
   createDepartment,
   removeDepartment,
@@ -24,7 +28,7 @@ export {
   updateDepartmentHead,
   assignTeamToDepartment,
   removeTeamFromDepartment,
-} from "./department";
+} from "../features/departments/actions";
 export {
   resetAll,
   seedMockData,
@@ -32,7 +36,7 @@ export {
   updateUserRole,
   updateUserPermission,
   kickOutUser,
-} from "./admin";
+} from "../features/admin/actions";
 export { updateProfileName, updateProfileImage } from "../features/profile/actions";
 export {
   type ImportResult,
@@ -50,7 +54,7 @@ export {
   reviewLeaveRequest,
   deleteLeaveRequest,
   allocateLeaveBalance,
-} from "./leave";
+} from "../features/leave/actions";
 export {
   createReviewTemplate,
   deleteReviewTemplate,
@@ -63,5 +67,5 @@ export {
   addReviewRequest,
   removeReviewRequest,
   submitReview,
-} from "./reviews";
+} from "../features/reviews/actions";
 export { createPositionEntry, deletePositionEntry } from "../features/positions/actions";

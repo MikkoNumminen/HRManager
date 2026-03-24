@@ -9,7 +9,7 @@ import { ActionError } from "@/actionErrors";
 import { getDemoSessionId } from "@/demoSession";
 import { MAX_NAME_LENGTH } from "@/schemas";
 import { getTranslations } from "next-intl/server";
-import { safe, validateUUID, type ActionResult } from "./_shared";
+import { safe, validateUUID, type ActionResult } from "@/lib/actionUtils";
 
 export async function addMember(data: FormData): Promise<ActionResult> {
   return safe(async () => {

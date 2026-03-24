@@ -19,21 +19,18 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 
 - 🟢⚡ CI pipeline monitoring & auto-fix — watching for failures, fixing build/lint/format issues [Claude 4, main]
 - 🟡🧠 Custom sign-in page — replace NextAuth default unstyled page with MUI dark-themed sign-in [Claude 4, main]
-- 🔴🧠 Reorganise into `src/features/<domain>/` — move serverActions/\* + split queries.ts into co-located actions/queries per domain; barrel re-exports for compat [Claude 1, main]
 
 ## Backlog
 
 ### Features
 
 - 🟡🧠 Email notifications — Resend/SendGrid for leave approvals, review requests, role changes + preferences page
-- 🟡🧠 Review aggregation dashboard — manager sees all reviews for their direct reports in one view
 - 🟡🧠 Leave balance carryover / accrual — year-end carryover logic, expiry dates, accrual schedules
 - 🟡🧠 Tutorial UX overhaul — no guiding effect on back button, lacks MUI visual guidance (highlighting/effects), guidance boxes appear in wrong positions
 - 🟢🧠 Bulk actions on tables — multi-select persons/teams and apply batch operations
 
 ### Code Quality / Architecture (found by audit)
 
-- 🟡🧠 Split `queries.ts` into domain modules — 1,073 lines; same domain split pattern as serverActions
 - 🟡🧠 Implement permission middleware for queries — inconsistent auth guards across query functions; some check permissions, others rely on caller
 - 🟡🧠 Consolidate duplicate seed data — demoSession.ts (9 persons) and serverActions.ts (6 persons) diverged; extract shared seed definitions to seedData.ts
 

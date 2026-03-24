@@ -411,3 +411,30 @@ export const OrgChartDataSchema = z.object({
 });
 
 export type OrgChartData = z.infer<typeof OrgChartDataSchema>;
+
+export const TeamReviewRequestSchema = z.object({
+  id: z.string().uuid(),
+  type: z.string(),
+  status: z.string(),
+  reviewerId: z.string().uuid().nullable(),
+  reviewerName: z.string().nullable(),
+});
+
+export type TeamReviewRequest = z.infer<typeof TeamReviewRequestSchema>;
+
+export const TeamReviewReportSchema = z.object({
+  subjectId: z.string().uuid(),
+  subjectName: z.string(),
+  requests: z.array(TeamReviewRequestSchema),
+});
+
+export type TeamReviewReport = z.infer<typeof TeamReviewReportSchema>;
+
+export const TeamReviewCycleSchema = z.object({
+  cycleId: z.string().uuid(),
+  cycleName: z.string(),
+  cycleStatus: z.enum(["DRAFT", "OPEN", "CLOSED"]),
+  reports: z.array(TeamReviewReportSchema),
+});
+
+export type TeamReviewCycle = z.infer<typeof TeamReviewCycleSchema>;

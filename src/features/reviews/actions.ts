@@ -8,7 +8,7 @@ import { ActionError } from "@/actionErrors";
 import { getDemoSessionId } from "@/demoSession";
 import { MAX_NAME_LENGTH, type ReviewQuestion } from "@/schemas";
 import { getTranslations } from "next-intl/server";
-import { safe, type ActionResult } from "./_shared";
+import { safe, type ActionResult } from "@/lib/actionUtils";
 
 export async function createReviewTemplate(data: FormData): Promise<ActionResult> {
   return safe(async () => {
