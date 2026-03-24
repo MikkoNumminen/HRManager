@@ -11,6 +11,8 @@ export interface AuditLogDocument {
   after: string | null;
   sessionId: string | null;
   createdAt: Date;
+  prevHash?: string | null;
+  hash?: string;
 }
 
 const globalForMongo = globalThis as unknown as {

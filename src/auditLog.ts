@@ -2,6 +2,7 @@ import { getAuditLogCollection, isMongoAvailable } from "@/mongoDb";
 import { auth } from "@/auth";
 import { getDemoSessionId } from "@/demoSession";
 import { AuditActionSchema, AuditEntityTypeSchema } from "@/schemas";
+import { computeHash, getLatestHash } from "@/lib/auditHashChain";
 import { after } from "next/server";
 import { z } from "zod";
 
@@ -44,7 +45,9 @@ export async function logAudit({
   const user = await getSessionUser();
   const sessionId = await getDemoSessionId();
 
-  await getAuditLogCollection().insertOne({
+  const prevHash = await getLatestHash(sessionId);
+  const createdAt = new Date();
+  const doc = {
     userId: user?.id ?? null,
     userEmail: user?.email ?? null,
     action,
@@ -53,8 +56,12 @@ export async function logAudit({
     before: before !== undefined ? JSON.stringify(before) : null,
     after: afterData !== undefined ? JSON.stringify(afterData) : null,
     sessionId,
-    createdAt: new Date(),
-  });
+    createdAt,
+    prevHash,
+    hash: "",
+  };
+  doc.hash = computeHash(doc);
+  await getAuditLogCollection().insertOne(doc);
 }
 
 /**
@@ -88,8 +95,11 @@ export function deferAudit(entries: DeferredAuditEntry[]): void {
   after(async () => {
     try {
       const col = getAuditLogCollection();
-      await col.insertMany(
-        entries.map((entry) => ({
+      // Build the chain: each entry links to the previous via prevHash
+      let prevHash = await getLatestHash(entries[0].sessionId);
+      const docs = entries.map((entry) => {
+        const createdAt = new Date();
+        const doc = {
           userId: entry.userId,
           userEmail: entry.userEmail,
           action: entry.action,
@@ -98,9 +108,15 @@ export function deferAudit(entries: DeferredAuditEntry[]): void {
           before: entry.before !== undefined ? JSON.stringify(entry.before) : null,
           after: entry.after !== undefined ? JSON.stringify(entry.after) : null,
           sessionId: entry.sessionId,
-          createdAt: new Date(),
-        })),
-      );
+          createdAt,
+          prevHash,
+          hash: "",
+        };
+        doc.hash = computeHash(doc);
+        prevHash = doc.hash;
+        return doc;
+      });
+      await col.insertMany(docs);
     } catch (error) {
       console.error("[audit] Failed to write deferred audit entries:", error);
     }
@@ -124,17 +140,23 @@ export async function logPermissionDenial(permissionKey: string): Promise<void> 
 
   after(async () => {
     try {
-      await getAuditLogCollection().insertOne({
+      const prevHash = await getLatestHash(sessionId);
+      const createdAt = new Date();
+      const doc = {
         userId: user?.id ?? null,
         userEmail: user?.email ?? null,
-        action: "permission_denied",
-        entityType: "security",
+        action: "permission_denied" as const,
+        entityType: "security" as const,
         entityId: null,
         before: null,
         after: JSON.stringify({ permissionKey }),
         sessionId,
-        createdAt: new Date(),
-      });
+        createdAt,
+        prevHash,
+        hash: "",
+      };
+      doc.hash = computeHash(doc);
+      await getAuditLogCollection().insertOne(doc);
     } catch (error) {
       console.error("[audit] Failed to log permission denial:", error);
     }
@@ -152,17 +174,23 @@ export async function logRateLimitHit(action: string, identifier: string): Promi
 
   after(async () => {
     try {
-      await getAuditLogCollection().insertOne({
+      const prevHash = await getLatestHash(sessionId);
+      const createdAt = new Date();
+      const doc = {
         userId: null,
         userEmail: null,
-        action: "rate_limited",
-        entityType: "security",
+        action: "rate_limited" as const,
+        entityType: "security" as const,
         entityId: null,
         before: null,
         after: JSON.stringify({ rateLimitedAction: action, identifier: safeIdentifier }),
         sessionId,
-        createdAt: new Date(),
-      });
+        createdAt,
+        prevHash,
+        hash: "",
+      };
+      doc.hash = computeHash(doc);
+      await getAuditLogCollection().insertOne(doc);
     } catch (error) {
       console.error("[audit] Failed to log rate limit hit:", error);
     }
