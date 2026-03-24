@@ -6,7 +6,7 @@ import { colors, pageContainerStyles } from "@/muiStyles";
 // Reusable top bar placeholder — matches AppBar + Toolbar height
 function TopBarSkeleton() {
   return (
-    <AppBar position="static" sx={{ backgroundColor: colors.slate800, mb: 2 }}>
+    <AppBar position="static" sx={{ backgroundColor: colors.slate700, mb: 2 }}>
       <Toolbar>
         <Skeleton variant="circular" width={36} height={36} sx={{ mr: 1.5 }} />
         <Skeleton variant="text" width={180} height={28} />
