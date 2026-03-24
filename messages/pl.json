@@ -470,6 +470,7 @@
     "urlTooLong": "URL nie może przekraczać {max} znaków",
     "invalidUrlProtocol": "URL musi używać protokołu http lub https",
     "invalidUrlFormat": "Nieprawidłowy format URL",
+    "imageUrlDomainNotAllowed": "Domena adresu URL obrazu jest niedozwolona. Użyj obsługiwanego hosta obrazów.",
     "csvNoFile": "Proszę wybrać plik CSV",
     "csvNotCsvFile": "Plik musi być plikiem .csv",
     "csvFileTooLarge": "Plik przekracza limit 1 MB",
@@ -584,7 +585,8 @@
     "employee": "Pracownik",
     "statusSubmitted": "Przesłano",
     "statusPending": "Oczekuje",
-    "selectCycle": "Wybierz cykl"
+    "selectCycle": "Wybierz cykl",
+    "actions": "Akcje"
   },
   "leave": {
     "title": "Zarządzanie urlopami",
@@ -639,7 +641,9 @@
     "filterAll": "Wszystkie",
     "filterPending": "Oczekujące",
     "filterApproved": "Zatwierdzone",
-    "filterRejected": "Odrzucone"
+    "filterRejected": "Odrzucone",
+    "statusFilter": "Filtr statusu",
+    "actions": "Akcje"
   },
   "leaveNotifications": {
     "leaveTypeCreated": "Typ urlopu został utworzony",

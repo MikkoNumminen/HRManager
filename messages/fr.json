@@ -470,6 +470,7 @@
     "urlTooLong": "L'URL ne doit pas dépasser {max} caractères",
     "invalidUrlProtocol": "L'URL doit utiliser le protocole http ou https",
     "invalidUrlFormat": "Format d'URL invalide",
+    "imageUrlDomainNotAllowed": "Le domaine de l'URL d'image n'est pas autorisé. Utilisez un hébergeur d'images pris en charge.",
     "csvNoFile": "Veuillez sélectionner un fichier CSV",
     "csvNotCsvFile": "Le fichier doit être un fichier .csv",
     "csvFileTooLarge": "Le fichier dépasse la limite de 1 Mo",
@@ -584,7 +585,8 @@
     "employee": "Employé",
     "statusSubmitted": "Soumis",
     "statusPending": "En attente",
-    "selectCycle": "Sélectionner le cycle"
+    "selectCycle": "Sélectionner le cycle",
+    "actions": "Actions"
   },
   "leave": {
     "title": "Gestion des congés",
@@ -639,7 +641,9 @@
     "filterAll": "Tous",
     "filterPending": "En attente",
     "filterApproved": "Approuvées",
-    "filterRejected": "Rejetées"
+    "filterRejected": "Rejetées",
+    "statusFilter": "Filtre de statut",
+    "actions": "Actions"
   },
   "leaveNotifications": {
     "leaveTypeCreated": "Type de congé créé",

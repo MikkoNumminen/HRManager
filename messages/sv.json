@@ -470,6 +470,7 @@
     "urlTooLong": "URL:en får inte överstiga {max} tecken",
     "invalidUrlProtocol": "URL:en måste använda http- eller https-protokollet",
     "invalidUrlFormat": "Ogiltigt URL-format",
+    "imageUrlDomainNotAllowed": "Bildadressen domän är inte tillåten. Använd en bildvärd som stöds.",
     "csvNoFile": "Välj en CSV-fil",
     "csvNotCsvFile": "Filen måste vara en .csv-fil",
     "csvFileTooLarge": "Filen överstiger gränsen på 1 MB",
@@ -584,7 +585,8 @@
     "employee": "Anställd",
     "statusSubmitted": "Inskickad",
     "statusPending": "Väntande",
-    "selectCycle": "Välj cykel"
+    "selectCycle": "Välj cykel",
+    "actions": "Åtgärder"
   },
   "leave": {
     "title": "Ledighetshantering",
@@ -639,7 +641,9 @@
     "filterAll": "Alla",
     "filterPending": "Väntande",
     "filterApproved": "Godkända",
-    "filterRejected": "Avslagna"
+    "filterRejected": "Avslagna",
+    "statusFilter": "Statusfilter",
+    "actions": "Åtgärder"
   },
   "leaveNotifications": {
     "leaveTypeCreated": "Ledighetstyp skapad",

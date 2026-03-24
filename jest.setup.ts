@@ -1,4 +1,5 @@
 import "@testing-library/jest-dom";
+import "jest-axe/extend-expect";
 import en from "./messages/en.json";
 
 // Mock SnackbarProvider globally so all components using useSnackbar work in tests.

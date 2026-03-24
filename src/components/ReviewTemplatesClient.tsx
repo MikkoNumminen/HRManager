@@ -148,6 +148,7 @@ export default function ReviewTemplatesClient({ templates }: Props) {
                 </ListItemButton>
                 <ListItemSecondaryAction>
                   <IconButton
+                    aria-label={t("deleteTemplate")}
                     edge="end"
                     onClick={() => setDeleteId(tmpl.id)}
                     disabled={isDeleting}

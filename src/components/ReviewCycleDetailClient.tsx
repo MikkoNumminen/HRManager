@@ -183,7 +183,12 @@ export default function ReviewCycleDetailClient({ cycle, persons, canManage }: P
             <input type="hidden" name="cycleId" value={cycle.id} />
             <FormControl sx={textFieldStyles}>
               <InputLabel shrink>{t("subject")}</InputLabel>
-              <Select name="subjectId" label={t("subject")} defaultValue="">
+              <Select
+                name="subjectId"
+                label={t("subject")}
+                inputProps={{ "aria-label": t("subject") }}
+                defaultValue=""
+              >
                 {persons.map((p) => (
                   <MenuItem key={p.id} value={p.id}>
                     {p.name}
@@ -193,7 +198,12 @@ export default function ReviewCycleDetailClient({ cycle, persons, canManage }: P
             </FormControl>
             <FormControl sx={textFieldStyles}>
               <InputLabel shrink>{t("reviewer")}</InputLabel>
-              <Select name="reviewerId" label={t("reviewer")} defaultValue="">
+              <Select
+                name="reviewerId"
+                label={t("reviewer")}
+                inputProps={{ "aria-label": t("reviewer") }}
+                defaultValue=""
+              >
                 {persons.map((p) => (
                   <MenuItem key={p.id} value={p.id}>
                     {p.name}
@@ -203,7 +213,12 @@ export default function ReviewCycleDetailClient({ cycle, persons, canManage }: P
             </FormControl>
             <FormControl sx={textFieldStyles}>
               <InputLabel shrink>{t("reviewType")}</InputLabel>
-              <Select name="type" label={t("reviewType")} defaultValue="PEER">
+              <Select
+                name="type"
+                label={t("reviewType")}
+                inputProps={{ "aria-label": t("reviewType") }}
+                defaultValue="PEER"
+              >
                 <MenuItem value="SELF">{t("typeSelf")}</MenuItem>
                 <MenuItem value="MANAGER">{t("typeManager")}</MenuItem>
                 <MenuItem value="PEER">{t("typePeer")}</MenuItem>
@@ -248,7 +263,9 @@ export default function ReviewCycleDetailClient({ cycle, persons, canManage }: P
                   <TableCell sx={{ color: colors.slate400 }}>{t("reviewType")}</TableCell>
                   <TableCell sx={{ color: colors.slate400 }}>Status</TableCell>
                   {canManage && cycle.status === "DRAFT" && (
-                    <TableCell sx={{ color: colors.slate400 }} align="right" />
+                    <TableCell sx={{ color: colors.slate400 }} align="right">
+                      {t("actions")}
+                    </TableCell>
                   )}
                 </TableRow>
               </TableHead>
@@ -284,6 +301,7 @@ export default function ReviewCycleDetailClient({ cycle, persons, canManage }: P
                     {canManage && cycle.status === "DRAFT" && (
                       <TableCell align="right">
                         <IconButton
+                          aria-label={t("removeRequest")}
                           size="small"
                           onClick={() => setDeleteRequestId(req.id)}
                           disabled={isRemoving}

@@ -470,6 +470,7 @@
     "urlTooLong": "URL saa olla enintään {max} merkkiä",
     "invalidUrlProtocol": "URL:n on käytettävä http- tai https-protokollaa",
     "invalidUrlFormat": "Virheellinen URL-muoto",
+    "imageUrlDomainNotAllowed": "Kuvan URL-osoitteen toimialue ei ole sallittu. Käytä tuettua kuvapalvelua.",
     "csvNoFile": "Valitse CSV-tiedosto",
     "csvNotCsvFile": "Tiedoston on oltava .csv-tiedosto",
     "csvFileTooLarge": "Tiedosto ylittää 1 Mt:n rajan",
@@ -584,7 +585,8 @@
     "employee": "Työntekijä",
     "statusSubmitted": "Lähetetty",
     "statusPending": "Odottaa",
-    "selectCycle": "Valitse jakso"
+    "selectCycle": "Valitse jakso",
+    "actions": "Toiminnot"
   },
   "leave": {
     "title": "Poissaolohallinta",
@@ -639,7 +641,9 @@
     "filterAll": "Kaikki",
     "filterPending": "Odottavat",
     "filterApproved": "Hyväksytyt",
-    "filterRejected": "Hylätyt"
+    "filterRejected": "Hylätyt",
+    "statusFilter": "Tilasuodatin",
+    "actions": "Toiminnot"
   },
   "leaveNotifications": {
     "leaveTypeCreated": "Poissaolotyyppi luotu",

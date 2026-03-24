@@ -470,6 +470,7 @@
     "urlTooLong": "URL {max} अक्षरों से अधिक नहीं होनी चाहिए",
     "invalidUrlProtocol": "URL को http या https प्रोटोकॉल का उपयोग करना चाहिए",
     "invalidUrlFormat": "अमान्य URL प्रारूप",
+    "imageUrlDomainNotAllowed": "छवि URL का डोमेन अनुमत नहीं है। समर्थित छवि होस्ट का उपयोग करें।",
     "csvNoFile": "कृपया एक CSV फ़ाइल चुनें",
     "csvNotCsvFile": "फ़ाइल एक .csv फ़ाइल होनी चाहिए",
     "csvFileTooLarge": "फ़ाइल 1 MB सीमा से अधिक है",
@@ -584,7 +585,8 @@
     "employee": "कर्मचारी",
     "statusSubmitted": "प्रस्तुत",
     "statusPending": "लंबित",
-    "selectCycle": "चक्र चुनें"
+    "selectCycle": "चक्र चुनें",
+    "actions": "क्रियाएँ"
   },
   "leave": {
     "title": "अवकाश प्रबंधन",
@@ -639,7 +641,9 @@
     "filterAll": "सभी",
     "filterPending": "लंबित",
     "filterApproved": "स्वीकृत",
-    "filterRejected": "अस्वीकृत"
+    "filterRejected": "अस्वीकृत",
+    "statusFilter": "स्थिति फ़िल्टर",
+    "actions": "कार्रवाइयाँ"
   },
   "leaveNotifications": {
     "leaveTypeCreated": "अवकाश प्रकार बनाया गया",

@@ -126,6 +126,7 @@ export default function ReviewSubmitClient({ request, template }: Props) {
                         </strong>
                       </Typography>
                       <Slider
+                        aria-label={q.text}
                         value={answer?.ratingValue ?? q.scaleMin ?? 1}
                         min={q.scaleMin ?? 1}
                         max={q.scaleMax ?? 5}

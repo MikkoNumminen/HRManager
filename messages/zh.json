@@ -470,6 +470,7 @@
     "urlTooLong": "URL 不能超过 {max} 个字符",
     "invalidUrlProtocol": "URL 必须使用 http 或 https 协议",
     "invalidUrlFormat": "无效的 URL 格式",
+    "imageUrlDomainNotAllowed": "图片 URL 的域名不被允许。请使用支持的图片托管服务。",
     "csvNoFile": "请选择一个 CSV 文件",
     "csvNotCsvFile": "文件必须是 .csv 格式",
     "csvFileTooLarge": "文件超过 1 MB 的限制",
@@ -584,7 +585,8 @@
     "employee": "员工",
     "statusSubmitted": "已提交",
     "statusPending": "待处理",
-    "selectCycle": "选择周期"
+    "selectCycle": "选择周期",
+    "actions": "操作"
   },
   "leave": {
     "title": "假期管理",
@@ -639,7 +641,9 @@
     "filterAll": "全部",
     "filterPending": "待审核",
     "filterApproved": "已批准",
-    "filterRejected": "已拒绝"
+    "filterRejected": "已拒绝",
+    "statusFilter": "状态筛选",
+    "actions": "操作"
   },
   "leaveNotifications": {
     "leaveTypeCreated": "假期类型已创建",

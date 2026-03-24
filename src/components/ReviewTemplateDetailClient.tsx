@@ -104,6 +104,7 @@ export default function ReviewTemplateDetailClient({ template }: Props) {
               value={questionType}
               onChange={(e) => setQuestionType(e.target.value as "RATING" | "TEXT")}
               label={t("questionType")}
+              inputProps={{ "aria-label": t("questionType") }}
             >
               <MenuItem value="RATING">{t("typeRating")}</MenuItem>
               <MenuItem value="TEXT">{t("typeText")}</MenuItem>
@@ -202,6 +203,7 @@ export default function ReviewTemplateDetailClient({ template }: Props) {
                   />
                   <ListItemSecondaryAction>
                     <IconButton
+                      aria-label={t("removeRequest")}
                       edge="end"
                       onClick={() => setDeleteQuestionId(q.id)}
                       disabled={isRemoving}

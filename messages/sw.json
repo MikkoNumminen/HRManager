@@ -470,6 +470,7 @@
     "urlTooLong": "URL lazima iwe na herufi {max} au chini",
     "invalidUrlProtocol": "URL lazima itumie itifaki ya http au https",
     "invalidUrlFormat": "Muundo wa URL si sahihi",
+    "imageUrlDomainNotAllowed": "Kikoa cha URL ya picha hakikubaliki. Tumia seva ya picha inayoungwa mkono.",
     "csvNoFile": "Tafadhali chagua faili la CSV",
     "csvNotCsvFile": "Faili lazima liwe faili la .csv",
     "csvFileTooLarge": "Faili linazidi kikomo cha 1 MB",
@@ -584,7 +585,8 @@
     "employee": "Mfanyakazi",
     "statusSubmitted": "Imewasilishwa",
     "statusPending": "Inasubiri",
-    "selectCycle": "Chagua mzunguko"
+    "selectCycle": "Chagua mzunguko",
+    "actions": "Vitendo"
   },
   "leave": {
     "title": "Usimamizi wa Likizo",
@@ -639,7 +641,9 @@
     "filterAll": "Zote",
     "filterPending": "Zinazosubiri",
     "filterApproved": "Zilizoidhinishwa",
-    "filterRejected": "Zilizokataliwa"
+    "filterRejected": "Zilizokataliwa",
+    "statusFilter": "Chuja hali",
+    "actions": "Vitendo"
   },
   "leaveNotifications": {
     "leaveTypeCreated": "Aina ya likizo imeundwa",

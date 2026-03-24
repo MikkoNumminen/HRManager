@@ -310,6 +310,7 @@ function AuditLogViewer({
           value={currentFilters.userEmail ?? ""}
           onChange={(e) => updateFilter("userEmail", e.target.value)}
           label={t("filterUser")}
+          inputProps={{ "aria-label": t("filterUser") }}
           sx={selectStyles}
         >
           <MenuItem value="">{t("allUsers")}</MenuItem>
@@ -327,6 +328,7 @@ function AuditLogViewer({
           value={currentFilters.action ?? ""}
           onChange={(e) => updateFilter("action", e.target.value)}
           label={t("filterAction")}
+          inputProps={{ "aria-label": t("filterAction") }}
           sx={selectStyles}
         >
           <MenuItem value="">{t("allActions")}</MenuItem>
@@ -344,6 +346,7 @@ function AuditLogViewer({
           value={currentFilters.entityType ?? ""}
           onChange={(e) => updateFilter("entityType", e.target.value)}
           label={t("filterType")}
+          inputProps={{ "aria-label": t("filterType") }}
           sx={selectStyles}
         >
           <MenuItem value="">{t("allTypes")}</MenuItem>

@@ -470,6 +470,7 @@
     "urlTooLong": "URL은 {max}자 이하여야 합니다",
     "invalidUrlProtocol": "URL은 http 또는 https 프로토콜을 사용해야 합니다",
     "invalidUrlFormat": "유효하지 않은 URL 형식",
+    "imageUrlDomainNotAllowed": "이미지 URL 도메인이 허용되지 않습니다. 지원되는 이미지 호스트를 사용하세요.",
     "csvNoFile": "CSV 파일을 선택해 주세요",
     "csvNotCsvFile": "파일은 .csv 형식이어야 합니다",
     "csvFileTooLarge": "파일이 1MB 제한을 초과합니다",
@@ -584,7 +585,8 @@
     "employee": "직원",
     "statusSubmitted": "제출됨",
     "statusPending": "대기 중",
-    "selectCycle": "주기 선택"
+    "selectCycle": "주기 선택",
+    "actions": "작업"
   },
   "leave": {
     "title": "휴가 관리",
@@ -639,7 +641,9 @@
     "filterAll": "전체",
     "filterPending": "대기 중",
     "filterApproved": "승인됨",
-    "filterRejected": "반려됨"
+    "filterRejected": "반려됨",
+    "statusFilter": "상태 필터",
+    "actions": "작업"
   },
   "leaveNotifications": {
     "leaveTypeCreated": "휴가 유형이 생성되었습니다",

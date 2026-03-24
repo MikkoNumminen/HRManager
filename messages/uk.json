@@ -470,6 +470,7 @@
     "urlTooLong": "URL не повинен перевищувати {max} символів",
     "invalidUrlProtocol": "URL має використовувати протокол http або https",
     "invalidUrlFormat": "Недійсний формат URL",
+    "imageUrlDomainNotAllowed": "Домен URL зображення не дозволено. Використовуйте підтримуваний хост зображень.",
     "csvNoFile": "Будь ласка, виберіть файл CSV",
     "csvNotCsvFile": "Файл має бути у форматі .csv",
     "csvFileTooLarge": "Файл перевищує обмеження в 1 МБ",
@@ -584,7 +585,8 @@
     "employee": "Співробітник",
     "statusSubmitted": "Надіслано",
     "statusPending": "Очікує",
-    "selectCycle": "Вибрати цикл"
+    "selectCycle": "Вибрати цикл",
+    "actions": "Дії"
   },
   "leave": {
     "title": "Управління відпустками",
@@ -639,7 +641,9 @@
     "filterAll": "Всі",
     "filterPending": "Очікуючі",
     "filterApproved": "Схвалені",
-    "filterRejected": "Відхилені"
+    "filterRejected": "Відхилені",
+    "statusFilter": "Фільтр статусу",
+    "actions": "Дії"
   },
   "leaveNotifications": {
     "leaveTypeCreated": "Вид відпустки створено",

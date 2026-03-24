@@ -470,6 +470,7 @@
     "urlTooLong": "URL en fazla {max} karakter olabilir",
     "invalidUrlProtocol": "URL, http veya https protokolünü kullanmalıdır",
     "invalidUrlFormat": "Geçersiz URL formatı",
+    "imageUrlDomainNotAllowed": "Görsel URL'nin alan adına izin verilmiyor. Desteklenen bir görsel sunucusu kullanın.",
     "csvNoFile": "Lütfen bir CSV dosyası seçin",
     "csvNotCsvFile": "Dosya .csv formatında olmalıdır",
     "csvFileTooLarge": "Dosya 1 MB sınırını aşıyor",
@@ -584,7 +585,8 @@
     "employee": "Çalışan",
     "statusSubmitted": "Gönderildi",
     "statusPending": "Beklemede",
-    "selectCycle": "Dönem seçin"
+    "selectCycle": "Dönem seçin",
+    "actions": "İşlemler"
   },
   "leave": {
     "title": "İzin Yönetimi",
@@ -639,7 +641,9 @@
     "filterAll": "Tümü",
     "filterPending": "Bekleyenler",
     "filterApproved": "Onaylananlar",
-    "filterRejected": "Reddedilenler"
+    "filterRejected": "Reddedilenler",
+    "statusFilter": "Durum filtresi",
+    "actions": "İşlemler"
   },
   "leaveNotifications": {
     "leaveTypeCreated": "İzin türü oluşturuldu",

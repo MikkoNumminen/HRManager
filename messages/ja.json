@@ -470,6 +470,7 @@
     "urlTooLong": "URLは{max}文字以内にしてください",
     "invalidUrlProtocol": "URLにはhttpまたはhttpsプロトコルを使用してください",
     "invalidUrlFormat": "無効なURL形式",
+    "imageUrlDomainNotAllowed": "画像URLのドメインは許可されていません。サポートされている画像ホストを使用してください。",
     "csvNoFile": "CSVファイルを選択してください",
     "csvNotCsvFile": "ファイルは.csv形式でなければなりません",
     "csvFileTooLarge": "ファイルが1MBの制限を超えています",
@@ -584,7 +585,8 @@
     "employee": "従業員",
     "statusSubmitted": "提出済み",
     "statusPending": "保留中",
-    "selectCycle": "サイクルを選択"
+    "selectCycle": "サイクルを選択",
+    "actions": "アクション"
   },
   "leave": {
     "title": "休暇管理",
@@ -639,7 +641,9 @@
     "filterAll": "すべて",
     "filterPending": "審査中",
     "filterApproved": "承認済み",
-    "filterRejected": "却下"
+    "filterRejected": "却下",
+    "statusFilter": "ステータスフィルター",
+    "actions": "アクション"
   },
   "leaveNotifications": {
     "leaveTypeCreated": "休暇種別を作成しました",

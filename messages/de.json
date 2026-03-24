@@ -470,6 +470,7 @@
     "urlTooLong": "Die URL darf maximal {max} Zeichen lang sein",
     "invalidUrlProtocol": "Die URL muss das http- oder https-Protokoll verwenden",
     "invalidUrlFormat": "Ungültiges URL-Format",
+    "imageUrlDomainNotAllowed": "Die Domain der Bild-URL ist nicht erlaubt. Verwende einen unterstützten Bild-Host.",
     "csvNoFile": "Bitte wählen Sie eine CSV-Datei aus",
     "csvNotCsvFile": "Die Datei muss eine .csv-Datei sein",
     "csvFileTooLarge": "Die Datei überschreitet das 1-MB-Limit",
@@ -584,7 +585,8 @@
     "employee": "Mitarbeiter",
     "statusSubmitted": "Eingereicht",
     "statusPending": "Ausstehend",
-    "selectCycle": "Zyklus auswählen"
+    "selectCycle": "Zyklus auswählen",
+    "actions": "Aktionen"
   },
   "leave": {
     "title": "Abwesenheitsverwaltung",
@@ -639,7 +641,9 @@
     "filterAll": "Alle",
     "filterPending": "Ausstehend",
     "filterApproved": "Genehmigt",
-    "filterRejected": "Abgelehnt"
+    "filterRejected": "Abgelehnt",
+    "statusFilter": "Statusfilter",
+    "actions": "Aktionen"
   },
   "leaveNotifications": {
     "leaveTypeCreated": "Abwesenheitstyp erstellt",

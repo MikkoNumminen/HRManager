@@ -432,6 +432,7 @@
     "urlTooLong": "URL must be {max} characters or less",
     "invalidUrlProtocol": "URL must use http or https protocol",
     "invalidUrlFormat": "Invalid URL format",
+    "imageUrlDomainNotAllowed": "Image URL domain is not allowed. Use a supported image host.",
     "csvNoFile": "Please select a CSV file",
     "csvNotCsvFile": "File must be a .csv file",
     "csvFileTooLarge": "File exceeds 1 MB limit",
@@ -584,7 +585,8 @@
     "employee": "Employee",
     "statusSubmitted": "Submitted",
     "statusPending": "Pending",
-    "selectCycle": "Select Cycle"
+    "selectCycle": "Select Cycle",
+    "actions": "Actions"
   },
   "leave": {
     "title": "Leave Management",
@@ -639,7 +641,9 @@
     "filterAll": "All",
     "filterPending": "Pending",
     "filterApproved": "Approved",
-    "filterRejected": "Rejected"
+    "filterRejected": "Rejected",
+    "statusFilter": "Status filter",
+    "actions": "Actions"
   },
   "leaveNotifications": {
     "leaveTypeCreated": "Leave type created",

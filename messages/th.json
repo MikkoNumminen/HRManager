@@ -470,6 +470,7 @@
     "urlTooLong": "URL ต้องมีไม่เกิน {max} ตัวอักษร",
     "invalidUrlProtocol": "URL ต้องใช้โปรโตคอล http หรือ https",
     "invalidUrlFormat": "รูปแบบ URL ไม่ถูกต้อง",
+    "imageUrlDomainNotAllowed": "โดเมนของ URL รูปภาพไม่ได้รับอนุญาต กรุณาใช้โฮสต์รูปภาพที่รองรับ",
     "csvNoFile": "กรุณาเลือกไฟล์ CSV",
     "csvNotCsvFile": "ไฟล์ต้องเป็นไฟล์ .csv",
     "csvFileTooLarge": "ไฟล์เกินขีดจำกัด 1 MB",
@@ -584,7 +585,8 @@
     "employee": "พนักงาน",
     "statusSubmitted": "ส่งแล้ว",
     "statusPending": "รอดำเนินการ",
-    "selectCycle": "เลือกรอบ"
+    "selectCycle": "เลือกรอบ",
+    "actions": "การดำเนินการ"
   },
   "leave": {
     "title": "การจัดการวันลา",
@@ -639,7 +641,9 @@
     "filterAll": "ทั้งหมด",
     "filterPending": "รอดำเนินการ",
     "filterApproved": "อนุมัติแล้ว",
-    "filterRejected": "ปฏิเสธแล้ว"
+    "filterRejected": "ปฏิเสธแล้ว",
+    "statusFilter": "ตัวกรองสถานะ",
+    "actions": "การดำเนินการ"
   },
   "leaveNotifications": {
     "leaveTypeCreated": "สร้างประเภทวันลาแล้ว",

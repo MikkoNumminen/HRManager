@@ -470,6 +470,7 @@
     "urlTooLong": "La URL no puede superar {max} caracteres",
     "invalidUrlProtocol": "La URL debe usar el protocolo http o https",
     "invalidUrlFormat": "Formato de URL no válido",
+    "imageUrlDomainNotAllowed": "El dominio de la URL de imagen no está permitido. Usa un host de imágenes compatible.",
     "csvNoFile": "Por favor, seleccione un archivo CSV",
     "csvNotCsvFile": "El archivo debe ser un archivo .csv",
     "csvFileTooLarge": "El archivo supera el límite de 1 MB",
@@ -584,7 +585,8 @@
     "employee": "Empleado",
     "statusSubmitted": "Enviado",
     "statusPending": "Pendiente",
-    "selectCycle": "Seleccionar ciclo"
+    "selectCycle": "Seleccionar ciclo",
+    "actions": "Acciones"
   },
   "leave": {
     "title": "Gestión de ausencias",
@@ -639,7 +641,9 @@
     "filterAll": "Todas",
     "filterPending": "Pendientes",
     "filterApproved": "Aprobadas",
-    "filterRejected": "Rechazadas"
+    "filterRejected": "Rechazadas",
+    "statusFilter": "Filtro de estado",
+    "actions": "Acciones"
   },
   "leaveNotifications": {
     "leaveTypeCreated": "Tipo de ausencia creado",

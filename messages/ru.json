@@ -470,6 +470,7 @@
     "urlTooLong": "URL не должен превышать {max} символов",
     "invalidUrlProtocol": "URL должен использовать протокол http или https",
     "invalidUrlFormat": "Недопустимый формат URL",
+    "imageUrlDomainNotAllowed": "Домен URL изображения не разрешён. Используйте поддерживаемый хост изображений.",
     "csvNoFile": "Пожалуйста, выберите CSV-файл",
     "csvNotCsvFile": "Файл должен быть в формате .csv",
     "csvFileTooLarge": "Файл превышает ограничение в 1 МБ",
@@ -584,7 +585,8 @@
     "employee": "Сотрудник",
     "statusSubmitted": "Отправлено",
     "statusPending": "Ожидание",
-    "selectCycle": "Выбрать цикл"
+    "selectCycle": "Выбрать цикл",
+    "actions": "Действия"
   },
   "leave": {
     "title": "Управление отпусками",
@@ -639,7 +641,9 @@
     "filterAll": "Все",
     "filterPending": "Ожидающие",
     "filterApproved": "Одобренные",
-    "filterRejected": "Отклонённые"
+    "filterRejected": "Отклонённые",
+    "statusFilter": "Фильтр статуса",
+    "actions": "Действия"
   },
   "leaveNotifications": {
     "leaveTypeCreated": "Вид отпуска создан",

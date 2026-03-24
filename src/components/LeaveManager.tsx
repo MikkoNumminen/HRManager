@@ -226,6 +226,7 @@ function RequestsTab({
           size="small"
           value={statusFilter}
           onChange={(e) => onStatusFilter(e.target.value)}
+          inputProps={{ "aria-label": t("statusFilter") }}
           sx={{ ...textFieldStyles, minWidth: 140 }}
         >
           <MenuItem value="all">{t("filterAll")}</MenuItem>
@@ -343,7 +344,9 @@ function RequestsTab({
                 <TableCell sx={{ color: colors.slate400 }}>{t("days")}</TableCell>
                 <TableCell sx={{ color: colors.slate400 }}>{t("status")}</TableCell>
                 <TableCell sx={{ color: colors.slate400 }}>{t("reviewer")}</TableCell>
-                {(canApprove || canRequest) && <TableCell sx={{ color: colors.slate400 }} />}
+                {(canApprove || canRequest) && (
+                  <TableCell sx={{ color: colors.slate400 }}>{t("actions")}</TableCell>
+                )}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -583,7 +586,9 @@ function LeaveTypesTab({
                 <TableCell sx={{ color: colors.slate400 }}>{t("enterDescription")}</TableCell>
                 <TableCell sx={{ color: colors.slate400 }}>{t("defaultDays")}</TableCell>
                 <TableCell sx={{ color: colors.slate400 }}>{t("color")}</TableCell>
-                {canManageTypes && <TableCell sx={{ color: colors.slate400 }} />}
+                {canManageTypes && (
+                  <TableCell sx={{ color: colors.slate400 }}>{t("actions")}</TableCell>
+                )}
               </TableRow>
             </TableHead>
             <TableBody>

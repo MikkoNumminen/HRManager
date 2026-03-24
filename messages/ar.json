@@ -470,6 +470,7 @@
     "urlTooLong": "يجب ألا يتجاوز الرابط {max} حرفاً",
     "invalidUrlProtocol": "يجب أن يستخدم الرابط بروتوكول http أو https",
     "invalidUrlFormat": "تنسيق الرابط غير صالح",
+    "imageUrlDomainNotAllowed": "نطاق رابط الصورة غير مسموح به. استخدم مضيف صور مدعوم.",
     "csvNoFile": "يرجى تحديد ملف CSV",
     "csvNotCsvFile": "يجب أن يكون الملف بصيغة .csv",
     "csvFileTooLarge": "الملف يتجاوز حد 1 ميغابايت",
@@ -584,7 +585,8 @@
     "employee": "الموظف",
     "statusSubmitted": "مقدم",
     "statusPending": "معلق",
-    "selectCycle": "اختر الدورة"
+    "selectCycle": "اختر الدورة",
+    "actions": "إجراءات"
   },
   "leave": {
     "title": "إدارة الإجازات",
@@ -639,7 +641,9 @@
     "filterAll": "الكل",
     "filterPending": "المعلقة",
     "filterApproved": "الموافَق عليها",
-    "filterRejected": "المرفوضة"
+    "filterRejected": "المرفوضة",
+    "statusFilter": "تصفية الحالة",
+    "actions": "الإجراءات"
   },
   "leaveNotifications": {
     "leaveTypeCreated": "تم إنشاء نوع الإجازة",
