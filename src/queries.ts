@@ -30,6 +30,8 @@ import {
   LeaveType,
   LeaveRequest,
   LeaveBalance,
+  PositionSchema,
+  Position,
   EmployeeProfileSchema,
   EmployeeProfile,
   OrgChartDataSchema,
@@ -42,6 +44,7 @@ import { Filter } from "mongodb";
 
 import {
   PAGE_SIZE,
+  DEMO_EMAIL,
   PersonDeleteImpact,
   TeamDeleteImpact,
   DepartmentDeleteImpact,
@@ -56,6 +59,17 @@ export async function getPersons(): Promise<Person[]> {
   });
 
   return persons.map((person) => PersonSchema.parse(person));
+}
+
+export async function getPositions(): Promise<Position[]> {
+  const sessionId = await getDemoSessionId();
+  const positions = await prisma.position.findMany({
+    where: { deletedAt: null, sessionId },
+    omit: { sessionId: true, deletedAt: true },
+    orderBy: { name: "asc" },
+  });
+
+  return positions.map((p) => PositionSchema.parse(p));
 }
 
 export async function getPagedPersons(
@@ -272,7 +286,7 @@ export async function getUsers(): Promise<AppUser[]> {
   const demoSessionId = await getDemoSessionId();
   const users = await prisma.user.findMany({
     // Demo sessions only see the demo user — prevents leaking real OAuth user emails
-    ...(demoSessionId ? { where: { email: "demo@hrmanager.app" } } : {}),
+    ...(demoSessionId ? { where: { email: DEMO_EMAIL } } : {}),
     omit: { permissionsVersion: true },
     orderBy: { createdAt: "asc" },
   });
@@ -294,7 +308,7 @@ export async function getUserById(userId: string) {
 
   if (!user) return null;
   // Demo sessions can only view the demo user — prevents accessing real OAuth users by UUID
-  if (demoSessionId && user.email !== "demo@hrmanager.app") return null;
+  if (demoSessionId && user.email !== DEMO_EMAIL) return null;
 
   const overrides = user.permissions.map((up) => ({
     key: up.permission.key,
@@ -410,7 +424,7 @@ export async function getDashboardMetrics(): Promise<DashboardMetrics> {
           (SELECT COUNT(*)::int FROM "Person" WHERE "deletedAt" IS NULL AND "sessionId" IS NOT DISTINCT FROM ${sessionId}) AS "totalPersons",
           (SELECT COUNT(*)::int FROM "Team" WHERE "deletedAt" IS NULL AND "sessionId" IS NOT DISTINCT FROM ${sessionId}) AS "totalTeams",
           (SELECT COUNT(*)::int FROM "Department" WHERE "deletedAt" IS NULL AND "sessionId" IS NOT DISTINCT FROM ${sessionId}) AS "totalDepartments",
-          (SELECT COUNT(*)::int FROM "User" WHERE (${sessionId}::text IS NULL OR email = 'demo@hrmanager.app')) AS "totalUsers"
+          (SELECT COUNT(*)::int FROM "User" WHERE (${sessionId}::text IS NULL OR email = ${DEMO_EMAIL})) AS "totalUsers"
       `,
       prisma.$queryRaw<TeamSizeRow[]>`
         SELECT

@@ -1,4 +1,5 @@
 export const PAGE_SIZE = 25;
+export const DEMO_EMAIL = "demo@hrmanager.app";
 
 export interface PersonDeleteImpact {
   managedTeams: { teamId: string; teamName: string }[];

@@ -323,6 +323,15 @@ export const LeaveBalanceSchema = z.object({
 
 export type LeaveBalance = z.infer<typeof LeaveBalanceSchema>;
 
+export const PositionSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string().min(1).max(MAX_NAME_LENGTH),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type Position = z.infer<typeof PositionSchema>;
+
 export const EmployeeTeamSchema = z.object({
   teamId: z.string().uuid(),
   teamName: z.string(),

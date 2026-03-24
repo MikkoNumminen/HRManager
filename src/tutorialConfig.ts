@@ -178,7 +178,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
   },
 ];
 
-export const DEMO_EMAIL = "demo@hrmanager.app";
+export { DEMO_EMAIL } from "@/constants";
 export const STORAGE_KEY = "hrm_tutorial_progress";
 
 export function matchRoute(stepRoute: string | RegExp, pathname: string): boolean {

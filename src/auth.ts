@@ -5,6 +5,7 @@ import Credentials from "next-auth/providers/credentials";
 import { prisma } from "@/db";
 import { resolvePermissions } from "@/permissions";
 import { seedDemoData, cleanupStaleDemoSessions } from "@/demoSession";
+import { DEMO_EMAIL } from "@/constants";
 
 // Demo login is enabled by default so the demo works out of the box.
 // Set NEXT_PUBLIC_DEMO_LOGIN=false to disable the zero-credential demo provider.
@@ -17,19 +18,18 @@ const demoProvider =
           name: "Demo",
           credentials: {},
           async authorize() {
-            const demoEmail = "demo@hrmanager.app";
-            let user = await prisma.user.findUnique({ where: { email: demoEmail } });
+            let user = await prisma.user.findUnique({ where: { email: DEMO_EMAIL } });
             if (!user) {
               user = await prisma.user.create({
                 data: {
-                  email: demoEmail,
+                  email: DEMO_EMAIL,
                   name: "Demo User",
                   role: "superuser",
                 },
               });
             } else if (user.role !== "superuser") {
               user = await prisma.user.update({
-                where: { email: demoEmail },
+                where: { email: DEMO_EMAIL },
                 data: { role: "superuser" },
               });
             }
