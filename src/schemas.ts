@@ -8,6 +8,23 @@ export const MAX_URL_LENGTH = 2048;
 
 export const EmailSchema = z.string().email().max(MAX_EMAIL_LENGTH);
 
+/** Validates a profile image URL: must be http/https and within MAX_URL_LENGTH. Empty string is not valid — callers should only apply this to non-empty trimmed values. */
+export const ImageUrlSchema = z
+  .string()
+  .max(MAX_URL_LENGTH, "urlTooLong")
+  .superRefine((val, ctx) => {
+    let parsed: URL;
+    try {
+      parsed = new URL(val);
+    } catch {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "invalidUrlFormat" });
+      return;
+    }
+    if (!["http:", "https:"].includes(parsed.protocol)) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "invalidUrlProtocol" });
+    }
+  });
+
 export const PersonSchema = z.object({
   id: z.string().uuid(),
   name: z.string().min(1).max(MAX_NAME_LENGTH),
@@ -196,6 +213,7 @@ export type CsvPersonImportRow = z.infer<typeof CsvPersonImportRowSchema>;
 
 export const MAX_IMPORT_ROWS = 1000;
 export const MAX_IMPORT_FILE_SIZE = 1024 * 1024; // 1 MB
+export const MAX_EXPORT_ROWS = 10000;
 
 export const MAX_QUESTION_TEXT_LENGTH = 500;
 

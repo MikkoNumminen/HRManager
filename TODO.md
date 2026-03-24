@@ -18,9 +18,11 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 > 📋 **Audit research:** All items below marked "(found by audit)" have detailed file:line references in `AUDIT_REPORT.md`. Read it before starting any of these tasks.
 
 - 🟢⚡ CI pipeline monitoring & auto-fix — watching for failures, fixing build/lint/format issues [Claude 4, main]
+- 🔴🧠 Split `serverActions.ts` into domain modules — barrel re-export for backward compat [Claude 3, split-server-actions]
 
 ## Recently Completed
 
+- ✅ Extract DEMO_EMAIL constant + add missing getPositions query — constants.ts, auth.ts, queries.ts, schemas.ts, tutorialConfig.ts (~10min)
 - ✅ Org chart visualization — ReactFlow + dagre, dept→team→member hierarchy, 23 tests (5 query + 18 component), 1544 total (~45min)
 - ✅ Test infrastructure fix — TRUNCATE CASCADE in cleanDb, RateLimitError in 7 mocks, eliminated all flaky FK failures
 - ✅ Employee profile pages — `/employees/[id]` read-only cards, guest-accessible, 3 sections (info/teams/leadership), 13 tests, 18 locales
@@ -44,7 +46,7 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 - 🟡🧠 Consolidate duplicate seed data — demoSession.ts (9 persons) and serverActions.ts (6 persons) diverged; extract shared seed definitions to seedData.ts
 - 🟢⚡ Replace CSV import loop with `createMany` — serverActions.ts:1611 creates up to 1,000 persons via sequential INSERT; use tx.person.createMany()
 - 🟢⚡ Replace seed sequential inserts with `createMany` — demoSession.ts:33–67 and serverActions.ts:1030–1072 use sequential creates inside transactions
-- 🟢⚡ Extract `DEMO_EMAIL` constant — magic string "demo@hrmanager.app" appears in 4 files; add to constants.ts and import everywhere
+- 🟢⚡ Extract `DEMO_EMAIL` constant — serverActions/admin.ts:488 still has hardcoded string (needs update after serverActions split lands)
 - 🟢⚡ Extract `MAX_EXPORT_ROWS` constant — magic `10000` literal at serverActions.ts:1737; add alongside MAX_IMPORT_ROWS in schemas.ts
 - 🟢⚡ Extract rate limit constants to named values — `60*1000`, `30`, `10` in rateLimit.ts:6–8; export as RATE_LIMIT_WINDOW_MS, MAX_REQUESTS_PER_WINDOW, AUTH_MAX_REQUESTS
 - 🟢⚡ Extract URL validator to schemas.ts — inline URL parse + protocol check at serverActions.ts:1517; extract to reusable ImageUrlSchema in schemas.ts
