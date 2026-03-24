@@ -80,10 +80,9 @@ describe("ReviewTemplateDetailClient", () => {
 
   // Shows required switch in the form.
   test("shows required switch", () => {
-    const { container } = render(<ReviewTemplateDetailClient {...defaultProps} />);
-    // MUI Switch renders a hidden checkbox input with name="required".
-    const switchInput = container.querySelector('input[name="required"]');
-    expect(switchInput).not.toBeNull();
+    render(<ReviewTemplateDetailClient {...defaultProps} />);
+    // MUI Switch renders with the switch ARIA role.
+    expect(screen.getByRole("switch")).toBeInTheDocument();
   });
 
   // Has submit button with add question label.
@@ -204,9 +203,8 @@ describe("ReviewTemplateDetailClient", () => {
 
   // Hidden input contains the template ID.
   test("form contains hidden template ID input", () => {
-    const { container } = render(<ReviewTemplateDetailClient {...defaultProps} />);
-    const hiddenInput = container.querySelector('input[name="templateId"]');
-    expect(hiddenInput).not.toBeNull();
-    expect(hiddenInput).toHaveValue("tmpl-1");
+    render(<ReviewTemplateDetailClient {...defaultProps} />);
+    // Hidden inputs have no accessible role — query by display value.
+    expect(screen.getByDisplayValue("tmpl-1")).toBeInTheDocument();
   });
 });

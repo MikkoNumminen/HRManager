@@ -137,13 +137,13 @@ describe("ReviewsClient", () => {
 
   // ─── Form Elements ────────────────────────────────────────
 
-  // Create form has date fields.
+  // Create form has date fields (type="date" has no accessible role in JSDOM).
   test("create form has date fields", () => {
     const { container } = render(<ReviewsClient {...defaultProps} />);
-    const startDate = container.querySelector('input[name="startDate"]');
-    const endDate = container.querySelector('input[name="endDate"]');
-    expect(startDate).not.toBeNull();
-    expect(endDate).not.toBeNull();
+    /* eslint-disable testing-library/no-container, testing-library/no-node-access */
+    expect(container.querySelector('input[name="startDate"]')).toBeInTheDocument();
+    expect(container.querySelector('input[name="endDate"]')).toBeInTheDocument();
+    /* eslint-enable testing-library/no-container, testing-library/no-node-access */
   });
 
   // Submit button is present with create cycle label.
