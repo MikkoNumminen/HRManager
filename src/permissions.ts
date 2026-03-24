@@ -1,5 +1,6 @@
 import { prisma } from "@/db";
 import { auth } from "@/auth";
+import { ActionError } from "@/actionErrors";
 
 export const PERMISSION_KEYS = [
   "person:create",
@@ -213,6 +214,6 @@ export async function requirePermission(permissionKey: string): Promise<void> {
     // Lazy import to avoid circular dependency (permissions → auditLog → auth → permissions)
     const { logPermissionDenial } = await import("@/auditLog");
     await logPermissionDenial(permissionKey);
-    throw new Error(`Permission denied: ${permissionKey}`);
+    throw new ActionError("permissionDenied", `Permission denied: ${permissionKey}`);
   }
 }

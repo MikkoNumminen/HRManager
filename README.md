@@ -57,7 +57,7 @@ sequenceDiagram
 
 ### 🔐 Security & access control
 
-- **33 permissions, not just 4 roles (granular RBAC)** — Instead of "admin = can do everything," each action has its own permission key (`person:create`, `team:delete`, `review:manage`). Any permission can be overridden per-user: grant a regular user `person:create` without promoting them, or deny `team:delete` from an administrator who shouldn't have it. _Why? Simple role checks seem fine until you need exceptions — and every real organization has them._
+- **37 permissions, not just 4 roles (granular RBAC)** — Instead of "admin = can do everything," each action has its own permission key (`person:create`, `team:delete`, `review:manage`, `leave:approve`). Any permission can be overridden per-user: grant a regular user `person:create` without promoting them, or deny `team:delete` from an administrator who shouldn't have it. _Why? Simple role checks seem fine until you need exceptions — and every real organization has them._
 
 ```mermaid
 graph TD
@@ -83,7 +83,7 @@ graph TD
 graph LR
     subgraph "Demo session isolation"
         Demo["Try Demo clicked"] --> UUID["Generate session UUID"]
-        UUID --> Seed["Seed sandbox data<br/><i>6 people, 3 teams, 2 depts</i>"]
+        UUID --> Seed["Seed sandbox data<br/><i>6 people, 3 teams, 2 depts, 4 leave types</i>"]
         Seed --> Filter["All queries filter by sessionId"]
         Filter --> R1["Real user data<br/><i>sessionId = NULL</i>"]
         Filter --> R2["Demo sandbox<br/><i>sessionId = abc-123</i>"]
@@ -123,6 +123,14 @@ graph LR
 - **Full 360-degree review system** — SELF, MANAGER, PEER, and DIRECT*REPORT review types. Configurable question templates with RATING (slider 1–10) and TEXT (free text) question types. Review cycles follow a DRAFT → OPEN → CLOSED lifecycle. \_Why a lifecycle? Drafts let HR build cycles before employees see them; closing locks in responses for archival accuracy.*
 
 - **Configurable templates and cycles** — Administrators create reusable `ReviewTemplate` models, attach questions, then instantiate `ReviewCycle` runs that target specific employees. `ReviewRequest` tracks who owes whom a review; `ReviewSubmission` stores the answers. Four new Prisma models, 11 server actions, 3 permission keys (`review:view`, `review:manage`, `review:submit`), and 6 dedicated routes (`/reviews`, `/reviews/templates`, `/reviews/cycles/[id]`, `/reviews/my-reviews`, etc.). Full audit logging and demo session isolation applied throughout.
+
+### 🏖️ Leave / Absence Management
+
+- **Complete leave lifecycle** — Leave types (Annual, Sick, Parental, Unpaid — fully configurable), leave requests with approval workflow, and per-person balance tracking. Three new Prisma models (`LeaveType`, `LeaveRequest`, `LeaveBalance`), 7 server actions, 4 permission keys (`leave:view`, `leave:request`, `leave:approve`, `leave:manage_types`). _Why a full workflow? Real HR systems don't just track time off — they enforce balances, prevent overlapping requests, and require manager approval._
+
+- **Balance enforcement and overlap detection** — Creating a leave request checks the employee's remaining balance and rejects if insufficient. Overlapping date ranges (pending or approved) are blocked at the transaction level. Approving a request automatically decrements the balance via upsert. _Why transactional? Two managers approving the same request simultaneously could double-debit the balance without transaction isolation._
+
+- **Three-tab UI** — Requests (with status filtering, approve/reject/cancel actions), Types (CRUD with color picker), and Balances (allocation with remaining calculation and color-coded indicators). Permission-gated controls: only users with `leave:approve` see the approve/reject buttons; only `leave:manage_types` can configure types and allocate balances.
 
 ### 🧪 Quality
 
@@ -191,7 +199,7 @@ graph LR
 
 | Role          | Access                           | Typical use case                                  |
 | ------------- | -------------------------------- | ------------------------------------------------- |
-| Superuser     | All 33 permissions (immutable)   | System admin — first OAuth user is auto-promoted  |
+| Superuser     | All 37 permissions (immutable)   | System admin — first OAuth user is auto-promoted  |
 | Administrator | All CRUD + dashboard + audit log | Day-to-day management (no admin UI or data reset) |
 | User          | Read-only                        | Regular employee viewing org data                 |
 | Guest         | Read-only (unauthenticated)      | Public visitors browsing without login            |
@@ -202,26 +210,26 @@ graph LR
 
 ## Testing
 
-| Layer            | Tests    | What it covers                                                                                      |
-| ---------------- | -------- | --------------------------------------------------------------------------------------------------- |
-| UI components    | 676      | All 50 components: charts, forms, permission toggles, mobile views, themes, skeletons, empty states |
-| Server actions   | 215      | Every mutation: happy path, errors, permission denials, cascades                                    |
-| Zod schemas      | 94       | Validation rules, edge cases, type inference                                                        |
-| Prisma queries   | 60       | Real PostgreSQL + MongoDB queries — not mocks                                                       |
-| CSV utils        | 39       | RFC 4180 parsing, import validation, export formatting                                              |
-| Style tokens     | 37       | Responsive breakpoints, theme tokens, component styles                                              |
-| Auth callbacks   | 32       | JWT enrichment, permission freshness, superuser bootstrap                                           |
-| RBAC logic       | 28       | Resolution, overrides, deny-wins, superuser bypass                                                  |
-| Tutorial config  | 26       | Tour steps, DOM selectors, completion detection                                                     |
-| CSP proxy        | 20       | Nonce generation, header injection, domain allowlists                                               |
-| Rate limiting    | 18       | Sliding window, race conditions, cleanup                                                            |
-| i18n             | 14       | Locale loading, cookie persistence, Accept-Language detection                                       |
-| Demo session     | 12       | Sandbox creation, isolation, cleanup, expiry                                                        |
-| Theme config     | 12       | All 6 themes, CSS variables, FOUC prevention                                                        |
-| Audit logging    | 11       | Deferred writes, before/after snapshots, security events                                            |
-| Auth route       | 5        | Rate limiting on auth endpoints, CSRF, GET passthrough                                              |
-| E2E (Playwright) | 75       | Auth, CRUD, detail editing, dashboard, profile, data I/O, form validation, full workflow            |
-| **Total**        | **1446** | **97.8% line coverage · 95.4% function coverage**                                                   |
+| Layer            | Tests    | What it covers                                                                                    |
+| ---------------- | -------- | ------------------------------------------------------------------------------------------------- |
+| UI components    | 696      | All 51 components: charts, forms, permission toggles, mobile views, themes, skeletons, leave mgmt |
+| Server actions   | 253      | Every mutation: happy path, errors, permission denials, cascades, leave approval workflow         |
+| Zod schemas      | 94       | Validation rules, edge cases, type inference                                                      |
+| Prisma queries   | 70       | Real PostgreSQL + MongoDB queries — not mocks                                                     |
+| CSV utils        | 39       | RFC 4180 parsing, import validation, export formatting                                            |
+| Style tokens     | 37       | Responsive breakpoints, theme tokens, component styles                                            |
+| Auth callbacks   | 32       | JWT enrichment, permission freshness, superuser bootstrap                                         |
+| RBAC logic       | 28       | Resolution, overrides, deny-wins, superuser bypass                                                |
+| Tutorial config  | 26       | Tour steps, DOM selectors, completion detection                                                   |
+| CSP proxy        | 20       | Nonce generation, header injection, domain allowlists                                             |
+| Rate limiting    | 18       | Sliding window, race conditions, cleanup                                                          |
+| i18n             | 14       | Locale loading, cookie persistence, Accept-Language detection                                     |
+| Demo session     | 12       | Sandbox creation, isolation, cleanup, expiry                                                      |
+| Theme config     | 12       | All 6 themes, CSS variables, FOUC prevention                                                      |
+| Audit logging    | 11       | Deferred writes, before/after snapshots, security events                                          |
+| Auth route       | 5        | Rate limiting on auth endpoints, CSRF, GET passthrough                                            |
+| E2E (Playwright) | 75       | Auth, CRUD, detail editing, dashboard, profile, data I/O, form validation, full workflow          |
+| **Total**        | **1446** | **97.8% line coverage · 95.4% function coverage**                                                 |
 
 ```
 Statements : 97.58%    Branches : 92.90%
