@@ -14,6 +14,7 @@ import { unstable_cache as nextCache } from "next/cache";
 
 // In test environments, unstable_cache requires incrementalCache (Next.js runtime).
 // Fall back to a passthrough wrapper so tests call the function directly.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- must match Next.js Callback type
 function cache<T extends (...args: any[]) => Promise<any>>(
   fn: T,
   keyParts?: string[],
