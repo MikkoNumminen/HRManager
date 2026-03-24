@@ -44,7 +44,8 @@
     "profile": "प्रोफ़ाइल",
     "dataImportExport": "डेटा आयात / निर्यात",
     "performanceReviews": "प्रदर्शन समीक्षाएँ",
-    "leaveManagement": "अवकाश प्रबंधन"
+    "leaveManagement": "अवकाश प्रबंधन",
+    "positionCatalog": "पद सूची"
   },
   "home": {
     "title": "मानव संसाधन प्रबंधन प्रणाली",
@@ -497,7 +498,9 @@
     "cannotDeleteNonPendingRequest": "केवल लंबित अवकाश अनुरोध रद्द किए जा सकते हैं",
     "noteTooLong": "नोट {max} वर्णों से अधिक नहीं होना चाहिए",
     "invalidId": "अमान्य आईडी",
-    "invalidYear": "अमान्य वर्ष"
+    "invalidYear": "अमान्य वर्ष",
+    "positionAlreadyExists": "यह पद पहले से मौजूद है",
+    "positionNotFound": "पद नहीं मिला"
   },
   "reviews": {
     "title": "प्रदर्शन समीक्षाएँ",
@@ -651,5 +654,22 @@
     "requestAdded": "समीक्षा अनुरोध जोड़ा गया",
     "requestRemoved": "समीक्षा अनुरोध हटाया गया",
     "reviewSubmitted": "समीक्षा सफलतापूर्वक सबमिट की गई"
+  },
+  "positions": {
+    "title": "पद",
+    "heading": "पद",
+    "description": "उपलब्ध पदों का प्रबंधन करें",
+    "addPosition": "पद जोड़ें",
+    "deletePosition": "पद हटाएं",
+    "deletePositionConfirm": "क्या आप वाकई इस पद को हटाना चाहते हैं?",
+    "positionName": "पद का नाम",
+    "enterPositionName": "पद का नाम दर्ज करें",
+    "noPositions": "कोई पद नहीं",
+    "noPositionsHint": "ऊपर दिए गए फॉर्म से अपना पहला पद जोड़ें",
+    "positionCount": "{count} पद"
+  },
+  "positionNotifications": {
+    "positionCreated": "पद बनाया गया",
+    "positionDeleted": "पद हटाया गया"
   }
 }

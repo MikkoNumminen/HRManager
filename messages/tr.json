@@ -44,7 +44,8 @@
     "profile": "Profil",
     "dataImportExport": "Veri İçeri Aktar / Dışa Aktar",
     "performanceReviews": "Performans Değerlendirmeleri",
-    "leaveManagement": "İzin Yönetimi"
+    "leaveManagement": "İzin Yönetimi",
+    "positionCatalog": "Pozisyon kataloğu"
   },
   "home": {
     "title": "İnsan Kaynakları Yönetim Sistemi",
@@ -497,7 +498,9 @@
     "cannotDeleteNonPendingRequest": "Yalnızca bekleyen izin talepleri iptal edilebilir",
     "noteTooLong": "Not en fazla {max} karakter olmalıdır",
     "invalidId": "Geçersiz kimlik",
-    "invalidYear": "Geçersiz yıl"
+    "invalidYear": "Geçersiz yıl",
+    "positionAlreadyExists": "Bu pozisyon zaten mevcut",
+    "positionNotFound": "Pozisyon bulunamadı"
   },
   "reviews": {
     "title": "Performans Değerlendirmeleri",
@@ -651,5 +654,22 @@
     "requestAdded": "Değerlendirme talebi eklendi",
     "requestRemoved": "Değerlendirme talebi kaldırıldı",
     "reviewSubmitted": "Değerlendirme başarıyla gönderildi"
+  },
+  "positions": {
+    "title": "Pozisyonlar",
+    "heading": "Pozisyonlar",
+    "description": "Mevcut pozisyonları yönet",
+    "addPosition": "Pozisyon ekle",
+    "deletePosition": "Pozisyonu sil",
+    "deletePositionConfirm": "Bu pozisyonu silmek istediğinizden emin misiniz?",
+    "positionName": "Pozisyon adı",
+    "enterPositionName": "Pozisyon adını girin",
+    "noPositions": "Pozisyon yok",
+    "noPositionsHint": "Yukarıdaki formu kullanarak ilk pozisyonunuzu ekleyin",
+    "positionCount": "{count} pozisyon"
+  },
+  "positionNotifications": {
+    "positionCreated": "Pozisyon oluşturuldu",
+    "positionDeleted": "Pozisyon silindi"
   }
 }

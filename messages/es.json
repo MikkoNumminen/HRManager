@@ -44,7 +44,8 @@
     "profile": "Perfil",
     "dataImportExport": "Importación / Exportación de datos",
     "performanceReviews": "Evaluaciones de desempeño",
-    "leaveManagement": "Gestión de ausencias"
+    "leaveManagement": "Gestión de ausencias",
+    "positionCatalog": "Catálogo de puestos"
   },
   "home": {
     "title": "Sistema de Gestión de Recursos Humanos",
@@ -497,7 +498,9 @@
     "cannotDeleteNonPendingRequest": "Solo se pueden cancelar las solicitudes de ausencia pendientes",
     "noteTooLong": "La nota debe tener como máximo {max} caracteres",
     "invalidId": "ID no válido",
-    "invalidYear": "Año no válido"
+    "invalidYear": "Año no válido",
+    "positionAlreadyExists": "Este puesto ya existe",
+    "positionNotFound": "Puesto no encontrado"
   },
   "reviews": {
     "title": "Evaluaciones de desempeño",
@@ -651,5 +654,22 @@
     "requestAdded": "Solicitud de evaluación añadida",
     "requestRemoved": "Solicitud de evaluación eliminada",
     "reviewSubmitted": "Evaluación enviada correctamente"
+  },
+  "positions": {
+    "title": "Puestos",
+    "heading": "Puestos",
+    "description": "Gestionar puestos disponibles",
+    "addPosition": "Añadir puesto",
+    "deletePosition": "Eliminar puesto",
+    "deletePositionConfirm": "¿Estás seguro de que quieres eliminar este puesto?",
+    "positionName": "Nombre del puesto",
+    "enterPositionName": "Introducir nombre del puesto",
+    "noPositions": "Sin puestos",
+    "noPositionsHint": "Añade tu primer puesto usando el formulario de arriba",
+    "positionCount": "{count} puestos"
+  },
+  "positionNotifications": {
+    "positionCreated": "Puesto creado",
+    "positionDeleted": "Puesto eliminado"
   }
 }

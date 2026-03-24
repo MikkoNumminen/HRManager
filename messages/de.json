@@ -44,7 +44,8 @@
     "profile": "Profil",
     "dataImportExport": "Datenimport / -export",
     "performanceReviews": "Leistungsbeurteilungen",
-    "leaveManagement": "Abwesenheitsverwaltung"
+    "leaveManagement": "Abwesenheitsverwaltung",
+    "positionCatalog": "Positionskatalog"
   },
   "home": {
     "title": "Personalverwaltungssystem",
@@ -497,7 +498,9 @@
     "cannotDeleteNonPendingRequest": "Nur ausstehende Abwesenheitsanträge können storniert werden",
     "noteTooLong": "Die Notiz darf maximal {max} Zeichen lang sein",
     "invalidId": "Ungültige ID",
-    "invalidYear": "Ungültiges Jahr"
+    "invalidYear": "Ungültiges Jahr",
+    "positionAlreadyExists": "Diese Position existiert bereits",
+    "positionNotFound": "Position nicht gefunden"
   },
   "reviews": {
     "title": "Leistungsbeurteilungen",
@@ -651,5 +654,22 @@
     "requestAdded": "Bewertungsanfrage hinzugefügt",
     "requestRemoved": "Bewertungsanfrage entfernt",
     "reviewSubmitted": "Beurteilung erfolgreich eingereicht"
+  },
+  "positions": {
+    "title": "Positionen",
+    "heading": "Positionen",
+    "description": "Verfügbare Positionen verwalten",
+    "addPosition": "Position hinzufügen",
+    "deletePosition": "Position löschen",
+    "deletePositionConfirm": "Möchten Sie diese Position wirklich löschen?",
+    "positionName": "Positionsname",
+    "enterPositionName": "Positionsname eingeben",
+    "noPositions": "Keine Positionen",
+    "noPositionsHint": "Fügen Sie Ihre erste Position mit dem obigen Formular hinzu",
+    "positionCount": "{count} Positionen"
+  },
+  "positionNotifications": {
+    "positionCreated": "Position erstellt",
+    "positionDeleted": "Position gelöscht"
   }
 }

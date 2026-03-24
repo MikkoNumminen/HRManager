@@ -44,7 +44,8 @@
     "profile": "Profil",
     "dataImportExport": "Dataimport / -export",
     "performanceReviews": "Prestationsbedömningar",
-    "leaveManagement": "Ledighetshantering"
+    "leaveManagement": "Ledighetshantering",
+    "positionCatalog": "Positionskatalog"
   },
   "home": {
     "title": "Personalhanteringssystem",
@@ -497,7 +498,9 @@
     "cannotDeleteNonPendingRequest": "Bara väntande ledighetsansökningar kan avbrytas",
     "noteTooLong": "Anteckningen får vara max {max} tecken",
     "invalidId": "Ogiltigt ID",
-    "invalidYear": "Ogiltigt år"
+    "invalidYear": "Ogiltigt år",
+    "positionAlreadyExists": "Denna position finns redan",
+    "positionNotFound": "Position hittades inte"
   },
   "reviews": {
     "title": "Prestationsbedömningar",
@@ -651,5 +654,22 @@
     "requestAdded": "Bedömningsbegäran tillagd",
     "requestRemoved": "Bedömningsbegäran borttagen",
     "reviewSubmitted": "Bedömning inlämnad"
+  },
+  "positions": {
+    "title": "Positioner",
+    "heading": "Positioner",
+    "description": "Hantera tillgängliga positioner",
+    "addPosition": "Lägg till position",
+    "deletePosition": "Ta bort position",
+    "deletePositionConfirm": "Är du säker på att du vill ta bort denna position?",
+    "positionName": "Positionsnamn",
+    "enterPositionName": "Ange positionsnamn",
+    "noPositions": "Inga positioner",
+    "noPositionsHint": "Lägg till din första position med formuläret ovan",
+    "positionCount": "{count} positioner"
+  },
+  "positionNotifications": {
+    "positionCreated": "Position skapad",
+    "positionDeleted": "Position borttagen"
   }
 }

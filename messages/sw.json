@@ -44,7 +44,8 @@
     "profile": "Wasifu",
     "dataImportExport": "Ingiza / Hamisha Data",
     "performanceReviews": "Tathmini za Utendaji",
-    "leaveManagement": "Usimamizi wa Likizo"
+    "leaveManagement": "Usimamizi wa Likizo",
+    "positionCatalog": "Orodha ya nafasi"
   },
   "home": {
     "title": "Mfumo wa Usimamizi wa Rasilimali Watu",
@@ -497,7 +498,9 @@
     "cannotDeleteNonPendingRequest": "Ni maombi ya likizo yanayosubiri tu yanaweza kufutwa",
     "noteTooLong": "Kumbuka lazima iwe herufi {max} au chini",
     "invalidId": "Kitambulisho si sahihi",
-    "invalidYear": "Mwaka si sahihi"
+    "invalidYear": "Mwaka si sahihi",
+    "positionAlreadyExists": "Nafasi hii tayari ipo",
+    "positionNotFound": "Nafasi haijapatikana"
   },
   "reviews": {
     "title": "Tathmini za Utendaji",
@@ -651,5 +654,22 @@
     "requestAdded": "Ombi la tathmini limeongezwa",
     "requestRemoved": "Ombi la tathmini limeondolewa",
     "reviewSubmitted": "Tathmini imewasilishwa kwa mafanikio"
+  },
+  "positions": {
+    "title": "Nafasi",
+    "heading": "Nafasi",
+    "description": "Simamia nafasi zinazopatikana",
+    "addPosition": "Ongeza nafasi",
+    "deletePosition": "Futa nafasi",
+    "deletePositionConfirm": "Una uhakika unataka kufuta nafasi hii?",
+    "positionName": "Jina la nafasi",
+    "enterPositionName": "Ingiza jina la nafasi",
+    "noPositions": "Hakuna nafasi",
+    "noPositionsHint": "Ongeza nafasi yako ya kwanza kwa kutumia fomu hapo juu",
+    "positionCount": "Nafasi {count}"
+  },
+  "positionNotifications": {
+    "positionCreated": "Nafasi imeundwa",
+    "positionDeleted": "Nafasi imefutwa"
   }
 }

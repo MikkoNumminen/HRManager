@@ -44,7 +44,8 @@
     "profile": "Profil",
     "dataImportExport": "Importation / Exportation de données",
     "performanceReviews": "Évaluations de performance",
-    "leaveManagement": "Gestion des congés"
+    "leaveManagement": "Gestion des congés",
+    "positionCatalog": "Catalogue des postes"
   },
   "home": {
     "title": "Système de gestion des ressources humaines",
@@ -497,7 +498,9 @@
     "cannotDeleteNonPendingRequest": "Seules les demandes de congé en attente peuvent être annulées",
     "noteTooLong": "La note doit comporter au maximum {max} caractères",
     "invalidId": "Identifiant invalide",
-    "invalidYear": "Année invalide"
+    "invalidYear": "Année invalide",
+    "positionAlreadyExists": "Ce poste existe déjà",
+    "positionNotFound": "Poste non trouvé"
   },
   "reviews": {
     "title": "Évaluations de performance",
@@ -651,5 +654,22 @@
     "requestAdded": "Demande d'évaluation ajoutée",
     "requestRemoved": "Demande d'évaluation supprimée",
     "reviewSubmitted": "Évaluation soumise avec succès"
+  },
+  "positions": {
+    "title": "Postes",
+    "heading": "Postes",
+    "description": "Gérer les postes disponibles",
+    "addPosition": "Ajouter un poste",
+    "deletePosition": "Supprimer le poste",
+    "deletePositionConfirm": "Voulez-vous vraiment supprimer ce poste ?",
+    "positionName": "Nom du poste",
+    "enterPositionName": "Entrer le nom du poste",
+    "noPositions": "Aucun poste",
+    "noPositionsHint": "Ajoutez votre premier poste avec le formulaire ci-dessus",
+    "positionCount": "{count} postes"
+  },
+  "positionNotifications": {
+    "positionCreated": "Poste créé",
+    "positionDeleted": "Poste supprimé"
   }
 }

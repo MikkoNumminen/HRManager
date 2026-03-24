@@ -44,7 +44,8 @@
     "profile": "个人资料",
     "dataImportExport": "数据导入/导出",
     "performanceReviews": "绩效评估",
-    "leaveManagement": "假期管理"
+    "leaveManagement": "假期管理",
+    "positionCatalog": "职位目录"
   },
   "home": {
     "title": "人力资源管理系统",
@@ -497,7 +498,9 @@
     "cannotDeleteNonPendingRequest": "只能取消待处理的假期申请",
     "noteTooLong": "备注不能超过 {max} 个字符",
     "invalidId": "无效的 ID",
-    "invalidYear": "无效的年份"
+    "invalidYear": "无效的年份",
+    "positionAlreadyExists": "该职位已存在",
+    "positionNotFound": "未找到职位"
   },
   "reviews": {
     "title": "绩效评估",
@@ -651,5 +654,22 @@
     "requestAdded": "评估请求已添加",
     "requestRemoved": "评估请求已删除",
     "reviewSubmitted": "评估已成功提交"
+  },
+  "positions": {
+    "title": "职位",
+    "heading": "职位",
+    "description": "管理可用职位",
+    "addPosition": "添加职位",
+    "deletePosition": "删除职位",
+    "deletePositionConfirm": "确定要删除此职位吗？",
+    "positionName": "职位名称",
+    "enterPositionName": "输入职位名称",
+    "noPositions": "暂无职位",
+    "noPositionsHint": "使用上方表单添加第一个职位",
+    "positionCount": "{count} 个职位"
+  },
+  "positionNotifications": {
+    "positionCreated": "职位已创建",
+    "positionDeleted": "职位已删除"
   }
 }

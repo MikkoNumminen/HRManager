@@ -44,7 +44,8 @@
     "profile": "Профіль",
     "dataImportExport": "Імпорт / Експорт даних",
     "performanceReviews": "Оцінка ефективності",
-    "leaveManagement": "Управління відпустками"
+    "leaveManagement": "Управління відпустками",
+    "positionCatalog": "Каталог посад"
   },
   "home": {
     "title": "Система управління персоналом",
@@ -497,7 +498,9 @@
     "cannotDeleteNonPendingRequest": "Можна скасувати лише заявки на відпустку у стані очікування",
     "noteTooLong": "Нотатка не повинна перевищувати {max} символів",
     "invalidId": "Недійсний ідентифікатор",
-    "invalidYear": "Недійсний рік"
+    "invalidYear": "Недійсний рік",
+    "positionAlreadyExists": "Ця посада вже існує",
+    "positionNotFound": "Посаду не знайдено"
   },
   "reviews": {
     "title": "Оцінка ефективності",
@@ -651,5 +654,22 @@
     "requestAdded": "Запит на оцінку додано",
     "requestRemoved": "Запит на оцінку видалено",
     "reviewSubmitted": "Оцінку успішно подано"
+  },
+  "positions": {
+    "title": "Посади",
+    "heading": "Посади",
+    "description": "Керування доступними посадами",
+    "addPosition": "Додати посаду",
+    "deletePosition": "Видалити посаду",
+    "deletePositionConfirm": "Ви впевнені, що хочете видалити цю посаду?",
+    "positionName": "Назва посади",
+    "enterPositionName": "Введіть назву посади",
+    "noPositions": "Немає посад",
+    "noPositionsHint": "Додайте першу посаду за допомогою форми вище",
+    "positionCount": "{count} посад"
+  },
+  "positionNotifications": {
+    "positionCreated": "Посаду створено",
+    "positionDeleted": "Посаду видалено"
   }
 }

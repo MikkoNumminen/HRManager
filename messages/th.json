@@ -44,7 +44,8 @@
     "profile": "โปรไฟล์",
     "dataImportExport": "นำเข้า/ส่งออกข้อมูล",
     "performanceReviews": "การประเมินผลการปฏิบัติงาน",
-    "leaveManagement": "การจัดการวันลา"
+    "leaveManagement": "การจัดการวันลา",
+    "positionCatalog": "แคตตาล็อกตำแหน่ง"
   },
   "home": {
     "title": "ระบบจัดการทรัพยากรบุคคล",
@@ -497,7 +498,9 @@
     "cannotDeleteNonPendingRequest": "สามารถยกเลิกได้เฉพาะคำขอลาที่อยู่ระหว่างรอการพิจารณาเท่านั้น",
     "noteTooLong": "หมายเหตุต้องไม่เกิน {max} ตัวอักษร",
     "invalidId": "รหัสไม่ถูกต้อง",
-    "invalidYear": "ปีไม่ถูกต้อง"
+    "invalidYear": "ปีไม่ถูกต้อง",
+    "positionAlreadyExists": "ตำแหน่งนี้มีอยู่แล้ว",
+    "positionNotFound": "ไม่พบตำแหน่ง"
   },
   "reviews": {
     "title": "การประเมินผลการปฏิบัติงาน",
@@ -651,5 +654,22 @@
     "requestAdded": "เพิ่มคำขอประเมินแล้ว",
     "requestRemoved": "ลบคำขอประเมินแล้ว",
     "reviewSubmitted": "ส่งการประเมินเรียบร้อยแล้ว"
+  },
+  "positions": {
+    "title": "ตำแหน่ง",
+    "heading": "ตำแหน่ง",
+    "description": "จัดการตำแหน่งที่มีอยู่",
+    "addPosition": "เพิ่มตำแหน่ง",
+    "deletePosition": "ลบตำแหน่ง",
+    "deletePositionConfirm": "คุณแน่ใจหรือไม่ว่าต้องการลบตำแหน่งนี้?",
+    "positionName": "ชื่อตำแหน่ง",
+    "enterPositionName": "ป้อนชื่อตำแหน่ง",
+    "noPositions": "ไม่มีตำแหน่ง",
+    "noPositionsHint": "เพิ่มตำแหน่งแรกของคุณโดยใช้แบบฟอร์มด้านบน",
+    "positionCount": "{count} ตำแหน่ง"
+  },
+  "positionNotifications": {
+    "positionCreated": "สร้างตำแหน่งแล้ว",
+    "positionDeleted": "ลบตำแหน่งแล้ว"
   }
 }

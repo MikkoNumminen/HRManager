@@ -44,7 +44,8 @@
     "profile": "プロフィール",
     "dataImportExport": "データのインポート/エクスポート",
     "performanceReviews": "パフォーマンス評価",
-    "leaveManagement": "休暇管理"
+    "leaveManagement": "休暇管理",
+    "positionCatalog": "役職カタログ"
   },
   "home": {
     "title": "人事管理システム",
@@ -497,7 +498,9 @@
     "cannotDeleteNonPendingRequest": "キャンセルできるのは保留中の休暇申請のみです",
     "noteTooLong": "メモは{max}文字以内にしてください",
     "invalidId": "無効なIDです",
-    "invalidYear": "無効な年です"
+    "invalidYear": "無効な年です",
+    "positionAlreadyExists": "この役職は既に存在します",
+    "positionNotFound": "役職が見つかりません"
   },
   "reviews": {
     "title": "パフォーマンス評価",
@@ -651,5 +654,22 @@
     "requestAdded": "評価リクエストを追加しました",
     "requestRemoved": "評価リクエストを削除しました",
     "reviewSubmitted": "評価を提出しました"
+  },
+  "positions": {
+    "title": "役職",
+    "heading": "役職",
+    "description": "利用可能な役職を管理",
+    "addPosition": "役職を追加",
+    "deletePosition": "役職を削除",
+    "deletePositionConfirm": "この役職を削除してもよろしいですか？",
+    "positionName": "役職名",
+    "enterPositionName": "役職名を入力",
+    "noPositions": "役職なし",
+    "noPositionsHint": "上のフォームから最初の役職を追加してください",
+    "positionCount": "{count}件の役職"
+  },
+  "positionNotifications": {
+    "positionCreated": "役職が作成されました",
+    "positionDeleted": "役職が削除されました"
   }
 }

@@ -44,7 +44,8 @@
     "profile": "Perfil",
     "dataImportExport": "Importação / Exportação de dados",
     "performanceReviews": "Avaliações de Desempenho",
-    "leaveManagement": "Gestão de Ausências"
+    "leaveManagement": "Gestão de Ausências",
+    "positionCatalog": "Catálogo de cargos"
   },
   "home": {
     "title": "Sistema de Gestão de Recursos Humanos",
@@ -497,7 +498,9 @@
     "cannotDeleteNonPendingRequest": "Apenas pedidos de ausência pendentes podem ser cancelados",
     "noteTooLong": "A nota deve ter no máximo {max} caracteres",
     "invalidId": "ID inválido",
-    "invalidYear": "Ano inválido"
+    "invalidYear": "Ano inválido",
+    "positionAlreadyExists": "Este cargo já existe",
+    "positionNotFound": "Cargo não encontrado"
   },
   "reviews": {
     "title": "Avaliações de Desempenho",
@@ -651,5 +654,22 @@
     "requestAdded": "Pedido de avaliação adicionado",
     "requestRemoved": "Pedido de avaliação removido",
     "reviewSubmitted": "Avaliação submetida com sucesso"
+  },
+  "positions": {
+    "title": "Cargos",
+    "heading": "Cargos",
+    "description": "Gerenciar cargos disponíveis",
+    "addPosition": "Adicionar cargo",
+    "deletePosition": "Excluir cargo",
+    "deletePositionConfirm": "Tem certeza de que deseja excluir este cargo?",
+    "positionName": "Nome do cargo",
+    "enterPositionName": "Inserir nome do cargo",
+    "noPositions": "Nenhum cargo",
+    "noPositionsHint": "Adicione seu primeiro cargo usando o formulário acima",
+    "positionCount": "{count} cargos"
+  },
+  "positionNotifications": {
+    "positionCreated": "Cargo criado",
+    "positionDeleted": "Cargo excluído"
   }
 }

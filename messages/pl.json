@@ -44,7 +44,8 @@
     "profile": "Profil",
     "dataImportExport": "Import / Eksport danych",
     "performanceReviews": "Oceny pracownicze",
-    "leaveManagement": "Zarządzanie urlopami"
+    "leaveManagement": "Zarządzanie urlopami",
+    "positionCatalog": "Katalog stanowisk"
   },
   "home": {
     "title": "System Zarządzania Zasobami Ludzkimi",
@@ -497,7 +498,9 @@
     "cannotDeleteNonPendingRequest": "Można anulować tylko oczekujące wnioski urlopowe",
     "noteTooLong": "Notatka może mieć maksymalnie {max} znaków",
     "invalidId": "Nieprawidłowy identyfikator",
-    "invalidYear": "Nieprawidłowy rok"
+    "invalidYear": "Nieprawidłowy rok",
+    "positionAlreadyExists": "To stanowisko już istnieje",
+    "positionNotFound": "Stanowisko nie znalezione"
   },
   "reviews": {
     "title": "Oceny pracownicze",
@@ -651,5 +654,22 @@
     "requestAdded": "Wniosek o ocenę został dodany",
     "requestRemoved": "Wniosek o ocenę został usunięty",
     "reviewSubmitted": "Ocena została pomyślnie przesłana"
+  },
+  "positions": {
+    "title": "Stanowiska",
+    "heading": "Stanowiska",
+    "description": "Zarządzaj dostępnymi stanowiskami",
+    "addPosition": "Dodaj stanowisko",
+    "deletePosition": "Usuń stanowisko",
+    "deletePositionConfirm": "Czy na pewno chcesz usunąć to stanowisko?",
+    "positionName": "Nazwa stanowiska",
+    "enterPositionName": "Wprowadź nazwę stanowiska",
+    "noPositions": "Brak stanowisk",
+    "noPositionsHint": "Dodaj swoje pierwsze stanowisko za pomocą powyższego formularza",
+    "positionCount": "{count} stanowisk"
+  },
+  "positionNotifications": {
+    "positionCreated": "Stanowisko utworzone",
+    "positionDeleted": "Stanowisko usunięte"
   }
 }

@@ -44,7 +44,8 @@
     "profile": "Profiili",
     "dataImportExport": "Tiedontuonti / Tiedonvienti",
     "performanceReviews": "Kehityskeskustelut",
-    "leaveManagement": "Poissaolohallinta"
+    "leaveManagement": "Poissaolohallinta",
+    "positionCatalog": "Nimikekatalogi"
   },
   "home": {
     "title": "Henkilöstöhallintajärjestelmä",
@@ -497,7 +498,9 @@
     "cannotDeleteNonPendingRequest": "Vain odottavat poissaolopynnöt voidaan peruuttaa",
     "noteTooLong": "Huomio voi olla enintään {max} merkkiä",
     "invalidId": "Virheellinen tunnus",
-    "invalidYear": "Virheellinen vuosi"
+    "invalidYear": "Virheellinen vuosi",
+    "positionAlreadyExists": "Tämä nimike on jo olemassa",
+    "positionNotFound": "Nimikettä ei löytynyt"
   },
   "reviews": {
     "title": "Kehityskeskustelut",
@@ -651,5 +654,22 @@
     "requestAdded": "Arviointipyyntö lisätty",
     "requestRemoved": "Arviointipyyntö poistettu",
     "reviewSubmitted": "Arviointi lähetetty onnistuneesti"
+  },
+  "positions": {
+    "title": "Nimikkeet",
+    "heading": "Nimikkeet",
+    "description": "Hallitse käytettävissä olevia nimikkeitä",
+    "addPosition": "Lisää nimike",
+    "deletePosition": "Poista nimike",
+    "deletePositionConfirm": "Haluatko varmasti poistaa tämän nimikkeen?",
+    "positionName": "Nimikkeen nimi",
+    "enterPositionName": "Syötä nimikkeen nimi",
+    "noPositions": "Ei nimikkeitä",
+    "noPositionsHint": "Lisää ensimmäinen nimike yllä olevalla lomakkeella",
+    "positionCount": "{count} nimikettä"
+  },
+  "positionNotifications": {
+    "positionCreated": "Nimike luotu",
+    "positionDeleted": "Nimike poistettu"
   }
 }

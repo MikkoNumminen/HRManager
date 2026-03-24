@@ -44,7 +44,8 @@
     "profile": "Профиль",
     "dataImportExport": "Импорт / Экспорт данных",
     "performanceReviews": "Оценка эффективности",
-    "leaveManagement": "Управление отпусками"
+    "leaveManagement": "Управление отпусками",
+    "positionCatalog": "Каталог должностей"
   },
   "home": {
     "title": "Система управления персоналом",
@@ -497,7 +498,9 @@
     "cannotDeleteNonPendingRequest": "Можно отменить только ожидающие заявки на отпуск",
     "noteTooLong": "Заметка не должна превышать {max} символов",
     "invalidId": "Неверный идентификатор",
-    "invalidYear": "Неверный год"
+    "invalidYear": "Неверный год",
+    "positionAlreadyExists": "Эта должность уже существует",
+    "positionNotFound": "Должность не найдена"
   },
   "reviews": {
     "title": "Оценка эффективности",
@@ -651,5 +654,22 @@
     "requestAdded": "Запрос на оценку добавлен",
     "requestRemoved": "Запрос на оценку удалён",
     "reviewSubmitted": "Оценка успешно отправлена"
+  },
+  "positions": {
+    "title": "Должности",
+    "heading": "Должности",
+    "description": "Управление доступными должностями",
+    "addPosition": "Добавить должность",
+    "deletePosition": "Удалить должность",
+    "deletePositionConfirm": "Вы уверены, что хотите удалить эту должность?",
+    "positionName": "Название должности",
+    "enterPositionName": "Введите название должности",
+    "noPositions": "Нет должностей",
+    "noPositionsHint": "Добавьте первую должность с помощью формы выше",
+    "positionCount": "{count} должностей"
+  },
+  "positionNotifications": {
+    "positionCreated": "Должность создана",
+    "positionDeleted": "Должность удалена"
   }
 }
