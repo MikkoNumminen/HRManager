@@ -18,24 +18,20 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 > 📋 **Audit research:** Items marked "(found by audit)" have detailed file:line references in memory file `project_audit_findings.md`. Read it before starting any of these tasks.
 
 - 🟢⚡ CI pipeline monitoring & auto-fix — watching for failures, fixing build/lint/format issues [Claude 4, main]
-- 🟡🧠 Typed server action errors — replace generic string errors with typed error codes [Claude 3, main]
-- 🟡🧠 Standardize positions catalog — free-text position field causes inconsistency [Claude 3, main]
 - 🟡🧠 Server-side pagination — all queries load entire result sets; add skip/take to Prisma queries [Claude 3, main]
 
 ## Recently Completed
 
+- ✅ Global search & filtering — SearchBar component, client-side filtering on persons/teams/departments, 38 tests, 18 locales
+- ✅ Typed server action errors — ErrorCode type, ActionError class, all throws updated, 1490 tests passing
+- ✅ Standardize positions catalog — Position model, 2 actions, /positions page, Autocomplete, 18 locales, 15 tests
 - ✅ Leave/absence management — 3 models, 7 actions, 3 queries, 68 tests, LeaveManager UI, 18 locales
 - ✅ Empty state polish — EmptyState component, 3 tables, 51 locale translations, 3 tests
-- ✅ Demo session cleanup failure logging — 1 line fix in auth.ts
-- ✅ Performance reviews / 360 feedback — 4 models, 11 actions, 6 pages, 29 tests, 1385 total passing
-- ✅ Loading skeletons with Suspense boundaries — PageSkeletons.tsx, 12 loading.tsx files, 10 tests
-- ✅ Playwright E2E test suite — 7 new spec files, 75 total tests (was 34)
 
 ## Backlog
 
 ### Features
 
-- 🟢🧠 Global search & filtering on person/team/department tables — no search UI exists
 - 🟢🧠 Employee profile pages — read-only `/employees/[id]` cards, guest-accessible
 - 🟡🧠 Tutorial UX overhaul — no guiding effect on back button, lacks MUI visual guidance (highlighting/effects), guidance boxes appear in wrong positions
 - 🟡🧠 Org chart visualization — interactive hierarchy using existing manager/dept head data
