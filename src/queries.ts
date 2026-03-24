@@ -30,8 +30,6 @@ import {
   LeaveType,
   LeaveRequest,
   LeaveBalance,
-  PositionSchema,
-  Position,
   EmployeeProfileSchema,
   EmployeeProfile,
   OrgChartDataSchema,
@@ -50,6 +48,7 @@ import {
   DepartmentDeleteImpact,
 } from "@/constants";
 export { PAGE_SIZE };
+export { getPositions } from "./features/positions/queries";
 
 export async function getPersons(): Promise<Person[]> {
   const sessionId = await getDemoSessionId();
@@ -59,17 +58,6 @@ export async function getPersons(): Promise<Person[]> {
   });
 
   return persons.map((person) => PersonSchema.parse(person));
-}
-
-export async function getPositions(): Promise<Position[]> {
-  const sessionId = await getDemoSessionId();
-  const positions = await prisma.position.findMany({
-    where: { deletedAt: null, sessionId },
-    omit: { sessionId: true, deletedAt: true },
-    orderBy: { name: "asc" },
-  });
-
-  return positions.map((p) => PositionSchema.parse(p));
 }
 
 export async function getPagedPersons(

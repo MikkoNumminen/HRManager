@@ -64,4 +64,4 @@ export {
   removeReviewRequest,
   submitReview,
 } from "./reviews";
-export { createPositionEntry, deletePositionEntry } from "./positions";
+export { createPositionEntry, deletePositionEntry } from "../features/positions/actions";
