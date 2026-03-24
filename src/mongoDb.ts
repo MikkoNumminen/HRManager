@@ -41,6 +41,9 @@ export function getAuditLogCollection(): Collection<AuditLogDocument> {
   return getMongoDb().collection<AuditLogDocument>("auditLogs");
 }
 
+// 90-day retention window for audit logs
+const AUDIT_LOG_TTL_SECONDS = 90 * 24 * 60 * 60;
+
 export async function ensureAuditLogIndexes(): Promise<void> {
   const col = getAuditLogCollection();
   await Promise.all([
@@ -50,6 +53,8 @@ export async function ensureAuditLogIndexes(): Promise<void> {
     col.createIndex({ entityType: 1 }),
     col.createIndex({ createdAt: -1 }),
     col.createIndex({ sessionId: 1 }),
+    // TTL index: MongoDB automatically deletes documents older than 90 days
+    col.createIndex({ createdAt: 1 }, { expireAfterSeconds: AUDIT_LOG_TTL_SECONDS }),
   ]);
 }
 

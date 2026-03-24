@@ -82,6 +82,19 @@ describe("mongoDb", () => {
     expect(indexKeys).toContain("sessionId");
   });
 
+  // ensureAuditLogIndexes registers a TTL index on createdAt for automatic 90-day retention.
+  test("ensureAuditLogIndexes creates TTL index with 90-day expiry on createdAt", async () => {
+    const { ensureAuditLogIndexes, getAuditLogCollection } = await import("@/mongoDb");
+    await ensureAuditLogIndexes();
+
+    const indexes = await getAuditLogCollection().indexes();
+    const ttlIndex = indexes.find(
+      (idx) => idx.key.createdAt !== undefined && idx.expireAfterSeconds !== undefined,
+    );
+    expect(ttlIndex).toBeDefined();
+    expect(ttlIndex!.expireAfterSeconds).toBe(90 * 24 * 60 * 60);
+  });
+
   // disconnectMongo closes the client and clears the singleton.
   test("disconnectMongo closes client and clears singleton", async () => {
     const { getMongoDb, disconnectMongo } = await import("@/mongoDb");

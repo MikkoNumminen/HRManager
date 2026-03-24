@@ -20,14 +20,13 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 - 🟢⚡ CI pipeline monitoring & auto-fix — watching for failures, fixing build/lint/format issues [Claude 4, main]
 - 🟢🧠 Employee profile pages — read-only `/employees/[id]` cards, guest-accessible [Claude 4, main]
 - 🟡🧠 Org chart visualization — interactive hierarchy using existing manager/dept head data [Claude 2, main]
-- 🟢⚡ Audit log TTL — add MongoDB TTL index for automatic 90-day retention [Claude 1, main]
-- 🟢⚡ Rate limit table cleanup — prune expired RateLimit rows on a schedule [Claude 1, main]
+- 🟢🧠 Cascade delete impact warnings — show what references break before deleting a person/team/department [Claude 3, main]
 
 ## Recently Completed
 
+- ✅ Audit log TTL + rate limit cleanup — MongoDB TTL index (90-day retention), /api/cron/cleanup route, 7 tests, 1498 total
 - ✅ Server-side pagination — getPagedPersons/Teams/Departments, skip/take Prisma, URL params (?q=&page=), 400ms debounce, MUI Pagination, 1491 tests
 - ✅ Standardize positions catalog — Position model, 2 actions, /positions page, Autocomplete, 18 locales, 15 tests
-- ✅ Typed server action errors — ErrorCode type, ActionError class, all throws updated, 1490 tests passing
 
 ## Backlog
 
@@ -37,7 +36,6 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 - 🟡🧠 Review aggregation dashboard — manager sees all reviews for their direct reports in one view
 - 🟡🧠 Leave balance carryover / accrual — year-end carryover logic, expiry dates, accrual schedules
 - 🟡🧠 Tutorial UX overhaul — no guiding effect on back button, lacks MUI visual guidance (highlighting/effects), guidance boxes appear in wrong positions
-- 🟢🧠 Cascade delete impact warnings — show what references break before deleting a person/team/department
 - 🟢🧠 Bulk actions on tables — multi-select persons/teams and apply batch operations
 
 ### Code Quality / Architecture
