@@ -108,7 +108,7 @@ graph LR
 
 - **Snackbar notifications** — Global success/error toasts via React context across all 17 form actions. No silent failures, no mystery about what happened.
 
-- **Accessibility (WCAG)** — Semantic landmarks, skip-to-content, ARIA labels, `role="alert"` on errors (screen readers announce immediately), keyboard-navigable tables, and info tooltips with `cursor: "help"`. _Built into every component from the start, not bolted on afterward._
+- **Accessibility (WCAG)** — Semantic landmarks, skip-to-content, ARIA labels, `role="alert"` on errors (screen readers announce immediately), keyboard-navigable tables, and info tooltips with `cursor: "help"`. Automated axe-core testing runs 25 WCAG AA checks across 22 components to catch violations early. _Built into every component from the start, not bolted on afterward._
 
 - **Loading skeletons on every page (Suspense boundaries)** — Every route has a `loading.tsx` that renders a pixel-matched MUI Skeleton layout while the async server component fetches data. Next.js automatically wraps these in `<Suspense>` — the shell is streamed instantly and the real content replaces it once ready. _Why skeletons instead of spinners? Spinners tell you "loading"; skeletons show you where the content will land, reducing perceived latency._
 
@@ -144,7 +144,7 @@ graph LR
 
 ### 🧪 Quality
 
-- **1671 tests, 91.9% line coverage** — Unit tests, integration tests against real PostgreSQL + in-memory MongoDB (no database mocks), and 75 Playwright E2E tests covering full user flows. _Why real databases in tests? Mocked tests can pass while production breaks. If your test doesn't hit a real database, it's not testing what you think it's testing._
+- **1696 tests, 91.9% line coverage** — Unit tests, integration tests against real PostgreSQL + in-memory MongoDB (no database mocks), and 75 Playwright E2E tests covering full user flows. _Why real databases in tests? Mocked tests can pass while production breaks. If your test doesn't hit a real database, it's not testing what you think it's testing._
 
 - **Docker-ready** — `docker compose up` starts PostgreSQL + MongoDB + the app. Migrations run automatically, demo login works out of the box. _One command, zero setup, fully working._
 
@@ -240,8 +240,9 @@ graph LR
 | Audit logging    | 11       | Deferred writes, before/after snapshots, security events                                                  |
 | Auth route       | 5        | Rate limiting on auth endpoints, CSRF, GET passthrough                                                    |
 | Reviews UI       | 86       | Cycle management, request table, submit form, templates, question CRUD, confirm dialogs                   |
+| Accessibility    | 25       | axe-core WCAG AA checks on 22 components — forms, tables, dialogs, skeletons, navigation                  |
 | E2E (Playwright) | 75       | Auth, CRUD, detail editing, dashboard, profile, data I/O, form validation, full workflow                  |
-| **Total**        | **1671** | **91.9% line coverage · 83.5% function coverage**                                                         |
+| **Total**        | **1696** | **91.9% line coverage · 83.5% function coverage**                                                         |
 
 ```
 Statements : 90.83%    Branches : 82.47%

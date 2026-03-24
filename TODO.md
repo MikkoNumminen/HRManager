@@ -18,6 +18,10 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 > 📋 **Audit research:** All items below marked "(found by audit)" have detailed file:line references in `AUDIT_REPORT.md` and `AUDIT_RESULTS.md`. Read before starting any audit-tagged task.
 
 - 🟢⚡ CI pipeline monitoring & auto-fix — watching for failures, fixing build/lint/format issues [Claude 4, main]
+- 🟢⚡ Domain-restrict profile image URLs [Claude 1, main]
+- 🟢⚡ crypto.timingSafeEqual for CRON_SECRET [Claude 1, main]
+- 🟢⚡ CSV formula injection sanitization [Claude 1, main]
+- 🟢⚡ IP allowlisting for admin functions [Claude 1, main]
 
 ## Backlog
 
@@ -61,7 +65,6 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 - 🟡⚡ Visual regression testing — Percy/Chromatic; snapshot all components in all 6 themes; diff on PRs
 - 🟡🧠 Load & performance benchmarks (k6) — 100 concurrent users; performance budgets (dashboard < 2s, mutations < 500ms); CI fails if exceeded
 - 🟡⚡ Mutation testing (Stryker) — mutate code; verify tests catch mutations; target > 80% mutation score
-- 🟢⚡ axe-core accessibility in CI — run axe on every Playwright page; fail CI on WCAG AA violations
 
 ### Accessibility (WCAG)
 
