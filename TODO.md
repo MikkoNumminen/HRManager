@@ -18,6 +18,7 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 > 📋 **Audit research:** All items below marked "(found by audit)" have detailed file:line references in `AUDIT_REPORT.md`. Read it before starting any of these tasks.
 
 - 🟢⚡ CI pipeline monitoring & auto-fix — watching for failures, fixing build/lint/format issues [Claude 4, main]
+- 🟡🧠 Custom sign-in page — replace NextAuth default unstyled page with MUI dark-themed sign-in [Claude 4, main]
 - 🔴🧠 Reorganise into `src/features/<domain>/` — move serverActions/\* + split queries.ts into co-located actions/queries per domain; barrel re-exports for compat [Claude 1, main]
 
 ## Backlog
@@ -37,9 +38,6 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 - 🟡🧠 Consolidate duplicate seed data — demoSession.ts (9 persons) and serverActions.ts (6 persons) diverged; extract shared seed definitions to seedData.ts
 
 ### Testing (found by audit)
-
-- 🟢⚡ Fix test file naming inconsistencies — PersonCheckBoxList.test.tsx → PersonCheckboxList, PersonTable → PersonsTable, RemovePeople → RemovePerson [Claude 3, main]
-- 🟢⚡ Add permission-denied path tests for queries — hasPermission always mocked to true in queries.test.ts; denial branch never exercised [Claude 3, main]
 
 ### Accessibility (WCAG)
 

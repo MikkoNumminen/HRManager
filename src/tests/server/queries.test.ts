@@ -56,6 +56,8 @@ import {
   getPersonDeleteImpact,
   getTeamDeleteImpact,
   getDepartmentDeleteImpact,
+  getLeaveRequests,
+  getLeaveBalances,
 } from "@/queries";
 
 const { auth } = require("@/auth");
@@ -1562,6 +1564,26 @@ describe("getDepartmentDeleteImpact", () => {
     expect(impact.teams).toHaveLength(2);
     const names = impact.teams.map((t) => t.teamName).sort();
     expect(names).toEqual(["Backend", "Frontend"]);
+  });
+});
+
+describe("leave query permission checks", () => {
+  const { hasPermission } = require("@/permissions");
+
+  afterEach(() => {
+    hasPermission.mockResolvedValue(true);
+  });
+
+  // Leave requests are protected — users without leave:view get denied.
+  test("getLeaveRequests throws when permission is denied", async () => {
+    hasPermission.mockResolvedValueOnce(false);
+    await expect(getLeaveRequests()).rejects.toThrow("Permission denied");
+  });
+
+  // Leave balances are protected — users without leave:view get denied.
+  test("getLeaveBalances throws when permission is denied", async () => {
+    hasPermission.mockResolvedValueOnce(false);
+    await expect(getLeaveBalances()).rejects.toThrow("Permission denied");
   });
 });
 
