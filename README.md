@@ -144,7 +144,7 @@ graph LR
 
 ### 🧪 Quality
 
-- **1544 tests, 99.9% line coverage** — Unit tests, integration tests against real PostgreSQL + in-memory MongoDB (no database mocks), and 75 Playwright E2E tests covering full user flows. _Why real databases in tests? Mocked tests can pass while production breaks. If your test doesn't hit a real database, it's not testing what you think it's testing._
+- **1636 tests, 91.9% line coverage** — Unit tests, integration tests against real PostgreSQL + in-memory MongoDB (no database mocks), and 75 Playwright E2E tests covering full user flows. _Why real databases in tests? Mocked tests can pass while production breaks. If your test doesn't hit a real database, it's not testing what you think it's testing._
 
 - **Docker-ready** — `docker compose up` starts PostgreSQL + MongoDB + the app. Migrations run automatically, demo login works out of the box. _One command, zero setup, fully working._
 
@@ -239,12 +239,13 @@ graph LR
 | Theme config     | 12       | All 6 themes, CSS variables, FOUC prevention                                                              |
 | Audit logging    | 11       | Deferred writes, before/after snapshots, security events                                                  |
 | Auth route       | 5        | Rate limiting on auth endpoints, CSRF, GET passthrough                                                    |
+| Reviews UI       | 82       | Cycle management, request table, submit form, templates, question CRUD, confirm dialogs                   |
 | E2E (Playwright) | 75       | Auth, CRUD, detail editing, dashboard, profile, data I/O, form validation, full workflow                  |
-| **Total**        | **1544** | **97.8% line coverage · 95.4% function coverage**                                                         |
+| **Total**        | **1636** | **91.9% line coverage · 83.5% function coverage**                                                         |
 
 ```
-Statements : 97.58%    Branches : 92.90%
-Functions  : 95.40%    Lines    : 97.81%
+Statements : 90.83%    Branches : 82.47%
+Functions  : 83.50%    Lines    : 91.91%
 ```
 
 **Testing philosophy:** Server-side tests run against **real PostgreSQL** and **in-memory MongoDB** — not mocks. If your test doesn't touch the real database, it's not catching the bugs that matter (wrong SQL, missing indexes, constraint violations). Client-side tests cover all 48 UI components. Playwright E2E tests run against a production build.

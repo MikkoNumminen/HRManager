@@ -1,6 +1,6 @@
 # TODO
 
-Shared task list across all Claude Code sessions. After completing a task, note how long it took before removing it.
+Shared task list across all Claude Code sessions. Remove completed tasks immediately — no "Recently Completed" section.
 Every item must have a size estimate: 🟢 small, 🟡 medium, 🔴 large. LLM marker: ⚡ Sonnet, 🧠 Opus.
 In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-name]`, etc.
 4 permanent Claude instances: **Claude 1, Claude 2, Claude 3, Claude 4.**
@@ -20,14 +20,6 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 - 🟢⚡ CI pipeline monitoring & auto-fix — watching for failures, fixing build/lint/format issues [Claude 4, main]
 - 🔴🧠 Split `serverActions.ts` into domain modules — barrel re-export for backward compat [Claude 3, split-server-actions]
 
-## Recently Completed
-
-- ✅ Extract DEMO_EMAIL constant + add missing getPositions query — constants.ts, auth.ts, queries.ts, schemas.ts, tutorialConfig.ts (~10min)
-- ✅ Org chart visualization — ReactFlow + dagre, dept→team→member hierarchy, 23 tests (5 query + 18 component), 1544 total (~45min)
-- ✅ Test infrastructure fix — TRUNCATE CASCADE in cleanDb, RateLimitError in 7 mocks, eliminated all flaky FK failures
-- ✅ Employee profile pages — `/employees/[id]` read-only cards, guest-accessible, 3 sections (info/teams/leadership), 13 tests, 18 locales
-- ✅ Cascade delete impact warnings — DeleteImpactList component, 3 impact queries, ConfirmDialog children, 10 tests
-
 ## Backlog
 
 ### Features
@@ -44,16 +36,10 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 - 🟡🧠 Split `queries.ts` into domain modules — 1,073 lines; same domain split pattern as serverActions
 - 🟡🧠 Implement permission middleware for queries — inconsistent auth guards across query functions; some check permissions, others rely on caller
 - 🟡🧠 Consolidate duplicate seed data — demoSession.ts (9 persons) and serverActions.ts (6 persons) diverged; extract shared seed definitions to seedData.ts
-- 🟢⚡ Replace CSV import loop with `createMany` — serverActions.ts:1611 creates up to 1,000 persons via sequential INSERT; use tx.person.createMany()
-- 🟢⚡ Replace seed sequential inserts with `createMany` — demoSession.ts:33–67 and serverActions.ts:1030–1072 use sequential creates inside transactions
 - 🟢⚡ Extract `DEMO_EMAIL` constant — serverActions/admin.ts:488 still has hardcoded string (needs update after serverActions split lands)
-- 🟢⚡ Extract `MAX_EXPORT_ROWS` constant — magic `10000` literal at serverActions.ts:1737; add alongside MAX_IMPORT_ROWS in schemas.ts
-- 🟢⚡ Extract rate limit constants to named values — `60*1000`, `30`, `10` in rateLimit.ts:6–8; export as RATE_LIMIT_WINDOW_MS, MAX_REQUESTS_PER_WINDOW, AUTH_MAX_REQUESTS
-- 🟢⚡ Extract URL validator to schemas.ts — inline URL parse + protocol check at serverActions.ts:1517; extract to reusable ImageUrlSchema in schemas.ts
 
 ### Testing (found by audit)
 
-- 🟡🧠 Add tests for 5 review client components — ReviewsClient, ReviewCycleDetailClient, ReviewSubmitClient, ReviewTemplateDetailClient, ReviewTemplatesClient have zero tests
 - 🟡🧠 Add tests for MyReviewsClient component — no direct tests; only covered indirectly
 - 🟢⚡ Fix test file naming inconsistencies — PersonCheckBoxList.test.tsx → PersonCheckboxList, PersonTable → PersonsTable, RemovePeople → RemovePerson
 - 🟢⚡ Add permission-denied path tests for queries — hasPermission always mocked to true in queries.test.ts; denial branch never exercised
