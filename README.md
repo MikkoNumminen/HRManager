@@ -112,7 +112,7 @@ graph LR
 
 - **Loading skeletons on every page (Suspense boundaries)** — Every route has a `loading.tsx` that renders a pixel-matched MUI Skeleton layout while the async server component fetches data. Next.js automatically wraps these in `<Suspense>` — the shell is streamed instantly and the real content replaces it once ready. _Why skeletons instead of spinners? Spinners tell you "loading"; skeletons show you where the content will land, reducing perceived latency._
 
-- **Client-side search & filtering** — Every data table (persons, teams, departments) has an instant search bar. Type a query and results filter in real-time using `useMemo` — no server round-trips, no debounce needed. Searches across all visible fields including nested data: team members, department teams, manager names. _Why client-side? These tables are small enough to live in memory. Skipping the network keeps filtering instant and eliminates loading states._
+- **Server-side pagination & search** — Every management table (persons, teams, departments) uses database-level `skip`/`take` (Prisma) so only one page of results loads at a time. Search is URL-driven (`?q=` + `?page=`) via a 400ms debounced `router.replace` — typing updates local state immediately, the server re-fetches after the debounce. Results are bookmarkable and shareable. _Why server-side? Client-side filtering doesn't scale; pushing skip/take into Prisma means 25 rows per page regardless of org size, and the URL approach means deep links and browser history work naturally._
 
 - **Polished empty states** — Tables show a contextual icon, heading, and hint when empty. Persons shows a people icon with "Add your first person using the form above"; teams and departments follow the same pattern. Hint text is shown only when the user has create permission. Translated across all 18 locales.
 
@@ -140,7 +140,7 @@ graph LR
 
 ### 🧪 Quality
 
-- **1444+ tests, 99.9% line coverage** — Unit tests, integration tests against real PostgreSQL + in-memory MongoDB (no database mocks), and 75 Playwright E2E tests covering full user flows. _Why real databases in tests? Mocked tests can pass while production breaks. If your test doesn't hit a real database, it's not testing what you think it's testing._
+- **1491 tests, 99.9% line coverage** — Unit tests, integration tests against real PostgreSQL + in-memory MongoDB (no database mocks), and 75 Playwright E2E tests covering full user flows. _Why real databases in tests? Mocked tests can pass while production breaks. If your test doesn't hit a real database, it's not testing what you think it's testing._
 
 - **Docker-ready** — `docker compose up` starts PostgreSQL + MongoDB + the app. Migrations run automatically, demo login works out of the box. _One command, zero setup, fully working._
 
@@ -221,7 +221,7 @@ graph LR
 | UI components    | 734      | All 52 components: charts, forms, permission toggles, mobile views, themes, skeletons, search, leave mgmt |
 | Server actions   | 253      | Every mutation: happy path, errors, permission denials, cascades, leave approval workflow                 |
 | Zod schemas      | 94       | Validation rules, edge cases, type inference                                                              |
-| Prisma queries   | 70       | Real PostgreSQL + MongoDB queries — not mocks                                                             |
+| Prisma queries   | 83       | Real PostgreSQL + MongoDB queries — not mocks; includes paged query tests for persons/teams/departments   |
 | CSV utils        | 39       | RFC 4180 parsing, import validation, export formatting                                                    |
 | Style tokens     | 37       | Responsive breakpoints, theme tokens, component styles                                                    |
 | Auth callbacks   | 32       | JWT enrichment, permission freshness, superuser bootstrap                                                 |
@@ -235,7 +235,7 @@ graph LR
 | Audit logging    | 11       | Deferred writes, before/after snapshots, security events                                                  |
 | Auth route       | 5        | Rate limiting on auth endpoints, CSRF, GET passthrough                                                    |
 | E2E (Playwright) | 75       | Auth, CRUD, detail editing, dashboard, profile, data I/O, form validation, full workflow                  |
-| **Total**        | **1484** | **97.8% line coverage · 95.4% function coverage**                                                         |
+| **Total**        | **1491** | **97.8% line coverage · 95.4% function coverage**                                                         |
 
 ```
 Statements : 97.58%    Branches : 92.90%
