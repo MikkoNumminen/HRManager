@@ -1,3 +1,7 @@
+# Load nvm so hooks use the correct Node.js version (not system default)
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
 echo "Running i18n audit..."
 AUDIT_OUTPUT=$(npx tsx scripts/i18n-sync.ts 2>&1 || true)
 MISSING=$(echo "$AUDIT_OUTPUT" | grep -c "^      + " || true)

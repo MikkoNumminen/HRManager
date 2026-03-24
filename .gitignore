@@ -54,3 +54,10 @@ prisma/**/test.db-journal
 
 # Claude
 .claude/
+
+# Vercel local config
+.vercel/
+
+# Generated audit reports
+AUDIT_REPORT.md
+AUDIT_RESULTS.md

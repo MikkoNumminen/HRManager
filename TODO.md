@@ -37,10 +37,6 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 
 ### Code Quality / Architecture (found by audit)
 
-- 🟡🧠 Implement permission middleware for queries — inconsistent auth guards across query functions; some check permissions, others rely on caller
-- 🟡🧠 Consolidate duplicate seed data — demoSession.ts (9 persons) and serverActions.ts (6 persons) diverged; extract shared seed definitions to seedData.ts
-- 🟡🧠 Add permission check to `getReviewRequestWithTemplate` — any authenticated user with a UUID can retrieve another user's review assignment (features/reviews/queries.ts)
-- 🟡🧠 Add consistent permission checks to read queries — getPersons, getTeams, getDepartments, getReviewTemplates, getReviewCycles lack explicit auth guards
 - 🟢⚡ Health check endpoints — /health (shallow: app running) + /ready (deep: DB connections live); JSON with version, uptime, dependency status
 - 🟡⚡ Caching layer for dashboard queries — 5-min cache via Redis or revalidateTag; invalidate on data change; monitor hit rate
 - 🟡🧠 OpenTelemetry tracing — instrument request → middleware → query → action → DB; export to Jaeger/Datadog; P95/P99 dashboards
@@ -74,7 +70,6 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 - 🟡🧠 Two-Factor Authentication (TOTP) — QR code setup, 6-digit codes, recovery codes, audit all 2FA events; SOC 2 requirement
 - 🟡🧠 Session management & concurrent limits — track sessions per device; force-logout on limit exceeded; "Sign out all other sessions" button
 - 🟡🧠 Audit log tamper detection (hash chain) — HMAC-SHA256 chain linking each log entry; verification endpoint; legal evidence integrity
-- 🟡🧠 Add permission check to read queries — getPersons, getTeams, getDepartments, getReviewTemplates, getReviewCycles lack explicit auth guards
 - 🟡🧠 Seed mock user data not env-gated — seedMockData() seeds admin@example.com etc. into global User table without NODE_ENV check (features/admin/actions.ts)
 - 🟡⚡ MongoDB audit log regex injection — userEmail passed directly to $regex without escaping; allows wildcard enumeration (features/audit/queries.ts:26)
 
