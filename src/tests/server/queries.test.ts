@@ -24,12 +24,17 @@ jest.mock("@/auth", () => ({
   auth: jest.fn(),
 }));
 
-// Mock permissions — hasPermission is used in audit log queries.
+// Mock permissions — hasPermission and getUserPermissions are used in query guards.
 // We allow all permissions so query tests focus on data logic.
-jest.mock("@/permissions", () => ({
-  ...jest.requireActual("@/permissions"),
-  hasPermission: jest.fn(() => true),
-}));
+jest.mock("@/permissions", () => {
+  const actual = jest.requireActual("@/permissions");
+  const allGranted = Object.fromEntries(actual.PERMISSION_KEYS.map((k: string) => [k, true]));
+  return {
+    ...actual,
+    hasPermission: jest.fn(() => true),
+    getUserPermissions: jest.fn(() => allGranted),
+  };
+});
 
 // Mock demo session — defaults to null (production mode).
 // Individual tests override mockGetDemoSessionId to simulate demo sessions.
@@ -58,6 +63,15 @@ import {
   getDepartmentDeleteImpact,
   getLeaveRequests,
   getLeaveBalances,
+  getLeaveTypes,
+  getReviewTemplates,
+  getReviewTemplate,
+  getReviewCycles,
+  getReviewCycle,
+  getMyReviewRequests,
+  getReviewRequestWithTemplate,
+  getPositions,
+  getOrgChartData,
 } from "@/queries";
 
 const { auth } = require("@/auth");
@@ -1584,6 +1598,207 @@ describe("leave query permission checks", () => {
   test("getLeaveBalances throws when permission is denied", async () => {
     hasPermission.mockResolvedValueOnce(false);
     await expect(getLeaveBalances()).rejects.toThrow("Permission denied");
+  });
+
+  // Leave types are protected — users without leave:view get denied.
+  test("getLeaveTypes throws when permission is denied", async () => {
+    hasPermission.mockResolvedValueOnce(false);
+    await expect(getLeaveTypes()).rejects.toThrow("Permission denied");
+  });
+});
+
+describe("person query permission checks", () => {
+  const { hasPermission } = require("@/permissions");
+
+  afterEach(() => {
+    hasPermission.mockResolvedValue(true);
+  });
+
+  // Person list is protected — users without person:read get denied.
+  test("getPersons throws when permission is denied", async () => {
+    hasPermission.mockResolvedValueOnce(false);
+    await expect(getPersons()).rejects.toThrow("Permission denied");
+  });
+
+  // Paged person list is protected — users without person:read get denied.
+  test("getPagedPersons throws when permission is denied", async () => {
+    hasPermission.mockResolvedValueOnce(false);
+    await expect(getPagedPersons()).rejects.toThrow("Permission denied");
+  });
+
+  // Employee profile is protected — users without person:read get denied.
+  test("getEmployeeProfile throws when permission is denied", async () => {
+    hasPermission.mockResolvedValueOnce(false);
+    const { getEmployeeProfile } = require("@/queries");
+    await expect(getEmployeeProfile("any-id")).rejects.toThrow("Permission denied");
+  });
+
+  // Person delete impact is protected — users without person:read get denied.
+  test("getPersonDeleteImpact throws when permission is denied", async () => {
+    hasPermission.mockResolvedValueOnce(false);
+    await expect(getPersonDeleteImpact("any-id")).rejects.toThrow("Permission denied");
+  });
+});
+
+describe("team query permission checks", () => {
+  const { hasPermission } = require("@/permissions");
+
+  afterEach(() => {
+    hasPermission.mockResolvedValue(true);
+  });
+
+  // Team list is protected — users without team:read get denied.
+  test("getTeams throws when permission is denied", async () => {
+    hasPermission.mockResolvedValueOnce(false);
+    await expect(getTeams()).rejects.toThrow("Permission denied");
+  });
+
+  // Paged team list is protected — users without team:read get denied.
+  test("getPagedTeams throws when permission is denied", async () => {
+    hasPermission.mockResolvedValueOnce(false);
+    await expect(getPagedTeams()).rejects.toThrow("Permission denied");
+  });
+
+  // Team delete impact is protected — users without team:read get denied.
+  test("getTeamDeleteImpact throws when permission is denied", async () => {
+    hasPermission.mockResolvedValueOnce(false);
+    await expect(getTeamDeleteImpact("any-id")).rejects.toThrow("Permission denied");
+  });
+});
+
+describe("department query permission checks", () => {
+  const { hasPermission } = require("@/permissions");
+
+  afterEach(() => {
+    hasPermission.mockResolvedValue(true);
+  });
+
+  // Department list is protected — users without department:read get denied.
+  test("getDepartments throws when permission is denied", async () => {
+    hasPermission.mockResolvedValueOnce(false);
+    await expect(getDepartments()).rejects.toThrow("Permission denied");
+  });
+
+  // Paged department list is protected — users without department:read get denied.
+  test("getPagedDepartments throws when permission is denied", async () => {
+    hasPermission.mockResolvedValueOnce(false);
+    await expect(getPagedDepartments()).rejects.toThrow("Permission denied");
+  });
+
+  // Department delete impact is protected — users without department:read get denied.
+  test("getDepartmentDeleteImpact throws when permission is denied", async () => {
+    hasPermission.mockResolvedValueOnce(false);
+    await expect(getDepartmentDeleteImpact("any-id")).rejects.toThrow("Permission denied");
+  });
+});
+
+describe("review query permission checks", () => {
+  const { hasPermission, getUserPermissions } = require("@/permissions");
+
+  afterEach(() => {
+    hasPermission.mockResolvedValue(true);
+    const actual = jest.requireActual("@/permissions");
+    getUserPermissions.mockReturnValue(
+      Object.fromEntries(actual.PERMISSION_KEYS.map((k: string) => [k, true])),
+    );
+  });
+
+  // Review templates are protected — users without review:manage get denied.
+  test("getReviewTemplates throws when permission is denied", async () => {
+    hasPermission.mockResolvedValueOnce(false);
+    await expect(getReviewTemplates()).rejects.toThrow("Permission denied");
+  });
+
+  // Single review template is protected — users without review:manage get denied.
+  test("getReviewTemplate throws when permission is denied", async () => {
+    hasPermission.mockResolvedValueOnce(false);
+    await expect(getReviewTemplate("any-id")).rejects.toThrow("Permission denied");
+  });
+
+  // Review cycles require review:view, review:manage, or review:submit.
+  test("getReviewCycles throws when all review permissions are denied", async () => {
+    getUserPermissions.mockReturnValueOnce({
+      "review:view": false,
+      "review:manage": false,
+      "review:submit": false,
+    });
+    await expect(getReviewCycles()).rejects.toThrow("Permission denied");
+  });
+
+  // Single review cycle requires review:view, review:manage, or review:submit.
+  test("getReviewCycle throws when all review permissions are denied", async () => {
+    getUserPermissions.mockReturnValueOnce({
+      "review:view": false,
+      "review:manage": false,
+      "review:submit": false,
+    });
+    await expect(getReviewCycle("any-id")).rejects.toThrow("Permission denied");
+  });
+
+  // My review requests are protected — users without review:submit get denied.
+  test("getMyReviewRequests throws when permission is denied", async () => {
+    hasPermission.mockResolvedValueOnce(false);
+    await expect(getMyReviewRequests("any-id")).rejects.toThrow("Permission denied");
+  });
+
+  // Review request with template is protected — users without review:submit get denied.
+  test("getReviewRequestWithTemplate throws when permission is denied", async () => {
+    hasPermission.mockResolvedValueOnce(false);
+    await expect(getReviewRequestWithTemplate("any-id")).rejects.toThrow("Permission denied");
+  });
+});
+
+describe("admin query permission checks", () => {
+  const { hasPermission } = require("@/permissions");
+
+  afterEach(() => {
+    hasPermission.mockResolvedValue(true);
+  });
+
+  // User list is protected — users without admin:manage_users get denied.
+  test("getUsers throws when permission is denied", async () => {
+    hasPermission.mockResolvedValueOnce(false);
+    await expect(getUsers()).rejects.toThrow("Permission denied");
+  });
+
+  // Single user lookup is protected — users without admin:manage_users get denied.
+  test("getUserById throws when permission is denied", async () => {
+    hasPermission.mockResolvedValueOnce(false);
+    await expect(getUserById("any-id")).rejects.toThrow("Permission denied");
+  });
+
+  // Permission key list is protected — users without admin:assign_permissions get denied.
+  test("getAllPermissionKeys throws when permission is denied", async () => {
+    hasPermission.mockResolvedValueOnce(false);
+    await expect(getAllPermissionKeys()).rejects.toThrow("Permission denied");
+  });
+});
+
+describe("dashboard query permission checks", () => {
+  const { hasPermission } = require("@/permissions");
+
+  afterEach(() => {
+    hasPermission.mockResolvedValue(true);
+  });
+
+  // Org chart data is protected — users without dashboard:view get denied.
+  test("getOrgChartData throws when permission is denied", async () => {
+    hasPermission.mockResolvedValueOnce(false);
+    await expect(getOrgChartData()).rejects.toThrow("Permission denied");
+  });
+});
+
+describe("position query permission checks", () => {
+  const { hasPermission } = require("@/permissions");
+
+  afterEach(() => {
+    hasPermission.mockResolvedValue(true);
+  });
+
+  // Position list is protected — users without person:read get denied.
+  test("getPositions throws when permission is denied", async () => {
+    hasPermission.mockResolvedValueOnce(false);
+    await expect(getPositions()).rejects.toThrow("Permission denied");
   });
 });
 

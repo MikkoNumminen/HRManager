@@ -11,6 +11,8 @@ import { getDemoSessionId } from "@/demoSession";
 import { hasPermission } from "@/permissions";
 
 export async function getLeaveTypes(): Promise<LeaveType[]> {
+  const allowed = await hasPermission("leave:view");
+  if (!allowed) throw new Error("Permission denied");
   const sessionId = await getDemoSessionId();
   const types = await prisma.leaveType.findMany({
     where: { deletedAt: null, sessionId },

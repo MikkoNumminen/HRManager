@@ -1,9 +1,12 @@
 import { prisma } from "@/db";
 import { TeamSchema, CombinedTeam } from "@/schemas";
 import { getDemoSessionId } from "@/demoSession";
+import { hasPermission } from "@/permissions";
 import { PAGE_SIZE, TeamDeleteImpact } from "@/constants";
 
 export async function getTeams(): Promise<CombinedTeam[]> {
+  const allowed = await hasPermission("team:read");
+  if (!allowed) throw new Error("Permission denied");
   const sessionId = await getDemoSessionId();
   const teams = await prisma.team.findMany({
     where: { deletedAt: null, sessionId },
@@ -42,6 +45,8 @@ export async function getTeams(): Promise<CombinedTeam[]> {
 export async function getPagedTeams(
   opts: { page?: number; pageSize?: number; search?: string } = {},
 ): Promise<{ items: CombinedTeam[]; total: number }> {
+  const allowed = await hasPermission("team:read");
+  if (!allowed) throw new Error("Permission denied");
   const { page = 1, pageSize = PAGE_SIZE, search = "" } = opts;
   const sessionId = await getDemoSessionId();
   const q = search.trim();
@@ -103,6 +108,8 @@ export async function getPagedTeams(
 }
 
 export async function getTeamDeleteImpact(teamId: string): Promise<TeamDeleteImpact> {
+  const allowed = await hasPermission("team:read");
+  if (!allowed) throw new Error("Permission denied");
   const sessionId = await getDemoSessionId();
   const [memberCount, team] = await Promise.all([
     prisma.teamMember.count({

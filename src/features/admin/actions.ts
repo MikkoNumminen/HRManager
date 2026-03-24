@@ -10,6 +10,13 @@ import { getDemoSessionId } from "@/demoSession";
 import { DEMO_EMAIL } from "@/constants";
 import { getTranslations } from "next-intl/server";
 import { safe, validateUUID, type ActionResult } from "@/lib/actionUtils";
+import {
+  PERSON_SEEDS,
+  TEAM_SEEDS,
+  MEMBERSHIP_SEEDS,
+  DEPARTMENT_SEEDS,
+  LEAVE_TYPE_SEEDS,
+} from "@/seeds";
 
 export async function resetAll(): Promise<ActionResult> {
   return safe(async () => {
@@ -67,20 +74,12 @@ export async function seedMockData(clearExisting: boolean = true): Promise<Actio
       }
 
       // Batch upsert persons — find all existing by email, create only missing ones
-      const personSeeds = [
-        { name: "Alice Johnson", position: "Engineering Manager", email: "alice@example.com" },
-        { name: "Bob Williams", position: "Senior Developer", email: "bob@example.com" },
-        { name: "Carol Davis", position: "UX Designer", email: "carol@example.com" },
-        { name: "Dave Martinez", position: "Backend Developer", email: "dave@example.com" },
-        { name: "Eve Thompson", position: "QA Engineer", email: "eve@example.com" },
-        { name: "Frank Lee", position: "Product Owner", email: "frank@example.com" },
-      ];
-      const personEmails = personSeeds.map((p) => p.email);
+      const personEmails = PERSON_SEEDS.map((p) => p.email);
       const existingPersons = await prisma.person.findMany({
         where: { email: { in: personEmails }, deletedAt: null, sessionId },
       });
       const existingPersonEmails = new Set(existingPersons.map((p) => p.email));
-      const missingPersonSeeds = personSeeds.filter((p) => !existingPersonEmails.has(p.email));
+      const missingPersonSeeds = PERSON_SEEDS.filter((p) => !existingPersonEmails.has(p.email));
       if (missingPersonSeeds.length > 0) {
         await prisma.person.createMany({
           data: missingPersonSeeds.map((p) => ({ ...p, sessionId })),
@@ -90,22 +89,19 @@ export async function seedMockData(clearExisting: boolean = true): Promise<Actio
         where: { email: { in: personEmails }, deletedAt: null, sessionId },
       });
       const personByEmail = new Map(persons.map((p) => [p.email, p]));
-      const [alice, bob, carol, dave, eve, frank] = personSeeds.map(
-        (p) => personByEmail.get(p.email)!,
-      );
+      const resolvedPersons = PERSON_SEEDS.map((p) => personByEmail.get(p.email)!);
 
       // Batch upsert teams — find all existing by name, create only missing ones
-      const teamSeeds = [
-        { teamName: "Engineering", teamManagerId: alice.id },
-        { teamName: "Design", teamManagerId: carol.id },
-        { teamName: "Platform", teamManagerId: dave.id },
-      ];
-      const teamNames = teamSeeds.map((t) => t.teamName);
+      const teamSeedsResolved = TEAM_SEEDS.map((t) => ({
+        teamName: t.teamName,
+        teamManagerId: resolvedPersons[t.managerIndex].id,
+      }));
+      const teamNames = teamSeedsResolved.map((t) => t.teamName);
       const existingTeams = await prisma.team.findMany({
         where: { teamName: { in: teamNames }, deletedAt: null, sessionId },
       });
       const existingTeamNames = new Set(existingTeams.map((t) => t.teamName));
-      const missingTeamSeeds = teamSeeds.filter((t) => !existingTeamNames.has(t.teamName));
+      const missingTeamSeeds = teamSeedsResolved.filter((t) => !existingTeamNames.has(t.teamName));
       if (missingTeamSeeds.length > 0) {
         await prisma.team.createMany({
           data: missingTeamSeeds.map((t) => ({ ...t, sessionId })),
@@ -115,18 +111,13 @@ export async function seedMockData(clearExisting: boolean = true): Promise<Actio
         where: { teamName: { in: teamNames }, deletedAt: null, sessionId },
       });
       const teamByName = new Map(teams.map((t) => [t.teamName, t]));
-      const [engineering, design, platform] = teamSeeds.map((t) => teamByName.get(t.teamName)!);
+      const resolvedTeams = TEAM_SEEDS.map((t) => teamByName.get(t.teamName)!);
 
       // Add members — skip if already a member (batch check then batch insert)
-      const memberships = [
-        { personId: alice.id, teamId: engineering.teamId },
-        { personId: bob.id, teamId: engineering.teamId },
-        { personId: eve.id, teamId: engineering.teamId },
-        { personId: carol.id, teamId: design.teamId },
-        { personId: frank.id, teamId: design.teamId },
-        { personId: dave.id, teamId: platform.teamId },
-        { personId: bob.id, teamId: platform.teamId },
-      ];
+      const memberships = MEMBERSHIP_SEEDS.map((m) => ({
+        personId: resolvedPersons[m.personIndex].id,
+        teamId: resolvedTeams[m.teamIndex].teamId,
+      }));
       const existingMembers = await prisma.teamMember.findMany({
         where: {
           OR: memberships.map((m) => ({ personId: m.personId, teamId: m.teamId })),
@@ -144,28 +135,19 @@ export async function seedMockData(clearExisting: boolean = true): Promise<Actio
       }
 
       // Upsert departments and assign teams
-      const departmentSeeds = [
-        {
-          name: "Engineering",
-          description: "Software development and infrastructure",
-          headId: alice.id,
-          teamNames: ["Engineering", "Platform"],
-        },
-        {
-          name: "Product & Design",
-          description: "Product management, UX, and design",
-          headId: frank.id,
-          teamNames: ["Design"],
-        },
-      ];
-      for (const d of departmentSeeds) {
+      for (const d of DEPARTMENT_SEEDS) {
         const existingDept = await prisma.department.findFirst({
           where: { name: d.name, deletedAt: null, sessionId },
         });
         const dept =
           existingDept ??
           (await prisma.department.create({
-            data: { name: d.name, description: d.description, headId: d.headId, sessionId },
+            data: {
+              name: d.name,
+              description: d.description,
+              headId: resolvedPersons[d.headIndex].id,
+              sessionId,
+            },
           }));
         for (const teamName of d.teamNames) {
           await prisma.team.updateMany({
@@ -176,29 +158,8 @@ export async function seedMockData(clearExisting: boolean = true): Promise<Actio
       }
 
       // Seed leave types
-      const leaveTypeSeeds = [
-        {
-          name: "Annual Leave",
-          description: "Paid annual vacation days",
-          defaultDays: 25,
-          color: "#4caf50",
-        },
-        { name: "Sick Leave", description: "Paid sick days", defaultDays: 10, color: "#f44336" },
-        {
-          name: "Parental Leave",
-          description: "Maternity or paternity leave",
-          defaultDays: 90,
-          color: "#9c27b0",
-        },
-        {
-          name: "Unpaid Leave",
-          description: "Leave without pay",
-          defaultDays: 0,
-          color: "#757575",
-        },
-      ];
       const leaveTypes = [];
-      for (const lt of leaveTypeSeeds) {
+      for (const lt of LEAVE_TYPE_SEEDS) {
         const existing = await prisma.leaveType.findFirst({
           where: { name: lt.name, deletedAt: null, sessionId },
         });
@@ -241,7 +202,10 @@ export async function seedMockData(clearExisting: boolean = true): Promise<Actio
       const nextWeek = new Date(today.getTime() + 7 * 86400000);
       const nextNextWeek = new Date(today.getTime() + 14 * 86400000);
 
-      // Alice: approved annual leave next week (5 days)
+      // Alice (index 0): approved annual leave next week (5 days)
+      const alice = resolvedPersons[0];
+      const bob = resolvedPersons[1];
+      const frank = resolvedPersons[5];
       await prisma.leaveRequest.create({
         data: {
           personId: alice.id,
@@ -257,7 +221,7 @@ export async function seedMockData(clearExisting: boolean = true): Promise<Actio
         },
       });
 
-      // Bob: pending sick leave
+      // Bob (index 1): pending sick leave
       await prisma.leaveRequest.create({
         data: {
           personId: bob.id,

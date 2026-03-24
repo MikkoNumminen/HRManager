@@ -10,9 +10,11 @@ import {
   TeamReviewCycle,
 } from "@/schemas";
 import { getDemoSessionId } from "@/demoSession";
-import { hasPermission } from "@/permissions";
+import { hasPermission, getUserPermissions } from "@/permissions";
 
 export async function getReviewTemplates(): Promise<ReviewTemplate[]> {
+  const allowed = await hasPermission("review:manage");
+  if (!allowed) throw new Error("Permission denied");
   const sessionId = await getDemoSessionId();
   const templates = await prisma.reviewTemplate.findMany({
     where: { deletedAt: null, sessionId },
@@ -29,6 +31,8 @@ export async function getReviewTemplates(): Promise<ReviewTemplate[]> {
 }
 
 export async function getReviewTemplate(id: string): Promise<ReviewTemplate | null> {
+  const allowed = await hasPermission("review:manage");
+  if (!allowed) throw new Error("Permission denied");
   const sessionId = await getDemoSessionId();
   const template = await prisma.reviewTemplate.findFirst({
     where: { id, deletedAt: null, sessionId },
@@ -44,6 +48,9 @@ export async function getReviewTemplate(id: string): Promise<ReviewTemplate | nu
 }
 
 export async function getReviewCycles(): Promise<ReviewCycle[]> {
+  const permissions = await getUserPermissions();
+  if (!permissions["review:view"] && !permissions["review:manage"] && !permissions["review:submit"])
+    throw new Error("Permission denied");
   const sessionId = await getDemoSessionId();
   const cycles = await prisma.reviewCycle.findMany({
     where: { deletedAt: null, sessionId },
@@ -78,6 +85,9 @@ export async function getReviewCycle(id: string): Promise<
     })
   | null
 > {
+  const permissions = await getUserPermissions();
+  if (!permissions["review:view"] && !permissions["review:manage"] && !permissions["review:submit"])
+    throw new Error("Permission denied");
   const sessionId = await getDemoSessionId();
   const cycle = await prisma.reviewCycle.findFirst({
     where: { id, deletedAt: null, sessionId },
@@ -130,6 +140,8 @@ export async function getReviewCycle(id: string): Promise<
 }
 
 export async function getMyReviewRequests(reviewerPersonId?: string): Promise<ReviewRequest[]> {
+  const allowed = await hasPermission("review:submit");
+  if (!allowed) throw new Error("Permission denied");
   const sessionId = await getDemoSessionId();
 
   if (!reviewerPersonId) return [];
@@ -170,6 +182,8 @@ export async function getReviewRequestWithTemplate(requestId: string): Promise<{
   request: ReviewRequest;
   template: ReviewTemplate | null;
 } | null> {
+  const allowed = await hasPermission("review:submit");
+  if (!allowed) throw new Error("Permission denied");
   const sessionId = await getDemoSessionId();
 
   const request = await prisma.reviewRequest.findFirst({

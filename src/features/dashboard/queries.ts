@@ -138,6 +138,8 @@ export async function getDashboardMetrics(): Promise<DashboardMetrics> {
 }
 
 export async function getOrgChartData(): Promise<OrgChartData> {
+  const allowed = await hasPermission("dashboard:view");
+  if (!allowed) throw new Error("Permission denied");
   const sessionId = await getDemoSessionId();
 
   const [departments, allTeams, allPersons, allMembers] = await Promise.all([

@@ -401,32 +401,38 @@ describe("seedMockData", () => {
   beforeEach(() => cleanDb());
   afterAll(() => cleanDb());
 
-  // Seeds 6 persons into the database.
-  test("creates 6 persons", async () => {
+  // Seeds 9 persons into the database (shared seed data from seeds.ts).
+  test("creates 9 persons", async () => {
     await seedMockData();
 
     const persons = await testPrisma.person.findMany();
-    expect(persons).toHaveLength(6);
+    expect(persons).toHaveLength(9);
   });
 
-  // Seeds 3 teams with the correct names.
-  test("creates 3 teams", async () => {
+  // Seeds 5 teams with the correct names (shared seed data from seeds.ts).
+  test("creates 5 teams", async () => {
     await seedMockData();
 
     const teams = await testPrisma.team.findMany({ orderBy: { teamName: "asc" } });
-    expect(teams).toHaveLength(3);
-    expect(teams.map((t) => t.teamName)).toEqual(["Design", "Engineering", "Platform"]);
+    expect(teams).toHaveLength(5);
+    expect(teams.map((t) => t.teamName)).toEqual([
+      "Data Analytics",
+      "Design",
+      "Engineering",
+      "People & Culture",
+      "Platform",
+    ]);
   });
 
-  // Seeds team memberships — 7 total across the three teams.
+  // Seeds team memberships — 10 total across the five teams.
   test("creates team memberships", async () => {
     await seedMockData();
 
     const members = await testPrisma.teamMember.findMany();
-    expect(members).toHaveLength(7);
+    expect(members).toHaveLength(10);
   });
 
-  // Assigns managers to all three teams.
+  // Assigns managers to all five teams.
   test("assigns correct managers to teams", async () => {
     await seedMockData();
 
@@ -446,7 +452,7 @@ describe("seedMockData", () => {
       where: { teamName: "Platform" },
       include: { manager: true },
     });
-    expect(platform!.manager!.name).toBe("Dave Martinez");
+    expect(platform!.manager!.name).toBe("Grace Park");
   });
 
   // Seeds 4 mock users for the admin panel demo.
@@ -466,9 +472,9 @@ describe("seedMockData", () => {
     await seedMockData(true);
 
     const persons = await testPrisma.person.findMany();
-    expect(persons).toHaveLength(6);
+    expect(persons).toHaveLength(9);
     const teams = await testPrisma.team.findMany();
-    expect(teams).toHaveLength(3);
+    expect(teams).toHaveLength(5);
     const users = await testPrisma.user.findMany();
     expect(users).toHaveLength(4);
   });
@@ -480,7 +486,7 @@ describe("seedMockData", () => {
     await seedMockData(false);
 
     const persons = await testPrisma.person.findMany();
-    expect(persons).toHaveLength(7); // 6 seeded + 1 pre-existing
+    expect(persons).toHaveLength(10); // 9 seeded + 1 pre-existing
     expect(persons.some((p) => p.email === "existing@test.com")).toBe(true);
   });
 
@@ -542,7 +548,7 @@ describe("seedMockData", () => {
     expect(users).toHaveLength(0);
     // Persons and teams should still be seeded (they have sessionId)
     const persons = await testPrisma.person.findMany();
-    expect(persons).toHaveLength(6);
+    expect(persons).toHaveLength(9);
   });
 });
 

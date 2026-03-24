@@ -6,6 +6,8 @@ import { getAuditLogCollection, isMongoAvailable } from "@/mongoDb";
 import { DEMO_EMAIL } from "@/constants";
 
 export async function getUsers(): Promise<AppUser[]> {
+  const allowed = await hasPermission("admin:manage_users");
+  if (!allowed) throw new Error("Permission denied");
   const demoSessionId = await getDemoSessionId();
   const users = await prisma.user.findMany({
     // Demo sessions only see the demo user — prevents leaking real OAuth user emails
@@ -18,6 +20,8 @@ export async function getUsers(): Promise<AppUser[]> {
 }
 
 export async function getUserById(userId: string) {
+  const allowed = await hasPermission("admin:manage_users");
+  if (!allowed) throw new Error("Permission denied");
   const demoSessionId = await getDemoSessionId();
   const user = await prisma.user.findUnique({
     where: { id: userId },
@@ -47,6 +51,8 @@ export async function getUserById(userId: string) {
 }
 
 export async function getAllPermissionKeys(): Promise<string[]> {
+  const allowed = await hasPermission("admin:assign_permissions");
+  if (!allowed) throw new Error("Permission denied");
   return [...PERMISSION_KEYS];
 }
 

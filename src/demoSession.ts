@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import { prisma } from "@/db";
 import { getAuditLogCollection, isMongoAvailable } from "@/mongoDb";
+import { PERSON_SEEDS, TEAM_SEEDS, MEMBERSHIP_SEEDS, DEPARTMENT_SEEDS } from "@/seeds";
 
 /**
  * Returns the demo session ID from the current JWT, or null for real users.
@@ -18,77 +19,34 @@ export async function getDemoSessionId(): Promise<string | null> {
  */
 export async function seedDemoData(sessionId: string): Promise<void> {
   await prisma.$transaction(async (tx) => {
-    const personSeeds = [
-      { name: "Alice Johnson", position: "Engineering Manager", email: "alice@example.com" },
-      { name: "Bob Williams", position: "Senior Developer", email: "bob@example.com" },
-      { name: "Carol Davis", position: "UX Designer", email: "carol@example.com" },
-      { name: "Dave Martinez", position: "Backend Developer", email: "dave@example.com" },
-      { name: "Eve Thompson", position: "QA Engineer", email: "eve@example.com" },
-      { name: "Frank Lee", position: "Product Owner", email: "frank@example.com" },
-      { name: "Grace Park", position: "DevOps Lead", email: "grace@example.com" },
-      { name: "Henry Chen", position: "Data Analyst", email: "henry@example.com" },
-      { name: "Ivy Santos", position: "HR Coordinator", email: "ivy@example.com" },
-    ];
     const persons = await tx.person.createManyAndReturn({
-      data: personSeeds.map((p) => ({ ...p, sessionId })),
+      data: PERSON_SEEDS.map((p) => ({ ...p, sessionId })),
     });
-    const [alice, bob, carol, dave, eve, frank, grace, henry, ivy] = persons;
 
-    const teamSeeds = [
-      { teamName: "Engineering", teamManagerId: alice.id },
-      { teamName: "Design", teamManagerId: carol.id },
-      { teamName: "Platform", teamManagerId: grace.id },
-      { teamName: "Data Analytics", teamManagerId: henry.id },
-      { teamName: "People & Culture", teamManagerId: ivy.id },
-    ];
     const teams = await tx.team.createManyAndReturn({
-      data: teamSeeds.map((t) => ({ ...t, sessionId })),
+      data: TEAM_SEEDS.map((t) => ({
+        teamName: t.teamName,
+        teamManagerId: persons[t.managerIndex].id,
+        sessionId,
+      })),
     });
-    const [engineering, design, platform, dataAnalytics, peopleCulture] = teams;
 
-    const memberships = [
-      { personId: alice.id, teamId: engineering.teamId },
-      { personId: bob.id, teamId: engineering.teamId },
-      { personId: dave.id, teamId: engineering.teamId },
-      { personId: eve.id, teamId: engineering.teamId },
-      { personId: carol.id, teamId: design.teamId },
-      { personId: frank.id, teamId: design.teamId },
-      { personId: grace.id, teamId: platform.teamId },
-      { personId: dave.id, teamId: platform.teamId },
-      { personId: henry.id, teamId: dataAnalytics.teamId },
-      { personId: ivy.id, teamId: peopleCulture.teamId },
-    ];
-    await tx.teamMember.createMany({ data: memberships.map((m) => ({ ...m, sessionId })) });
+    await tx.teamMember.createMany({
+      data: MEMBERSHIP_SEEDS.map((m) => ({
+        personId: persons[m.personIndex].id,
+        teamId: teams[m.teamIndex].teamId,
+        sessionId,
+      })),
+    });
 
-    const departmentSeeds = [
-      {
-        name: "Engineering",
-        description: "Software development and infrastructure",
-        headId: alice.id,
-        teamNames: ["Engineering", "Platform"],
-      },
-      {
-        name: "Product & Design",
-        description: "Product management, UX, and design",
-        headId: frank.id,
-        teamNames: ["Design"],
-      },
-      {
-        name: "Data",
-        description: "Analytics, reporting, and data engineering",
-        headId: henry.id,
-        teamNames: ["Data Analytics"],
-      },
-      {
-        name: "Human Resources",
-        description: "People operations and talent management",
-        headId: ivy.id,
-        teamNames: ["People & Culture"],
-      },
-    ];
-    for (const d of departmentSeeds) {
+    for (const d of DEPARTMENT_SEEDS) {
       const dept = await tx.department.create({
-        data: { name: d.name, description: d.description, headId: d.headId, sessionId },
+        data: {
+          name: d.name,
+          description: d.description,
+          headId: persons[d.headIndex].id,
+          sessionId,
+        },
       });
       for (const teamName of d.teamNames) {
         await tx.team.updateMany({
