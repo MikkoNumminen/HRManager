@@ -116,6 +116,8 @@ graph LR
 
 - **Cascade delete impact warnings** — Before deleting a person, team, or department, the confirmation dialog shows exactly what references will break: managed teams that will lose their manager, departments that will lose their head, team memberships that will be removed, linked leave requests, and review assignments. Fetched server-side and displayed with a warning panel inside the ConfirmDialog. _Why? Accidental deletes in HR systems can cascade in ways users don't expect — showing the blast radius before confirmation prevents "I didn't know that would happen" moments._
 
+- **Interactive organization chart** — Full-screen hierarchical visualization of the company structure: departments → teams → members, plus unassigned groups. Built with ReactFlow (`@xyflow/react`) and dagre auto-layout. Color-coded node types (departments in indigo, teams in sky blue, people in slate), summary chips showing counts, zoom/pan controls, and a minimap for navigation. Permission-gated with `person:read`. _Why ReactFlow over D3? First-class React integration, built-in zoom/pan/minimap, and custom node rendering without fighting the DOM._
+
 - **Polished empty states** — Tables show a contextual icon, heading, and hint when empty. Persons shows a people icon with "Add your first person using the form above"; teams and departments follow the same pattern. Hint text is shown only when the user has create permission. Translated across all 18 locales.
 
 ### 📦 Data operations
@@ -154,6 +156,7 @@ graph LR
 | ---------- | -------------------------------- | ----------------------------------------------------------------- |
 | Framework  | Next.js 16 (App Router)          | Server Components for zero-waterfall data fetching                |
 | UI         | React 19 + MUI v7 + MUI X Charts | `useOptimistic` + `useActionState` eliminate form boilerplate     |
+| Org Chart  | ReactFlow + dagre                | Interactive graph visualization with auto-layout                  |
 | Language   | TypeScript 5.9                   | End-to-end type safety from database schema to UI props           |
 | ORM        | Prisma 7                         | Type-safe queries + raw SQL escape hatch for complex analytics    |
 | Databases  | PostgreSQL + MongoDB 8           | Relational data in SQL, append-only logs in a document store      |
