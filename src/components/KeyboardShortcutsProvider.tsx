@@ -172,8 +172,8 @@ export default function KeyboardShortcutsProvider({ children }: { children: Reac
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            bgcolor: colors.background,
-            color: colors.text,
+            bgcolor: colors.slate700,
+            color: colors.slate100,
           }}
         >
           <Typography variant="h6" component="span">
@@ -183,22 +183,22 @@ export default function KeyboardShortcutsProvider({ children }: { children: Reac
             onClick={hideHelp}
             size="small"
             aria-label="Close"
-            sx={{ color: colors.text }}
+            sx={{ color: colors.slate100 }}
           >
             <CloseIcon />
           </IconButton>
         </DialogTitle>
-        <DialogContent sx={{ bgcolor: colors.background, p: 0 }}>
+        <DialogContent sx={{ bgcolor: colors.slate700, p: 0 }}>
           <Table size="small">
             <TableBody>
               {SHORTCUTS.map((s) => (
                 <TableRow key={s.keys}>
-                  <TableCell sx={{ color: colors.textSecondary, width: "40%" }}>
+                  <TableCell sx={{ color: colors.slate400, width: "40%" }}>
                     <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
                       {s.keys.split(" then ").map((key, i) => (
                         <Box key={i} sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
                           {i > 0 && (
-                            <Typography variant="caption" sx={{ color: colors.textSecondary }}>
+                            <Typography variant="caption" sx={{ color: colors.slate400 }}>
                               then
                             </Typography>
                           )}
@@ -209,10 +209,10 @@ export default function KeyboardShortcutsProvider({ children }: { children: Reac
                               py: 0.25,
                               borderRadius: 0.5,
                               border: "1px solid",
-                              borderColor: colors.textSecondary,
+                              borderColor: colors.slate400,
                               fontFamily: "monospace",
                               fontSize: "0.85rem",
-                              color: colors.text,
+                              color: colors.slate100,
                             }}
                           >
                             {key}
@@ -221,7 +221,7 @@ export default function KeyboardShortcutsProvider({ children }: { children: Reac
                       ))}
                     </Box>
                   </TableCell>
-                  <TableCell sx={{ color: colors.text }}>{s.description}</TableCell>
+                  <TableCell sx={{ color: colors.slate100 }}>{s.description}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
