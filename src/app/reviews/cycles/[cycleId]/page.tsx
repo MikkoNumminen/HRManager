@@ -4,7 +4,6 @@ import { getReviewCycle, getPersons } from "@/queries";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getUserPermissions } from "@/permissions";
-import { getTranslations } from "next-intl/server";
 
 interface Props {
   params: Promise<{ cycleId: string }>;
@@ -22,8 +21,6 @@ export default async function ReviewCycleDetailPage({ params }: Props) {
   if (!cycle) redirect("/reviews");
 
   const persons = await getPersons();
-  const t = await getTranslations("reviews");
-
   return (
     <>
       <TopBar title={cycle.name} backHref="/reviews" permissions={permissions} />

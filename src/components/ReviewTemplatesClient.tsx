@@ -19,7 +19,6 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import {
   colors,
   formStyles,
-  headerStyles,
   pageContainerStyles,
   textFieldStyles,
   smallButtonStyles,
@@ -66,8 +65,6 @@ export default function ReviewTemplatesClient({ templates }: Props) {
     },
     { error: null },
   );
-
-  const templateToDelete = templates.find((t) => t.id === deleteId);
 
   return (
     <Box>
