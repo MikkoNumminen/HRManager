@@ -170,7 +170,11 @@
     "kickOut": "추방",
     "kickOutTitle": "사용자 추방",
     "kickOutDescription": "이 사용자를 시스템에서 제거합니다. 모든 접근 권한과 권한 재정의가 삭제됩니다.",
-    "kickOutConfirm": "{name}을(를) 추방하시겠습니까? 접근 권한과 모든 권한 재정의가 삭제됩니다."
+    "kickOutConfirm": "{name}을(를) 추방하시겠습니까? 접근 권한과 모든 권한 재정의가 삭제됩니다.",
+    "reset2FA": "2FA 초기화",
+    "reset2FATitle": "이중 인증 초기화",
+    "reset2FADescription": "이 사용자의 이중 인증을 제거합니다. 다시 설정해야 합니다.",
+    "reset2FAConfirm": "{name}의 이중 인증을 초기화하시겠습니까? 인증 앱을 다시 구성해야 합니다."
   },
   "dashboard": {
     "title": "대시보드",
@@ -335,7 +339,8 @@
     "dataImported": "{count, plural, one {# 명의 인원을 성공적으로 가져왔습니다} other {# 명의 인원을 성공적으로 가져왔습니다}}",
     "otherSessionsSignedOut": "다른 모든 세션이 로그아웃되었습니다",
     "sessionForceLoggedOut": "세션이 강제 로그아웃되었습니다",
-    "allSessionsForceLoggedOut": "{name}의 모든 세션이 강제 로그아웃되었습니다"
+    "allSessionsForceLoggedOut": "{name}의 모든 세션이 강제 로그아웃되었습니다",
+    "twoFactorReset": "{name}의 이중 인증이 초기화되었습니다"
   },
   "tutorial": {
     "checklistTitle": "데모 투어",
@@ -511,7 +516,11 @@
     "positionAlreadyExists": "이 직위는 이미 존재합니다",
     "positionNotFound": "직위를 찾을 수 없습니다",
     "sessionNotFound": "세션을 찾을 수 없습니다",
-    "sessionAlreadyInactive": "세션이 이미 비활성 상태입니다"
+    "sessionAlreadyInactive": "세션이 이미 비활성 상태입니다",
+    "invalidTotpCode": "유효하지 않은 인증 코드입니다. 다시 시도해 주세요.",
+    "invalidTotpSecret": "유효하지 않은 TOTP 비밀키",
+    "twoFactorAlreadyEnabled": "이중 인증이 이미 활성화되어 있습니다",
+    "twoFactorNotEnabled": "이중 인증이 활성화되어 있지 않습니다"
   },
   "reviews": {
     "title": "성과 평가",
@@ -749,5 +758,44 @@
     "forceLogout": "강제 로그아웃",
     "forceLogoutAll": "모두 강제 로그아웃",
     "noActiveSessions": "이 사용자의 활성 세션이 없습니다"
+  },
+  "twoFactor": {
+    "title": "이중 인증",
+    "description": "인증 앱의 인증 코드를 요구하여 계정에 추가 보안 계층을 추가합니다.",
+    "enable": "2FA 활성화",
+    "disable": "2FA 비활성화",
+    "enabled": "이중 인증이 활성화되었습니다",
+    "disabled": "이중 인증이 비활성화되었습니다",
+    "setupTitle": "이중 인증 설정",
+    "setupError": "2FA 설정 초기화 실패",
+    "stepScan": "QR 코드 스캔",
+    "stepVerify": "코드 확인",
+    "stepRecovery": "복구 코드",
+    "scanInstructions": "인증 앱(Google Authenticator, Authy, 1Password 등)으로 이 QR 코드를 스캔하세요",
+    "qrCodeAlt": "인증 앱용 QR 코드",
+    "manualEntry": "또는 이 코드를 수동으로 입력:",
+    "secretCopied": "비밀키가 클립보드에 복사되었습니다",
+    "next": "다음",
+    "back": "뒤로",
+    "verifyInstructions": "설정을 확인하려면 인증 앱의 6자리 코드를 입력하세요.",
+    "codeLabel": "인증 코드",
+    "recoveryCodeLabel": "복구 코드",
+    "verifyAndEnable": "확인 및 활성화",
+    "recoveryWarning": "이 복구 코드를 안전한 곳에 저장하세요. 각 코드는 한 번만 사용할 수 있습니다. 인증 앱에 접근할 수 없게 되면 이 코드로 로그인할 수 있습니다.",
+    "copyCodes": "모든 코드 복사",
+    "codesCopied": "복구 코드가 클립보드에 복사되었습니다",
+    "done": "완료",
+    "disableTitle": "이중 인증 비활성화",
+    "disableInstructions": "이중 인증을 비활성화하려면 현재 인증 코드를 입력하세요. 계정의 추가 보안 계층이 제거됩니다.",
+    "regenerateTitle": "복구 코드 재생성",
+    "regenerateCodes": "복구 코드 재생성",
+    "regenerateInstructions": "새 복구 코드를 생성하려면 현재 인증 코드를 입력하세요. 기존 코드는 무효화됩니다.",
+    "codesRegenerated": "복구 코드가 재생성되었습니다",
+    "verifyTitle": "이중 인증 확인",
+    "loginVerifyInstructions": "로그인을 완료하려면 인증 앱의 6자리 코드를 입력하세요.",
+    "recoveryInstructions": "복구 코드 중 하나를 입력하세요. 각 코드는 한 번만 사용할 수 있습니다.",
+    "verify": "확인",
+    "useRecoveryCode": "대신 복구 코드 사용",
+    "useAuthenticator": "대신 인증 앱 사용"
   }
 }

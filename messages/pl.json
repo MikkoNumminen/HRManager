@@ -170,7 +170,11 @@
     "kickOut": "Wyrzuć",
     "kickOutTitle": "Wyrzuć użytkownika",
     "kickOutDescription": "Usuń tego użytkownika z systemu. Utraci wszystkie uprawnienia dostępu i nadpisania uprawnień.",
-    "kickOutConfirm": "Czy na pewno chcesz wyrzucić {name}? Utraci dostęp i wszystkie nadpisania uprawnień."
+    "kickOutConfirm": "Czy na pewno chcesz wyrzucić {name}? Utraci dostęp i wszystkie nadpisania uprawnień.",
+    "reset2FA": "Zresetuj 2FA",
+    "reset2FATitle": "Zresetuj uwierzytelnianie dwuskładnikowe",
+    "reset2FADescription": "Usuń uwierzytelnianie dwuskładnikowe tego użytkownika. Będzie musiał je ponownie skonfigurować.",
+    "reset2FAConfirm": "Czy na pewno chcesz zresetować uwierzytelnianie dwuskładnikowe dla {name}? Użytkownik będzie musiał ponownie skonfigurować aplikację uwierzytelniającą."
   },
   "dashboard": {
     "title": "Panel",
@@ -335,7 +339,8 @@
     "dataImported": "{count, plural, one {# osoba zaimportowana pomyślnie} other {# osób zaimportowanych pomyślnie}}",
     "otherSessionsSignedOut": "Wszystkie inne sesje zostały wylogowane",
     "sessionForceLoggedOut": "Sesja została wymuszone wylogowana",
-    "allSessionsForceLoggedOut": "Wszystkie sesje użytkownika {name} zostały wymuszone wylogowane"
+    "allSessionsForceLoggedOut": "Wszystkie sesje użytkownika {name} zostały wymuszone wylogowane",
+    "twoFactorReset": "Uwierzytelnianie dwuskładnikowe zostało zresetowane dla {name}"
   },
   "tutorial": {
     "checklistTitle": "Przewodnik demo",
@@ -511,7 +516,11 @@
     "positionAlreadyExists": "To stanowisko już istnieje",
     "positionNotFound": "Stanowisko nie znalezione",
     "sessionNotFound": "Sesja nie została znaleziona",
-    "sessionAlreadyInactive": "Sesja jest już nieaktywna"
+    "sessionAlreadyInactive": "Sesja jest już nieaktywna",
+    "invalidTotpCode": "Nieprawidłowy kod weryfikacyjny. Spróbuj ponownie.",
+    "invalidTotpSecret": "Nieprawidłowy sekret TOTP",
+    "twoFactorAlreadyEnabled": "Uwierzytelnianie dwuskładnikowe jest już włączone",
+    "twoFactorNotEnabled": "Uwierzytelnianie dwuskładnikowe nie jest włączone"
   },
   "reviews": {
     "title": "Oceny pracownicze",
@@ -749,5 +758,44 @@
     "forceLogout": "Wymuś wylogowanie",
     "forceLogoutAll": "Wymuś wylogowanie wszystkich",
     "noActiveSessions": "Brak aktywnych sesji dla tego użytkownika"
+  },
+  "twoFactor": {
+    "title": "Uwierzytelnianie dwuskładnikowe",
+    "description": "Dodaj dodatkową warstwę zabezpieczeń do swojego konta, wymagając kodu weryfikacyjnego z aplikacji uwierzytelniającej.",
+    "enable": "Włącz 2FA",
+    "disable": "Wyłącz 2FA",
+    "enabled": "Uwierzytelnianie dwuskładnikowe włączone",
+    "disabled": "Uwierzytelnianie dwuskładnikowe wyłączone",
+    "setupTitle": "Konfiguracja uwierzytelniania dwuskładnikowego",
+    "setupError": "Nie udało się zainicjować konfiguracji 2FA",
+    "stepScan": "Zeskanuj kod QR",
+    "stepVerify": "Zweryfikuj kod",
+    "stepRecovery": "Kody odzyskiwania",
+    "scanInstructions": "Zeskanuj ten kod QR aplikacją uwierzytelniającą (Google Authenticator, Authy, 1Password itp.)",
+    "qrCodeAlt": "Kod QR dla aplikacji uwierzytelniającej",
+    "manualEntry": "Lub wprowadź ten kod ręcznie:",
+    "secretCopied": "Sekret skopiowany do schowka",
+    "next": "Dalej",
+    "back": "Wstecz",
+    "verifyInstructions": "Wprowadź 6-cyfrowy kod z aplikacji uwierzytelniającej, aby zweryfikować konfigurację.",
+    "codeLabel": "Kod weryfikacyjny",
+    "recoveryCodeLabel": "Kod odzyskiwania",
+    "verifyAndEnable": "Zweryfikuj i włącz",
+    "recoveryWarning": "Zapisz te kody odzyskiwania w bezpiecznym miejscu. Każdy kod może być użyty tylko raz. Jeśli utracisz dostęp do aplikacji uwierzytelniającej, możesz użyć tych kodów do logowania.",
+    "copyCodes": "Kopiuj wszystkie kody",
+    "codesCopied": "Kody odzyskiwania skopiowane do schowka",
+    "done": "Gotowe",
+    "disableTitle": "Wyłącz uwierzytelnianie dwuskładnikowe",
+    "disableInstructions": "Wprowadź swój aktualny kod weryfikacyjny, aby wyłączyć uwierzytelnianie dwuskładnikowe. Spowoduje to usunięcie dodatkowej warstwy zabezpieczeń z Twojego konta.",
+    "regenerateTitle": "Wygeneruj ponownie kody odzyskiwania",
+    "regenerateCodes": "Wygeneruj ponownie kody odzyskiwania",
+    "regenerateInstructions": "Wprowadź swój aktualny kod weryfikacyjny, aby wygenerować nowe kody odzyskiwania. Twoje istniejące kody zostaną unieważnione.",
+    "codesRegenerated": "Kody odzyskiwania wygenerowane ponownie",
+    "verifyTitle": "Weryfikacja dwuskładnikowa",
+    "loginVerifyInstructions": "Wprowadź 6-cyfrowy kod z aplikacji uwierzytelniającej, aby zakończyć logowanie.",
+    "recoveryInstructions": "Wprowadź jeden ze swoich kodów odzyskiwania. Każdy kod może być użyty tylko raz.",
+    "verify": "Zweryfikuj",
+    "useRecoveryCode": "Użyj zamiast tego kodu odzyskiwania",
+    "useAuthenticator": "Użyj zamiast tego aplikacji uwierzytelniającej"
   }
 }

@@ -170,7 +170,11 @@
     "kickOut": "踢出",
     "kickOutTitle": "踢出用户",
     "kickOutDescription": "从系统中移除此用户。他们将失去所有访问权限和权限覆盖。",
-    "kickOutConfirm": "确定要踢出{name}吗？他们将失去访问权限和所有权限覆盖。"
+    "kickOutConfirm": "确定要踢出{name}吗？他们将失去访问权限和所有权限覆盖。",
+    "reset2FA": "重置两步验证",
+    "reset2FATitle": "重置双因素身份验证",
+    "reset2FADescription": "移除该用户的双因素身份验证。他们需要重新设置。",
+    "reset2FAConfirm": "您确定要重置 {name} 的双因素身份验证吗？他们需要重新配置身份验证应用程序。"
   },
   "dashboard": {
     "title": "仪表板",
@@ -335,7 +339,8 @@
     "dataImported": "{count, plural, one {# 名人员导入成功} other {# 名人员导入成功}}",
     "otherSessionsSignedOut": "所有其他会话已退出登录",
     "sessionForceLoggedOut": "会话已被强制注销",
-    "allSessionsForceLoggedOut": "{name} 的所有会话已被强制注销"
+    "allSessionsForceLoggedOut": "{name} 的所有会话已被强制注销",
+    "twoFactorReset": "已重置 {name} 的双因素身份验证"
   },
   "tutorial": {
     "checklistTitle": "演示导览",
@@ -511,7 +516,11 @@
     "positionAlreadyExists": "该职位已存在",
     "positionNotFound": "未找到职位",
     "sessionNotFound": "未找到会话",
-    "sessionAlreadyInactive": "会话已处于非活跃状态"
+    "sessionAlreadyInactive": "会话已处于非活跃状态",
+    "invalidTotpCode": "验证码无效。请重试。",
+    "invalidTotpSecret": "TOTP 密钥无效",
+    "twoFactorAlreadyEnabled": "双因素身份验证已启用",
+    "twoFactorNotEnabled": "双因素身份验证未启用"
   },
   "reviews": {
     "title": "绩效评估",
@@ -749,5 +758,44 @@
     "forceLogout": "强制注销",
     "forceLogoutAll": "强制注销所有",
     "noActiveSessions": "该用户暂无活跃会话"
+  },
+  "twoFactor": {
+    "title": "双因素身份验证",
+    "description": "通过要求身份验证应用程序的验证码，为您的帐户添加额外的安全层。",
+    "enable": "启用 2FA",
+    "disable": "禁用 2FA",
+    "enabled": "双因素身份验证已启用",
+    "disabled": "双因素身份验证已禁用",
+    "setupTitle": "设置双因素身份验证",
+    "setupError": "初始化 2FA 设置失败",
+    "stepScan": "扫描二维码",
+    "stepVerify": "验证码",
+    "stepRecovery": "恢复代码",
+    "scanInstructions": "使用您的身份验证应用程序（Google Authenticator、Authy、1Password 等）扫描此二维码",
+    "qrCodeAlt": "身份验证应用程序的二维码",
+    "manualEntry": "或手动输入此代码：",
+    "secretCopied": "密钥已复制到剪贴板",
+    "next": "下一步",
+    "back": "返回",
+    "verifyInstructions": "输入身份验证应用程序中的 6 位验证码以验证设置。",
+    "codeLabel": "验证码",
+    "recoveryCodeLabel": "恢复代码",
+    "verifyAndEnable": "验证并启用",
+    "recoveryWarning": "请将这些恢复代码保存在安全的地方。每个代码只能使用一次。如果您无法访问身份验证应用程序，可以使用这些代码登录。",
+    "copyCodes": "复制所有代码",
+    "codesCopied": "恢复代码已复制到剪贴板",
+    "done": "完成",
+    "disableTitle": "禁用双因素身份验证",
+    "disableInstructions": "输入您当前的验证码以禁用双因素身份验证。这将从您的帐户中删除额外的安全层。",
+    "regenerateTitle": "重新生成恢复代码",
+    "regenerateCodes": "重新生成恢复代码",
+    "regenerateInstructions": "输入您当前的验证码以生成新的恢复代码。您现有的代码将失效。",
+    "codesRegenerated": "恢复代码已重新生成",
+    "verifyTitle": "双因素验证",
+    "loginVerifyInstructions": "输入身份验证应用程序中的 6 位验证码以完成登录。",
+    "recoveryInstructions": "输入您的一个恢复代码。每个代码只能使用一次。",
+    "verify": "验证",
+    "useRecoveryCode": "改用恢复代码",
+    "useAuthenticator": "改用身份验证应用程序"
   }
 }

@@ -170,7 +170,11 @@
     "kickOut": "Poista käyttäjä",
     "kickOutTitle": "Poista käyttäjä",
     "kickOutDescription": "Poista tämä käyttäjä järjestelmästä. He menettävät kaikki käyttöoikeudet ja ohitukset.",
-    "kickOutConfirm": "Haluatko varmasti poistaa käyttäjän {name}? He menettävät käyttöoikeutensa ja kaikki ohitukset."
+    "kickOutConfirm": "Haluatko varmasti poistaa käyttäjän {name}? He menettävät käyttöoikeutensa ja kaikki ohitukset.",
+    "reset2FA": "Nollaa 2FA",
+    "reset2FATitle": "Nollaa kaksivaiheinen tunnistautuminen",
+    "reset2FADescription": "Poista tämän käyttäjän kaksivaiheinen tunnistautuminen. Käyttäjän on määritettävä se uudelleen.",
+    "reset2FAConfirm": "Haluatko varmasti nollata kaksivaiheisen tunnistautumisen käyttäjälle {name}? Käyttäjän on määritettävä tunnistautumissovelluksensa uudelleen."
   },
   "dashboard": {
     "title": "Kojelauta",
@@ -335,7 +339,8 @@
     "dataImported": "{count, plural, one {# henkilö tuotu onnistuneesti} other {# henkilöä tuotu onnistuneesti}}",
     "otherSessionsSignedOut": "Kaikki muut istunnot on kirjattu ulos",
     "sessionForceLoggedOut": "Istunto pakkokirjattu ulos",
-    "allSessionsForceLoggedOut": "Kaikki {name}n istunnot on pakkokirjattu ulos"
+    "allSessionsForceLoggedOut": "Kaikki {name}n istunnot on pakkokirjattu ulos",
+    "twoFactorReset": "Kaksivaiheinen tunnistautuminen nollattu käyttäjälle {name}"
   },
   "tutorial": {
     "checklistTitle": "Demokierros",
@@ -511,7 +516,11 @@
     "positionAlreadyExists": "Tämä nimike on jo olemassa",
     "positionNotFound": "Nimikettä ei löytynyt",
     "sessionNotFound": "Istuntoa ei löydy",
-    "sessionAlreadyInactive": "Istunto on jo epäaktiivinen"
+    "sessionAlreadyInactive": "Istunto on jo epäaktiivinen",
+    "invalidTotpCode": "Virheellinen vahvistuskoodi. Yritä uudelleen.",
+    "invalidTotpSecret": "Virheellinen TOTP-salaisuus",
+    "twoFactorAlreadyEnabled": "Kaksivaiheinen tunnistautuminen on jo käytössä",
+    "twoFactorNotEnabled": "Kaksivaiheinen tunnistautuminen ei ole käytössä"
   },
   "reviews": {
     "title": "Kehityskeskustelut",
@@ -749,5 +758,44 @@
     "forceLogout": "Pakkokirjautuminen ulos",
     "forceLogoutAll": "Pakkokirjaa kaikki ulos",
     "noActiveSessions": "Ei aktiivisia istuntoja tälle käyttäjälle"
+  },
+  "twoFactor": {
+    "title": "Kaksivaiheinen tunnistautuminen",
+    "description": "Lisää tiliisi ylimääräinen suojauskerros vaatimalla vahvistuskoodi tunnistautumissovelluksestasi.",
+    "enable": "Ota 2FA käyttöön",
+    "disable": "Poista 2FA käytöstä",
+    "enabled": "Kaksivaiheinen tunnistautuminen käytössä",
+    "disabled": "Kaksivaiheinen tunnistautuminen poistettu käytöstä",
+    "setupTitle": "Määritä kaksivaiheinen tunnistautuminen",
+    "setupError": "2FA-määrityksen alustaminen epäonnistui",
+    "stepScan": "Skannaa QR-koodi",
+    "stepVerify": "Vahvista koodi",
+    "stepRecovery": "Palautuskoodit",
+    "scanInstructions": "Skannaa tämä QR-koodi tunnistautumissovelluksellasi (Google Authenticator, Authy, 1Password jne.)",
+    "qrCodeAlt": "QR-koodi tunnistautumissovellukselle",
+    "manualEntry": "Tai syötä tämä koodi manuaalisesti:",
+    "secretCopied": "Salaisuus kopioitu leikepöydälle",
+    "next": "Seuraava",
+    "back": "Takaisin",
+    "verifyInstructions": "Syötä tunnistautumissovelluksesi 6-numeroinen koodi vahvistaaksesi määrityksen.",
+    "codeLabel": "Vahvistuskoodi",
+    "recoveryCodeLabel": "Palautuskoodi",
+    "verifyAndEnable": "Vahvista ja ota käyttöön",
+    "recoveryWarning": "Tallenna nämä palautuskoodit turvalliseen paikkaan. Jokaista koodia voidaan käyttää vain kerran. Jos menetät pääsyn tunnistautumissovellukseesi, voit käyttää näitä koodeja kirjautumiseen.",
+    "copyCodes": "Kopioi kaikki koodit",
+    "codesCopied": "Palautuskoodit kopioitu leikepöydälle",
+    "done": "Valmis",
+    "disableTitle": "Poista kaksivaiheinen tunnistautuminen käytöstä",
+    "disableInstructions": "Syötä nykyinen vahvistuskoodisi poistaaksesi kaksivaiheisen tunnistautumisen käytöstä. Tämä poistaa tilisi ylimääräisen suojauskerroksen.",
+    "regenerateTitle": "Luo palautuskoodit uudelleen",
+    "regenerateCodes": "Luo palautuskoodit uudelleen",
+    "regenerateInstructions": "Syötä nykyinen vahvistuskoodisi luodaksesi uudet palautuskoodit. Nykyiset koodisi mitätöidään.",
+    "codesRegenerated": "Palautuskoodit luotu uudelleen",
+    "verifyTitle": "Kaksivaiheinen vahvistus",
+    "loginVerifyInstructions": "Syötä tunnistautumissovelluksesi 6-numeroinen koodi viimeistelläksesi kirjautumisen.",
+    "recoveryInstructions": "Syötä yksi palautuskoodeistasi. Jokaista koodia voidaan käyttää vain kerran.",
+    "verify": "Vahvista",
+    "useRecoveryCode": "Käytä sen sijaan palautuskoodia",
+    "useAuthenticator": "Käytä sen sijaan tunnistautumissovellusta"
   }
 }

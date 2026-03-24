@@ -170,7 +170,11 @@
     "kickOut": "At",
     "kickOutTitle": "Kullanıcıyı At",
     "kickOutDescription": "Bu kullanıcıyı sistemden kaldırın. Tüm erişim hakları ve izin geçersiz kılmaları kaybedilecektir.",
-    "kickOutConfirm": "{name} kullanıcısını atmak istediğinizden emin misiniz? Erişim hakları ve tüm izin geçersiz kılmaları kaybedilecektir."
+    "kickOutConfirm": "{name} kullanıcısını atmak istediğinizden emin misiniz? Erişim hakları ve tüm izin geçersiz kılmaları kaybedilecektir.",
+    "reset2FA": "2FA'yı Sıfırla",
+    "reset2FATitle": "İki Faktörlü Kimlik Doğrulamayı Sıfırla",
+    "reset2FADescription": "Bu kullanıcının iki faktörlü kimlik doğrulamasını kaldırın. Yeniden kurması gerekecek.",
+    "reset2FAConfirm": "{name} için iki faktörlü kimlik doğrulamayı sıfırlamak istediğinizden emin misiniz? Kimlik doğrulama uygulamasını yeniden yapılandırması gerekecek."
   },
   "dashboard": {
     "title": "Gösterge Paneli",
@@ -335,7 +339,8 @@
     "dataImported": "{count, plural, one {# kişi başarıyla içeri aktarıldı} other {# kişi başarıyla içeri aktarıldı}}",
     "otherSessionsSignedOut": "Diğer tüm oturumlar kapatıldı",
     "sessionForceLoggedOut": "Oturum zorla kapatıldı",
-    "allSessionsForceLoggedOut": "{name} adlı kullanıcının tüm oturumları zorla kapatıldı"
+    "allSessionsForceLoggedOut": "{name} adlı kullanıcının tüm oturumları zorla kapatıldı",
+    "twoFactorReset": "{name} için iki faktörlü kimlik doğrulama sıfırlandı"
   },
   "tutorial": {
     "checklistTitle": "Demo Turu",
@@ -511,7 +516,11 @@
     "positionAlreadyExists": "Bu pozisyon zaten mevcut",
     "positionNotFound": "Pozisyon bulunamadı",
     "sessionNotFound": "Oturum bulunamadı",
-    "sessionAlreadyInactive": "Oturum zaten etkin değil"
+    "sessionAlreadyInactive": "Oturum zaten etkin değil",
+    "invalidTotpCode": "Geçersiz doğrulama kodu. Lütfen tekrar deneyin.",
+    "invalidTotpSecret": "Geçersiz TOTP gizli anahtarı",
+    "twoFactorAlreadyEnabled": "İki faktörlü kimlik doğrulama zaten etkin",
+    "twoFactorNotEnabled": "İki faktörlü kimlik doğrulama etkin değil"
   },
   "reviews": {
     "title": "Performans Değerlendirmeleri",
@@ -749,5 +758,44 @@
     "forceLogout": "Zorla Çıkış",
     "forceLogoutAll": "Tümünü Zorla Çıkar",
     "noActiveSessions": "Bu kullanıcı için aktif oturum yok"
+  },
+  "twoFactor": {
+    "title": "İki Faktörlü Kimlik Doğrulama",
+    "description": "Kimlik doğrulama uygulamanızdan bir doğrulama kodu isteyerek hesabınıza ekstra bir güvenlik katmanı ekleyin.",
+    "enable": "2FA'yı Etkinleştir",
+    "disable": "2FA'yı Devre Dışı Bırak",
+    "enabled": "İki faktörlü kimlik doğrulama etkinleştirildi",
+    "disabled": "İki faktörlü kimlik doğrulama devre dışı bırakıldı",
+    "setupTitle": "İki Faktörlü Kimlik Doğrulamayı Kur",
+    "setupError": "2FA kurulumu başlatılamadı",
+    "stepScan": "QR Kodunu Tara",
+    "stepVerify": "Kodu Doğrula",
+    "stepRecovery": "Kurtarma Kodları",
+    "scanInstructions": "Bu QR kodunu kimlik doğrulama uygulamanızla tarayın (Google Authenticator, Authy, 1Password vb.)",
+    "qrCodeAlt": "Kimlik doğrulama uygulaması için QR kodu",
+    "manualEntry": "Veya bu kodu manuel olarak girin:",
+    "secretCopied": "Gizli anahtar panoya kopyalandı",
+    "next": "İleri",
+    "back": "Geri",
+    "verifyInstructions": "Kurulumu doğrulamak için kimlik doğrulama uygulamanızdaki 6 haneli kodu girin.",
+    "codeLabel": "Doğrulama Kodu",
+    "recoveryCodeLabel": "Kurtarma Kodu",
+    "verifyAndEnable": "Doğrula ve Etkinleştir",
+    "recoveryWarning": "Bu kurtarma kodlarını güvenli bir yerde saklayın. Her kod yalnızca bir kez kullanılabilir. Kimlik doğrulama uygulamanıza erişiminizi kaybederseniz, giriş yapmak için bu kodları kullanabilirsiniz.",
+    "copyCodes": "Tüm Kodları Kopyala",
+    "codesCopied": "Kurtarma kodları panoya kopyalandı",
+    "done": "Tamam",
+    "disableTitle": "İki Faktörlü Kimlik Doğrulamayı Devre Dışı Bırak",
+    "disableInstructions": "İki faktörlü kimlik doğrulamayı devre dışı bırakmak için mevcut doğrulama kodunuzu girin. Bu, hesabınızdaki ekstra güvenlik katmanını kaldıracaktır.",
+    "regenerateTitle": "Kurtarma Kodlarını Yeniden Oluştur",
+    "regenerateCodes": "Kurtarma Kodlarını Yeniden Oluştur",
+    "regenerateInstructions": "Yeni kurtarma kodları oluşturmak için mevcut doğrulama kodunuzu girin. Mevcut kodlarınız geçersiz kılınacak.",
+    "codesRegenerated": "Kurtarma kodları yeniden oluşturuldu",
+    "verifyTitle": "İki Faktörlü Doğrulama",
+    "loginVerifyInstructions": "Girişi tamamlamak için kimlik doğrulama uygulamanızdaki 6 haneli kodu girin.",
+    "recoveryInstructions": "Kurtarma kodlarınızdan birini girin. Her kod yalnızca bir kez kullanılabilir.",
+    "verify": "Doğrula",
+    "useRecoveryCode": "Bunun yerine kurtarma kodu kullan",
+    "useAuthenticator": "Bunun yerine kimlik doğrulama uygulaması kullan"
   }
 }

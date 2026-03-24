@@ -170,7 +170,11 @@
     "kickOut": "Expulsar",
     "kickOutTitle": "Expulsar usuario",
     "kickOutDescription": "Eliminar este usuario del sistema. Perderá todos los accesos y las anulaciones de permisos.",
-    "kickOutConfirm": "¿Estás seguro de que quieres expulsar a {name}? Perderá sus accesos y todas las anulaciones de permisos."
+    "kickOutConfirm": "¿Estás seguro de que quieres expulsar a {name}? Perderá sus accesos y todas las anulaciones de permisos.",
+    "reset2FA": "Restablecer 2FA",
+    "reset2FATitle": "Restablecer autenticación de dos factores",
+    "reset2FADescription": "Elimina la autenticación de dos factores de este usuario. Tendrá que configurarla nuevamente.",
+    "reset2FAConfirm": "¿Está seguro de que desea restablecer la autenticación de dos factores para {name}? Tendrá que reconfigurar su aplicación de autenticación."
   },
   "dashboard": {
     "title": "Panel",
@@ -335,7 +339,8 @@
     "dataImported": "{count, plural, one {# persona importada correctamente} other {# personas importadas correctamente}}",
     "otherSessionsSignedOut": "Se han cerrado todas las demás sesiones",
     "sessionForceLoggedOut": "Sesión cerrada forzosamente",
-    "allSessionsForceLoggedOut": "Todas las sesiones de {name} han sido cerradas forzosamente"
+    "allSessionsForceLoggedOut": "Todas las sesiones de {name} han sido cerradas forzosamente",
+    "twoFactorReset": "Autenticación de dos factores restablecida para {name}"
   },
   "tutorial": {
     "checklistTitle": "Visita guiada",
@@ -511,7 +516,11 @@
     "positionAlreadyExists": "Este puesto ya existe",
     "positionNotFound": "Puesto no encontrado",
     "sessionNotFound": "Sesión no encontrada",
-    "sessionAlreadyInactive": "La sesión ya está inactiva"
+    "sessionAlreadyInactive": "La sesión ya está inactiva",
+    "invalidTotpCode": "Código de verificación no válido. Por favor, inténtelo de nuevo.",
+    "invalidTotpSecret": "Secreto TOTP no válido",
+    "twoFactorAlreadyEnabled": "La autenticación de dos factores ya está habilitada",
+    "twoFactorNotEnabled": "La autenticación de dos factores no está habilitada"
   },
   "reviews": {
     "title": "Evaluaciones de desempeño",
@@ -749,5 +758,44 @@
     "forceLogout": "Forzar cierre de sesión",
     "forceLogoutAll": "Forzar cierre de todas las sesiones",
     "noActiveSessions": "No hay sesiones activas para este usuario"
+  },
+  "twoFactor": {
+    "title": "Autenticación de dos factores",
+    "description": "Añada una capa adicional de seguridad a su cuenta solicitando un código de verificación de su aplicación de autenticación.",
+    "enable": "Activar 2FA",
+    "disable": "Desactivar 2FA",
+    "enabled": "Autenticación de dos factores activada",
+    "disabled": "Autenticación de dos factores desactivada",
+    "setupTitle": "Configurar autenticación de dos factores",
+    "setupError": "Error al inicializar la configuración de 2FA",
+    "stepScan": "Escanear código QR",
+    "stepVerify": "Verificar código",
+    "stepRecovery": "Códigos de recuperación",
+    "scanInstructions": "Escanee este código QR con su aplicación de autenticación (Google Authenticator, Authy, 1Password, etc.)",
+    "qrCodeAlt": "Código QR para la aplicación de autenticación",
+    "manualEntry": "O introduzca este código manualmente:",
+    "secretCopied": "Secreto copiado al portapapeles",
+    "next": "Siguiente",
+    "back": "Atrás",
+    "verifyInstructions": "Introduzca el código de 6 dígitos de su aplicación de autenticación para verificar la configuración.",
+    "codeLabel": "Código de verificación",
+    "recoveryCodeLabel": "Código de recuperación",
+    "verifyAndEnable": "Verificar y activar",
+    "recoveryWarning": "Guarde estos códigos de recuperación en un lugar seguro. Cada código solo puede usarse una vez. Si pierde el acceso a su aplicación de autenticación, puede usar estos códigos para iniciar sesión.",
+    "copyCodes": "Copiar todos los códigos",
+    "codesCopied": "Códigos de recuperación copiados al portapapeles",
+    "done": "Listo",
+    "disableTitle": "Desactivar autenticación de dos factores",
+    "disableInstructions": "Introduzca su código de verificación actual para desactivar la autenticación de dos factores. Esto eliminará la capa de seguridad adicional de su cuenta.",
+    "regenerateTitle": "Regenerar códigos de recuperación",
+    "regenerateCodes": "Regenerar códigos de recuperación",
+    "regenerateInstructions": "Introduzca su código de verificación actual para generar nuevos códigos de recuperación. Sus códigos existentes quedarán invalidados.",
+    "codesRegenerated": "Códigos de recuperación regenerados",
+    "verifyTitle": "Verificación de dos factores",
+    "loginVerifyInstructions": "Introduzca el código de 6 dígitos de su aplicación de autenticación para completar el inicio de sesión.",
+    "recoveryInstructions": "Introduzca uno de sus códigos de recuperación. Cada código solo puede usarse una vez.",
+    "verify": "Verificar",
+    "useRecoveryCode": "Usar un código de recuperación en su lugar",
+    "useAuthenticator": "Usar la aplicación de autenticación en su lugar"
   }
 }

@@ -170,7 +170,11 @@
     "kickOut": "Fukuza",
     "kickOutTitle": "Fukuza Mtumiaji",
     "kickOutDescription": "Ondoa mtumiaji huyu kutoka kwenye mfumo. Atapoteza ufikiaji wote na ubatilishaji wa ruhusa.",
-    "kickOutConfirm": "Una uhakika unataka kumfukuza {name}? Atapoteza ufikiaji na ubatilishaji wote wa ruhusa."
+    "kickOutConfirm": "Una uhakika unataka kumfukuza {name}? Atapoteza ufikiaji na ubatilishaji wote wa ruhusa.",
+    "reset2FA": "Weka upya 2FA",
+    "reset2FATitle": "Weka upya uthibitishaji wa hatua mbili",
+    "reset2FADescription": "Ondoa uthibitishaji wa hatua mbili wa mtumiaji huyu. Watahitaji kuusanidi tena.",
+    "reset2FAConfirm": "Una uhakika unataka kuweka upya uthibitishaji wa hatua mbili kwa {name}? Watahitaji kusanidi upya programu yao ya uthibitishaji."
   },
   "dashboard": {
     "title": "Dashibodi",
@@ -335,7 +339,8 @@
     "dataImported": "{count, plural, one {# mtu aliingizwa kwa mafanikio} other {# watu waliingizwa kwa mafanikio}}",
     "otherSessionsSignedOut": "Vipindi vingine vyote vimefungwa",
     "sessionForceLoggedOut": "Kipindi kimefungwa kwa nguvu",
-    "allSessionsForceLoggedOut": "Vipindi vyote vya {name} vimefungwa kwa nguvu"
+    "allSessionsForceLoggedOut": "Vipindi vyote vya {name} vimefungwa kwa nguvu",
+    "twoFactorReset": "Uthibitishaji wa hatua mbili umewekwa upya kwa {name}"
   },
   "tutorial": {
     "checklistTitle": "Ziara ya Demo",
@@ -511,7 +516,11 @@
     "positionAlreadyExists": "Nafasi hii tayari ipo",
     "positionNotFound": "Nafasi haijapatikana",
     "sessionNotFound": "Kipindi hakikupatikana",
-    "sessionAlreadyInactive": "Kipindi tayari hakifanyi kazi"
+    "sessionAlreadyInactive": "Kipindi tayari hakifanyi kazi",
+    "invalidTotpCode": "Nambari ya uthibitishaji si sahihi. Tafadhali jaribu tena.",
+    "invalidTotpSecret": "Siri ya TOTP si sahihi",
+    "twoFactorAlreadyEnabled": "Uthibitishaji wa hatua mbili umewashwa tayari",
+    "twoFactorNotEnabled": "Uthibitishaji wa hatua mbili haujawashwa"
   },
   "reviews": {
     "title": "Tathmini za Utendaji",
@@ -749,5 +758,44 @@
     "forceLogout": "Toka kwa nguvu",
     "forceLogoutAll": "Toka wote kwa nguvu",
     "noActiveSessions": "Hakuna vipindi vinavyofanya kazi kwa mtumiaji huyu"
+  },
+  "twoFactor": {
+    "title": "Uthibitishaji wa hatua mbili",
+    "description": "Ongeza safu ya ziada ya usalama kwenye akaunti yako kwa kuhitaji nambari ya uthibitishaji kutoka kwenye programu yako ya uthibitishaji.",
+    "enable": "Washa 2FA",
+    "disable": "Zima 2FA",
+    "enabled": "Uthibitishaji wa hatua mbili umewashwa",
+    "disabled": "Uthibitishaji wa hatua mbili umezimwa",
+    "setupTitle": "Sanidi uthibitishaji wa hatua mbili",
+    "setupError": "Imeshindwa kuanzisha usanidi wa 2FA",
+    "stepScan": "Skani msimbo wa QR",
+    "stepVerify": "Thibitisha msimbo",
+    "stepRecovery": "Msimbo wa uokoaji",
+    "scanInstructions": "Skani msimbo huu wa QR na programu yako ya uthibitishaji (Google Authenticator, Authy, 1Password, n.k.)",
+    "qrCodeAlt": "Msimbo wa QR kwa programu ya uthibitishaji",
+    "manualEntry": "Au ingiza msimbo huu kwa mkono:",
+    "secretCopied": "Siri imenakiliwa kwenye ubao wa kunakili",
+    "next": "Endelea",
+    "back": "Rudi",
+    "verifyInstructions": "Ingiza msimbo wa tarakimu 6 kutoka kwenye programu yako ya uthibitishaji ili kuthibitisha usanidi.",
+    "codeLabel": "Msimbo wa uthibitishaji",
+    "recoveryCodeLabel": "Msimbo wa uokoaji",
+    "verifyAndEnable": "Thibitisha na uwashe",
+    "recoveryWarning": "Hifadhi misimbo hii ya uokoaji mahali salama. Kila msimbo unaweza kutumika mara moja tu. Ukipoteza ufikiaji wa programu yako ya uthibitishaji, unaweza kutumia misimbo hii kuingia.",
+    "copyCodes": "Nakili misimbo yote",
+    "codesCopied": "Misimbo ya uokoaji imenakiliwa kwenye ubao wa kunakili",
+    "done": "Imekamilika",
+    "disableTitle": "Zima uthibitishaji wa hatua mbili",
+    "disableInstructions": "Ingiza msimbo wako wa sasa wa uthibitishaji ili kuzima uthibitishaji wa hatua mbili. Hii itaondoa safu ya ziada ya usalama kutoka kwa akaunti yako.",
+    "regenerateTitle": "Tengeneza upya misimbo ya uokoaji",
+    "regenerateCodes": "Tengeneza upya misimbo ya uokoaji",
+    "regenerateInstructions": "Ingiza msimbo wako wa sasa wa uthibitishaji ili kutengeneza misimbo mipya ya uokoaji. Misimbo yako iliyopo itabatilishwa.",
+    "codesRegenerated": "Misimbo ya uokoaji imetengenezwa upya",
+    "verifyTitle": "Uthibitishaji wa hatua mbili",
+    "loginVerifyInstructions": "Ingiza msimbo wa tarakimu 6 kutoka kwenye programu yako ya uthibitishaji ili kukamilisha kuingia.",
+    "recoveryInstructions": "Ingiza moja ya misimbo yako ya uokoaji. Kila msimbo unaweza kutumika mara moja tu.",
+    "verify": "Thibitisha",
+    "useRecoveryCode": "Tumia msimbo wa uokoaji badala yake",
+    "useAuthenticator": "Tumia programu ya uthibitishaji badala yake"
   }
 }

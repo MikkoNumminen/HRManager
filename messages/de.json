@@ -170,7 +170,11 @@
     "kickOut": "Rauswerfen",
     "kickOutTitle": "Benutzer rauswerfen",
     "kickOutDescription": "Diesen Benutzer aus dem System entfernen. Alle Zugriffsrechte und Berechtigungsüberschreibungen gehen verloren.",
-    "kickOutConfirm": "Möchten Sie {name} wirklich rauswerfen? Alle Zugriffsrechte und Berechtigungsüberschreibungen gehen verloren."
+    "kickOutConfirm": "Möchten Sie {name} wirklich rauswerfen? Alle Zugriffsrechte und Berechtigungsüberschreibungen gehen verloren.",
+    "reset2FA": "2FA zurücksetzen",
+    "reset2FATitle": "Zwei-Faktor-Authentifizierung zurücksetzen",
+    "reset2FADescription": "Entfernt die Zwei-Faktor-Authentifizierung dieses Benutzers. Er muss sie erneut einrichten.",
+    "reset2FAConfirm": "Sind Sie sicher, dass Sie die Zwei-Faktor-Authentifizierung für {name} zurücksetzen möchten? Der Benutzer muss die Authentifizierungs-App neu konfigurieren."
   },
   "dashboard": {
     "title": "Übersicht",
@@ -335,7 +339,8 @@
     "dataImported": "{count, plural, one {# Person erfolgreich importiert} other {# Personen erfolgreich importiert}}",
     "otherSessionsSignedOut": "Alle anderen Sitzungen wurden abgemeldet",
     "sessionForceLoggedOut": "Sitzung zwangsweise abgemeldet",
-    "allSessionsForceLoggedOut": "Alle Sitzungen von {name} wurden zwangsweise abgemeldet"
+    "allSessionsForceLoggedOut": "Alle Sitzungen von {name} wurden zwangsweise abgemeldet",
+    "twoFactorReset": "Zwei-Faktor-Authentifizierung für {name} zurückgesetzt"
   },
   "tutorial": {
     "checklistTitle": "Demo-Rundgang",
@@ -511,7 +516,11 @@
     "positionAlreadyExists": "Diese Position existiert bereits",
     "positionNotFound": "Position nicht gefunden",
     "sessionNotFound": "Sitzung nicht gefunden",
-    "sessionAlreadyInactive": "Sitzung ist bereits inaktiv"
+    "sessionAlreadyInactive": "Sitzung ist bereits inaktiv",
+    "invalidTotpCode": "Ungültiger Bestätigungscode. Bitte versuchen Sie es erneut.",
+    "invalidTotpSecret": "Ungültiges TOTP-Geheimnis",
+    "twoFactorAlreadyEnabled": "Die Zwei-Faktor-Authentifizierung ist bereits aktiviert",
+    "twoFactorNotEnabled": "Die Zwei-Faktor-Authentifizierung ist nicht aktiviert"
   },
   "reviews": {
     "title": "Leistungsbeurteilungen",
@@ -749,5 +758,44 @@
     "forceLogout": "Zwangsabmeldung",
     "forceLogoutAll": "Alle zwangsweise abmelden",
     "noActiveSessions": "Keine aktiven Sitzungen für diesen Benutzer"
+  },
+  "twoFactor": {
+    "title": "Zwei-Faktor-Authentifizierung",
+    "description": "Fügen Sie Ihrem Konto eine zusätzliche Sicherheitsebene hinzu, indem Sie einen Bestätigungscode aus Ihrer Authentifizierungs-App anfordern.",
+    "enable": "2FA aktivieren",
+    "disable": "2FA deaktivieren",
+    "enabled": "Zwei-Faktor-Authentifizierung aktiviert",
+    "disabled": "Zwei-Faktor-Authentifizierung deaktiviert",
+    "setupTitle": "Zwei-Faktor-Authentifizierung einrichten",
+    "setupError": "Fehler beim Initialisieren der 2FA-Einrichtung",
+    "stepScan": "QR-Code scannen",
+    "stepVerify": "Code verifizieren",
+    "stepRecovery": "Wiederherstellungscodes",
+    "scanInstructions": "Scannen Sie diesen QR-Code mit Ihrer Authentifizierungs-App (Google Authenticator, Authy, 1Password usw.)",
+    "qrCodeAlt": "QR-Code für die Authentifizierungs-App",
+    "manualEntry": "Oder geben Sie diesen Code manuell ein:",
+    "secretCopied": "Geheimnis in die Zwischenablage kopiert",
+    "next": "Weiter",
+    "back": "Zurück",
+    "verifyInstructions": "Geben Sie den 6-stelligen Code aus Ihrer Authentifizierungs-App ein, um die Einrichtung zu bestätigen.",
+    "codeLabel": "Bestätigungscode",
+    "recoveryCodeLabel": "Wiederherstellungscode",
+    "verifyAndEnable": "Verifizieren & Aktivieren",
+    "recoveryWarning": "Speichern Sie diese Wiederherstellungscodes an einem sicheren Ort. Jeder Code kann nur einmal verwendet werden. Falls Sie den Zugriff auf Ihre Authentifizierungs-App verlieren, können Sie diese Codes zur Anmeldung verwenden.",
+    "copyCodes": "Alle Codes kopieren",
+    "codesCopied": "Wiederherstellungscodes in die Zwischenablage kopiert",
+    "done": "Fertig",
+    "disableTitle": "Zwei-Faktor-Authentifizierung deaktivieren",
+    "disableInstructions": "Geben Sie Ihren aktuellen Bestätigungscode ein, um die Zwei-Faktor-Authentifizierung zu deaktivieren. Dadurch wird die zusätzliche Sicherheitsebene von Ihrem Konto entfernt.",
+    "regenerateTitle": "Wiederherstellungscodes neu generieren",
+    "regenerateCodes": "Wiederherstellungscodes neu generieren",
+    "regenerateInstructions": "Geben Sie Ihren aktuellen Bestätigungscode ein, um neue Wiederherstellungscodes zu generieren. Ihre vorhandenen Codes werden ungültig.",
+    "codesRegenerated": "Wiederherstellungscodes neu generiert",
+    "verifyTitle": "Zwei-Faktor-Verifizierung",
+    "loginVerifyInstructions": "Geben Sie den 6-stelligen Code aus Ihrer Authentifizierungs-App ein, um die Anmeldung abzuschließen.",
+    "recoveryInstructions": "Geben Sie einen Ihrer Wiederherstellungscodes ein. Jeder Code kann nur einmal verwendet werden.",
+    "verify": "Verifizieren",
+    "useRecoveryCode": "Stattdessen einen Wiederherstellungscode verwenden",
+    "useAuthenticator": "Stattdessen die Authentifizierungs-App verwenden"
   }
 }

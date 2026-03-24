@@ -170,7 +170,11 @@
     "kickOut": "Exclure",
     "kickOutTitle": "Exclure l'utilisateur",
     "kickOutDescription": "Supprimer cet utilisateur du système. Il perdra tous ses accès et ses dérogations de permissions.",
-    "kickOutConfirm": "Êtes-vous sûr de vouloir exclure {name} ? Il perdra ses accès et toutes ses dérogations de permissions."
+    "kickOutConfirm": "Êtes-vous sûr de vouloir exclure {name} ? Il perdra ses accès et toutes ses dérogations de permissions.",
+    "reset2FA": "Réinitialiser la 2FA",
+    "reset2FATitle": "Réinitialiser l'authentification à deux facteurs",
+    "reset2FADescription": "Supprime l'authentification à deux facteurs de cet utilisateur. Il devra la reconfigurer.",
+    "reset2FAConfirm": "Êtes-vous sûr de vouloir réinitialiser l'authentification à deux facteurs pour {name} ? Il devra reconfigurer son application d'authentification."
   },
   "dashboard": {
     "title": "Tableau de bord",
@@ -335,7 +339,8 @@
     "dataImported": "{count, plural, one {# personne importée avec succès} other {# personnes importées avec succès}}",
     "otherSessionsSignedOut": "Toutes les autres sessions ont été déconnectées",
     "sessionForceLoggedOut": "Session déconnectée de force",
-    "allSessionsForceLoggedOut": "Toutes les sessions de {name} ont été déconnectées de force"
+    "allSessionsForceLoggedOut": "Toutes les sessions de {name} ont été déconnectées de force",
+    "twoFactorReset": "Authentification à deux facteurs réinitialisée pour {name}"
   },
   "tutorial": {
     "checklistTitle": "Visite guidée",
@@ -511,7 +516,11 @@
     "positionAlreadyExists": "Ce poste existe déjà",
     "positionNotFound": "Poste non trouvé",
     "sessionNotFound": "Session introuvable",
-    "sessionAlreadyInactive": "La session est déjà inactive"
+    "sessionAlreadyInactive": "La session est déjà inactive",
+    "invalidTotpCode": "Code de vérification invalide. Veuillez réessayer.",
+    "invalidTotpSecret": "Secret TOTP invalide",
+    "twoFactorAlreadyEnabled": "L'authentification à deux facteurs est déjà activée",
+    "twoFactorNotEnabled": "L'authentification à deux facteurs n'est pas activée"
   },
   "reviews": {
     "title": "Évaluations de performance",
@@ -749,5 +758,44 @@
     "forceLogout": "Déconnexion forcée",
     "forceLogoutAll": "Déconnecter tous de force",
     "noActiveSessions": "Aucune session active pour cet utilisateur"
+  },
+  "twoFactor": {
+    "title": "Authentification à deux facteurs",
+    "description": "Ajoutez une couche de sécurité supplémentaire à votre compte en exigeant un code de vérification de votre application d'authentification.",
+    "enable": "Activer la 2FA",
+    "disable": "Désactiver la 2FA",
+    "enabled": "Authentification à deux facteurs activée",
+    "disabled": "Authentification à deux facteurs désactivée",
+    "setupTitle": "Configurer l'authentification à deux facteurs",
+    "setupError": "Échec de l'initialisation de la configuration 2FA",
+    "stepScan": "Scanner le code QR",
+    "stepVerify": "Vérifier le code",
+    "stepRecovery": "Codes de récupération",
+    "scanInstructions": "Scannez ce code QR avec votre application d'authentification (Google Authenticator, Authy, 1Password, etc.)",
+    "qrCodeAlt": "Code QR pour l'application d'authentification",
+    "manualEntry": "Ou saisissez ce code manuellement :",
+    "secretCopied": "Secret copié dans le presse-papiers",
+    "next": "Suivant",
+    "back": "Retour",
+    "verifyInstructions": "Saisissez le code à 6 chiffres de votre application d'authentification pour vérifier la configuration.",
+    "codeLabel": "Code de vérification",
+    "recoveryCodeLabel": "Code de récupération",
+    "verifyAndEnable": "Vérifier et activer",
+    "recoveryWarning": "Enregistrez ces codes de récupération dans un endroit sûr. Chaque code ne peut être utilisé qu'une seule fois. Si vous perdez l'accès à votre application d'authentification, vous pouvez utiliser ces codes pour vous connecter.",
+    "copyCodes": "Copier tous les codes",
+    "codesCopied": "Codes de récupération copiés dans le presse-papiers",
+    "done": "Terminé",
+    "disableTitle": "Désactiver l'authentification à deux facteurs",
+    "disableInstructions": "Saisissez votre code de vérification actuel pour désactiver l'authentification à deux facteurs. Cela supprimera la couche de sécurité supplémentaire de votre compte.",
+    "regenerateTitle": "Régénérer les codes de récupération",
+    "regenerateCodes": "Régénérer les codes de récupération",
+    "regenerateInstructions": "Saisissez votre code de vérification actuel pour générer de nouveaux codes de récupération. Vos codes existants seront invalidés.",
+    "codesRegenerated": "Codes de récupération régénérés",
+    "verifyTitle": "Vérification à deux facteurs",
+    "loginVerifyInstructions": "Saisissez le code à 6 chiffres de votre application d'authentification pour finaliser la connexion.",
+    "recoveryInstructions": "Saisissez l'un de vos codes de récupération. Chaque code ne peut être utilisé qu'une seule fois.",
+    "verify": "Vérifier",
+    "useRecoveryCode": "Utiliser un code de récupération à la place",
+    "useAuthenticator": "Utiliser l'application d'authentification à la place"
   }
 }

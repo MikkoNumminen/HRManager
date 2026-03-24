@@ -170,7 +170,11 @@
     "kickOut": "Sparka ut",
     "kickOutTitle": "Sparka ut användare",
     "kickOutDescription": "Ta bort denna användare från systemet. De förlorar all åtkomst och behörighetsöverskridanden.",
-    "kickOutConfirm": "Är du säker på att du vill sparka ut {name}? De förlorar åtkomst och alla behörighetsöverskridanden."
+    "kickOutConfirm": "Är du säker på att du vill sparka ut {name}? De förlorar åtkomst och alla behörighetsöverskridanden.",
+    "reset2FA": "Återställ 2FA",
+    "reset2FATitle": "Återställ tvåfaktorsautentisering",
+    "reset2FADescription": "Ta bort den här användarens tvåfaktorsautentisering. De måste konfigurera den igen.",
+    "reset2FAConfirm": "Är du säker på att du vill återställa tvåfaktorsautentisering för {name}? De måste konfigurera om sin autentiseringsapp."
   },
   "dashboard": {
     "title": "Instrumentpanel",
@@ -335,7 +339,8 @@
     "dataImported": "{count, plural, one {# person importerad} other {# personer importerade}}",
     "otherSessionsSignedOut": "Alla andra sessioner har loggats ut",
     "sessionForceLoggedOut": "Session tvångsnedloggad",
-    "allSessionsForceLoggedOut": "Alla sessioner för {name} har tvångsnedloggats"
+    "allSessionsForceLoggedOut": "Alla sessioner för {name} har tvångsnedloggats",
+    "twoFactorReset": "Tvåfaktorsautentisering återställd för {name}"
   },
   "tutorial": {
     "checklistTitle": "Demoguide",
@@ -511,7 +516,11 @@
     "positionAlreadyExists": "Denna position finns redan",
     "positionNotFound": "Position hittades inte",
     "sessionNotFound": "Sessionen hittades inte",
-    "sessionAlreadyInactive": "Sessionen är redan inaktiv"
+    "sessionAlreadyInactive": "Sessionen är redan inaktiv",
+    "invalidTotpCode": "Ogiltig verifieringskod. Försök igen.",
+    "invalidTotpSecret": "Ogiltigt TOTP-hemligt",
+    "twoFactorAlreadyEnabled": "Tvåfaktorsautentisering är redan aktiverad",
+    "twoFactorNotEnabled": "Tvåfaktorsautentisering är inte aktiverad"
   },
   "reviews": {
     "title": "Prestationsbedömningar",
@@ -749,5 +758,44 @@
     "forceLogout": "Tvångsnedloggning",
     "forceLogoutAll": "Tvångsnedlogga alla",
     "noActiveSessions": "Inga aktiva sessioner för den här användaren"
+  },
+  "twoFactor": {
+    "title": "Tvåfaktorsautentisering",
+    "description": "Lägg till ett extra säkerhetslager till ditt konto genom att kräva en verifieringskod från din autentiseringsapp.",
+    "enable": "Aktivera 2FA",
+    "disable": "Inaktivera 2FA",
+    "enabled": "Tvåfaktorsautentisering aktiverad",
+    "disabled": "Tvåfaktorsautentisering inaktiverad",
+    "setupTitle": "Konfigurera tvåfaktorsautentisering",
+    "setupError": "Misslyckades med att initiera 2FA-konfiguration",
+    "stepScan": "Skanna QR-kod",
+    "stepVerify": "Verifiera kod",
+    "stepRecovery": "Återställningskoder",
+    "scanInstructions": "Skanna den här QR-koden med din autentiseringsapp (Google Authenticator, Authy, 1Password osv.)",
+    "qrCodeAlt": "QR-kod för autentiseringsapp",
+    "manualEntry": "Eller ange den här koden manuellt:",
+    "secretCopied": "Hemlighet kopierad till urklipp",
+    "next": "Nästa",
+    "back": "Tillbaka",
+    "verifyInstructions": "Ange den 6-siffriga koden från din autentiseringsapp för att verifiera konfigurationen.",
+    "codeLabel": "Verifieringskod",
+    "recoveryCodeLabel": "Återställningskod",
+    "verifyAndEnable": "Verifiera och aktivera",
+    "recoveryWarning": "Spara dessa återställningskoder på ett säkert ställe. Varje kod kan bara användas en gång. Om du förlorar åtkomst till din autentiseringsapp kan du använda dessa koder för att logga in.",
+    "copyCodes": "Kopiera alla koder",
+    "codesCopied": "Återställningskoder kopierade till urklipp",
+    "done": "Klar",
+    "disableTitle": "Inaktivera tvåfaktorsautentisering",
+    "disableInstructions": "Ange din nuvarande verifieringskod för att inaktivera tvåfaktorsautentisering. Detta tar bort det extra säkerhetslagret från ditt konto.",
+    "regenerateTitle": "Återskapa återställningskoder",
+    "regenerateCodes": "Återskapa återställningskoder",
+    "regenerateInstructions": "Ange din nuvarande verifieringskod för att generera nya återställningskoder. Dina befintliga koder blir ogiltiga.",
+    "codesRegenerated": "Återställningskoder återskapade",
+    "verifyTitle": "Tvåfaktorsverifiering",
+    "loginVerifyInstructions": "Ange den 6-siffriga koden från din autentiseringsapp för att slutföra inloggningen.",
+    "recoveryInstructions": "Ange en av dina återställningskoder. Varje kod kan bara användas en gång.",
+    "verify": "Verifiera",
+    "useRecoveryCode": "Använd en återställningskod istället",
+    "useAuthenticator": "Använd autentiseringsapp istället"
   }
 }
