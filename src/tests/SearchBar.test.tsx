@@ -49,8 +49,8 @@ describe("SearchBar", () => {
 
   // Renders the search icon adornment.
   test("renders the search icon", () => {
-    const { container } = render(<SearchBar value="" onChange={jest.fn()} />);
-    expect(container.querySelector("svg[data-testid='SearchIcon']")).toBeInTheDocument();
+    render(<SearchBar value="" onChange={jest.fn()} />);
+    expect(screen.getByTestId("SearchIcon")).toBeInTheDocument();
   });
 });
 
