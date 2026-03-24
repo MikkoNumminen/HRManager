@@ -485,7 +485,7 @@ export async function kickOutUser(data: FormData): Promise<ActionResult> {
       throw new ActionError("cannotKickSuperuser", t("cannotKickSuperuser"));
     }
     // Demo sessions can only kick the demo user — prevent deleting real OAuth users
-    if (demoSessionId && targetUser.email !== "demo@hrmanager.app") {
+    if (demoSessionId && targetUser.email !== DEMO_EMAIL) {
       throw new ActionError("demoCannotManageUsers", t("demoCannotManageUsers"));
     }
     // Prevent self-kick — deleting your own user orphans the session
