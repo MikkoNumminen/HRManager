@@ -19,6 +19,8 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 
 ## Recently Completed
 
+- ✅ Loading skeletons with Suspense boundaries — PageSkeletons.tsx, 12 loading.tsx files, 10 tests
+
 - ✅ Playwright E2E test suite — 7 new spec files, 75 total tests (was 34): dashboard, profile, data I/O, detail editing, validation, full workflow
 - ✅ Translate server action errors — 48-key errors namespace, 18 locales, next-intl/server mock for tests
 - ✅ Memoize expensive components — React.memo on AuditLogViewer + DashboardCharts, useCallback on helpers
