@@ -180,3 +180,17 @@ export function AdminPageSkeleton() {
     </>
   );
 }
+
+export function LeaveSkeleton() {
+  return (
+    <>
+      <TopBarSkeleton />
+      <Box sx={{ ...pageContainerStyles }}>
+        <Skeleton variant="rounded" height={48} sx={{ mb: 2 }} />
+        {Array.from({ length: 5 }).map((_, i) => (
+          <Skeleton key={i} variant="rounded" height={56} sx={{ mb: 0.75 }} />
+        ))}
+      </Box>
+    </>
+  );
+}

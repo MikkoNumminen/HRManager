@@ -18,6 +18,18 @@ import {
   AuditLog,
   AuditLogFilter,
   DashboardMetrics,
+  ReviewTemplateSchema,
+  ReviewCycleSchema,
+  ReviewRequestSchema,
+  ReviewTemplate,
+  ReviewCycle,
+  ReviewRequest,
+  LeaveTypeSchema,
+  LeaveRequestSchema,
+  LeaveBalanceSchema,
+  LeaveType,
+  LeaveRequest,
+  LeaveBalance,
 } from "./schemas";
 import { resolvePermissions, PERMISSION_KEYS, hasPermission } from "@/permissions";
 import { getDemoSessionId } from "@/demoSession";
@@ -393,4 +405,306 @@ export async function getDataExportCounts(): Promise<DataExportCounts> {
     isMongoAvailable() ? getAuditLogCollection().countDocuments({ sessionId }) : 0,
   ]);
   return { persons, teams, departments, auditLogs };
+}
+
+export async function getReviewTemplates(): Promise<ReviewTemplate[]> {
+  const sessionId = await getDemoSessionId();
+  const templates = await prisma.reviewTemplate.findMany({
+    where: { deletedAt: null, sessionId },
+    omit: { sessionId: true, deletedAt: true },
+    orderBy: { createdAt: "asc" },
+  });
+
+  return templates.map((t) =>
+    ReviewTemplateSchema.parse({
+      ...t,
+      questions: Array.isArray(t.questions) ? t.questions : [],
+    }),
+  );
+}
+
+export async function getReviewTemplate(id: string): Promise<ReviewTemplate | null> {
+  const sessionId = await getDemoSessionId();
+  const template = await prisma.reviewTemplate.findFirst({
+    where: { id, deletedAt: null, sessionId },
+    omit: { sessionId: true, deletedAt: true },
+  });
+
+  if (!template) return null;
+
+  return ReviewTemplateSchema.parse({
+    ...template,
+    questions: Array.isArray(template.questions) ? template.questions : [],
+  });
+}
+
+export async function getReviewCycles(): Promise<ReviewCycle[]> {
+  const sessionId = await getDemoSessionId();
+  const cycles = await prisma.reviewCycle.findMany({
+    where: { deletedAt: null, sessionId },
+    include: {
+      template: { select: { name: true } },
+      requests: { select: { status: true } },
+    },
+    omit: { sessionId: true, deletedAt: true },
+    orderBy: { createdAt: "desc" },
+  });
+
+  return cycles.map((c) =>
+    ReviewCycleSchema.parse({
+      id: c.id,
+      name: c.name,
+      templateId: c.templateId ?? null,
+      templateName: c.template?.name ?? null,
+      status: c.status,
+      startDate: c.startDate,
+      endDate: c.endDate,
+      requestCount: c.requests.length,
+      submittedCount: c.requests.filter((r) => r.status === "SUBMITTED").length,
+      createdAt: c.createdAt,
+      updatedAt: c.updatedAt,
+    }),
+  );
+}
+
+export async function getReviewCycle(id: string): Promise<
+  | (ReviewCycle & {
+      requests: ReviewRequest[];
+    })
+  | null
+> {
+  const sessionId = await getDemoSessionId();
+  const cycle = await prisma.reviewCycle.findFirst({
+    where: { id, deletedAt: null, sessionId },
+    include: {
+      template: { select: { name: true } },
+      requests: {
+        include: {
+          subject: { select: { id: true, name: true } },
+          reviewer: { select: { id: true, name: true } },
+        },
+        orderBy: { createdAt: "asc" },
+      },
+    },
+    omit: { sessionId: true, deletedAt: true },
+  });
+
+  if (!cycle) return null;
+
+  const parsedCycle = ReviewCycleSchema.parse({
+    id: cycle.id,
+    name: cycle.name,
+    templateId: cycle.templateId ?? null,
+    templateName: cycle.template?.name ?? null,
+    status: cycle.status,
+    startDate: cycle.startDate,
+    endDate: cycle.endDate,
+    requestCount: cycle.requests.length,
+    submittedCount: cycle.requests.filter((r) => r.status === "SUBMITTED").length,
+    createdAt: cycle.createdAt,
+    updatedAt: cycle.updatedAt,
+  });
+
+  const requests = cycle.requests.map((r) =>
+    ReviewRequestSchema.parse({
+      id: r.id,
+      cycleId: r.cycleId,
+      cycleName: cycle.name,
+      cycleStatus: cycle.status,
+      subjectId: r.subjectId ?? null,
+      subjectName: r.subject?.name ?? null,
+      reviewerId: r.reviewerId ?? null,
+      reviewerName: r.reviewer?.name ?? null,
+      type: r.type,
+      status: r.status,
+      createdAt: r.createdAt,
+    }),
+  );
+
+  return { ...parsedCycle, requests };
+}
+
+export async function getMyReviewRequests(reviewerPersonId?: string): Promise<ReviewRequest[]> {
+  const sessionId = await getDemoSessionId();
+
+  if (!reviewerPersonId) return [];
+
+  const requests = await prisma.reviewRequest.findMany({
+    where: {
+      reviewerId: reviewerPersonId,
+      status: "PENDING",
+      sessionId,
+      cycle: { status: "OPEN", deletedAt: null, sessionId },
+    },
+    include: {
+      cycle: { select: { name: true, status: true } },
+      subject: { select: { id: true, name: true } },
+      reviewer: { select: { id: true, name: true } },
+    },
+    orderBy: { createdAt: "asc" },
+  });
+
+  return requests.map((r) =>
+    ReviewRequestSchema.parse({
+      id: r.id,
+      cycleId: r.cycleId,
+      cycleName: r.cycle.name,
+      cycleStatus: r.cycle.status,
+      subjectId: r.subjectId ?? null,
+      subjectName: r.subject?.name ?? null,
+      reviewerId: r.reviewerId ?? null,
+      reviewerName: r.reviewer?.name ?? null,
+      type: r.type,
+      status: r.status,
+      createdAt: r.createdAt,
+    }),
+  );
+}
+
+export async function getReviewRequestWithTemplate(requestId: string): Promise<{
+  request: ReviewRequest;
+  template: ReviewTemplate | null;
+} | null> {
+  const sessionId = await getDemoSessionId();
+
+  const request = await prisma.reviewRequest.findFirst({
+    where: { id: requestId, sessionId },
+    include: {
+      cycle: {
+        include: {
+          template: true,
+        },
+      },
+      subject: { select: { id: true, name: true } },
+      reviewer: { select: { id: true, name: true } },
+    },
+  });
+
+  if (!request) return null;
+
+  const parsedRequest = ReviewRequestSchema.parse({
+    id: request.id,
+    cycleId: request.cycleId,
+    cycleName: request.cycle.name,
+    cycleStatus: request.cycle.status,
+    subjectId: request.subjectId ?? null,
+    subjectName: request.subject?.name ?? null,
+    reviewerId: request.reviewerId ?? null,
+    reviewerName: request.reviewer?.name ?? null,
+    type: request.type,
+    status: request.status,
+    createdAt: request.createdAt,
+  });
+
+  const template = request.cycle.template
+    ? ReviewTemplateSchema.parse({
+        ...request.cycle.template,
+        questions: Array.isArray(request.cycle.template.questions)
+          ? request.cycle.template.questions
+          : [],
+      })
+    : null;
+
+  return { request: parsedRequest, template };
+}
+
+export async function getLeaveTypes(): Promise<LeaveType[]> {
+  const sessionId = await getDemoSessionId();
+  const types = await prisma.leaveType.findMany({
+    where: { deletedAt: null, sessionId },
+    orderBy: { name: "asc" },
+  });
+
+  return types.map((t) =>
+    LeaveTypeSchema.parse({
+      id: t.id,
+      name: t.name,
+      description: t.description ?? null,
+      defaultDays: t.defaultDays,
+      color: t.color,
+      createdAt: t.createdAt,
+      updatedAt: t.updatedAt,
+    }),
+  );
+}
+
+export async function getLeaveRequests(filters?: {
+  personId?: string;
+  status?: string;
+}): Promise<LeaveRequest[]> {
+  const allowed = await hasPermission("leave:view");
+  if (!allowed) throw new Error("Permission denied");
+
+  const sessionId = await getDemoSessionId();
+  const where: Record<string, unknown> = { deletedAt: null, sessionId };
+  if (filters?.personId) where.personId = filters.personId;
+  if (filters?.status) where.status = filters.status;
+
+  const requests = await prisma.leaveRequest.findMany({
+    where,
+    include: {
+      person: { select: { name: true } },
+      leaveType: { select: { name: true, color: true } },
+      reviewer: { select: { name: true } },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  return requests.map((r) =>
+    LeaveRequestSchema.parse({
+      id: r.id,
+      personId: r.personId,
+      personName: r.person.name,
+      leaveTypeId: r.leaveTypeId,
+      leaveTypeName: r.leaveType.name,
+      leaveTypeColor: r.leaveType.color,
+      startDate: r.startDate,
+      endDate: r.endDate,
+      days: r.days,
+      note: r.note ?? null,
+      status: r.status,
+      reviewerId: r.reviewerId ?? null,
+      reviewerName: r.reviewer?.name ?? null,
+      reviewNote: r.reviewNote ?? null,
+      reviewedAt: r.reviewedAt ?? null,
+      createdAt: r.createdAt,
+    }),
+  );
+}
+
+export async function getLeaveBalances(filters?: {
+  personId?: string;
+  year?: number;
+}): Promise<LeaveBalance[]> {
+  const allowed = await hasPermission("leave:view");
+  if (!allowed) throw new Error("Permission denied");
+
+  const sessionId = await getDemoSessionId();
+  const where: Record<string, unknown> = { sessionId };
+  if (filters?.personId) where.personId = filters.personId;
+  if (filters?.year) where.year = filters.year;
+
+  const balances = await prisma.leaveBalance.findMany({
+    where,
+    include: {
+      person: { select: { name: true } },
+      leaveType: { select: { name: true, color: true } },
+    },
+    orderBy: [{ person: { name: "asc" } }, { leaveType: { name: "asc" } }],
+  });
+
+  return balances.map((b) =>
+    LeaveBalanceSchema.parse({
+      id: b.id,
+      personId: b.personId,
+      personName: b.person.name,
+      leaveTypeId: b.leaveTypeId,
+      leaveTypeName: b.leaveType.name,
+      leaveTypeColor: b.leaveType.color,
+      year: b.year,
+      allocated: b.allocated,
+      used: b.used,
+      remaining: b.allocated - b.used,
+    }),
+  );
 }

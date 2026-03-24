@@ -71,6 +71,7 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
   const canSeed = permissions?.["data:seed"];
   const canReset = permissions?.["data:reset"];
   const canDataIO = permissions?.["data:import"] || permissions?.["data:export"];
+  const canLeave = permissions?.["leave:view"];
   const demoEnabled = process.env.NEXT_PUBLIC_DEMO_LOGIN !== "false";
 
   const handleSeed = (clearExisting: boolean) => {
@@ -196,6 +197,18 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
                   >
                     {t("profile")}
                   </MenuItem>
+                  {(session?.user?.permissions?.["review:view"] ||
+                    session?.user?.permissions?.["review:manage"] ||
+                    session?.user?.permissions?.["review:submit"]) && (
+                    <MenuItem
+                      component={Link}
+                      href="/reviews"
+                      onClick={() => setAnchorEl(null)}
+                      sx={userMenuItemStyles}
+                    >
+                      {t("performanceReviews")}
+                    </MenuItem>
+                  )}
                   {session?.user?.permissions?.["dashboard:view"] && (
                     <MenuItem
                       component={Link}
@@ -236,6 +249,16 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
                       sx={userMenuItemStyles}
                     >
                       {t("dataImportExport")}
+                    </MenuItem>
+                  )}
+                  {canLeave && (
+                    <MenuItem
+                      component={Link}
+                      href="/leave"
+                      onClick={() => setAnchorEl(null)}
+                      sx={userMenuItemStyles}
+                    >
+                      {t("leaveManagement")}
                     </MenuItem>
                   )}
                   {canSeed && (
@@ -376,6 +399,23 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
                 </ListItemButton>
               </ListItem>
             )}
+            {(session?.user?.permissions?.["review:view"] ||
+              session?.user?.permissions?.["review:manage"] ||
+              session?.user?.permissions?.["review:submit"]) && (
+              <ListItem disablePadding>
+                <ListItemButton
+                  component={Link}
+                  href="/reviews"
+                  onClick={() => setDrawerOpen(false)}
+                  sx={{
+                    color: colors.slate100,
+                    "&:hover": { backgroundColor: colors.hoverOverlay },
+                  }}
+                >
+                  <ListItemText primary={t("performanceReviews")} />
+                </ListItemButton>
+              </ListItem>
+            )}
             {session?.user?.permissions?.["dashboard:view"] && (
               <ListItem disablePadding>
                 <ListItemButton
@@ -435,6 +475,21 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
                   }}
                 >
                   <ListItemText primary={t("dataImportExport")} />
+                </ListItemButton>
+              </ListItem>
+            )}
+            {canLeave && (
+              <ListItem disablePadding>
+                <ListItemButton
+                  component={Link}
+                  href="/leave"
+                  onClick={() => setDrawerOpen(false)}
+                  sx={{
+                    color: colors.slate100,
+                    "&:hover": { backgroundColor: colors.hoverOverlay },
+                  }}
+                >
+                  <ListItemText primary={t("leaveManagement")} />
                 </ListItemButton>
               </ListItem>
             )}

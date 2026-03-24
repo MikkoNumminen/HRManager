@@ -16,6 +16,8 @@ import {
   MAX_IMPORT_ROWS,
   MAX_IMPORT_FILE_SIZE,
   EmailSchema,
+  MAX_LEAVE_NOTE_LENGTH,
+  type ReviewQuestion,
 } from "@/schemas";
 import { parseCSV, generateCSV, validatePersonImportRows } from "@/csvUtils";
 import { getTranslations } from "next-intl/server";
@@ -955,6 +957,9 @@ export async function resetAll(): Promise<ActionResult> {
         departments: await tx.department.count({ where: sessionWhere }),
         persons: await tx.person.count({ where: sessionWhere }),
       };
+      await tx.leaveRequest.deleteMany({ where: sessionWhere });
+      await tx.leaveBalance.deleteMany({ where: sessionWhere });
+      await tx.leaveType.deleteMany({ where: sessionWhere });
       await tx.teamMember.deleteMany({ where: sessionWhere });
       await tx.team.deleteMany({ where: sessionWhere });
       await tx.department.deleteMany({ where: sessionWhere });
@@ -971,6 +976,7 @@ export async function resetAll(): Promise<ActionResult> {
     revalidatePath("/managePersons");
     revalidatePath("/manageTeams");
     revalidatePath("/manageDepartments");
+    revalidatePath("/leave");
   });
 }
 
@@ -982,6 +988,9 @@ export async function seedMockData(clearExisting: boolean = true): Promise<Actio
     const sessionWhere = { sessionId };
     await prisma.$transaction(async (prisma) => {
       if (clearExisting) {
+        await prisma.leaveRequest.deleteMany({ where: sessionWhere });
+        await prisma.leaveBalance.deleteMany({ where: sessionWhere });
+        await prisma.leaveType.deleteMany({ where: sessionWhere });
         await prisma.teamMember.deleteMany({ where: sessionWhere });
         await prisma.team.deleteMany({ where: sessionWhere });
         await prisma.department.deleteMany({ where: sessionWhere });
@@ -1073,6 +1082,114 @@ export async function seedMockData(clearExisting: boolean = true): Promise<Actio
           });
         }
       }
+
+      // Seed leave types
+      const leaveTypeSeeds = [
+        {
+          name: "Annual Leave",
+          description: "Paid annual vacation days",
+          defaultDays: 25,
+          color: "#4caf50",
+        },
+        { name: "Sick Leave", description: "Paid sick days", defaultDays: 10, color: "#f44336" },
+        {
+          name: "Parental Leave",
+          description: "Maternity or paternity leave",
+          defaultDays: 90,
+          color: "#9c27b0",
+        },
+        {
+          name: "Unpaid Leave",
+          description: "Leave without pay",
+          defaultDays: 0,
+          color: "#757575",
+        },
+      ];
+      const leaveTypes = [];
+      for (const lt of leaveTypeSeeds) {
+        const existing = await prisma.leaveType.findFirst({
+          where: { name: lt.name, deletedAt: null, sessionId },
+        });
+        const leaveType =
+          existing ?? (await prisma.leaveType.create({ data: { ...lt, sessionId } }));
+        leaveTypes.push(leaveType);
+      }
+      const [annualLeave, sickLeave] = leaveTypes;
+
+      // Seed leave balances for current year
+      const currentYear = new Date().getFullYear();
+      for (const person of persons) {
+        for (const lt of leaveTypes) {
+          const existing = await prisma.leaveBalance.findUnique({
+            where: {
+              personId_leaveTypeId_year: {
+                personId: person.id,
+                leaveTypeId: lt.id,
+                year: currentYear,
+              },
+            },
+          });
+          if (!existing) {
+            await prisma.leaveBalance.create({
+              data: {
+                personId: person.id,
+                leaveTypeId: lt.id,
+                year: currentYear,
+                allocated: lt.defaultDays,
+                used: 0,
+                sessionId,
+              },
+            });
+          }
+        }
+      }
+
+      // Seed a few sample leave requests
+      const today = new Date();
+      const nextWeek = new Date(today.getTime() + 7 * 86400000);
+      const nextNextWeek = new Date(today.getTime() + 14 * 86400000);
+
+      // Alice: approved annual leave next week (5 days)
+      await prisma.leaveRequest.create({
+        data: {
+          personId: alice.id,
+          leaveTypeId: annualLeave.id,
+          startDate: nextWeek,
+          endDate: new Date(nextWeek.getTime() + 4 * 86400000),
+          days: 5,
+          note: "Family vacation",
+          status: "approved",
+          reviewerId: frank.id,
+          reviewedAt: today,
+          sessionId,
+        },
+      });
+
+      // Bob: pending sick leave
+      await prisma.leaveRequest.create({
+        data: {
+          personId: bob.id,
+          leaveTypeId: sickLeave.id,
+          startDate: nextNextWeek,
+          endDate: new Date(nextNextWeek.getTime() + 1 * 86400000),
+          days: 2,
+          note: "Medical appointment",
+          status: "pending",
+          sessionId,
+        },
+      });
+
+      // Update Alice's annual leave balance to reflect approved leave
+      await prisma.leaveBalance.update({
+        where: {
+          personId_leaveTypeId_year: {
+            personId: alice.id,
+            leaveTypeId: annualLeave.id,
+            year: currentYear,
+          },
+        },
+        data: { used: 5 },
+      });
     });
 
     // Seed mock users only for real (non-demo) sessions — the User table has no
@@ -1616,4 +1733,1019 @@ export async function exportAuditLogsCsv(): Promise<string> {
       l.after ?? "",
     ]),
   );
+}
+
+// ─── Leave Management ────────────────────────────────────────────
+
+export async function createLeaveType(data: FormData): Promise<ActionResult> {
+  return safe(async () => {
+    const t = await getTranslations("errors");
+    await requirePermission("leave:manage_types");
+    await rateLimit("createLeaveType");
+
+    const name = data.get("name")?.valueOf();
+    if (typeof name !== "string" || name.trim().length === 0) throw new Error(t("invalidName"));
+    if (name.trim().length > MAX_NAME_LENGTH)
+      throw new Error(t("nameTooLong", { max: MAX_NAME_LENGTH }));
+
+    const description = data.get("description")?.valueOf();
+    const descStr =
+      typeof description === "string" && description.trim().length > 0 ? description.trim() : null;
+    if (descStr && descStr.length > MAX_DESCRIPTION_LENGTH)
+      throw new Error(t("descriptionTooLong", { max: MAX_DESCRIPTION_LENGTH }));
+
+    const defaultDaysStr = data.get("defaultDays")?.valueOf();
+    const defaultDays = typeof defaultDaysStr === "string" ? parseInt(defaultDaysStr, 10) : 0;
+    if (isNaN(defaultDays) || defaultDays < 0) throw new Error(t("invalidDaysValue"));
+
+    const color = (data.get("color")?.valueOf() as string) ?? "#1976d2";
+
+    const sessionId = await getDemoSessionId();
+    const ctx = await captureAuditContext();
+    const auditEntries: DeferredAuditEntry[] = [];
+    await prisma.$transaction(async (tx) => {
+      const existing = await tx.leaveType.findFirst({
+        where: { name: name.trim(), deletedAt: null, sessionId },
+      });
+      if (existing) throw new Error(t("leaveTypeAlreadyExists"));
+
+      const leaveType = await tx.leaveType.create({
+        data: { name: name.trim(), description: descStr, defaultDays, color, sessionId },
+      });
+      auditEntries.push({
+        ...ctx,
+        action: "create",
+        entityType: "leaveType",
+        entityId: leaveType.id,
+        after: { name: leaveType.name, defaultDays, color },
+      });
+    });
+    deferAudit(auditEntries);
+    revalidatePath("/leave");
+  });
+}
+
+export async function updateLeaveType(data: FormData): Promise<ActionResult> {
+  return safe(async () => {
+    const t = await getTranslations("errors");
+    await requirePermission("leave:manage_types");
+    await rateLimit("updateLeaveType");
+
+    const id = data.get("id")?.valueOf();
+    if (typeof id !== "string") throw new Error(t("invalidId"));
+    validateUUID(id, "leaveTypeId");
+
+    const name = data.get("name")?.valueOf();
+    if (typeof name !== "string" || name.trim().length === 0) throw new Error(t("invalidName"));
+    if (name.trim().length > MAX_NAME_LENGTH)
+      throw new Error(t("nameTooLong", { max: MAX_NAME_LENGTH }));
+
+    const description = data.get("description")?.valueOf();
+    const descStr =
+      typeof description === "string" && description.trim().length > 0 ? description.trim() : null;
+
+    const defaultDaysStr = data.get("defaultDays")?.valueOf();
+    const defaultDays = typeof defaultDaysStr === "string" ? parseInt(defaultDaysStr, 10) : 0;
+    if (isNaN(defaultDays) || defaultDays < 0) throw new Error(t("invalidDaysValue"));
+
+    const color = (data.get("color")?.valueOf() as string) ?? "#1976d2";
+
+    const sessionId = await getDemoSessionId();
+    const ctx = await captureAuditContext();
+    const auditEntries: DeferredAuditEntry[] = [];
+    await prisma.$transaction(async (tx) => {
+      const existing = await tx.leaveType.findFirst({
+        where: { id, deletedAt: null, sessionId },
+      });
+      if (!existing) throw new Error(t("leaveTypeNotFound"));
+
+      const duplicate = await tx.leaveType.findFirst({
+        where: { name: name.trim(), deletedAt: null, sessionId, NOT: { id } },
+      });
+      if (duplicate) throw new Error(t("leaveTypeAlreadyExists"));
+
+      await tx.leaveType.update({
+        where: { id },
+        data: { name: name.trim(), description: descStr, defaultDays, color },
+      });
+      auditEntries.push({
+        ...ctx,
+        action: "update",
+        entityType: "leaveType",
+        entityId: id,
+        before: { name: existing.name, defaultDays: existing.defaultDays, color: existing.color },
+        after: { name: name.trim(), defaultDays, color },
+      });
+    });
+    deferAudit(auditEntries);
+    revalidatePath("/leave");
+  });
+}
+
+export async function deleteLeaveType(data: FormData): Promise<ActionResult> {
+  return safe(async () => {
+    const t = await getTranslations("errors");
+    await requirePermission("leave:manage_types");
+    await rateLimit("deleteLeaveType");
+
+    const id = data.get("id")?.valueOf();
+    if (typeof id !== "string") throw new Error(t("invalidId"));
+    validateUUID(id, "leaveTypeId");
+
+    const sessionId = await getDemoSessionId();
+    const ctx = await captureAuditContext();
+    const auditEntries: DeferredAuditEntry[] = [];
+    const now = new Date();
+    await prisma.$transaction(async (tx) => {
+      const existing = await tx.leaveType.findFirst({
+        where: { id, deletedAt: null, sessionId },
+      });
+      if (!existing) throw new Error(t("leaveTypeNotFound"));
+
+      await tx.leaveType.update({ where: { id }, data: { deletedAt: now } });
+      auditEntries.push({
+        ...ctx,
+        action: "delete",
+        entityType: "leaveType",
+        entityId: id,
+        before: { name: existing.name },
+      });
+    });
+    deferAudit(auditEntries);
+    revalidatePath("/leave");
+  });
+}
+
+export async function createLeaveRequest(data: FormData): Promise<ActionResult> {
+  return safe(async () => {
+    const t = await getTranslations("errors");
+    await requirePermission("leave:request");
+    await rateLimit("createLeaveRequest");
+
+    const personId = data.get("personId")?.valueOf();
+    if (typeof personId !== "string") throw new Error(t("noPersonSelected"));
+    validateUUID(personId, "personId");
+
+    const leaveTypeId = data.get("leaveTypeId")?.valueOf();
+    if (typeof leaveTypeId !== "string") throw new Error(t("leaveTypeRequired"));
+    validateUUID(leaveTypeId, "leaveTypeId");
+
+    const startDateStr = data.get("startDate")?.valueOf();
+    const endDateStr = data.get("endDate")?.valueOf();
+    if (typeof startDateStr !== "string" || typeof endDateStr !== "string")
+      throw new Error(t("invalidDateRange"));
+
+    const startDate = new Date(startDateStr);
+    const endDate = new Date(endDateStr);
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime()))
+      throw new Error(t("invalidDateRange"));
+    if (endDate < startDate) throw new Error(t("endDateBeforeStartDate"));
+
+    const daysStr = data.get("days")?.valueOf();
+    const days = typeof daysStr === "string" ? parseInt(daysStr, 10) : 0;
+    if (isNaN(days) || days < 1) throw new Error(t("invalidDaysValue"));
+
+    const note = data.get("note")?.valueOf();
+    const noteStr = typeof note === "string" && note.trim().length > 0 ? note.trim() : null;
+    if (noteStr && noteStr.length > MAX_LEAVE_NOTE_LENGTH)
+      throw new Error(t("noteTooLong", { max: MAX_LEAVE_NOTE_LENGTH }));
+
+    const sessionId = await getDemoSessionId();
+    const ctx = await captureAuditContext();
+    const auditEntries: DeferredAuditEntry[] = [];
+    await prisma.$transaction(async (tx) => {
+      const person = await tx.person.findFirst({
+        where: { id: personId, deletedAt: null, sessionId },
+      });
+      if (!person) throw new Error(t("personNotFound"));
+
+      const leaveType = await tx.leaveType.findFirst({
+        where: { id: leaveTypeId, deletedAt: null, sessionId },
+      });
+      if (!leaveType) throw new Error(t("leaveTypeNotFound"));
+
+      // Check for overlapping leave requests
+      const overlapping = await tx.leaveRequest.findFirst({
+        where: {
+          personId,
+          deletedAt: null,
+          sessionId,
+          status: { not: "rejected" },
+          startDate: { lte: endDate },
+          endDate: { gte: startDate },
+        },
+      });
+      if (overlapping) throw new Error(t("leaveRequestOverlapping"));
+
+      // Check balance
+      const year = startDate.getFullYear();
+      const balance = await tx.leaveBalance.findUnique({
+        where: { personId_leaveTypeId_year: { personId, leaveTypeId, year } },
+      });
+      if (balance && balance.allocated - balance.used < days)
+        throw new Error(t("insufficientLeaveBalance"));
+
+      const request = await tx.leaveRequest.create({
+        data: {
+          personId,
+          leaveTypeId,
+          startDate,
+          endDate,
+          days,
+          note: noteStr,
+          sessionId,
+        },
+      });
+      auditEntries.push({
+        ...ctx,
+        action: "create",
+        entityType: "leaveRequest",
+        entityId: request.id,
+        after: {
+          personName: person.name,
+          leaveType: leaveType.name,
+          startDate: startDate.toISOString(),
+          endDate: endDate.toISOString(),
+          days,
+        },
+      });
+    });
+    deferAudit(auditEntries);
+    revalidatePath("/leave");
+  });
+}
+
+export async function reviewLeaveRequest(data: FormData): Promise<ActionResult> {
+  return safe(async () => {
+    const t = await getTranslations("errors");
+    await requirePermission("leave:approve");
+    await rateLimit("reviewLeaveRequest");
+
+    const id = data.get("id")?.valueOf();
+    if (typeof id !== "string") throw new Error(t("invalidId"));
+    validateUUID(id, "leaveRequestId");
+
+    const action = data.get("action")?.valueOf();
+    if (action !== "approved" && action !== "rejected") throw new Error(t("invalidLeaveAction"));
+
+    const reviewerId = data.get("reviewerId")?.valueOf();
+    const reviewerIdStr = typeof reviewerId === "string" ? reviewerId : null;
+    if (reviewerIdStr) validateUUID(reviewerIdStr, "reviewerId");
+
+    const reviewNote = data.get("reviewNote")?.valueOf();
+    const reviewNoteStr =
+      typeof reviewNote === "string" && reviewNote.trim().length > 0 ? reviewNote.trim() : null;
+    if (reviewNoteStr && reviewNoteStr.length > MAX_LEAVE_NOTE_LENGTH)
+      throw new Error(t("noteTooLong", { max: MAX_LEAVE_NOTE_LENGTH }));
+
+    const sessionId = await getDemoSessionId();
+    const ctx = await captureAuditContext();
+    const auditEntries: DeferredAuditEntry[] = [];
+    await prisma.$transaction(async (tx) => {
+      const request = await tx.leaveRequest.findFirst({
+        where: { id, deletedAt: null, sessionId, status: "pending" },
+        include: { person: true, leaveType: true },
+      });
+      if (!request) throw new Error(t("leaveRequestNotFound"));
+
+      await tx.leaveRequest.update({
+        where: { id },
+        data: {
+          status: action,
+          reviewerId: reviewerIdStr,
+          reviewNote: reviewNoteStr,
+          reviewedAt: new Date(),
+        },
+      });
+
+      // If approved, update the balance
+      if (action === "approved") {
+        const year = request.startDate.getFullYear();
+        await tx.leaveBalance.upsert({
+          where: {
+            personId_leaveTypeId_year: {
+              personId: request.personId,
+              leaveTypeId: request.leaveTypeId,
+              year,
+            },
+          },
+          create: {
+            personId: request.personId,
+            leaveTypeId: request.leaveTypeId,
+            year,
+            allocated: request.leaveType.defaultDays,
+            used: request.days,
+            sessionId,
+          },
+          update: { used: { increment: request.days } },
+        });
+      }
+
+      auditEntries.push({
+        ...ctx,
+        action: action === "approved" ? "approve" : "reject",
+        entityType: "leaveRequest",
+        entityId: id,
+        before: { status: "pending" },
+        after: {
+          status: action,
+          personName: request.person.name,
+          leaveType: request.leaveType.name,
+          days: request.days,
+          reviewNote: reviewNoteStr,
+        },
+      });
+    });
+    deferAudit(auditEntries);
+    revalidatePath("/leave");
+  });
+}
+
+export async function deleteLeaveRequest(data: FormData): Promise<ActionResult> {
+  return safe(async () => {
+    const t = await getTranslations("errors");
+    await requirePermission("leave:request");
+    await rateLimit("deleteLeaveRequest");
+
+    const id = data.get("id")?.valueOf();
+    if (typeof id !== "string") throw new Error(t("invalidId"));
+    validateUUID(id, "leaveRequestId");
+
+    const sessionId = await getDemoSessionId();
+    const ctx = await captureAuditContext();
+    const auditEntries: DeferredAuditEntry[] = [];
+    const now = new Date();
+    await prisma.$transaction(async (tx) => {
+      const request = await tx.leaveRequest.findFirst({
+        where: { id, deletedAt: null, sessionId },
+        include: { person: true, leaveType: true },
+      });
+      if (!request) throw new Error(t("leaveRequestNotFound"));
+      if (request.status !== "pending") throw new Error(t("cannotDeleteNonPendingRequest"));
+
+      await tx.leaveRequest.update({ where: { id }, data: { deletedAt: now } });
+      auditEntries.push({
+        ...ctx,
+        action: "delete",
+        entityType: "leaveRequest",
+        entityId: id,
+        before: {
+          personName: request.person.name,
+          leaveType: request.leaveType.name,
+          startDate: request.startDate.toISOString(),
+          endDate: request.endDate.toISOString(),
+          days: request.days,
+        },
+      });
+    });
+    deferAudit(auditEntries);
+    revalidatePath("/leave");
+  });
+}
+
+export async function allocateLeaveBalance(data: FormData): Promise<ActionResult> {
+  return safe(async () => {
+    const t = await getTranslations("errors");
+    await requirePermission("leave:manage_types");
+    await rateLimit("allocateLeaveBalance");
+
+    const personId = data.get("personId")?.valueOf();
+    if (typeof personId !== "string") throw new Error(t("noPersonSelected"));
+    validateUUID(personId, "personId");
+
+    const leaveTypeId = data.get("leaveTypeId")?.valueOf();
+    if (typeof leaveTypeId !== "string") throw new Error(t("leaveTypeRequired"));
+    validateUUID(leaveTypeId, "leaveTypeId");
+
+    const yearStr = data.get("year")?.valueOf();
+    const year = typeof yearStr === "string" ? parseInt(yearStr, 10) : new Date().getFullYear();
+    if (isNaN(year) || year < 2000 || year > 2100) throw new Error(t("invalidYear"));
+
+    const allocatedStr = data.get("allocated")?.valueOf();
+    const allocated = typeof allocatedStr === "string" ? parseInt(allocatedStr, 10) : 0;
+    if (isNaN(allocated) || allocated < 0) throw new Error(t("invalidDaysValue"));
+
+    const sessionId = await getDemoSessionId();
+    const ctx = await captureAuditContext();
+    const auditEntries: DeferredAuditEntry[] = [];
+    await prisma.$transaction(async (tx) => {
+      const person = await tx.person.findFirst({
+        where: { id: personId, deletedAt: null, sessionId },
+      });
+      if (!person) throw new Error(t("personNotFound"));
+
+      const leaveType = await tx.leaveType.findFirst({
+        where: { id: leaveTypeId, deletedAt: null, sessionId },
+      });
+      if (!leaveType) throw new Error(t("leaveTypeNotFound"));
+
+      const balance = await tx.leaveBalance.upsert({
+        where: { personId_leaveTypeId_year: { personId, leaveTypeId, year } },
+        create: { personId, leaveTypeId, year, allocated, sessionId },
+        update: { allocated },
+      });
+
+      auditEntries.push({
+        ...ctx,
+        action: "update",
+        entityType: "leaveBalance",
+        entityId: balance.id,
+        after: {
+          personName: person.name,
+          leaveType: leaveType.name,
+          year,
+          allocated,
+        },
+      });
+    });
+    deferAudit(auditEntries);
+    revalidatePath("/leave");
+  });
+}
+
+// ============================================================
+// PERFORMANCE REVIEWS
+// ============================================================
+
+export async function createReviewTemplate(data: FormData): Promise<ActionResult> {
+  return safe(async () => {
+    const t = await getTranslations("errors");
+    await requirePermission("review:manage");
+    await rateLimit("createReviewTemplate");
+
+    const name = data.get("name");
+    const description = data.get("description");
+
+    if (typeof name !== "string" || name.trim().length === 0) {
+      throw new Error(t("invalidName"));
+    }
+    if (name.trim().length > MAX_NAME_LENGTH) {
+      throw new Error(t("nameTooLong", { max: MAX_NAME_LENGTH }));
+    }
+    if (description !== null && typeof description !== "string") {
+      throw new Error(t("unexpectedError"));
+    }
+
+    const sessionId = await getDemoSessionId();
+    const ctx = await captureAuditContext();
+    const auditEntries: DeferredAuditEntry[] = [];
+
+    await prisma.$transaction(async (tx) => {
+      const template = await tx.reviewTemplate.create({
+        data: {
+          name: name.trim(),
+          description: description?.trim() || null,
+          questions: [],
+          sessionId,
+        },
+      });
+
+      auditEntries.push({
+        ...ctx,
+        action: "create",
+        entityType: "reviewTemplate",
+        entityId: template.id,
+        after: { name: template.name },
+      });
+    });
+
+    deferAudit(auditEntries);
+    revalidatePath("/reviews/templates");
+    revalidatePath("/reviews");
+  });
+}
+
+export async function deleteReviewTemplate(data: FormData): Promise<ActionResult> {
+  return safe(async () => {
+    const t = await getTranslations("errors");
+    await requirePermission("review:manage");
+    await rateLimit("deleteReviewTemplate");
+
+    const templateId = data.get("templateId");
+    if (typeof templateId !== "string" || !templateId.trim()) {
+      throw new Error(t("unexpectedError"));
+    }
+
+    const sessionId = await getDemoSessionId();
+    const ctx = await captureAuditContext();
+    const auditEntries: DeferredAuditEntry[] = [];
+
+    await prisma.$transaction(async (tx) => {
+      const template = await tx.reviewTemplate.findFirst({
+        where: { id: templateId, deletedAt: null, sessionId },
+      });
+      if (!template) throw new Error(t("reviewTemplateNotFound"));
+
+      await tx.reviewTemplate.update({
+        where: { id: templateId },
+        data: { deletedAt: new Date() },
+      });
+
+      auditEntries.push({
+        ...ctx,
+        action: "delete",
+        entityType: "reviewTemplate",
+        entityId: templateId,
+        before: { name: template.name },
+      });
+    });
+
+    deferAudit(auditEntries);
+    revalidatePath("/reviews/templates");
+    revalidatePath("/reviews");
+  });
+}
+
+export async function addReviewQuestion(data: FormData): Promise<ActionResult> {
+  return safe(async () => {
+    const t = await getTranslations("errors");
+    await requirePermission("review:manage");
+    await rateLimit("addReviewQuestion");
+
+    const templateId = data.get("templateId");
+    const text = data.get("text");
+    const type = data.get("type");
+    const scaleMinRaw = data.get("scaleMin");
+    const scaleMaxRaw = data.get("scaleMax");
+    const requiredRaw = data.get("required");
+
+    if (typeof templateId !== "string" || !templateId.trim()) {
+      throw new Error(t("unexpectedError"));
+    }
+    if (typeof text !== "string" || text.trim().length === 0) {
+      throw new Error(t("invalidName"));
+    }
+    if (type !== "RATING" && type !== "TEXT") {
+      throw new Error(t("invalidQuestionType"));
+    }
+
+    const scaleMin = scaleMinRaw ? parseInt(String(scaleMinRaw), 10) : null;
+    const scaleMax = scaleMaxRaw ? parseInt(String(scaleMaxRaw), 10) : null;
+    const required = requiredRaw !== "false";
+
+    const sessionId = await getDemoSessionId();
+    const ctx = await captureAuditContext();
+    const auditEntries: DeferredAuditEntry[] = [];
+
+    await prisma.$transaction(async (tx) => {
+      const template = await tx.reviewTemplate.findFirst({
+        where: { id: templateId, deletedAt: null, sessionId },
+      });
+      if (!template) throw new Error(t("reviewTemplateNotFound"));
+
+      const existingQuestions = Array.isArray(template.questions)
+        ? (template.questions as ReviewQuestion[])
+        : [];
+      const newQuestion: ReviewQuestion = {
+        id: crypto.randomUUID(),
+        text: text.trim(),
+        type: type as "RATING" | "TEXT",
+        scaleMin: type === "RATING" ? (scaleMin ?? 1) : null,
+        scaleMax: type === "RATING" ? (scaleMax ?? 5) : null,
+        order: existingQuestions.length,
+        required,
+      };
+
+      await tx.reviewTemplate.update({
+        where: { id: templateId },
+        data: { questions: [...existingQuestions, newQuestion] },
+      });
+
+      auditEntries.push({
+        ...ctx,
+        action: "update",
+        entityType: "reviewTemplate",
+        entityId: templateId,
+        after: { addedQuestion: newQuestion.text },
+      });
+    });
+
+    deferAudit(auditEntries);
+    revalidatePath(`/reviews/templates/${templateId}`);
+  });
+}
+
+export async function removeReviewQuestion(data: FormData): Promise<ActionResult> {
+  return safe(async () => {
+    const t = await getTranslations("errors");
+    await requirePermission("review:manage");
+    await rateLimit("removeReviewQuestion");
+
+    const templateId = data.get("templateId");
+    const questionId = data.get("questionId");
+
+    if (typeof templateId !== "string" || !templateId.trim()) {
+      throw new Error(t("unexpectedError"));
+    }
+    if (typeof questionId !== "string" || !questionId.trim()) {
+      throw new Error(t("unexpectedError"));
+    }
+
+    const sessionId = await getDemoSessionId();
+    const ctx = await captureAuditContext();
+    const auditEntries: DeferredAuditEntry[] = [];
+
+    await prisma.$transaction(async (tx) => {
+      const template = await tx.reviewTemplate.findFirst({
+        where: { id: templateId, deletedAt: null, sessionId },
+      });
+      if (!template) throw new Error(t("reviewTemplateNotFound"));
+
+      const existingQuestions = Array.isArray(template.questions)
+        ? (template.questions as ReviewQuestion[])
+        : [];
+      const filtered = existingQuestions
+        .filter((q) => q.id !== questionId)
+        .map((q, i) => ({ ...q, order: i }));
+
+      await tx.reviewTemplate.update({
+        where: { id: templateId },
+        data: { questions: filtered },
+      });
+
+      auditEntries.push({
+        ...ctx,
+        action: "update",
+        entityType: "reviewTemplate",
+        entityId: templateId,
+        after: { removedQuestion: questionId },
+      });
+    });
+
+    deferAudit(auditEntries);
+    revalidatePath(`/reviews/templates/${templateId}`);
+  });
+}
+
+export async function createReviewCycle(data: FormData): Promise<ActionResult> {
+  return safe(async () => {
+    const t = await getTranslations("errors");
+    await requirePermission("review:manage");
+    await rateLimit("createReviewCycle");
+
+    const name = data.get("name");
+    const templateId = data.get("templateId");
+    const startDateRaw = data.get("startDate");
+    const endDateRaw = data.get("endDate");
+
+    if (typeof name !== "string" || name.trim().length === 0) {
+      throw new Error(t("invalidName"));
+    }
+    if (name.trim().length > MAX_NAME_LENGTH) {
+      throw new Error(t("nameTooLong", { max: MAX_NAME_LENGTH }));
+    }
+
+    const startDate = startDateRaw ? new Date(String(startDateRaw)) : null;
+    const endDate = endDateRaw ? new Date(String(endDateRaw)) : null;
+    if (!startDate || isNaN(startDate.getTime())) {
+      throw new Error(t("unexpectedError"));
+    }
+    if (!endDate || isNaN(endDate.getTime())) {
+      throw new Error(t("unexpectedError"));
+    }
+
+    const resolvedTemplateId =
+      typeof templateId === "string" && templateId.trim() ? templateId.trim() : null;
+
+    const sessionId = await getDemoSessionId();
+    const ctx = await captureAuditContext();
+    const auditEntries: DeferredAuditEntry[] = [];
+
+    await prisma.$transaction(async (tx) => {
+      if (resolvedTemplateId) {
+        const tpl = await tx.reviewTemplate.findFirst({
+          where: { id: resolvedTemplateId, deletedAt: null, sessionId },
+        });
+        if (!tpl) throw new Error(t("reviewTemplateNotFound"));
+      }
+
+      const cycle = await tx.reviewCycle.create({
+        data: {
+          name: name.trim(),
+          templateId: resolvedTemplateId,
+          startDate,
+          endDate,
+          status: "DRAFT",
+          sessionId,
+        },
+      });
+
+      auditEntries.push({
+        ...ctx,
+        action: "create",
+        entityType: "reviewCycle",
+        entityId: cycle.id,
+        after: { name: cycle.name, status: cycle.status },
+      });
+    });
+
+    deferAudit(auditEntries);
+    revalidatePath("/reviews");
+  });
+}
+
+export async function deleteReviewCycle(data: FormData): Promise<ActionResult> {
+  return safe(async () => {
+    const t = await getTranslations("errors");
+    await requirePermission("review:manage");
+    await rateLimit("deleteReviewCycle");
+
+    const cycleId = data.get("cycleId");
+    if (typeof cycleId !== "string" || !cycleId.trim()) {
+      throw new Error(t("unexpectedError"));
+    }
+
+    const sessionId = await getDemoSessionId();
+    const ctx = await captureAuditContext();
+    const auditEntries: DeferredAuditEntry[] = [];
+
+    await prisma.$transaction(async (tx) => {
+      const cycle = await tx.reviewCycle.findFirst({
+        where: { id: cycleId, deletedAt: null, sessionId },
+      });
+      if (!cycle) throw new Error(t("reviewCycleNotFound"));
+
+      await tx.reviewCycle.update({
+        where: { id: cycleId },
+        data: { deletedAt: new Date() },
+      });
+
+      auditEntries.push({
+        ...ctx,
+        action: "delete",
+        entityType: "reviewCycle",
+        entityId: cycleId,
+        before: { name: cycle.name, status: cycle.status },
+      });
+    });
+
+    deferAudit(auditEntries);
+    revalidatePath("/reviews");
+  });
+}
+
+export async function openReviewCycle(data: FormData): Promise<ActionResult> {
+  return safe(async () => {
+    const t = await getTranslations("errors");
+    await requirePermission("review:manage");
+    await rateLimit("openReviewCycle");
+
+    const cycleId = data.get("cycleId");
+    if (typeof cycleId !== "string" || !cycleId.trim()) {
+      throw new Error(t("unexpectedError"));
+    }
+
+    const sessionId = await getDemoSessionId();
+    const ctx = await captureAuditContext();
+    const auditEntries: DeferredAuditEntry[] = [];
+
+    await prisma.$transaction(async (tx) => {
+      const cycle = await tx.reviewCycle.findFirst({
+        where: { id: cycleId, deletedAt: null, sessionId },
+      });
+      if (!cycle) throw new Error(t("reviewCycleNotFound"));
+      if (cycle.status !== "DRAFT") throw new Error(t("reviewCycleNotDraft"));
+
+      await tx.reviewCycle.update({
+        where: { id: cycleId },
+        data: { status: "OPEN" },
+      });
+
+      auditEntries.push({
+        ...ctx,
+        action: "update",
+        entityType: "reviewCycle",
+        entityId: cycleId,
+        before: { status: "DRAFT" },
+        after: { status: "OPEN" },
+      });
+    });
+
+    deferAudit(auditEntries);
+    revalidatePath(`/reviews/cycles/${cycleId}`);
+    revalidatePath("/reviews");
+  });
+}
+
+export async function closeReviewCycle(data: FormData): Promise<ActionResult> {
+  return safe(async () => {
+    const t = await getTranslations("errors");
+    await requirePermission("review:manage");
+    await rateLimit("closeReviewCycle");
+
+    const cycleId = data.get("cycleId");
+    if (typeof cycleId !== "string" || !cycleId.trim()) {
+      throw new Error(t("unexpectedError"));
+    }
+
+    const sessionId = await getDemoSessionId();
+    const ctx = await captureAuditContext();
+    const auditEntries: DeferredAuditEntry[] = [];
+
+    await prisma.$transaction(async (tx) => {
+      const cycle = await tx.reviewCycle.findFirst({
+        where: { id: cycleId, deletedAt: null, sessionId },
+      });
+      if (!cycle) throw new Error(t("reviewCycleNotFound"));
+      if (cycle.status === "CLOSED") throw new Error(t("reviewCycleAlreadyClosed"));
+      if (cycle.status !== "OPEN") throw new Error(t("reviewCycleNotOpen"));
+
+      await tx.reviewCycle.update({
+        where: { id: cycleId },
+        data: { status: "CLOSED" },
+      });
+
+      auditEntries.push({
+        ...ctx,
+        action: "update",
+        entityType: "reviewCycle",
+        entityId: cycleId,
+        before: { status: "OPEN" },
+        after: { status: "CLOSED" },
+      });
+    });
+
+    deferAudit(auditEntries);
+    revalidatePath(`/reviews/cycles/${cycleId}`);
+    revalidatePath("/reviews");
+  });
+}
+
+export async function addReviewRequest(data: FormData): Promise<ActionResult> {
+  return safe(async () => {
+    const t = await getTranslations("errors");
+    await requirePermission("review:manage");
+    await rateLimit("addReviewRequest");
+
+    const cycleId = data.get("cycleId");
+    const subjectId = data.get("subjectId");
+    const reviewerId = data.get("reviewerId");
+    const type = data.get("type");
+
+    if (typeof cycleId !== "string" || !cycleId.trim()) {
+      throw new Error(t("unexpectedError"));
+    }
+    if (typeof subjectId !== "string" || !subjectId.trim()) {
+      throw new Error(t("noPersonSelected"));
+    }
+    if (typeof reviewerId !== "string" || !reviewerId.trim()) {
+      throw new Error(t("noPersonSelected"));
+    }
+    if (!["SELF", "MANAGER", "PEER", "DIRECT_REPORT"].includes(String(type))) {
+      throw new Error(t("unexpectedError"));
+    }
+
+    const sessionId = await getDemoSessionId();
+    const ctx = await captureAuditContext();
+    const auditEntries: DeferredAuditEntry[] = [];
+
+    await prisma.$transaction(async (tx) => {
+      const cycle = await tx.reviewCycle.findFirst({
+        where: { id: cycleId, deletedAt: null, sessionId },
+      });
+      if (!cycle) throw new Error(t("reviewCycleNotFound"));
+
+      const existing = await tx.reviewRequest.findUnique({
+        where: {
+          cycleId_subjectId_reviewerId_type: {
+            cycleId,
+            subjectId,
+            reviewerId,
+            type: type as "SELF" | "MANAGER" | "PEER" | "DIRECT_REPORT",
+          },
+        },
+      });
+      if (existing) throw new Error(t("reviewAlreadyExists"));
+
+      const req = await tx.reviewRequest.create({
+        data: {
+          cycleId,
+          subjectId,
+          reviewerId,
+          type: type as "SELF" | "MANAGER" | "PEER" | "DIRECT_REPORT",
+          status: "PENDING",
+          sessionId,
+        },
+      });
+
+      auditEntries.push({
+        ...ctx,
+        action: "create",
+        entityType: "reviewRequest",
+        entityId: req.id,
+        after: { cycleId, type },
+      });
+    });
+
+    deferAudit(auditEntries);
+    revalidatePath(`/reviews/cycles/${cycleId}`);
+  });
+}
+
+export async function removeReviewRequest(data: FormData): Promise<ActionResult> {
+  return safe(async () => {
+    const t = await getTranslations("errors");
+    await requirePermission("review:manage");
+    await rateLimit("removeReviewRequest");
+
+    const requestId = data.get("requestId");
+    const cycleId = data.get("cycleId");
+
+    if (typeof requestId !== "string" || !requestId.trim()) {
+      throw new Error(t("unexpectedError"));
+    }
+
+    const sessionId = await getDemoSessionId();
+    const ctx = await captureAuditContext();
+    const auditEntries: DeferredAuditEntry[] = [];
+
+    await prisma.$transaction(async (tx) => {
+      const req = await tx.reviewRequest.findFirst({
+        where: { id: requestId, sessionId },
+      });
+      if (!req) throw new Error(t("reviewRequestNotFound"));
+
+      await tx.reviewRequest.delete({ where: { id: requestId } });
+
+      auditEntries.push({
+        ...ctx,
+        action: "delete",
+        entityType: "reviewRequest",
+        entityId: requestId,
+        before: { type: req.type, status: req.status },
+      });
+    });
+
+    deferAudit(auditEntries);
+    if (typeof cycleId === "string" && cycleId.trim()) {
+      revalidatePath(`/reviews/cycles/${cycleId}`);
+    }
+  });
+}
+
+export async function submitReview(data: FormData): Promise<ActionResult> {
+  return safe(async () => {
+    const t = await getTranslations("errors");
+    await requirePermission("review:submit");
+    await rateLimit("submitReview");
+
+    const requestId = data.get("requestId");
+    const answersRaw = data.get("answers");
+
+    if (typeof requestId !== "string" || !requestId.trim()) {
+      throw new Error(t("unexpectedError"));
+    }
+
+    let answers: Array<{
+      questionId: string;
+      ratingValue: number | null;
+      textValue: string | null;
+    }> = [];
+    if (typeof answersRaw === "string") {
+      try {
+        answers = JSON.parse(answersRaw);
+      } catch {
+        throw new Error(t("unexpectedError"));
+      }
+    }
+
+    const sessionId = await getDemoSessionId();
+    const ctx = await captureAuditContext();
+    const auditEntries: DeferredAuditEntry[] = [];
+
+    await prisma.$transaction(async (tx) => {
+      const req = await tx.reviewRequest.findFirst({
+        where: { id: requestId, sessionId },
+        include: { cycle: true },
+      });
+      if (!req) throw new Error(t("reviewRequestNotFound"));
+      if (req.status === "SUBMITTED") throw new Error(t("reviewAlreadySubmitted"));
+      if (req.cycle.status !== "OPEN") throw new Error(t("reviewCycleNotOpen"));
+
+      const submission = await tx.reviewSubmission.create({
+        data: {
+          requestId,
+          answers,
+          sessionId,
+        },
+      });
+
+      await tx.reviewRequest.update({
+        where: { id: requestId },
+        data: { status: "SUBMITTED" },
+      });
+
+      auditEntries.push({
+        ...ctx,
+        action: "create",
+        entityType: "reviewSubmission",
+        entityId: submission.id,
+        after: { requestId, answerCount: answers.length },
+      });
+    });
+
+    deferAudit(auditEntries);
+    revalidatePath("/reviews/my-reviews");
+    revalidatePath(`/reviews/cycles/${data.get("cycleId")}`);
+  });
 }

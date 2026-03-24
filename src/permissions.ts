@@ -28,6 +28,13 @@ export const PERMISSION_KEYS = [
   "dashboard:view",
   "data:import",
   "data:export",
+  "review:view",
+  "review:manage",
+  "review:submit",
+  "leave:view",
+  "leave:request",
+  "leave:approve",
+  "leave:manage_types",
 ] as const;
 
 export type PermissionKey = (typeof PERMISSION_KEYS)[number];
@@ -56,8 +63,23 @@ export const ROLE_DEFAULTS: Record<string, PermissionKey[]> = {
     "admin:view_audit_log",
     "dashboard:view",
     "data:export",
+    "review:view",
+    "review:manage",
+    "review:submit",
+    "leave:view",
+    "leave:request",
+    "leave:approve",
+    "leave:manage_types",
   ],
-  user: ["person:read", "team:read", "department:read"],
+  user: [
+    "person:read",
+    "team:read",
+    "department:read",
+    "review:view",
+    "review:submit",
+    "leave:view",
+    "leave:request",
+  ],
   guest: ["person:read", "team:read", "department:read"],
 };
 
@@ -101,6 +123,13 @@ function formatPermissionDescription(key: PermissionKey): string {
     "dashboard:view": "View dashboard with analytics",
     "data:import": "Import data from CSV files",
     "data:export": "Export data to CSV files",
+    "review:view": "View performance reviews and cycles",
+    "review:manage": "Create and manage review templates and cycles",
+    "review:submit": "Submit assigned performance reviews",
+    "leave:view": "View leave requests and balances",
+    "leave:request": "Submit leave requests",
+    "leave:approve": "Approve or reject leave requests",
+    "leave:manage_types": "Create and manage leave types",
   };
   return descriptions[key];
 }

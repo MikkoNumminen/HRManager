@@ -97,6 +97,8 @@ export const AuditActionSchema = z.enum([
   "rate_limited",
   "import",
   "export",
+  "approve",
+  "reject",
 ]);
 
 export const AuditEntityTypeSchema = z.enum([
@@ -108,6 +110,13 @@ export const AuditEntityTypeSchema = z.enum([
   "userPermission",
   "auth",
   "security",
+  "reviewTemplate",
+  "reviewCycle",
+  "reviewRequest",
+  "reviewSubmission",
+  "leaveType",
+  "leaveRequest",
+  "leaveBalance",
 ]);
 
 export const AuditLogSchema = z.object({
@@ -187,3 +196,129 @@ export type CsvPersonImportRow = z.infer<typeof CsvPersonImportRowSchema>;
 
 export const MAX_IMPORT_ROWS = 1000;
 export const MAX_IMPORT_FILE_SIZE = 1024 * 1024; // 1 MB
+
+export const MAX_QUESTION_TEXT_LENGTH = 500;
+
+export const ReviewQuestionSchema = z.object({
+  id: z.string().uuid(),
+  text: z.string().min(1).max(MAX_QUESTION_TEXT_LENGTH),
+  type: z.enum(["RATING", "TEXT"]),
+  scaleMin: z.number().int().min(1).max(5).nullable(),
+  scaleMax: z.number().int().min(2).max(10).nullable(),
+  order: z.number().int().min(0),
+  required: z.boolean(),
+});
+
+export type ReviewQuestion = z.infer<typeof ReviewQuestionSchema>;
+
+export const ReviewTemplateSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string().min(1).max(MAX_NAME_LENGTH),
+  description: z.string().max(MAX_DESCRIPTION_LENGTH).nullable(),
+  questions: z.array(ReviewQuestionSchema),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type ReviewTemplate = z.infer<typeof ReviewTemplateSchema>;
+
+export const ReviewCycleSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string().min(1).max(MAX_NAME_LENGTH),
+  templateId: z.string().uuid().nullable(),
+  templateName: z.string().nullable(),
+  status: z.enum(["DRAFT", "OPEN", "CLOSED"]),
+  startDate: z.date(),
+  endDate: z.date(),
+  requestCount: z.number().int(),
+  submittedCount: z.number().int(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type ReviewCycle = z.infer<typeof ReviewCycleSchema>;
+
+export const ReviewRequestSchema = z.object({
+  id: z.string().uuid(),
+  cycleId: z.string().uuid(),
+  cycleName: z.string(),
+  cycleStatus: z.enum(["DRAFT", "OPEN", "CLOSED"]),
+  subjectId: z.string().uuid().nullable(),
+  subjectName: z.string().nullable(),
+  reviewerId: z.string().uuid().nullable(),
+  reviewerName: z.string().nullable(),
+  type: z.enum(["SELF", "MANAGER", "PEER", "DIRECT_REPORT"]),
+  status: z.enum(["PENDING", "SUBMITTED"]),
+  createdAt: z.date(),
+});
+
+export type ReviewRequest = z.infer<typeof ReviewRequestSchema>;
+
+export const ReviewAnswerSchema = z.object({
+  questionId: z.string().uuid(),
+  ratingValue: z.number().int().min(1).max(10).nullable(),
+  textValue: z.string().max(2000).nullable(),
+});
+
+export type ReviewAnswer = z.infer<typeof ReviewAnswerSchema>;
+
+export const ReviewSubmissionSchema = z.object({
+  id: z.string().uuid(),
+  requestId: z.string().uuid(),
+  answers: z.array(ReviewAnswerSchema),
+  submittedAt: z.date(),
+});
+
+export type ReviewSubmission = z.infer<typeof ReviewSubmissionSchema>;
+
+export const MAX_LEAVE_NOTE_LENGTH = 500;
+
+export const LeaveRequestStatusSchema = z.enum(["pending", "approved", "rejected"]);
+
+export const LeaveTypeSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string().min(1).max(MAX_NAME_LENGTH),
+  description: z.string().max(MAX_DESCRIPTION_LENGTH).nullable(),
+  defaultDays: z.number().int().min(0),
+  color: z.string().max(7),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type LeaveType = z.infer<typeof LeaveTypeSchema>;
+
+export const LeaveRequestSchema = z.object({
+  id: z.string().uuid(),
+  personId: z.string().uuid(),
+  personName: z.string(),
+  leaveTypeId: z.string().uuid(),
+  leaveTypeName: z.string(),
+  leaveTypeColor: z.string(),
+  startDate: z.date(),
+  endDate: z.date(),
+  days: z.number().int().min(1),
+  note: z.string().max(MAX_LEAVE_NOTE_LENGTH).nullable(),
+  status: LeaveRequestStatusSchema,
+  reviewerId: z.string().uuid().nullable(),
+  reviewerName: z.string().nullable(),
+  reviewNote: z.string().max(MAX_LEAVE_NOTE_LENGTH).nullable(),
+  reviewedAt: z.date().nullable(),
+  createdAt: z.date(),
+});
+
+export type LeaveRequest = z.infer<typeof LeaveRequestSchema>;
+
+export const LeaveBalanceSchema = z.object({
+  id: z.string().uuid(),
+  personId: z.string().uuid(),
+  personName: z.string(),
+  leaveTypeId: z.string().uuid(),
+  leaveTypeName: z.string(),
+  leaveTypeColor: z.string(),
+  year: z.number().int(),
+  allocated: z.number().int().min(0),
+  used: z.number().int().min(0),
+  remaining: z.number().int(),
+});
+
+export type LeaveBalance = z.infer<typeof LeaveBalanceSchema>;

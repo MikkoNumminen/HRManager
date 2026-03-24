@@ -17,6 +17,9 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 
 > 📋 **Audit research:** Items marked "(found by audit)" have detailed file:line references in memory file `project_audit_findings.md`. Read it before starting any of these tasks.
 
+- 🔴🧠 Performance reviews / 360 feedback — review templates, rating scales, feedback cycles [Claude 3, main]
+- 🔴🧠 Leave/absence management — leave types, requests, balances, approval workflows [Claude 2, main]
+
 ## Recently Completed
 
 - ✅ Loading skeletons with Suspense boundaries — PageSkeletons.tsx, 12 loading.tsx files, 10 tests
@@ -34,12 +37,9 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 - 🟢🧠 Global search & filtering on person/team/department tables — no search UI exists
 - 🟢🧠 Employee profile pages — read-only `/employees/[id]` cards, guest-accessible
 - 🟡🧠 Tutorial UX overhaul — no guiding effect on back button, lacks MUI visual guidance (highlighting/effects), guidance boxes appear in wrong positions
-- 🟡⚡ Loading skeletons with Suspense boundaries — no loading states on any pages
 - 🟡🧠 Org chart visualization — interactive hierarchy using existing manager/dept head data
 - 🟡🧠 Bulk actions on tables — multi-select persons/teams and apply batch operations
 - 🟡⚡ Empty state polish — illustrations and CTAs when tables are empty
-- 🔴🧠 Leave/absence management — leave types, requests, balances, approval workflows
-- 🔴🧠 Performance reviews / 360 feedback — review templates, rating scales, feedback cycles
 
 ### Code Quality / Architecture
 

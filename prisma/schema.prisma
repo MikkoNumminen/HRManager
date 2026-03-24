@@ -18,7 +18,12 @@ model Person {
   updatedAt DateTime    @updatedAt
   teams             TeamMember[]
   managedTeams      Team[]
-  headOfDepartments Department[]
+  headOfDepartments   Department[]
+  reviewsAsSubject    ReviewRequest[] @relation("ReviewSubject")
+  reviewsAsReviewer   ReviewRequest[] @relation("ReviewReviewer")
+  leaveRequests       LeaveRequest[]
+  leaveRequestsReviewed LeaveRequest[] @relation("LeaveReviewer")
+  leaveBalances       LeaveBalance[]
 
   @@index([deletedAt])
   @@index([sessionId])
@@ -130,4 +135,157 @@ model DemoSession {
 
   @@index([userId])
   @@index([lastActiveAt])
+}
+
+enum QuestionType {
+  RATING
+  TEXT
+}
+
+enum CycleStatus {
+  DRAFT
+  OPEN
+  CLOSED
+}
+
+enum ReviewType {
+  SELF
+  MANAGER
+  PEER
+  DIRECT_REPORT
+}
+
+enum RequestStatus {
+  PENDING
+  SUBMITTED
+}
+
+model ReviewTemplate {
+  id          String        @id @default(uuid())
+  name        String
+  description String?
+  questions   Json          @default("[]")
+  cycles      ReviewCycle[]
+  sessionId   String?
+  deletedAt   DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([deletedAt])
+  @@index([sessionId])
+}
+
+model ReviewCycle {
+  id         String          @id @default(uuid())
+  name       String
+  templateId String?
+  template   ReviewTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)
+  status     CycleStatus     @default(DRAFT)
+  startDate  DateTime
+  endDate    DateTime
+  requests   ReviewRequest[]
+  sessionId  String?
+  deletedAt  DateTime?
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+
+  @@index([deletedAt])
+  @@index([sessionId])
+  @@index([status])
+}
+
+model ReviewRequest {
+  id         String            @id @default(uuid())
+  cycleId    String
+  cycle      ReviewCycle       @relation(fields: [cycleId], references: [id], onDelete: Cascade)
+  subjectId  String?
+  subject    Person?           @relation("ReviewSubject", fields: [subjectId], references: [id], onDelete: SetNull)
+  reviewerId String?
+  reviewer   Person?           @relation("ReviewReviewer", fields: [reviewerId], references: [id], onDelete: SetNull)
+  type       ReviewType
+  status     RequestStatus     @default(PENDING)
+  submission ReviewSubmission?
+  sessionId  String?
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+
+  @@unique([cycleId, subjectId, reviewerId, type])
+  @@index([status])
+  @@index([reviewerId])
+  @@index([cycleId])
+}
+
+model ReviewSubmission {
+  id          String        @id @default(uuid())
+  requestId   String        @unique
+  request     ReviewRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  answers     Json          @default("[]")
+  submittedAt DateTime      @default(now())
+  sessionId   String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model LeaveType {
+  id             String         @id @default(uuid())
+  name           String
+  description    String?
+  defaultDays    Int            @default(0)
+  color          String         @default("#1976d2")
+  sessionId      String?
+  deletedAt      DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  leaveRequests  LeaveRequest[]
+  leaveBalances  LeaveBalance[]
+
+  @@index([deletedAt])
+  @@index([sessionId])
+}
+
+model LeaveRequest {
+  id           String    @id @default(uuid())
+  personId     String
+  leaveTypeId  String
+  startDate    DateTime
+  endDate      DateTime
+  days         Int
+  note         String?
+  status       String    @default("pending") // pending, approved, rejected
+  reviewerId   String?
+  reviewNote   String?
+  reviewedAt   DateTime?
+  sessionId    String?
+  deletedAt    DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  person    Person    @relation(fields: [personId], references: [id])
+  leaveType LeaveType @relation(fields: [leaveTypeId], references: [id])
+  reviewer  Person?   @relation("LeaveReviewer", fields: [reviewerId], references: [id], onDelete: SetNull)
+
+  @@index([personId])
+  @@index([leaveTypeId])
+  @@index([status])
+  @@index([deletedAt])
+  @@index([sessionId])
+}
+
+model LeaveBalance {
+  id          String   @id @default(uuid())
+  personId    String
+  leaveTypeId String
+  year        Int
+  allocated   Int      @default(0)
+  used        Int      @default(0)
+  sessionId   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  person    Person    @relation(fields: [personId], references: [id])
+  leaveType LeaveType @relation(fields: [leaveTypeId], references: [id])
+
+  @@unique([personId, leaveTypeId, year])
+  @@index([personId])
+  @@index([sessionId])
 }
