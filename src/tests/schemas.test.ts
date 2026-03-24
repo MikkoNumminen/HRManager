@@ -779,19 +779,58 @@ describe("MAX_URL_LENGTH", () => {
 });
 
 describe("ImageUrlSchema", () => {
-  // A valid HTTPS URL should pass without errors.
-  test("accepts a valid https URL", () => {
-    expect(() => ImageUrlSchema.parse("https://example.com/avatar.png")).not.toThrow();
+  // Google OAuth avatar URLs (lh3.googleusercontent.com) must be accepted.
+  test("accepts lh3.googleusercontent.com URL", () => {
+    expect(() =>
+      ImageUrlSchema.parse("https://lh3.googleusercontent.com/a/user-photo"),
+    ).not.toThrow();
   });
 
-  // A valid HTTP URL should also be accepted.
-  test("accepts a valid http URL", () => {
-    expect(() => ImageUrlSchema.parse("http://example.com/img.jpg")).not.toThrow();
+  // GitHub OAuth avatar URLs must be accepted.
+  test("accepts avatars.githubusercontent.com URL", () => {
+    expect(() =>
+      ImageUrlSchema.parse("https://avatars.githubusercontent.com/u/12345?v=4"),
+    ).not.toThrow();
+  });
+
+  // Any subdomain of googleusercontent.com must be accepted (CDN pattern).
+  test("accepts arbitrary subdomain of googleusercontent.com", () => {
+    expect(() =>
+      ImageUrlSchema.parse("https://other-cdn.googleusercontent.com/photo.jpg"),
+    ).not.toThrow();
+  });
+
+  // Other known CDN hosts (Gravatar, Discord, Twitter, Imgur) must be accepted.
+  test("accepts gravatar.com URL", () => {
+    expect(() => ImageUrlSchema.parse("https://www.gravatar.com/avatar/abc123")).not.toThrow();
+  });
+
+  test("accepts cdn.discordapp.com URL", () => {
+    expect(() =>
+      ImageUrlSchema.parse("https://cdn.discordapp.com/avatars/123/abc.png"),
+    ).not.toThrow();
+  });
+
+  test("accepts pbs.twimg.com URL", () => {
+    expect(() =>
+      ImageUrlSchema.parse("https://pbs.twimg.com/profile_images/123/photo.jpg"),
+    ).not.toThrow();
+  });
+
+  test("accepts i.imgur.com URL", () => {
+    expect(() => ImageUrlSchema.parse("https://i.imgur.com/AbCdEf.jpg")).not.toThrow();
+  });
+
+  // An arbitrary domain not on the allowlist must be rejected with imageUrlDomainNotAllowed.
+  test("rejects https://evil.com/avatar.png with imageUrlDomainNotAllowed", () => {
+    const result = ImageUrlSchema.safeParse("https://evil.com/avatar.png");
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0]?.message).toBe("imageUrlDomainNotAllowed");
   });
 
   // Non-http/https protocols (ftp, javascript, etc.) must be rejected.
   test("rejects non-http protocol", () => {
-    const result = ImageUrlSchema.safeParse("ftp://example.com/file.png");
+    const result = ImageUrlSchema.safeParse("ftp://lh3.googleusercontent.com/file.png");
     expect(result.success).toBe(false);
     expect(result.error?.issues[0]?.message).toBe("invalidUrlProtocol");
   });
@@ -811,7 +850,7 @@ describe("ImageUrlSchema", () => {
 
   // A URL exceeding MAX_URL_LENGTH characters should fail with the urlTooLong message.
   test("rejects URL that exceeds MAX_URL_LENGTH", () => {
-    const longUrl = "https://example.com/" + "a".repeat(MAX_URL_LENGTH);
+    const longUrl = "https://lh3.googleusercontent.com/" + "a".repeat(MAX_URL_LENGTH);
     const result = ImageUrlSchema.safeParse(longUrl);
     expect(result.success).toBe(false);
     expect(result.error?.issues[0]?.message).toBe("urlTooLong");

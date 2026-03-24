@@ -227,9 +227,9 @@ describe("updateProfileImage", () => {
       data: { email: "alice@test.com", name: "Alice", role: "user" },
     });
     auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
-    await updateProfileImage(formData({ image: "https://example.com/avatar.jpg" }));
+    await updateProfileImage(formData({ image: "https://lh3.googleusercontent.com/avatar.jpg" }));
     const updated = await testPrisma.user.findUnique({ where: { id: user.id } });
-    expect(updated!.image).toBe("https://example.com/avatar.jpg");
+    expect(updated!.image).toBe("https://lh3.googleusercontent.com/avatar.jpg");
   });
 
   // Sending an empty string clears the custom image (reverts to OAuth avatar).
@@ -270,9 +270,9 @@ describe("updateProfileImage", () => {
       data: { email: "alice@test.com", name: "Alice", role: "user" },
     });
     auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
-    await updateProfileImage(formData({ image: "  https://example.com/pic.png  " }));
+    await updateProfileImage(formData({ image: "  https://lh3.googleusercontent.com/pic.png  " }));
     const updated = await testPrisma.user.findUnique({ where: { id: user.id } });
-    expect(updated!.image).toBe("https://example.com/pic.png");
+    expect(updated!.image).toBe("https://lh3.googleusercontent.com/pic.png");
   });
 
   // Only http and https URLs are allowed — no javascript: or ftp: schemes.
@@ -293,7 +293,7 @@ describe("updateProfileImage", () => {
     });
     auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
     expect(
-      await updateProfileImage(formData({ image: "ftp://example.com/pic.jpg" })),
+      await updateProfileImage(formData({ image: "ftp://lh3.googleusercontent.com/pic.jpg" })),
     ).toMatchObject({ error: expect.stringContaining("protocol") });
   });
 
@@ -314,7 +314,7 @@ describe("updateProfileImage", () => {
       data: { email: "alice@test.com", name: "Alice", role: "user" },
     });
     auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
-    const longUrl = "https://example.com/" + "a".repeat(2040);
+    const longUrl = "https://lh3.googleusercontent.com/" + "a".repeat(2016);
     expect(await updateProfileImage(formData({ image: longUrl }))).toMatchObject({
       error: expect.stringContaining("characters or less"),
     });
@@ -334,7 +334,7 @@ describe("updateProfileImage", () => {
       user: { id: "00000000-0000-0000-0000-000000000000", email: "ghost@test.com" },
     });
     expect(
-      await updateProfileImage(formData({ image: "https://example.com/pic.jpg" })),
+      await updateProfileImage(formData({ image: "https://lh3.googleusercontent.com/pic.jpg" })),
     ).toMatchObject({ error: expect.stringContaining("User not found") });
   });
 
@@ -344,9 +344,9 @@ describe("updateProfileImage", () => {
       data: { email: "alice@test.com", name: "Alice", role: "user" },
     });
     auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
-    await updateProfileImage(formData({ image: "http://example.com/pic.jpg" }));
+    await updateProfileImage(formData({ image: "http://lh3.googleusercontent.com/pic.jpg" }));
     const updated = await testPrisma.user.findUnique({ where: { id: user.id } });
-    expect(updated!.image).toBe("http://example.com/pic.jpg");
+    expect(updated!.image).toBe("http://lh3.googleusercontent.com/pic.jpg");
   });
 
   // Missing image field should clear the image (treat as empty string).

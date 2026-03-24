@@ -65,6 +65,8 @@ export async function updateProfileImage(data: FormData): Promise<ActionResult> 
           throw new ActionError("invalidUrlProtocol", t("invalidUrlProtocol"));
         if (msg === "invalidUrlFormat")
           throw new ActionError("invalidUrlFormat", t("invalidUrlFormat"));
+        if (msg === "imageUrlDomainNotAllowed")
+          throw new ActionError("imageUrlDomainNotAllowed", t("imageUrlDomainNotAllowed"));
         throw new ActionError("urlTooLong", t("urlTooLong", { max: MAX_URL_LENGTH }));
       }
     }

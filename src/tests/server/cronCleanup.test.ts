@@ -77,3 +77,10 @@ test("returns 401 when scheme is not Bearer", async () => {
   const response = await POST(makeRequest(`Basic ${VALID_SECRET}`));
   expect(response.status).toBe(401);
 });
+
+// Returns 401 when secret has correct prefix but wrong length (guards against length-based timing leak path)
+test("returns 401 when secret is a prefix of the correct secret", async () => {
+  const response = await POST(makeRequest(`Bearer ${VALID_SECRET.slice(0, -1)}`));
+  expect(response.status).toBe(401);
+  expect(mockCleanup).not.toHaveBeenCalled();
+});

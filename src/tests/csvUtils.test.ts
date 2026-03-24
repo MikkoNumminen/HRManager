@@ -157,6 +157,37 @@ describe("generateCSV", () => {
     expect(result).toBe("a,b\n,\n");
   });
 
+  // Formula injection: values starting with = are prefixed with \t to prevent spreadsheet execution
+  test("prefixes = formula with tab to prevent injection", () => {
+    const result = generateCSV(["cmd"], [["=SUM(A1)"]]);
+    // The cell value in the output must start with \t before the dangerous character
+    expect(result).toContain("\t=SUM(A1)");
+  });
+
+  // Formula injection: values starting with + are prefixed with \t
+  test("prefixes + formula with tab to prevent injection", () => {
+    const result = generateCSV(["cmd"], [["+cmd"]]);
+    expect(result).toContain("\t+cmd");
+  });
+
+  // Formula injection: values starting with - are prefixed with \t
+  test("prefixes - formula with tab to prevent injection", () => {
+    const result = generateCSV(["val"], [["-1+2"]]);
+    expect(result).toContain("\t-1+2");
+  });
+
+  // Formula injection: values starting with @ are prefixed with \t
+  test("prefixes @ formula with tab to prevent injection", () => {
+    const result = generateCSV(["val"], [["@SUM"]]);
+    expect(result).toContain("\t@SUM");
+  });
+
+  // Safe values are not modified by the injection sanitizer
+  test("does not modify safe plain text values", () => {
+    const result = generateCSV(["val"], [["normal text"]]);
+    expect(result).toBe("val\nnormal text\n");
+  });
+
   // Round-trips through parse and generate
   test("round-trips through parse → generate → parse", () => {
     const original = [

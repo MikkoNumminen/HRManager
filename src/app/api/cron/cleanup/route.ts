@@ -1,3 +1,4 @@
+import { timingSafeEqual } from "crypto";
 import { NextResponse } from "next/server";
 import { cleanupExpiredRateLimits } from "@/rateLimit";
 
@@ -10,7 +11,11 @@ export async function POST(request: Request): Promise<NextResponse> {
   }
 
   const authHeader = request.headers.get("authorization");
-  if (authHeader !== `Bearer ${secret}`) {
+  const expected = Buffer.from(`Bearer ${secret}`);
+  const actual = Buffer.from(authHeader ?? "");
+  // Length check is safe to do early — the length of "Bearer <secret>" is not itself secret.
+  // timingSafeEqual requires equal-length buffers, so reject on length mismatch first.
+  if (actual.length !== expected.length || !timingSafeEqual(actual, expected)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

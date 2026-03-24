@@ -10,6 +10,7 @@ import { getDemoSessionId } from "@/demoSession";
 import { DEMO_EMAIL } from "@/constants";
 import { getTranslations } from "next-intl/server";
 import { safe, validateUUID, type ActionResult } from "@/lib/actionUtils";
+import { requireAdminIp } from "@/lib/ipAllowlist";
 import {
   PERSON_SEEDS,
   TEAM_SEEDS,
@@ -327,6 +328,7 @@ export async function seedMockData(clearExisting: boolean = true): Promise<Actio
 }
 
 export async function initializePermissions() {
+  await requireAdminIp();
   await requirePermission("admin:manage_users");
   await rateLimit("initializePermissions");
   await seedPermissions();
@@ -335,6 +337,7 @@ export async function initializePermissions() {
 export async function updateUserRole(data: FormData): Promise<ActionResult> {
   return safe(async () => {
     const t = await getTranslations("errors");
+    await requireAdminIp();
     await requirePermission("admin:manage_users");
     await rateLimit("updateUserRole");
 
@@ -383,6 +386,7 @@ export async function updateUserRole(data: FormData): Promise<ActionResult> {
 export async function updateUserPermission(data: FormData): Promise<ActionResult> {
   return safe(async () => {
     const t = await getTranslations("errors");
+    await requireAdminIp();
     await requirePermission("admin:assign_permissions");
     await rateLimit("updateUserPermission");
 
@@ -456,6 +460,7 @@ export async function updateUserPermission(data: FormData): Promise<ActionResult
 export async function kickOutUser(data: FormData): Promise<ActionResult> {
   return safe(async () => {
     const t = await getTranslations("errors");
+    await requireAdminIp();
     await requirePermission("admin:manage_users");
     await rateLimit("kickOutUser");
 

@@ -89,6 +89,11 @@ export function parseCSV(text: string): string[][] {
  */
 export function generateCSV(headers: string[], rows: string[][]): string {
   const escapeField = (value: string): string => {
+    // Prevent CSV formula injection (OWASP): prefix dangerous leading characters with a tab
+    // so spreadsheet apps treat the cell as text rather than a formula.
+    if (/^[=+\-@\t\r]/.test(value)) {
+      value = "\t" + value;
+    }
     if (
       value.includes(",") ||
       value.includes('"') ||

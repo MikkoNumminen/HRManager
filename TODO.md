@@ -18,10 +18,6 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 > 📋 **Audit research:** All items below marked "(found by audit)" have detailed file:line references in `AUDIT_REPORT.md` and `AUDIT_RESULTS.md`. Read before starting any audit-tagged task.
 
 - 🟢⚡ CI pipeline monitoring & auto-fix — watching for failures, fixing build/lint/format issues [Claude 4, main]
-- 🟢⚡ Domain-restrict profile image URLs [Claude 1, main]
-- 🟢⚡ crypto.timingSafeEqual for CRON_SECRET [Claude 1, main]
-- 🟢⚡ CSV formula injection sanitization [Claude 1, main]
-- 🟢⚡ IP allowlisting for admin functions [Claude 1, main]
 
 ## Backlog
 
@@ -81,10 +77,6 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 - 🟡🧠 Add permission check to read queries — getPersons, getTeams, getDepartments, getReviewTemplates, getReviewCycles lack explicit auth guards
 - 🟡🧠 Seed mock user data not env-gated — seedMockData() seeds admin@example.com etc. into global User table without NODE_ENV check (features/admin/actions.ts)
 - 🟡⚡ MongoDB audit log regex injection — userEmail passed directly to $regex without escaping; allows wildcard enumeration (features/audit/queries.ts:26)
-- 🟢⚡ Domain-restrict profile image URLs — updateProfileImage accepts any HTTPS URL; restrict to known CDNs or an allowlist (features/profile/actions.ts)
-- 🟢⚡ Use crypto.timingSafeEqual for CRON_SECRET — timing attack on /api/cron/cleanup; replace === with timingSafeEqual
-- 🟢⚡ CSV formula injection sanitization — strip/quote-escape leading =, +, -, @ in imported CSV cells (features/data/actions.ts)
-- 🟢⚡ IP allowlisting for admin functions — restrict superuser/admin actions to configured IP ranges; log IP-based access events
 
 ### DevOps & Infrastructure
 

@@ -90,6 +90,8 @@ export type ErrorCode =
   | "answerRequired"
   // Generic
   | "invalidId"
+  // IP allowlist
+  | "ipNotAllowed"
   // System-level (not in errors namespace — detected/attached by safe())
   | "permissionDenied"
   | "rateLimited"
