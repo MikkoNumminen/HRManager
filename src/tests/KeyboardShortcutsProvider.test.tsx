@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, act } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import KeyboardShortcutsProvider, {
   useKeyboardShortcuts,
 } from "../components/KeyboardShortcutsProvider";
@@ -58,10 +58,10 @@ describe("KeyboardShortcutsProvider", () => {
   test('"/" focuses the search input', () => {
     renderWithProvider();
     const searchInput = screen.getByTestId("search");
-    expect(document.activeElement).not.toBe(searchInput);
+    expect(searchInput).not.toHaveFocus();
 
     fireEvent.keyDown(document, { key: "/" });
-    expect(document.activeElement).toBe(searchInput);
+    expect(searchInput).toHaveFocus();
   });
 
   // "g then d" navigates to dashboard.

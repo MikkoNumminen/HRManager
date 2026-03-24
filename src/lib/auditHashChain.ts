@@ -85,8 +85,6 @@ export async function verifyChain(sessionId: string | null): Promise<Verificatio
   const docs = await col.find({ sessionId }).sort({ createdAt: 1, _id: 1 }).toArray();
 
   const entries = docs as Array<WithId<AuditLogDocument & { prevHash?: string; hash?: string }>>;
-  let prevHash: string | null = null;
-
   for (let i = 0; i < entries.length; i++) {
     const entry = entries[i];
 
@@ -120,8 +118,6 @@ export async function verifyChain(sessionId: string | null): Promise<Verificatio
         },
       };
     }
-
-    prevHash = entry.hash;
   }
 
   return {

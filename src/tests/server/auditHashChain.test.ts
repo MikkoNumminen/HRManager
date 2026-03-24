@@ -122,7 +122,7 @@ describe("getLatestHash", () => {
   // Returns the hash of the most recent entry.
   test("returns hash of the most recent entry", async () => {
     await insertHashedEntry({ action: "create" });
-    const secondId = await insertHashedEntry({ action: "update" });
+    await insertHashedEntry({ action: "update" });
 
     const latest = await getLatestHash(null);
     expect(latest).toBeDefined();

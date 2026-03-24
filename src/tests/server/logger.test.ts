@@ -24,7 +24,6 @@ describe("Structured logger (Pino)", () => {
 
   // Logger outputs JSON with level field.
   test("logger outputs structured JSON with level", () => {
-    const chunks: string[] = [];
     const dest = logger.child({}, { level: "info" });
     // Pino child loggers inherit the destination — we just verify the shape
     expect(dest).toBeDefined();
