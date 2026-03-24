@@ -18,7 +18,8 @@
     "goBack": "Повернутися назад",
     "unknown": "невідомо",
     "noEmail": "Немає електронної пошти",
-    "dash": "-"
+    "dash": "-",
+    "searchPlaceholder": "Пошук…"
   },
   "topBar": {
     "userManagement": "Керування користувачами",

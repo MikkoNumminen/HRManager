@@ -18,7 +18,8 @@
     "goBack": "Retour",
     "unknown": "inconnu",
     "noEmail": "Pas d'e-mail",
-    "dash": "-"
+    "dash": "-",
+    "searchPlaceholder": "Rechercher…"
   },
   "topBar": {
     "userManagement": "Gestion des utilisateurs",

@@ -18,7 +18,8 @@
     "goBack": "返回",
     "unknown": "未知",
     "noEmail": "无邮箱",
-    "dash": "-"
+    "dash": "-",
+    "searchPlaceholder": "搜索…"
   },
   "topBar": {
     "userManagement": "用户管理",

@@ -18,7 +18,8 @@
     "goBack": "Rudi nyuma",
     "unknown": "haijulikani",
     "noEmail": "Hakuna barua pepe",
-    "dash": "-"
+    "dash": "-",
+    "searchPlaceholder": "Tafuta…"
   },
   "topBar": {
     "userManagement": "Usimamizi wa watumiaji",

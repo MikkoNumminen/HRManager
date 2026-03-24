@@ -18,7 +18,8 @@
     "goBack": "Takaisin",
     "unknown": "tuntematon",
     "noEmail": "Ei sähköpostia",
-    "dash": "-"
+    "dash": "-",
+    "searchPlaceholder": "Hae…"
   },
   "topBar": {
     "userManagement": "Käyttäjähallinta",

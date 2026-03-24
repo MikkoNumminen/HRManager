@@ -18,7 +18,8 @@
     "goBack": "ย้อนกลับ",
     "unknown": "ไม่ทราบ",
     "noEmail": "ไม่มีอีเมล",
-    "dash": "-"
+    "dash": "-",
+    "searchPlaceholder": "ค้นหา…"
   },
   "topBar": {
     "userManagement": "จัดการผู้ใช้",

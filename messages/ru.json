@@ -18,7 +18,8 @@
     "goBack": "Назад",
     "unknown": "неизвестно",
     "noEmail": "Нет эл. почты",
-    "dash": "-"
+    "dash": "-",
+    "searchPlaceholder": "Поиск…"
   },
   "topBar": {
     "userManagement": "Управление пользователями",

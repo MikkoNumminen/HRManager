@@ -18,7 +18,8 @@
     "goBack": "Gå tillbaka",
     "unknown": "okänd",
     "noEmail": "Ingen e-post",
-    "dash": "-"
+    "dash": "-",
+    "searchPlaceholder": "Sök…"
   },
   "topBar": {
     "userManagement": "Användarhantering",

@@ -1,11 +1,12 @@
 "use client";
 
-import { useOptimistic } from "react";
+import { useOptimistic, useState, useMemo } from "react";
 import { Person } from "@/schemas";
 import { Box, Typography } from "@mui/material";
 import { pageContainerStyles } from "@/muiStyles";
 import AddPersonForm from "./AddPeople";
 import PersonTable from "./EditablePersonsTable";
+import SearchBar from "./SearchBar";
 import { useTranslations } from "next-intl";
 
 interface OptimisticPersonsProps {
@@ -17,11 +18,23 @@ type OptimisticAction = { type: "add"; person: Person };
 
 export default function OptimisticPersons({ persons, canCreate }: OptimisticPersonsProps) {
   const t = useTranslations("persons");
+  const [search, setSearch] = useState("");
 
   const [optimisticPersons, addOptimistic] = useOptimistic<Person[], OptimisticAction>(
     persons,
     (state, action) => (action.type === "add" ? [...state, action.person] : state),
   );
+
+  const filteredPersons = useMemo(() => {
+    const q = search.toLowerCase().trim();
+    if (!q) return optimisticPersons;
+    return optimisticPersons.filter(
+      (p) =>
+        p.name.toLowerCase().includes(q) ||
+        (p.email && p.email.toLowerCase().includes(q)) ||
+        (p.position && p.position.toLowerCase().includes(q)),
+    );
+  }, [optimisticPersons, search]);
 
   const handleOptimisticAdd = (name: string, email: string) => {
     const now = new Date();
@@ -45,7 +58,8 @@ export default function OptimisticPersons({ persons, canCreate }: OptimisticPers
         <Typography variant="h6" mb={1}>
           {t("heading")}
         </Typography>
-        <PersonTable persons={optimisticPersons} canCreate={canCreate} />
+        <SearchBar value={search} onChange={setSearch} />
+        <PersonTable persons={filteredPersons} canCreate={canCreate} />
       </Box>
     </>
   );

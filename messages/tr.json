@@ -18,7 +18,8 @@
     "goBack": "Geri dön",
     "unknown": "bilinmiyor",
     "noEmail": "E-posta yok",
-    "dash": "-"
+    "dash": "-",
+    "searchPlaceholder": "Ara…"
   },
   "topBar": {
     "userManagement": "Kullanıcı yönetimi",

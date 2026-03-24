@@ -18,7 +18,8 @@
     "goBack": "वापस जाएँ",
     "unknown": "अज्ञात",
     "noEmail": "कोई ईमेल नहीं",
-    "dash": "-"
+    "dash": "-",
+    "searchPlaceholder": "खोजें…"
   },
   "topBar": {
     "userManagement": "उपयोगकर्ता प्रबंधन",

@@ -18,7 +18,8 @@
     "goBack": "العودة",
     "unknown": "غير معروف",
     "noEmail": "لا يوجد بريد إلكتروني",
-    "dash": "-"
+    "dash": "-",
+    "searchPlaceholder": "بحث…"
   },
   "topBar": {
     "userManagement": "إدارة المستخدمين",
@@ -43,7 +44,8 @@
     "profile": "الملف الشخصي",
     "dataImportExport": "استيراد/تصدير البيانات",
     "performanceReviews": "تقييمات الأداء",
-    "leaveManagement": "إدارة الإجازات"
+    "leaveManagement": "إدارة الإجازات",
+    "positionCatalog": "كتالوج الوظائف"
   },
   "home": {
     "title": "نظام إدارة الموارد البشرية",
@@ -483,6 +485,8 @@
     "invalidQuestionType": "نوع السؤال غير صالح",
     "ratingOutOfRange": "قيمة التقييم خارج النطاق المسموح به",
     "answerRequired": "هذا السؤال يتطلب إجابة",
+    "positionAlreadyExists": "توجد وظيفة بهذا الاسم بالفعل",
+    "positionNotFound": "الوظيفة غير موجودة",
     "leaveTypeAlreadyExists": "يوجد نوع إجازة بهذا الاسم بالفعل",
     "leaveTypeNotFound": "نوع الإجازة غير موجود",
     "leaveTypeRequired": "نوع الإجازة مطلوب",
@@ -650,5 +654,22 @@
     "requestAdded": "تمت إضافة طلب التقييم",
     "requestRemoved": "تمت إزالة طلب التقييم",
     "reviewSubmitted": "تم تقديم التقييم بنجاح"
+  },
+  "positions": {
+    "title": "كتالوج الوظائف",
+    "heading": "كتالوج الوظائف",
+    "description": "إدارة القائمة الرسمية للوظائف المستخدمة في جميع أنحاء المنظمة.",
+    "addPosition": "إضافة وظيفة",
+    "deletePosition": "حذف وظيفة",
+    "deletePositionConfirm": "حذف هذه الوظيفة من الكتالوج؟",
+    "positionName": "اسم الوظيفة",
+    "enterPositionName": "أدخل اسم الوظيفة",
+    "noPositions": "لا توجد وظائف في الكتالوج بعد.",
+    "noPositionsHint": "أضف وظائف لتوحيد المسميات الوظيفية في جميع أنحاء المنظمة.",
+    "positionCount": "{count, plural, =0 {لا توجد وظائف} one {وظيفة واحدة} two {وظيفتان} few {# وظائف} many {# وظيفة} other {# وظيفة}}"
+  },
+  "positionNotifications": {
+    "positionCreated": "تمت إضافة الوظيفة إلى الكتالوج",
+    "positionDeleted": "تمت إزالة الوظيفة من الكتالوج"
   }
 }

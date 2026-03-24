@@ -18,7 +18,8 @@
     "goBack": "Go back",
     "unknown": "unknown",
     "noEmail": "No email",
-    "dash": "-"
+    "dash": "-",
+    "searchPlaceholder": "Search…"
   },
   "topBar": {
     "userManagement": "User Management",
@@ -43,7 +44,8 @@
     "menu": "Menu",
     "dataImportExport": "Data Import / Export",
     "performanceReviews": "Performance Reviews",
-    "leaveManagement": "Leave Management"
+    "leaveManagement": "Leave Management",
+    "positionCatalog": "Position Catalog"
   },
   "home": {
     "title": "Human Resources Management System",
@@ -445,6 +447,8 @@
     "invalidQuestionType": "Invalid question type",
     "ratingOutOfRange": "Rating value is out of range",
     "answerRequired": "This question requires an answer",
+    "positionAlreadyExists": "A position with this name already exists",
+    "positionNotFound": "Position not found",
     "leaveTypeAlreadyExists": "A leave type with this name already exists",
     "leaveTypeNotFound": "Leave type not found",
     "leaveTypeRequired": "Leave type is required",
@@ -650,5 +654,22 @@
     "requestAdded": "Review request added",
     "requestRemoved": "Review request removed",
     "reviewSubmitted": "Review submitted successfully"
+  },
+  "positions": {
+    "title": "Position Catalog",
+    "heading": "Position Catalog",
+    "description": "Manage the official list of positions used across the organization.",
+    "addPosition": "Add Position",
+    "deletePosition": "Delete Position",
+    "deletePositionConfirm": "Delete this position from the catalog?",
+    "positionName": "Position Name",
+    "enterPositionName": "Enter position name",
+    "noPositions": "No positions in the catalog yet.",
+    "noPositionsHint": "Add positions to standardize job titles across the organization.",
+    "positionCount": "{count, plural, =0 {No positions} one {1 position} other {# positions}}"
+  },
+  "positionNotifications": {
+    "positionCreated": "Position added to catalog",
+    "positionDeleted": "Position removed from catalog"
   }
 }

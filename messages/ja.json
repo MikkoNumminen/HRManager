@@ -18,7 +18,8 @@
     "goBack": "戻る",
     "unknown": "不明",
     "noEmail": "メールなし",
-    "dash": "-"
+    "dash": "-",
+    "searchPlaceholder": "検索…"
   },
   "topBar": {
     "userManagement": "ユーザー管理",
