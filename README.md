@@ -110,13 +110,15 @@ graph LR
 
 - **Accessibility (WCAG)** — Semantic landmarks, skip-to-content, ARIA labels, `role="alert"` on errors (screen readers announce immediately), keyboard-navigable tables, and info tooltips with `cursor: "help"`. _Built into every component from the start, not bolted on afterward._
 
+- **Loading skeletons on every page (Suspense boundaries)** — Every route has a `loading.tsx` that renders a pixel-matched MUI Skeleton layout while the async server component fetches data. Next.js automatically wraps these in `<Suspense>` — the shell is streamed instantly and the real content replaces it once ready. _Why skeletons instead of spinners? Spinners tell you "loading"; skeletons show you where the content will land, reducing perceived latency._
+
 ### 📦 Data operations
 
 - **CSV import/export** — Drag-and-drop CSV upload with client-side validation preview and RFC 4180 parsing (the official CSV standard). Export persons, teams, departments, and audit logs. Custom CSV parser with zero external dependencies. _Why no library? Full control over error handling, smaller bundle, and no third-party code in the data pipeline._
 
 ### 🧪 Quality
 
-- **1322 tests, 99.9% line coverage** — Unit tests, integration tests against real PostgreSQL + in-memory MongoDB (no database mocks), and 34 Playwright E2E tests covering full user flows. _Why real databases in tests? Mocked tests can pass while production breaks. If your test doesn't hit a real database, it's not testing what you think it's testing._
+- **1401 tests, 99.9% line coverage** — Unit tests, integration tests against real PostgreSQL + in-memory MongoDB (no database mocks), and 75 Playwright E2E tests covering full user flows. _Why real databases in tests? Mocked tests can pass while production breaks. If your test doesn't hit a real database, it's not testing what you think it's testing._
 
 - **Docker-ready** — `docker compose up` starts PostgreSQL + MongoDB + the app. Migrations run automatically, demo login works out of the box. _One command, zero setup, fully working._
 
@@ -192,26 +194,26 @@ graph LR
 
 ## Testing
 
-| Layer            | Tests    | What it covers                                                             |
-| ---------------- | -------- | -------------------------------------------------------------------------- |
-| UI components    | 663      | All 48 components: charts, forms, permission toggles, mobile views, themes |
-| Server actions   | 186      | Every mutation: happy path, errors, permission denials, cascades           |
-| Zod schemas      | 94       | Validation rules, edge cases, type inference                               |
-| Prisma queries   | 60       | Real PostgreSQL + MongoDB queries — not mocks                              |
-| CSV utils        | 39       | RFC 4180 parsing, import validation, export formatting                     |
-| Style tokens     | 37       | Responsive breakpoints, theme tokens, component styles                     |
-| Auth callbacks   | 32       | JWT enrichment, permission freshness, superuser bootstrap                  |
-| RBAC logic       | 28       | Resolution, overrides, deny-wins, superuser bypass                         |
-| Tutorial config  | 26       | Tour steps, DOM selectors, completion detection                            |
-| CSP proxy        | 20       | Nonce generation, header injection, domain allowlists                      |
-| Rate limiting    | 18       | Sliding window, race conditions, cleanup                                   |
-| i18n             | 14       | Locale loading, cookie persistence, Accept-Language detection              |
-| Demo session     | 12       | Sandbox creation, isolation, cleanup, expiry                               |
-| Theme config     | 12       | All 6 themes, CSS variables, FOUC prevention                               |
-| Audit logging    | 11       | Deferred writes, before/after snapshots, security events                   |
-| Auth route       | 5        | Rate limiting on auth endpoints, CSRF, GET passthrough                     |
-| E2E (Playwright) | 34       | Full user flows: auth, CRUD, admin access, guest limits, themes            |
-| **Total**        | **1306** | **97.8% line coverage · 95.4% function coverage**                          |
+| Layer            | Tests    | What it covers                                                                           |
+| ---------------- | -------- | ---------------------------------------------------------------------------------------- |
+| UI components    | 663      | All 48 components: charts, forms, permission toggles, mobile views, themes               |
+| Server actions   | 186      | Every mutation: happy path, errors, permission denials, cascades                         |
+| Zod schemas      | 94       | Validation rules, edge cases, type inference                                             |
+| Prisma queries   | 60       | Real PostgreSQL + MongoDB queries — not mocks                                            |
+| CSV utils        | 39       | RFC 4180 parsing, import validation, export formatting                                   |
+| Style tokens     | 37       | Responsive breakpoints, theme tokens, component styles                                   |
+| Auth callbacks   | 32       | JWT enrichment, permission freshness, superuser bootstrap                                |
+| RBAC logic       | 28       | Resolution, overrides, deny-wins, superuser bypass                                       |
+| Tutorial config  | 26       | Tour steps, DOM selectors, completion detection                                          |
+| CSP proxy        | 20       | Nonce generation, header injection, domain allowlists                                    |
+| Rate limiting    | 18       | Sliding window, race conditions, cleanup                                                 |
+| i18n             | 14       | Locale loading, cookie persistence, Accept-Language detection                            |
+| Demo session     | 12       | Sandbox creation, isolation, cleanup, expiry                                             |
+| Theme config     | 12       | All 6 themes, CSS variables, FOUC prevention                                             |
+| Audit logging    | 11       | Deferred writes, before/after snapshots, security events                                 |
+| Auth route       | 5        | Rate limiting on auth endpoints, CSRF, GET passthrough                                   |
+| E2E (Playwright) | 75       | Auth, CRUD, detail editing, dashboard, profile, data I/O, form validation, full workflow |
+| **Total**        | **1347** | **97.8% line coverage · 95.4% function coverage**                                        |
 
 ```
 Statements : 97.58%    Branches : 92.90%
