@@ -6,6 +6,27 @@ import { prisma } from "@/db";
 import { resolvePermissions } from "@/permissions";
 import { seedDemoData, cleanupStaleDemoSessions } from "@/demoSession";
 import { DEMO_EMAIL } from "@/constants";
+import { MAX_CONCURRENT_SESSIONS } from "@/schemas";
+import { headers } from "next/headers";
+
+/**
+ * Extract client IP and user agent from request headers for session tracking.
+ * Returns nulls when headers() is not available (e.g. during build).
+ */
+async function getRequestMeta(): Promise<{ ipAddress: string | null; userAgent: string | null }> {
+  try {
+    const headersList = await headers();
+    const ipAddress =
+      headersList.get("x-vercel-forwarded-for")?.split(",")[0]?.trim() ??
+      headersList.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+      headersList.get("x-real-ip") ??
+      null;
+    const userAgent = headersList.get("user-agent") ?? null;
+    return { ipAddress, userAgent };
+  } catch {
+    return { ipAddress: null, userAgent: null };
+  }
+}
 
 // Demo login is enabled by default so the demo works out of the box.
 // Set NEXT_PUBLIC_DEMO_LOGIN=false to disable the zero-credential demo provider.
@@ -101,6 +122,66 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.demoSessionId = user.demoSessionId;
       }
 
+      // --- Session tracking: create a new UserSession on sign-in ---
+      if (trigger === "signIn") {
+        const dbUser = await prisma.user.findUnique({
+          where: { email: token.email },
+          select: { id: true },
+        });
+        if (dbUser) {
+          const { ipAddress, userAgent } = await getRequestMeta();
+          const newSession = await prisma.userSession.create({
+            data: {
+              userId: dbUser.id,
+              ipAddress,
+              userAgent,
+            },
+          });
+          token.sessionId = newSession.id;
+
+          // Enforce concurrent session limit: deactivate oldest sessions beyond the limit
+          const activeSessions = await prisma.userSession.findMany({
+            where: { userId: dbUser.id, active: true },
+            orderBy: { lastActiveAt: "desc" },
+            select: { id: true },
+          });
+          if (activeSessions.length > MAX_CONCURRENT_SESSIONS) {
+            const toDeactivate = activeSessions.slice(MAX_CONCURRENT_SESSIONS).map((s) => s.id);
+            await prisma.userSession.updateMany({
+              where: { id: { in: toDeactivate } },
+              data: { active: false },
+            });
+          }
+        }
+      }
+
+      // --- Session validity check: if sessionId exists, verify it's still active ---
+      if (token.sessionId && trigger !== "signIn") {
+        const sessionRecord = await prisma.userSession.findUnique({
+          where: { id: token.sessionId as string },
+          select: { active: true },
+        });
+        if (!sessionRecord || !sessionRecord.active) {
+          // Session was deactivated (force logout or concurrent limit exceeded)
+          // Clear the token to force re-authentication
+          return {} as typeof token;
+        }
+        // Update lastActiveAt (at most once per 60 seconds to avoid DB write storms)
+        const now = Date.now();
+        const lastUpdate = token.sessionLastUpdate as number | undefined;
+        if (!lastUpdate || now - lastUpdate > 60_000) {
+          await prisma.userSession
+            .update({
+              where: { id: token.sessionId as string },
+              data: { lastActiveAt: new Date() },
+            })
+            .catch(() => {
+              // Non-critical — don't fail the request if lastActiveAt update fails
+            });
+          token.sessionLastUpdate = now;
+        }
+      }
+
       const needsFullRefresh =
         trigger === "signIn" || !token.role || typeof token.permissionsVersion !== "number";
 
@@ -187,6 +268,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (token.permissions)
         session.user.permissions = token.permissions as Record<string, boolean>;
       if (token.demoSessionId) session.user.demoSessionId = token.demoSessionId as string;
+      if (token.sessionId) session.user.sessionId = token.sessionId as string;
       return session;
     },
   },

@@ -163,6 +163,9 @@ export const AuditActionSchema = z.enum([
   "approve",
   "reject",
   "ip_blocked",
+  "session_login",
+  "session_force_logout",
+  "session_concurrent_exceeded",
 ]);
 
 export const AuditEntityTypeSchema = z.enum([
@@ -182,6 +185,7 @@ export const AuditEntityTypeSchema = z.enum([
   "leaveRequest",
   "leaveBalance",
   "position",
+  "userSession",
 ]);
 
 export const AuditLogSchema = z.object({
@@ -485,3 +489,17 @@ export const TeamReviewCycleSchema = z.object({
 });
 
 export type TeamReviewCycle = z.infer<typeof TeamReviewCycleSchema>;
+
+export const MAX_CONCURRENT_SESSIONS = 5;
+
+export const UserSessionSchema = z.object({
+  id: z.string().uuid(),
+  userId: z.string().uuid(),
+  userAgent: z.string().nullable(),
+  ipAddress: z.string().nullable(),
+  active: z.boolean(),
+  lastActiveAt: z.date(),
+  createdAt: z.date(),
+});
+
+export type UserSession = z.infer<typeof UserSessionSchema>;

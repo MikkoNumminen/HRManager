@@ -39,3 +39,4 @@ export {
   getReviewRequestWithTemplate,
   getManagerTeamReviews,
 } from "./features/reviews/queries";
+export { getMyActiveSessions, getUserActiveSessions } from "./features/sessions/queries";

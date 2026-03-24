@@ -14,6 +14,7 @@ declare module "next-auth" {
       role?: string;
       permissions?: Record<string, boolean>;
       demoSessionId?: string;
+      sessionId?: string;
     };
   }
 }
@@ -24,5 +25,7 @@ declare module "next-auth/jwt" {
     permissions?: Record<string, boolean>;
     userId?: string;
     demoSessionId?: string;
+    sessionId?: string;
+    sessionLastUpdate?: number;
   }
 }

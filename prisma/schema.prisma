@@ -90,6 +90,7 @@ model User {
   updatedAt          DateTime         @updatedAt
   permissions        UserPermission[]
   demoSessions       DemoSession[]
+  sessions           UserSession[]
 }
 
 model Permission {
@@ -134,6 +135,21 @@ model DemoSession {
   lastActiveAt DateTime @default(now())
 
   @@index([userId])
+  @@index([lastActiveAt])
+}
+
+model UserSession {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userAgent    String?
+  ipAddress    String?
+  active       Boolean  @default(true)
+  lastActiveAt DateTime @default(now())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([userId, active])
   @@index([lastActiveAt])
 }
 

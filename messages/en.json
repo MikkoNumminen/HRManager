@@ -301,7 +301,11 @@
     "permViewLeave": "view leave requests and balances",
     "permRequestLeave": "submit leave requests",
     "permApproveLeave": "approve or reject leave requests",
-    "permManageLeaveTypes": "manage leave types"
+    "permManageLeaveTypes": "manage leave types",
+    "typeUserSession": "User Session",
+    "actionSessionLogin": "Session Login",
+    "actionSessionForceLogout": "Session Force Logout",
+    "actionSessionConcurrentExceeded": "Concurrent Limit Exceeded"
   },
   "profile": {
     "title": "Profile",
@@ -349,7 +353,10 @@
     "userKickedOut": "{name} has been kicked out",
     "profileNameUpdated": "Display name updated successfully",
     "profileImageUpdated": "Profile picture updated successfully",
-    "dataImported": "{count, plural, one {# person imported successfully} other {# persons imported successfully}}"
+    "dataImported": "{count, plural, one {# person imported successfully} other {# persons imported successfully}}",
+    "otherSessionsSignedOut": "All other sessions have been signed out",
+    "sessionForceLoggedOut": "Session force-logged out",
+    "allSessionsForceLoggedOut": "All sessions for {name} have been force-logged out"
   },
   "dataIO": {
     "title": "Data Import / Export",
@@ -464,7 +471,9 @@
     "cannotDeleteNonPendingRequest": "Only pending leave requests can be cancelled",
     "noteTooLong": "Note must be {max} characters or less",
     "invalidId": "Invalid ID",
-    "invalidYear": "Invalid year"
+    "invalidYear": "Invalid year",
+    "sessionNotFound": "Session not found",
+    "sessionAlreadyInactive": "Session is already inactive"
   },
   "tutorial": {
     "checklistTitle": "Demo Tour",
@@ -718,6 +727,19 @@
     "memberCount": "{count, plural, one {# member} other {# members}}",
     "departmentAssignment": "Department assignment (will be unlinked)",
     "assignedTeams": "{count, plural, =0 {} one {# team assigned (will be unlinked)} other {# teams assigned (will be unlinked)}}"
+  },
+  "sessions": {
+    "title": "Active Sessions",
+    "description": "Devices where you are currently signed in. You can sign out all other sessions to secure your account.",
+    "signOutOthers": "Sign Out Others",
+    "currentSession": "This device",
+    "noSessions": "No active sessions",
+    "unknownIp": "Unknown IP",
+    "lastActive": "Last active: {time}",
+    "adminTitle": "Active Sessions",
+    "forceLogout": "Force Logout",
+    "forceLogoutAll": "Force Logout All",
+    "noActiveSessions": "No active sessions for this user"
   },
   "signIn": {
     "subtitle": "Human Resource Management",

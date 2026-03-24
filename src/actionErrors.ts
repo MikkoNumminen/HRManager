@@ -89,6 +89,10 @@ export type ErrorCode =
   | "invalidQuestionType"
   | "ratingOutOfRange"
   | "answerRequired"
+  // Session management
+  | "sessionNotFound"
+  | "sessionAlreadyInactive"
+  | "cannotDeactivateOwnSession"
   // Generic
   | "invalidId"
   // IP allowlist
