@@ -23,7 +23,7 @@ describe("EmptyState", () => {
 
   // Subtitle is omitted when not provided.
   test("does not render subtitle when omitted", () => {
-    const { queryByText } = render(<EmptyState icon={PeopleOutlined} title="No items" />);
-    expect(queryByText(/form above/i)).not.toBeInTheDocument();
+    render(<EmptyState icon={PeopleOutlined} title="No items" />);
+    expect(screen.queryByText(/form above/i)).not.toBeInTheDocument();
   });
 });
