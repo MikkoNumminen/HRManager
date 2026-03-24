@@ -1,4 +1,3 @@
-"use server";
 import { RateLimitError } from "@/rateLimit";
 import { ActionError, type ErrorCode } from "@/actionErrors";
 import { getTranslations } from "next-intl/server";

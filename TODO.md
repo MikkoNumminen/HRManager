@@ -18,7 +18,7 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 > 📋 **Audit research:** All items below marked "(found by audit)" have detailed file:line references in `AUDIT_REPORT.md`. Read it before starting any of these tasks.
 
 - 🟢⚡ CI pipeline monitoring & auto-fix — watching for failures, fixing build/lint/format issues [Claude 4, main]
-- 🔴🧠 Split `serverActions.ts` into domain modules — barrel re-export for backward compat [Claude 3, split-server-actions]
+- 🔴🧠 Reorganise into `src/features/<domain>/` — move serverActions/\* + split queries.ts into co-located actions/queries per domain; barrel re-exports for compat [Claude 1, main]
 
 ## Backlog
 
@@ -32,17 +32,14 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 
 ### Code Quality / Architecture (found by audit)
 
-- 🔴🧠 Split `serverActions.ts` into domain modules — god file at 2,861 lines; split into serverActions.person/team/dept/admin/leave/reviews/data/positions.ts
 - 🟡🧠 Split `queries.ts` into domain modules — 1,073 lines; same domain split pattern as serverActions
 - 🟡🧠 Implement permission middleware for queries — inconsistent auth guards across query functions; some check permissions, others rely on caller
 - 🟡🧠 Consolidate duplicate seed data — demoSession.ts (9 persons) and serverActions.ts (6 persons) diverged; extract shared seed definitions to seedData.ts
-- 🟢⚡ Extract `DEMO_EMAIL` constant — serverActions/admin.ts:488 still has hardcoded string (needs update after serverActions split lands)
 
 ### Testing (found by audit)
 
-- 🟡🧠 Add tests for MyReviewsClient component — no direct tests; only covered indirectly
-- 🟢⚡ Fix test file naming inconsistencies — PersonCheckBoxList.test.tsx → PersonCheckboxList, PersonTable → PersonsTable, RemovePeople → RemovePerson
-- 🟢⚡ Add permission-denied path tests for queries — hasPermission always mocked to true in queries.test.ts; denial branch never exercised
+- 🟢⚡ Fix test file naming inconsistencies — PersonCheckBoxList.test.tsx → PersonCheckboxList, PersonTable → PersonsTable, RemovePeople → RemovePerson [Claude 3, main]
+- 🟢⚡ Add permission-denied path tests for queries — hasPermission always mocked to true in queries.test.ts; denial branch never exercised [Claude 3, main]
 
 ### Accessibility (WCAG)
 
