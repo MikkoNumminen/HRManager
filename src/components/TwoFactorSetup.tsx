@@ -24,7 +24,7 @@ import {
   disableTwoFactor,
   regenerateRecoveryCodes,
   type TwoFactorSetupResult,
-} from "@/serverActions";
+} from "@/features/twoFactor/actions";
 import {
   colors,
   formStyles,

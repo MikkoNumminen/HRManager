@@ -3,7 +3,7 @@ import TeamReviewsDashboardClient from "@/components/TeamReviewsDashboardClient"
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getUserPermissions } from "@/permissions";
-import { getManagerTeamReviews } from "@/queries";
+import { getManagerTeamReviews } from "@/features/reviews/queries";
 import { prisma } from "@/db";
 import { getDemoSessionId } from "@/demoSession";
 import { getTranslations } from "next-intl/server";

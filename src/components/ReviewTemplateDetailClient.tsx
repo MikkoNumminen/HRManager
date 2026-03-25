@@ -29,7 +29,7 @@ import {
   smallButtonStyles,
 } from "@/muiStyles";
 import { ReviewTemplate } from "@/schemas";
-import { addReviewQuestion, removeReviewQuestion } from "@/serverActions";
+import { addReviewQuestion, removeReviewQuestion } from "@/features/reviews/actions";
 import { useSnackbar } from "./SnackbarProvider";
 import ConfirmDialog from "./ConfirmDialog";
 import { useTranslations } from "next-intl";

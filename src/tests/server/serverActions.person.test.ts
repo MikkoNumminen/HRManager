@@ -66,7 +66,7 @@ import {
   updatePosition,
   updateEmail,
   updatePersonName,
-} from "@/serverActions";
+} from "@/features/persons/actions";
 
 // Helper to build FormData — server actions receive form submissions,
 // so we simulate that by packing key-value pairs into a FormData object.

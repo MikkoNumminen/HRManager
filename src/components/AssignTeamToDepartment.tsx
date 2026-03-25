@@ -1,6 +1,6 @@
 "use client";
 
-import { assignTeamToDepartment } from "@/serverActions";
+import { assignTeamToDepartment } from "@/features/departments/actions";
 import {
   activeButtonStyles,
   formButtonContainerStyles,

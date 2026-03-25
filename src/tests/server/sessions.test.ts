@@ -58,8 +58,8 @@ import {
   signOutOtherSessions,
   adminForceLogoutSession,
   adminForceLogoutAllSessions,
-} from "@/serverActions";
-import { getMyActiveSessions, getUserActiveSessions } from "@/queries";
+} from "@/features/sessions/actions";
+import { getMyActiveSessions, getUserActiveSessions } from "@/features/sessions/queries";
 import { MAX_CONCURRENT_SESSIONS } from "@/schemas";
 
 const { auth } = require("@/auth");

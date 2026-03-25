@@ -7,7 +7,7 @@ import {
   smallButtonStyles,
   textFieldStyles,
 } from "@/muiStyles";
-import { updateTeamName } from "@/serverActions";
+import { updateTeamName } from "@/features/teams/actions";
 import { Box, Button, TextField, Tooltip, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useActionState, useState } from "react";

@@ -1,6 +1,6 @@
 "use client";
 
-import { updateProfileName, updateProfileImage } from "@/serverActions";
+import { updateProfileName, updateProfileImage } from "@/features/profile/actions";
 import {
   colors,
   formStyles,

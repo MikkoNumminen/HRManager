@@ -1,6 +1,6 @@
 import TopBar from "@/components/TopBar";
 import ReviewTemplatesClient from "@/components/ReviewTemplatesClient";
-import { getReviewTemplates } from "@/queries";
+import { getReviewTemplates } from "@/features/reviews/queries";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getUserPermissions } from "@/permissions";

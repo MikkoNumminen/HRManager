@@ -54,7 +54,8 @@ jest.mock("next/navigation", () => ({
   redirect: jest.fn(),
 }));
 
-import { createPositionEntry, deletePositionEntry, updatePosition } from "@/serverActions";
+import { createPositionEntry, deletePositionEntry } from "@/features/positions/actions";
+import { updatePosition } from "@/features/persons/actions";
 
 // Helper to build FormData from key-value pairs.
 function formData(entries: Record<string, string>): FormData {

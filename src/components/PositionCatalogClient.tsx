@@ -30,7 +30,7 @@ import {
 import { useSnackbar } from "./SnackbarProvider";
 import { useTranslations } from "next-intl";
 import type { Position, Permissions } from "@/schemas";
-import { createPositionEntry, deletePositionEntry } from "@/serverActions";
+import { createPositionEntry, deletePositionEntry } from "@/features/positions/actions";
 
 interface Props {
   positions: Position[];

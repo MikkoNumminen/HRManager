@@ -11,7 +11,7 @@ import {
   smallButtonStyles,
 } from "@/muiStyles";
 import { ReviewRequest, ReviewTemplate } from "@/schemas";
-import { submitReview } from "@/serverActions";
+import { submitReview } from "@/features/reviews/actions";
 import { useSnackbar } from "./SnackbarProvider";
 import ConfirmDialog from "./ConfirmDialog";
 import { useTranslations } from "next-intl";

@@ -26,7 +26,7 @@ import {
   smallButtonStyles,
 } from "@/muiStyles";
 import { ReviewCycle } from "@/schemas";
-import { createReviewCycle } from "@/serverActions";
+import { createReviewCycle } from "@/features/reviews/actions";
 import { useSnackbar } from "./SnackbarProvider";
 import { useTranslations } from "next-intl";
 

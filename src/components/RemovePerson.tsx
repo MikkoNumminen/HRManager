@@ -1,7 +1,7 @@
 "use client";
 
 import { formButtonContainerStyles, formStyles, smallButtonStyles } from "@/muiStyles";
-import { removePerson } from "@/serverActions";
+import { removePerson } from "@/features/persons/actions";
 import { Box, Button, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useActionState, useRef, useState } from "react";

@@ -1,6 +1,6 @@
 "use client";
 
-import { addMember } from "@/serverActions";
+import { addMember } from "@/features/teams/actions";
 import {
   activeButtonStyles,
   formButtonContainerStyles,

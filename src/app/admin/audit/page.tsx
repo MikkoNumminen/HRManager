@@ -2,7 +2,7 @@ import { Box, Typography } from "@mui/material";
 import TopBar from "@/components/TopBar";
 import AuditLogViewer from "@/components/AuditLogViewer";
 import { pageContainerStyles } from "@/muiStyles";
-import { getAuditLogs, getAuditLogUserEmails } from "@/queries";
+import { getAuditLogs, getAuditLogUserEmails } from "@/features/audit/queries";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getUserPermissions } from "@/permissions";

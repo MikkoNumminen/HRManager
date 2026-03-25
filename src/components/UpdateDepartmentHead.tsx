@@ -1,6 +1,6 @@
 "use client";
 
-import { updateDepartmentHead } from "@/serverActions";
+import { updateDepartmentHead } from "@/features/departments/actions";
 import {
   activeButtonStyles,
   formButtonContainerStyles,

@@ -60,14 +60,8 @@ jest.mock("next/navigation", () => ({
   redirect: jest.fn(),
 }));
 
-import {
-  createTeam,
-  updateTeamName,
-  removeTeam,
-  addManager,
-  addMember,
-  removeMember,
-} from "@/serverActions";
+import { createTeam, updateTeamName, removeTeam, addMember, removeMember } from "@/features/teams/actions";
+import { addManager } from "@/features/persons/actions";
 
 // Helper to build FormData — server actions receive form submissions,
 // so we simulate that by packing key-value pairs into a FormData object.

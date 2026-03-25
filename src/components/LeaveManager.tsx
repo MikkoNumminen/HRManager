@@ -46,7 +46,7 @@ import {
   reviewLeaveRequest,
   deleteLeaveRequest,
   allocateLeaveBalance,
-} from "@/serverActions";
+} from "@/features/leave/actions";
 
 interface LeaveManagerProps {
   leaveTypes: LeaveType[];

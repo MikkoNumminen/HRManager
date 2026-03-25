@@ -1,6 +1,6 @@
 "use client";
 
-import { adminForceLogoutSession, adminForceLogoutAllSessions } from "@/serverActions";
+import { adminForceLogoutSession, adminForceLogoutAllSessions } from "@/features/sessions/actions";
 import { colors, formStyles, headerStyles, smallButtonStyles } from "@/muiStyles";
 import { Box, Button, Typography } from "@mui/material";
 import { useActionState } from "react";

@@ -2,8 +2,8 @@ import { redirect } from "next/navigation";
 export const dynamic = "force-dynamic";
 import { RemovePersonCheckBoxList } from "@/components/RemovePersonCheckBoxList";
 import { formStyles, headerStyles, smallButtonStyles } from "@/muiStyles";
-import { removePerson } from "@/serverActions";
-import { getPersons } from "@/queries";
+import { removePerson } from "@/features/persons/actions";
+import { getPersons } from "@/features/persons/queries";
 import { Box, Button, Typography } from "@mui/material";
 
 async function handleSubmit(data: FormData) {

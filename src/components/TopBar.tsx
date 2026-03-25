@@ -28,7 +28,7 @@ import { avatarStyles, colors, userMenuItemStyles, userMenuStyles } from "@/muiS
 import Link from "next/link";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { useRef, useState, useTransition } from "react";
-import { resetAll, seedMockData } from "@/serverActions";
+import { resetAll, seedMockData } from "@/features/admin/actions";
 import ConfirmDialog from "./ConfirmDialog";
 import { useSnackbar } from "./SnackbarProvider";
 import LanguageSwitcher from "./LanguageSwitcher";

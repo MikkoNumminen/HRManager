@@ -90,15 +90,14 @@ jest.mock("next/navigation", () => ({
   redirect: jest.fn(),
 }));
 
+import { updateProfileName, updateProfileImage } from "@/features/profile/actions";
 import {
-  updateProfileName,
-  updateProfileImage,
   importPersonsCsv,
   exportPersonsCsv,
   exportTeamsCsv,
   exportDepartmentsCsv,
   exportAuditLogsCsv,
-} from "@/serverActions";
+} from "@/features/data/actions";
 
 const { auth } = require("@/auth");
 

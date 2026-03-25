@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { formStyles, headerStyles, smallButtonStyles, textFieldStyles } from "@/muiStyles";
-import { createPerson } from "@/serverActions";
+import { createPerson } from "@/features/persons/actions";
 async function handleSubmit(data: FormData) {
   "use server";
   await createPerson(data);
