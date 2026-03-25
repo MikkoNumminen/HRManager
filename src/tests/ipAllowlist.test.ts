@@ -125,6 +125,14 @@ describe("requireAdminIp", () => {
     expect((error as ActionError).code).toBe("ipNotAllowed");
   });
 
+  // Allowlist that contains only commas becomes empty after filter — covers line 47 early return.
+  test("passes when ADMIN_IP_ALLOWLIST is commas-only (empty after parsing)", async () => {
+    process.env.ADMIN_IP_ALLOWLIST = ",,,";
+    mockGet.mockReturnValue("5.6.7.8");
+
+    await expect(requireAdminIp()).resolves.toBeUndefined();
+  });
+
   // Allowlist with whitespace around IPs is parsed correctly
   test("handles whitespace around IPs in allowlist", async () => {
     process.env.ADMIN_IP_ALLOWLIST = " 1.2.3.4 , 5.6.7.8 ";

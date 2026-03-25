@@ -41,7 +41,7 @@ jest.mock("@/auditLog", () => ({
 // We store fake log entries here so tests can populate and query them.
 let mockAuditLogs: Array<Record<string, unknown>> = [];
 jest.mock("@/mongoDb", () => ({
-  isMongoAvailable: () => true,
+  isMongoAvailable: jest.fn().mockReturnValue(true),
   getAuditLogCollection: () => ({
     find: (query: Record<string, unknown>) => {
       // Filter by sessionId if provided
@@ -84,7 +84,6 @@ jest.mock("@/demoSession", () => ({
 // but the server actions call them after every mutation.
 jest.mock("next/cache", () => ({
   revalidatePath: jest.fn(),
-  revalidateTag: jest.fn(),
 }));
 jest.mock("next/navigation", () => ({
   redirect: jest.fn(),
@@ -470,6 +469,20 @@ describe("importPersonsCsv", () => {
     expect(person!.position).toBeNull();
   });
 
+  // All rows are duplicates — valid.length === 0 and errors.length === 0.
+  // Covers the false branch of `if (valid.length > 0)` at line 65 without errors.
+  test("returns 0 imported with 0 errors when all rows are skipped as duplicates", async () => {
+    await createTestPerson({ name: "Alice", email: "alice@test.com" });
+
+    // All rows are duplicates — skipped, not errors.
+    const csv = "name,email\nAlice,alice@test.com";
+    const result = await importPersonsCsv(null, importFormData(csv));
+
+    expect(result.result!.imported).toBe(0);
+    expect(result.result!.skipped).toBe(1);
+    expect(result.result!.errors).toHaveLength(0);
+  });
+
   // Returns error for empty file
   test("returns error for empty file", async () => {
     const fd = new FormData();
@@ -521,6 +534,14 @@ describe("exportPersonsCsv", () => {
     const aliceIdx = csv.indexOf("Alice");
     const charlieIdx = csv.indexOf("Charlie");
     expect(aliceIdx).toBeLessThan(charlieIdx);
+  });
+
+  // Person with null email — covers the `p.email ?? ""` null-coalescing branch (line 115).
+  test("exports empty string for person with null email", async () => {
+    await testPrisma.person.create({ data: { name: "NoEmail" } });
+
+    const csv = await exportPersonsCsv();
+    expect(csv).toContain("NoEmail,,");
   });
 });
 
@@ -663,6 +684,38 @@ describe("exportAuditLogsCsv", () => {
     const csv = await exportAuditLogsCsv();
     const lines = csv.trim().split("\n");
     expect(lines).toHaveLength(1);
+  });
+
+  // When MongoDB is unavailable, returns an empty CSV (headers only) — covers line 196 false branch.
+  test("returns headers-only CSV when MongoDB is unavailable", async () => {
+    // isMongoAvailable is a jest.fn() — return false for this one call.
+    const mongoMock = jest.requireMock("@/mongoDb");
+    mongoMock.isMongoAvailable.mockReturnValueOnce(false);
+
+    const csv = await exportAuditLogsCsv();
+    const lines = csv.trim().split("\n");
+    expect(lines).toHaveLength(1); // only headers, no data rows
+  });
+
+  // Exports logs with null optional fields — covers the `?? ""` branches on lines 208, 211-213.
+  test("replaces null optional fields with empty strings in CSV", async () => {
+    mockAuditLogs = [
+      {
+        action: "create",
+        entityType: "person",
+        entityId: null,
+        userEmail: null,
+        before: null,
+        after: null,
+        createdAt: new Date("2026-01-01"),
+        sessionId: null,
+      },
+    ];
+
+    const csv = await exportAuditLogsCsv();
+    expect(csv).toContain("create");
+    // Null fields should appear as empty strings, not "null".
+    expect(csv).not.toContain("null");
   });
 
   // Exports multiple logs in correct order (mock already returns them sorted)

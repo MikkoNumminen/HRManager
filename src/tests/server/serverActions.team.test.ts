@@ -60,7 +60,13 @@ jest.mock("next/navigation", () => ({
   redirect: jest.fn(),
 }));
 
-import { createTeam, updateTeamName, removeTeam, addMember, removeMember } from "@/features/teams/actions";
+import {
+  createTeam,
+  updateTeamName,
+  removeTeam,
+  addMember,
+  removeMember,
+} from "@/features/teams/actions";
 import { addManager } from "@/features/persons/actions";
 
 // Helper to build FormData — server actions receive form submissions,
@@ -372,6 +378,28 @@ describe("addMember", () => {
     expect(await addMember(formData({ teamID: "x", personID: "y" }))).toMatchObject({
       error: expect.stringContaining("Invalid"),
     });
+  });
+
+  // When a soft-deleted membership exists, addMember should restore it rather than creating a new record.
+  test("restores soft-deleted membership when re-adding a previously removed person", async () => {
+    const person = await createTestPerson({ name: "Alice", email: "alice@test.com" });
+    const team = await createTestTeam({ teamName: "Team A" });
+
+    // Create a soft-deleted membership record.
+    await testPrisma.teamMember.create({
+      data: { personId: person.id, teamId: team.teamId, deletedAt: new Date() },
+    });
+
+    // addMember should restore the deleted record without error.
+    const result = await addMember(formData({ teamID: team.teamId, personID: person.id }));
+    expect(result).toBeUndefined();
+
+    const members = await testPrisma.teamMember.findMany({
+      where: { personId: person.id, teamId: team.teamId },
+    });
+    // Only one record should exist and it must be active.
+    expect(members).toHaveLength(1);
+    expect(members[0].deletedAt).toBeNull();
   });
 });
 

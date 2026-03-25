@@ -174,9 +174,36 @@ describe("Session Management", () => {
       const sessions = await getUserActiveSessions(user.id);
       expect(sessions).toHaveLength(2);
     });
+
+    // Callers without admin:manage_users permission must receive a hard error.
+    it("throws Permission denied when hasPermission returns false", async () => {
+      const { hasPermission } = require("@/permissions");
+      hasPermission.mockResolvedValueOnce(false);
+
+      const user = await createUser();
+      await expect(getUserActiveSessions(user.id)).rejects.toThrow("Permission denied");
+    });
   });
 
   describe("signOutOtherSessions", () => {
+    // Test that deactivates all active sessions when no currentSessionId in JWT
+    it("should deactivate all sessions when no current sessionId in JWT", async () => {
+      const user = await createUser();
+      await createSession(user.id);
+      await createSession(user.id);
+
+      // Auth without a sessionId property (no current session to preserve)
+      auth.mockResolvedValue({ user: { id: user.id, email: user.email } });
+
+      const result = await signOutOtherSessions();
+      expect(result).toBeUndefined();
+
+      const active = await testPrisma.userSession.findMany({
+        where: { userId: user.id, active: true },
+      });
+      expect(active).toHaveLength(0);
+    });
+
     // Test that signing out others deactivates all sessions except the current one
     it("should deactivate all sessions except the current one", async () => {
       const user = await createUser();
@@ -208,6 +235,12 @@ describe("Session Management", () => {
   });
 
   describe("adminForceLogoutSession", () => {
+    // Test that missing sessionId in form data returns an error
+    it("should fail when sessionId is missing from form data", async () => {
+      const result = await adminForceLogoutSession(formData({}));
+      expect(result?.error).toBeTruthy();
+    });
+
     // Test that admin can force-logout a specific session
     it("should deactivate a specific session", async () => {
       const user = await createUser();
@@ -241,6 +274,12 @@ describe("Session Management", () => {
   });
 
   describe("adminForceLogoutAllSessions", () => {
+    // Test that missing userId in form data returns an error
+    it("should fail when userId is missing from form data", async () => {
+      const result = await adminForceLogoutAllSessions(formData({}));
+      expect(result?.error).toBeTruthy();
+    });
+
     // Test that admin can force-logout all sessions for a user
     it("should deactivate all sessions for a user", async () => {
       const user = await createUser();

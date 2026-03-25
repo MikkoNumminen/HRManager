@@ -13,8 +13,44 @@ import * as OTPAuth from "otpauth";
 
 // Set a deterministic encryption key for tests
 process.env.TOTP_ENCRYPTION_KEY = "test-encryption-key-for-totp-at-least-32-chars";
+process.env.NEXTAUTH_SECRET = "nextauth-fallback-secret-for-testing-32-chars";
 
 describe("TOTP Crypto Utilities", () => {
+  describe("getEncryptionKey fallback", () => {
+    // Falls back to NEXTAUTH_SECRET when TOTP_ENCRYPTION_KEY is not set
+    it("should use NEXTAUTH_SECRET as fallback when TOTP_ENCRYPTION_KEY is missing", () => {
+      const saved = process.env.TOTP_ENCRYPTION_KEY;
+      delete process.env.TOTP_ENCRYPTION_KEY;
+
+      // Should still encrypt/decrypt successfully using NEXTAUTH_SECRET fallback
+      const { encryptSecret, decryptSecret } = require("@/lib/totpCrypto");
+      const secret = "JBSWY3DPEHPK3PXP";
+      const encrypted = encryptSecret(secret);
+      const decrypted = decryptSecret(encrypted);
+      expect(decrypted).toBe(secret);
+
+      process.env.TOTP_ENCRYPTION_KEY = saved;
+    });
+
+    // Throws when both TOTP_ENCRYPTION_KEY and NEXTAUTH_SECRET are absent — covers line 16.
+    it("throws when neither TOTP_ENCRYPTION_KEY nor NEXTAUTH_SECRET is set", () => {
+      const savedTotp = process.env.TOTP_ENCRYPTION_KEY;
+      const savedNext = process.env.NEXTAUTH_SECRET;
+      delete process.env.TOTP_ENCRYPTION_KEY;
+      delete process.env.NEXTAUTH_SECRET;
+
+      jest.resetModules();
+      const { encryptSecret: encryptFresh } = require("@/lib/totpCrypto");
+      expect(() => encryptFresh("JBSWY3DPEHPK3PXP")).toThrow(
+        "TOTP_ENCRYPTION_KEY or NEXTAUTH_SECRET must be set",
+      );
+
+      process.env.TOTP_ENCRYPTION_KEY = savedTotp;
+      process.env.NEXTAUTH_SECRET = savedNext;
+      jest.resetModules();
+    });
+  });
+
   describe("encryptSecret / decryptSecret", () => {
     // Round-trip encryption should return the original secret
     it("should encrypt and decrypt a secret successfully", () => {

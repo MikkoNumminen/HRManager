@@ -54,7 +54,6 @@ jest.mock("@/demoSession", () => ({
 // but the server actions call them after every mutation.
 jest.mock("next/cache", () => ({
   revalidatePath: jest.fn(),
-  revalidateTag: jest.fn(),
 }));
 jest.mock("next/navigation", () => ({
   redirect: jest.fn(),
@@ -121,6 +120,12 @@ describe("createReviewTemplate", () => {
     const result = await createReviewTemplate(formData({}));
     expect(result).toMatchObject({ error: expect.any(String) });
   });
+
+  // A name exceeding MAX_NAME_LENGTH characters must be rejected with nameTooLong error.
+  test("returns error when name exceeds max length", async () => {
+    const result = await createReviewTemplate(formData({ name: "a".repeat(256) }));
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
 });
 
 describe("deleteReviewTemplate", () => {
@@ -144,6 +149,12 @@ describe("deleteReviewTemplate", () => {
     const result = await deleteReviewTemplate(
       formData({ templateId: "00000000-0000-0000-0000-000000000000" }),
     );
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  // Missing templateId field must be rejected with an error.
+  test("returns error when templateId is missing", async () => {
+    const result = await deleteReviewTemplate(formData({}));
     expect(result).toMatchObject({ error: expect.any(String) });
   });
 });
@@ -216,6 +227,23 @@ describe("addReviewQuestion", () => {
     );
     expect(result).toMatchObject({ error: expect.any(String) });
   });
+
+  // Missing templateId field must be rejected with an error.
+  test("returns error when templateId is missing", async () => {
+    const result = await addReviewQuestion(formData({ text: "Q", type: "TEXT" }));
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  // Missing text field must be rejected with an error.
+  test("returns error when text is empty", async () => {
+    const template = await testPrisma.reviewTemplate.create({
+      data: { name: "Template", questions: [], sessionId: null },
+    });
+    const result = await addReviewQuestion(
+      formData({ templateId: template.id, text: "", type: "TEXT" }),
+    );
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
 });
 
 describe("removeReviewQuestion", () => {
@@ -245,6 +273,29 @@ describe("removeReviewQuestion", () => {
     expect(remaining).toHaveLength(0);
   });
 
+  // Removes one of two questions — the remaining question gets reordered (line 202 map branch).
+  test("reorders remaining questions after removing one of two", async () => {
+    const template = await testPrisma.reviewTemplate.create({
+      data: { name: "Two-Q Template", questions: [], sessionId: null },
+    });
+
+    await addReviewQuestion(formData({ templateId: template.id, text: "First Q", type: "TEXT" }));
+    await addReviewQuestion(formData({ templateId: template.id, text: "Second Q", type: "TEXT" }));
+
+    const withTwo = await testPrisma.reviewTemplate.findUnique({ where: { id: template.id } });
+    const qs = withTwo!.questions as Array<{ id: string; text: string }>;
+    expect(qs).toHaveLength(2);
+
+    // Remove the first question — second should remain and be reordered to order:0.
+    await removeReviewQuestion(formData({ templateId: template.id, questionId: qs[0].id }));
+
+    const updated = await testPrisma.reviewTemplate.findUnique({ where: { id: template.id } });
+    const remaining = updated!.questions as Array<{ id: string; text: string; order: number }>;
+    expect(remaining).toHaveLength(1);
+    expect(remaining[0].text).toBe("Second Q");
+    expect(remaining[0].order).toBe(0);
+  });
+
   // Supplying a templateId that doesn't exist should return an error.
   test("returns error when template not found", async () => {
     const result = await removeReviewQuestion(
@@ -254,6 +305,44 @@ describe("removeReviewQuestion", () => {
       }),
     );
     expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  // Missing templateId field must be rejected with an error.
+  test("returns error when templateId is missing", async () => {
+    const result = await removeReviewQuestion(
+      formData({ questionId: "00000000-0000-0000-0000-000000000001" }),
+    );
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  // Missing questionId field must be rejected with an error.
+  test("returns error when questionId is missing", async () => {
+    const template = await testPrisma.reviewTemplate.create({
+      data: { name: "Template", questions: [], sessionId: null },
+    });
+    const result = await removeReviewQuestion(formData({ templateId: template.id }));
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  // When the questions field is a non-array JSON, removeReviewQuestion treats it as empty
+  // and produces an empty filtered array — covers the non-array branch (line 199 false, line 202).
+  test("removes question gracefully when questions is a non-array JSON", async () => {
+    const template = await testPrisma.reviewTemplate.create({
+      data: {
+        name: "Non-array Template",
+        questions: { unexpected: "data" } as unknown as [],
+        sessionId: null,
+      },
+    });
+
+    const result = await removeReviewQuestion(
+      formData({ templateId: template.id, questionId: "some-question-id" }),
+    );
+    // Should succeed (no error) — nothing to remove, questions is treated as [].
+    expect(result).toBeUndefined();
+    const updated = await testPrisma.reviewTemplate.findUnique({ where: { id: template.id } });
+    expect(Array.isArray(updated!.questions)).toBe(true);
+    expect((updated!.questions as unknown[]).length).toBe(0);
   });
 });
 
@@ -281,6 +370,63 @@ describe("createReviewCycle", () => {
     );
     expect(result).toMatchObject({ error: expect.any(String) });
   });
+
+  // A name exceeding MAX_NAME_LENGTH characters must be rejected.
+  test("returns error when name exceeds max length", async () => {
+    const result = await createReviewCycle(
+      formData({ name: "a".repeat(256), startDate: "2026-01-01", endDate: "2026-03-31" }),
+    );
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  // An invalid startDate string must be rejected.
+  test("returns error when startDate is invalid", async () => {
+    const result = await createReviewCycle(
+      formData({ name: "Cycle", startDate: "not-a-date", endDate: "2026-03-31" }),
+    );
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  // An invalid endDate string must be rejected.
+  test("returns error when endDate is invalid", async () => {
+    const result = await createReviewCycle(
+      formData({ name: "Cycle", startDate: "2026-01-01", endDate: "bad-date" }),
+    );
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  // Providing a non-existent templateId must return a reviewTemplateNotFound error.
+  test("returns error when templateId references non-existent template", async () => {
+    const result = await createReviewCycle(
+      formData({
+        name: "Cycle",
+        startDate: "2026-01-01",
+        endDate: "2026-03-31",
+        templateId: "00000000-0000-0000-0000-000000000000",
+      }),
+    );
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  // A cycle with a valid templateId links to the template.
+  test("creates a cycle linked to a template", async () => {
+    const template = await testPrisma.reviewTemplate.create({
+      data: { name: "Template", questions: [], sessionId: null },
+    });
+
+    await createReviewCycle(
+      formData({
+        name: "Linked Cycle",
+        startDate: "2026-01-01",
+        endDate: "2026-03-31",
+        templateId: template.id,
+      }),
+    );
+
+    const cycles = await testPrisma.reviewCycle.findMany();
+    expect(cycles).toHaveLength(1);
+    expect(cycles[0].templateId).toBe(template.id);
+  });
 });
 
 describe("deleteReviewCycle", () => {
@@ -303,6 +449,20 @@ describe("deleteReviewCycle", () => {
 
     const found = await testPrisma.reviewCycle.findUnique({ where: { id: cycle.id } });
     expect(found!.deletedAt).not.toBeNull();
+  });
+
+  // Missing cycleId field must be rejected with an error.
+  test("returns error when cycleId is missing", async () => {
+    const result = await deleteReviewCycle(formData({}));
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  // Non-existent cycleId must return reviewCycleNotFound error.
+  test("returns error when cycle not found", async () => {
+    const result = await deleteReviewCycle(
+      formData({ cycleId: "00000000-0000-0000-0000-000000000000" }),
+    );
+    expect(result).toMatchObject({ error: expect.any(String) });
   });
 });
 
@@ -378,6 +538,50 @@ describe("openReviewCycle / closeReviewCycle", () => {
     });
 
     const result = await closeReviewCycle(formData({ cycleId: cycle.id }));
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  // A CLOSED cycle must not be closed again — reviewCycleAlreadyClosed error.
+  test("returns error when cycle is already CLOSED", async () => {
+    const cycle = await testPrisma.reviewCycle.create({
+      data: {
+        name: "Cycle",
+        startDate: new Date(),
+        endDate: new Date(),
+        status: "CLOSED",
+        sessionId: null,
+      },
+    });
+
+    const result = await closeReviewCycle(formData({ cycleId: cycle.id }));
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  // Missing cycleId in openReviewCycle must be rejected.
+  test("openReviewCycle returns error when cycleId is missing", async () => {
+    const result = await openReviewCycle(formData({}));
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  // Missing cycleId in closeReviewCycle must be rejected.
+  test("closeReviewCycle returns error when cycleId is missing", async () => {
+    const result = await closeReviewCycle(formData({}));
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  // Non-existent cycle in openReviewCycle must return reviewCycleNotFound.
+  test("openReviewCycle returns error when cycle not found", async () => {
+    const result = await openReviewCycle(
+      formData({ cycleId: "00000000-0000-0000-0000-000000000000" }),
+    );
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  // Non-existent cycle in closeReviewCycle must return reviewCycleNotFound.
+  test("closeReviewCycle returns error when cycle not found", async () => {
+    const result = await closeReviewCycle(
+      formData({ cycleId: "00000000-0000-0000-0000-000000000000" }),
+    );
     expect(result).toMatchObject({ error: expect.any(String) });
   });
 });
@@ -476,6 +680,43 @@ describe("addReviewRequest", () => {
     );
     expect(result).toMatchObject({ error: expect.any(String) });
   });
+
+  // Missing cycleId must be rejected with an error.
+  test("returns error when cycleId is missing", async () => {
+    const result = await addReviewRequest(
+      formData({ subjectId: "some-id", reviewerId: "some-id", type: "PEER" }),
+    );
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  // Missing subjectId must be rejected.
+  test("returns error when subjectId is missing", async () => {
+    const result = await addReviewRequest(
+      formData({ cycleId: "some-id", reviewerId: "some-id", type: "PEER" }),
+    );
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  // Missing reviewerId must be rejected.
+  test("returns error when reviewerId is missing", async () => {
+    const result = await addReviewRequest(
+      formData({ cycleId: "some-id", subjectId: "some-id", type: "PEER" }),
+    );
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  // Invalid type must be rejected.
+  test("returns error when type is invalid", async () => {
+    const result = await addReviewRequest(
+      formData({
+        cycleId: "some-id",
+        subjectId: "some-id",
+        reviewerId: "some-id",
+        type: "INVALID",
+      }),
+    );
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
 });
 
 describe("removeReviewRequest", () => {
@@ -522,6 +763,43 @@ describe("removeReviewRequest", () => {
       formData({ requestId: "00000000-0000-0000-0000-000000000000" }),
     );
     expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  // Missing requestId field must be rejected with an error.
+  test("returns error when requestId is missing", async () => {
+    const result = await removeReviewRequest(formData({}));
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  // removeReviewRequest without cycleId still succeeds — cycleId is optional for revalidatePath.
+  test("removes request successfully when cycleId is not provided", async () => {
+    const subject = await testPrisma.person.create({
+      data: { name: "Alice", email: "alice@test.com" },
+    });
+    const cycle = await testPrisma.reviewCycle.create({
+      data: {
+        name: "Cycle",
+        startDate: new Date(),
+        endDate: new Date(),
+        status: "DRAFT",
+        sessionId: null,
+      },
+    });
+    const request = await testPrisma.reviewRequest.create({
+      data: {
+        cycleId: cycle.id,
+        subjectId: subject.id,
+        type: "SELF",
+        status: "PENDING",
+        sessionId: null,
+      },
+    });
+
+    // No cycleId in formData — should still remove the request.
+    const result = await removeReviewRequest(formData({ requestId: request.id }));
+    expect(result).toBeUndefined();
+    const remaining = await testPrisma.reviewRequest.findMany();
+    expect(remaining).toHaveLength(0);
   });
 });
 
@@ -634,6 +912,49 @@ describe("submitReview", () => {
 
     const result = await submitReview(
       formData({ requestId: request.id, answers: JSON.stringify([]) }),
+    );
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  // Missing requestId must be rejected with an error.
+  test("returns error when requestId is missing", async () => {
+    const result = await submitReview(formData({ answers: JSON.stringify([]) }));
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  // Invalid JSON in answers field must be rejected with an error.
+  test("returns error when answers JSON is invalid", async () => {
+    const cycle = await testPrisma.reviewCycle.create({
+      data: {
+        name: "Cycle",
+        startDate: new Date(),
+        endDate: new Date(),
+        status: "OPEN",
+        sessionId: null,
+      },
+    });
+    const subject = await testPrisma.person.create({ data: { name: "Subject" } });
+    const request = await testPrisma.reviewRequest.create({
+      data: {
+        cycleId: cycle.id,
+        subjectId: subject.id,
+        type: "SELF",
+        status: "PENDING",
+        sessionId: null,
+      },
+    });
+
+    const result = await submitReview(formData({ requestId: request.id, answers: "not-json{" }));
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  // Non-existent requestId must return reviewRequestNotFound error.
+  test("returns error when request not found", async () => {
+    const result = await submitReview(
+      formData({
+        requestId: "00000000-0000-0000-0000-000000000000",
+        answers: JSON.stringify([]),
+      }),
     );
     expect(result).toMatchObject({ error: expect.any(String) });
   });

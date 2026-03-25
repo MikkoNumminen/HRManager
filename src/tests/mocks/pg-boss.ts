@@ -1,20 +1,39 @@
-// Mock pg-boss — it ships ESM which Jest can't parse in CJS mode.
-// Tests that need job queue functionality should mock @/jobs/queue directly.
-export default class PgBoss {
+// Mock for pg-boss (pure ESM package — incompatible with Jest CJS mode).
+// Tests that need pg-boss behaviour should mock @/jobs/queue directly.
+// This stub prevents module-resolution errors for test files that import
+// @/queries transitively (which re-exports from features/jobs/queries.ts).
+
+class PgBoss {
   constructor() {}
-  async start() {}
-  async stop() {}
-  async send() {
-    return "mock-job-id";
+  start() {
+    return Promise.resolve(this);
   }
-  async fetch() {
-    return null;
+  stop() {
+    return Promise.resolve();
   }
-  async complete() {}
-  async fail() {}
-  async getQueueSize() {
-    return 0;
+  on() {
+    return this;
   }
-  async deleteQueue() {}
-  async createQueue() {}
+  work() {
+    return Promise.resolve("worker-id");
+  }
+  send() {
+    return Promise.resolve("job-id");
+  }
+  schedule() {
+    return Promise.resolve();
+  }
+  unschedule() {
+    return Promise.resolve();
+  }
+  getJobById() {
+    return Promise.resolve(null);
+  }
+  getQueue() {
+    return Promise.resolve(null);
+  }
 }
+
+module.exports = PgBoss;
+module.exports.default = PgBoss;
+module.exports.PgBoss = PgBoss;

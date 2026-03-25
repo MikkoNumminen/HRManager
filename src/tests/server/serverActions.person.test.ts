@@ -352,6 +352,21 @@ describe("updatePosition", () => {
     const updated = await testPrisma.person.findUnique({ where: { id: person.id } });
     expect(updated!.position).toBe("Lead Dev");
   });
+
+  // When the position already exists in the catalog, it should not be re-created.
+  test("does not create a duplicate position in the catalog when it already exists", async () => {
+    const person = await createTestPerson({ name: "Alice", email: "alice@test.com" });
+    // Pre-create the position in the catalog
+    await testPrisma.position.create({ data: { name: "Staff Eng", sessionId: null } });
+
+    await updatePosition(formData({ personID: person.id, name: "Staff Eng" }));
+
+    // Only one position entry should exist in the catalog
+    const positions = await testPrisma.position.findMany({ where: { name: "Staff Eng" } });
+    expect(positions).toHaveLength(1);
+    const updated = await testPrisma.person.findUnique({ where: { id: person.id } });
+    expect(updated!.position).toBe("Staff Eng");
+  });
 });
 
 describe("updateEmail", () => {

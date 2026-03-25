@@ -12,6 +12,7 @@ const customJestConfig: Config = {
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
     "^next/image$": "<rootDir>/__mocks__/next/image.js",
+    "^pg-boss$": "<rootDir>/src/tests/mocks/pg-boss.js",
   },
 };
 

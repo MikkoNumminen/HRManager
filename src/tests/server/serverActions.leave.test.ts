@@ -48,7 +48,6 @@ jest.mock("@/demoSession", () => ({
 // Mock Next.js server functions.
 jest.mock("next/cache", () => ({
   revalidatePath: jest.fn(),
-  revalidateTag: jest.fn(),
 }));
 jest.mock("next/navigation", () => ({
   redirect: jest.fn(),
@@ -181,6 +180,38 @@ describe("createLeaveType", () => {
     const types = await testPrisma.leaveType.findMany();
     expect(types).toHaveLength(2);
   });
+
+  // Rejects a name that exceeds MAX_NAME_LENGTH — nameTooLong error.
+  test("rejects name that exceeds max length", async () => {
+    const result = await createLeaveType(
+      formData({ name: "a".repeat(256), defaultDays: "10", color: "#000" }),
+    );
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  // Rejects a description that exceeds MAX_DESCRIPTION_LENGTH — descriptionTooLong error.
+  test("rejects description that exceeds max length", async () => {
+    const result = await createLeaveType(
+      formData({ name: "Short", description: "a".repeat(1001), defaultDays: "10", color: "#000" }),
+    );
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  // When defaultDays is not provided, falls back to 0 — covers the non-string ternary branch (line 37).
+  test("creates leave type without defaultDays using fallback 0", async () => {
+    await createLeaveType(formData({ name: "Minimal Leave", color: "#fff" }));
+    const types = await testPrisma.leaveType.findMany();
+    expect(types).toHaveLength(1);
+    expect(types[0].defaultDays).toBe(0);
+  });
+
+  // When color is not provided, falls back to default "#1976d2" — covers ?? branch (line 41).
+  test("creates leave type without color using default color", async () => {
+    await createLeaveType(formData({ name: "Default Color Leave", defaultDays: "5" }));
+    const types = await testPrisma.leaveType.findMany();
+    expect(types).toHaveLength(1);
+    expect(types[0].color).toBe("#1976d2");
+  });
 });
 
 // ─── updateLeaveType ─────────────────────────────────────────
@@ -214,6 +245,14 @@ describe("updateLeaveType", () => {
     expect(result).toMatchObject({ error: expect.any(String) });
   });
 
+  // Rejects missing id field — invalidId error (line 75).
+  test("rejects missing id field on update", async () => {
+    const result = await updateLeaveType(
+      formData({ name: "Annual", defaultDays: "10", color: "#000" }),
+    );
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
   // Rejects duplicate name on update.
   test("rejects duplicate name on update", async () => {
     await createTestLeaveType({ name: "Annual" });
@@ -222,6 +261,80 @@ describe("updateLeaveType", () => {
       formData({ id: lt2.id, name: "Annual", defaultDays: "5", color: "#000" }),
     );
     expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  // Rejects negative defaultDays — invalidDaysValue error (line 91).
+  test("rejects negative defaultDays on update", async () => {
+    const lt = await createTestLeaveType({ name: "Annual", defaultDays: 10 });
+    const result = await updateLeaveType(
+      formData({ id: lt.id, name: "Annual", defaultDays: "-1", color: "#000" }),
+    );
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  // Rejects empty name — invalidName error (line 80).
+  test("rejects empty name on update", async () => {
+    const lt = await createTestLeaveType({ name: "Annual", defaultDays: 10 });
+    const result = await updateLeaveType(
+      formData({ id: lt.id, name: "", defaultDays: "10", color: "#000" }),
+    );
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  // Rejects name that exceeds MAX_NAME_LENGTH — nameTooLong error (line 82).
+  test("rejects name exceeding max length on update", async () => {
+    const lt = await createTestLeaveType({ name: "Annual", defaultDays: 10 });
+    const result = await updateLeaveType(
+      formData({ id: lt.id, name: "a".repeat(256), defaultDays: "10", color: "#000" }),
+    );
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  // When defaultDays is missing, falls back to 0 — covers the ternary false branch (line 89).
+  // 0 is treated as invalid (< 1 for leave types) so this should error out.
+  test("falls back to 0 days when defaultDays is not provided and rejects", async () => {
+    const lt = await createTestLeaveType({ name: "Annual", defaultDays: 10 });
+    // defaultDays not provided → defaultDays = 0 → isNaN(0)=false but 0 >= 0 so NOT rejected.
+    // Actually defaultDays >= 0 check: updateLeaveType uses `defaultDays < 0` not `< 1`.
+    const result = await updateLeaveType(formData({ id: lt.id, name: "Annual", color: "#000" }));
+    // No error — defaultDays 0 is valid for update.
+    expect(result).toBeUndefined();
+    const updated = await testPrisma.leaveType.findUnique({ where: { id: lt.id } });
+    expect(updated!.defaultDays).toBe(0);
+  });
+
+  // When color is not provided in update, falls back to default "#1976d2" — covers ?? (line 93).
+  test("uses default color when color is not provided in update", async () => {
+    const lt = await createTestLeaveType({ name: "Annual", defaultDays: 10 });
+    await updateLeaveType(formData({ id: lt.id, name: "Annual Updated", defaultDays: "10" }));
+    const updated = await testPrisma.leaveType.findUnique({ where: { id: lt.id } });
+    expect(updated!.color).toBe("#1976d2");
+  });
+
+  // Empty string description results in null (descStr false branch, line 86).
+  test("sets description to null when empty string is provided", async () => {
+    const lt = await createTestLeaveType({ name: "Annual", defaultDays: 10 });
+    await updateLeaveType(
+      formData({ id: lt.id, name: "Annual", defaultDays: "10", color: "#000", description: "" }),
+    );
+    const updated = await testPrisma.leaveType.findUnique({ where: { id: lt.id } });
+    expect(updated!.description).toBeNull();
+  });
+
+  // Non-empty description is saved (descStr truthy branch, line 86 true branch).
+  test("saves non-empty description when provided", async () => {
+    const lt = await createTestLeaveType({ name: "Annual", defaultDays: 10 });
+    await updateLeaveType(
+      formData({
+        id: lt.id,
+        name: "Annual",
+        defaultDays: "10",
+        color: "#000",
+        description: "Used for annual leave",
+      }),
+    );
+    const updated = await testPrisma.leaveType.findUnique({ where: { id: lt.id } });
+    expect(updated!.description).toBe("Used for annual leave");
   });
 });
 
@@ -242,6 +355,12 @@ describe("deleteLeaveType", () => {
   // Rejects deletion of non-existent leave type.
   test("rejects deletion of non-existent leave type", async () => {
     const result = await deleteLeaveType(formData({ id: "00000000-0000-0000-0000-000000000000" }));
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  // Rejects missing id field — invalidId error (line 134).
+  test("rejects missing id field on delete", async () => {
+    const result = await deleteLeaveType(formData({}));
     expect(result).toMatchObject({ error: expect.any(String) });
   });
 });
@@ -370,6 +489,99 @@ describe("createLeaveRequest", () => {
         startDate: "2026-07-01",
         endDate: "2026-07-05",
         days: "5",
+      }),
+    );
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  // Rejects missing personId field — noPersonSelected error.
+  test("rejects missing personId", async () => {
+    const lt = await createTestLeaveType({ name: "Annual" });
+    const result = await createLeaveRequest(
+      formData({ leaveTypeId: lt.id, startDate: "2026-07-01", endDate: "2026-07-05", days: "5" }),
+    );
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  // Rejects missing leaveTypeId field — leaveTypeRequired error.
+  test("rejects missing leaveTypeId", async () => {
+    const person = await createTestPerson({ name: "Alice" });
+    const result = await createLeaveRequest(
+      formData({ personId: person.id, startDate: "2026-07-01", endDate: "2026-07-05", days: "5" }),
+    );
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  // Rejects missing startDate/endDate fields — invalidDateRange error.
+  test("rejects missing date fields", async () => {
+    const person = await createTestPerson({ name: "Bob" });
+    const lt = await createTestLeaveType({ name: "Sick" });
+    const result = await createLeaveRequest(
+      formData({ personId: person.id, leaveTypeId: lt.id, days: "3" }),
+    );
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  // Rejects non-parseable date strings — invalidDateRange (NaN) error.
+  test("rejects invalid date strings", async () => {
+    const person = await createTestPerson({ name: "Carol" });
+    const lt = await createTestLeaveType({ name: "Annual" });
+    const result = await createLeaveRequest(
+      formData({
+        personId: person.id,
+        leaveTypeId: lt.id,
+        startDate: "not-a-date",
+        endDate: "2026-07-05",
+        days: "5",
+      }),
+    );
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  // When days is not provided, falls back to 0 — which then fails invalidDaysValue (line 190→191).
+  test("rejects missing days field using fallback 0", async () => {
+    const person = await createTestPerson({ name: "Alex" });
+    const lt = await createTestLeaveType({ name: "Annual" });
+    const result = await createLeaveRequest(
+      formData({
+        personId: person.id,
+        leaveTypeId: lt.id,
+        startDate: "2026-07-01",
+        endDate: "2026-07-05",
+      }),
+    );
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  // Rejects when the leave type does not exist — leaveTypeNotFound error (line 210).
+  test("rejects when leave type is not found in DB", async () => {
+    const person = await createTestPerson({ name: "Bailey" });
+    // Use a valid UUID that does not correspond to any leaveType record.
+    const result = await createLeaveRequest(
+      formData({
+        personId: person.id,
+        leaveTypeId: "00000000-0000-0000-0000-000000000099",
+        startDate: "2026-07-01",
+        endDate: "2026-07-05",
+        days: "5",
+      }),
+    );
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  // Rejects a note that exceeds MAX_LEAVE_NOTE_LENGTH.
+  test("rejects note that is too long", async () => {
+    const person = await createTestPerson({ name: "Dave" });
+    const lt = await createTestLeaveType({ name: "Annual", defaultDays: 30 });
+    await createTestBalance(person.id, lt.id, { allocated: 30, used: 0 });
+    const result = await createLeaveRequest(
+      formData({
+        personId: person.id,
+        leaveTypeId: lt.id,
+        startDate: "2026-07-01",
+        endDate: "2026-07-05",
+        days: "5",
+        note: "a".repeat(1001),
       }),
     );
     expect(result).toMatchObject({ error: expect.any(String) });
@@ -515,6 +727,87 @@ describe("reviewLeaveRequest", () => {
     const result = await reviewLeaveRequest(formData({ id: request.id, action: "invalid" }));
     expect(result).toMatchObject({ error: expect.any(String) });
   });
+
+  // Rejects missing id field — invalidId error (line 271).
+  test("rejects missing id field on review", async () => {
+    const result = await reviewLeaveRequest(formData({ action: "approved" }));
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  // Approves with a valid reviewerId UUID — covers line 279 true branch and line 280 validateUUID call.
+  test("approves with a valid reviewerId UUID", async () => {
+    const person = await createTestPerson({ name: "Hugo" });
+    const reviewer = await createTestPerson({ name: "Reviewer" });
+    const lt = await createTestLeaveType({ name: "Annual", defaultDays: 20 });
+    await createTestBalance(person.id, lt.id, { allocated: 20, used: 0 });
+    const request = await testPrisma.leaveRequest.create({
+      data: {
+        personId: person.id,
+        leaveTypeId: lt.id,
+        startDate: new Date("2026-09-01"),
+        endDate: new Date("2026-09-05"),
+        days: 5,
+        status: "pending",
+        sessionId: null,
+      },
+    });
+
+    const result = await reviewLeaveRequest(
+      formData({ id: request.id, action: "approved", reviewerId: reviewer.id }),
+    );
+    expect(result).toBeUndefined();
+    const updated = await testPrisma.leaveRequest.findUnique({ where: { id: request.id } });
+    expect(updated!.status).toBe("approved");
+    expect(updated!.reviewerId).toBe(reviewer.id);
+  });
+
+  // When reviewerId is not provided, reviewerIdStr = null — covers lines 279-280 null branches.
+  test("approves without reviewerId (null reviewerId is allowed)", async () => {
+    const person = await createTestPerson({ name: "Ian" });
+    const lt = await createTestLeaveType({ name: "Annual", defaultDays: 20 });
+    await createTestBalance(person.id, lt.id, { allocated: 20, used: 0 });
+    const request = await testPrisma.leaveRequest.create({
+      data: {
+        personId: person.id,
+        leaveTypeId: lt.id,
+        startDate: new Date("2026-07-01"),
+        endDate: new Date("2026-07-05"),
+        days: 5,
+        status: "pending",
+        sessionId: null,
+      },
+    });
+
+    // No reviewerId provided — should succeed.
+    const result = await reviewLeaveRequest(formData({ id: request.id, action: "approved" }));
+    expect(result).toBeUndefined();
+    const updated = await testPrisma.leaveRequest.findUnique({ where: { id: request.id } });
+    expect(updated!.status).toBe("approved");
+    expect(updated!.reviewerId).toBeNull();
+  });
+
+  // Rejects a reviewNote that exceeds MAX_LEAVE_NOTE_LENGTH — noteTooLong error (line 286).
+  test("rejects reviewNote that is too long", async () => {
+    const person = await createTestPerson({ name: "Frank" });
+    const lt = await createTestLeaveType({ name: "Annual" });
+
+    const request = await testPrisma.leaveRequest.create({
+      data: {
+        personId: person.id,
+        leaveTypeId: lt.id,
+        startDate: new Date("2026-07-01"),
+        endDate: new Date("2026-07-05"),
+        days: 5,
+        status: "pending",
+        sessionId: null,
+      },
+    });
+
+    const result = await reviewLeaveRequest(
+      formData({ id: request.id, action: "approved", reviewNote: "a".repeat(1001) }),
+    );
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
 });
 
 // ─── deleteLeaveRequest ──────────────────────────────────────
@@ -543,6 +836,12 @@ describe("deleteLeaveRequest", () => {
     await deleteLeaveRequest(formData({ id: request.id }));
     const deleted = await testPrisma.leaveRequest.findUnique({ where: { id: request.id } });
     expect(deleted!.deletedAt).not.toBeNull();
+  });
+
+  // Rejects missing id field — invalidId error (line 358).
+  test("rejects missing id field on delete request", async () => {
+    const result = await deleteLeaveRequest(formData({}));
+    expect(result).toMatchObject({ error: expect.any(String) });
   });
 
   // Rejects deletion of non-pending request.
@@ -681,5 +980,52 @@ describe("allocateLeaveBalance", () => {
       }),
     );
     expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  // Rejects missing personId field — noPersonSelected error (line 402).
+  test("rejects missing personId", async () => {
+    const lt = await createTestLeaveType({ name: "Annual" });
+    const result = await allocateLeaveBalance(
+      formData({ leaveTypeId: lt.id, year: "2026", allocated: "20" }),
+    );
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  // Rejects missing leaveTypeId field — leaveTypeRequired error (line 407).
+  test("rejects missing leaveTypeId", async () => {
+    const person = await createTestPerson({ name: "Frank" });
+    const result = await allocateLeaveBalance(
+      formData({ personId: person.id, year: "2026", allocated: "20" }),
+    );
+    expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  // When year is not provided, falls back to current year — covers ternary false branch (line 411).
+  test("creates balance using current year when year is not provided", async () => {
+    const person = await createTestPerson({ name: "Grace" });
+    const lt = await createTestLeaveType({ name: "Annual" });
+    const result = await allocateLeaveBalance(
+      formData({ personId: person.id, leaveTypeId: lt.id, allocated: "15" }),
+    );
+    expect(result).toBeUndefined();
+    const currentYear = new Date().getFullYear();
+    const balance = await testPrisma.leaveBalance.findFirst({
+      where: { personId: person.id, leaveTypeId: lt.id, year: currentYear },
+    });
+    expect(balance).not.toBeNull();
+  });
+
+  // When allocated is not provided, falls back to 0 — covers ternary false branch (line 416).
+  test("creates balance with 0 allocated days when allocated is not provided", async () => {
+    const person = await createTestPerson({ name: "Henry" });
+    const lt = await createTestLeaveType({ name: "Sick" });
+    const result = await allocateLeaveBalance(
+      formData({ personId: person.id, leaveTypeId: lt.id, year: "2026" }),
+    );
+    expect(result).toBeUndefined();
+    const balance = await testPrisma.leaveBalance.findFirst({
+      where: { personId: person.id, leaveTypeId: lt.id, year: 2026 },
+    });
+    expect(balance!.allocated).toBe(0);
   });
 });

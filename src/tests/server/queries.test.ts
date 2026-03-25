@@ -43,32 +43,40 @@ jest.mock("@/demoSession", () => ({
   getDemoSessionId: () => mockGetDemoSessionId(),
 }));
 
-import { getPersons, getPagedPersons, getPersonDeleteImpact } from "@/features/persons/queries";
-import { getTeams, getPagedTeams, getTeamDeleteImpact } from "@/features/teams/queries";
 import {
+  getPersons,
+  getPagedPersons,
+  getPersonDeleteImpact,
+  getTeams,
+  getPagedTeams,
+  getTeamDeleteImpact,
   getDepartments,
   getPagedDepartments,
   getDepartmentDeleteImpact,
-} from "@/features/departments/queries";
-import {
   getUsers,
   getUserById,
   getAllPermissionKeys,
   getDataExportCounts,
-} from "@/features/admin/queries";
-import { getAuditLogs, getAuditLogUserEmails } from "@/features/audit/queries";
-import { getDashboardMetrics, getOrgChartData } from "@/features/dashboard/queries";
-import { getProfile } from "@/features/profile/queries";
-import { getLeaveRequests, getLeaveBalances, getLeaveTypes } from "@/features/leave/queries";
-import {
+  getAuditLogs,
+  getAuditLogUserEmails,
+  getDashboardMetrics,
+  getOrgChartData,
+  getProfile,
+  getLeaveRequests,
+  getLeaveBalances,
+  getLeaveTypes,
   getReviewTemplates,
   getReviewTemplate,
   getReviewCycles,
   getReviewCycle,
   getMyReviewRequests,
   getReviewRequestWithTemplate,
-} from "@/features/reviews/queries";
-import { getPositions } from "@/features/positions/queries";
+  getManagerTeamReviews,
+  getTwoFactorStatus,
+  isUserTwoFactorEnabled,
+  getUserTwoFactorAuth,
+  getPositions,
+} from "@/queries";
 
 const { auth } = require("@/auth");
 
@@ -450,10 +458,10 @@ describe("getUserById", () => {
 });
 
 describe("getAllPermissionKeys", () => {
-  // Should return all 34 permission keys defined in the system.
-  test("returns all 34 permission keys", async () => {
+  // Should return all 38 permission keys defined in the system.
+  test("returns all 38 permission keys", async () => {
     const keys = await getAllPermissionKeys();
-    expect(keys).toHaveLength(34);
+    expect(keys).toHaveLength(38);
     expect(keys).toContain("person:create");
     expect(keys).toContain("department:create");
     expect(keys).toContain("admin:manage_users");
@@ -618,6 +626,46 @@ describe("getAuditLogs", () => {
     expect(result.logs).toHaveLength(1);
     expect(result.logs[0].action).toBe("update");
     expect(result.total).toBe(1);
+  });
+
+  // Filters logs using only dateFrom (no dateTo) — covers audit/queries.ts line 44 true branch
+  // and line 45 false branch (dateTo not set).
+  test("filters by dateFrom only (no dateTo)", async () => {
+    await insertTestAuditLog({
+      action: "create",
+      entityType: "person",
+      userEmail: "a@b.com",
+      createdAt: new Date("2025-01-01T00:00:00Z"),
+    });
+    await insertTestAuditLog({
+      action: "update",
+      entityType: "person",
+      userEmail: "a@b.com",
+      createdAt: new Date("2025-08-01T00:00:00Z"),
+    });
+    const result = await getAuditLogs({ dateFrom: new Date("2025-06-01") });
+    expect(result.logs).toHaveLength(1);
+    expect(result.logs[0].action).toBe("update");
+  });
+
+  // Filters logs using only dateTo (no dateFrom) — covers audit/queries.ts line 44 false branch
+  // and line 45 true branch (dateFrom not set).
+  test("filters by dateTo only (no dateFrom)", async () => {
+    await insertTestAuditLog({
+      action: "create",
+      entityType: "person",
+      userEmail: "a@b.com",
+      createdAt: new Date("2025-01-01T00:00:00Z"),
+    });
+    await insertTestAuditLog({
+      action: "delete",
+      entityType: "person",
+      userEmail: "a@b.com",
+      createdAt: new Date("2025-12-01T00:00:00Z"),
+    });
+    const result = await getAuditLogs({ dateTo: new Date("2025-06-01") });
+    expect(result.logs).toHaveLength(1);
+    expect(result.logs[0].action).toBe("create");
   });
 
   // Returns correct total count even when paginated.
@@ -1138,6 +1186,20 @@ describe("audit log permission checks", () => {
     hasPermission.mockResolvedValueOnce(false);
     await expect(getDashboardMetrics()).rejects.toThrow("Permission denied");
   });
+
+  // getAuditLogs returns empty result when MongoDB is unavailable.
+  test("getAuditLogs returns empty result when MongoDB is unavailable", async () => {
+    jest.spyOn(require("@/mongoDb"), "isMongoAvailable").mockReturnValueOnce(false);
+    const result = await getAuditLogs();
+    expect(result).toEqual({ logs: [], total: 0 });
+  });
+
+  // getAuditLogUserEmails returns empty array when MongoDB is unavailable.
+  test("getAuditLogUserEmails returns empty array when MongoDB is unavailable", async () => {
+    jest.spyOn(require("@/mongoDb"), "isMongoAvailable").mockReturnValueOnce(false);
+    const result = await getAuditLogUserEmails();
+    expect(result).toEqual([]);
+  });
 });
 
 describe("getDataExportCounts", () => {
@@ -1184,6 +1246,15 @@ describe("getDataExportCounts", () => {
   test("throws when permission is denied", async () => {
     hasPermission.mockResolvedValueOnce(false);
     await expect(getDataExportCounts()).rejects.toThrow("Permission denied");
+  });
+
+  // Returns zero audit log count when MongoDB is unavailable.
+  test("returns zero auditLogs when MongoDB is unavailable", async () => {
+    jest.spyOn(require("@/mongoDb"), "isMongoAvailable").mockReturnValueOnce(false);
+    await testPrisma.person.create({ data: { name: "Test" } });
+    const counts = await getDataExportCounts();
+    expect(counts.auditLogs).toBe(0);
+    expect(counts.persons).toBe(1);
   });
 });
 
@@ -1238,6 +1309,24 @@ describe("getProfile", () => {
     const profile = await getProfile();
     expect(profile!.resolvedPermissions["person:read"]).toBe(true);
     expect(profile!.resolvedPermissions["person:create"]).toBe(false);
+  });
+
+  // Profile includes twoFactorEnabled=true when 2FA is enabled.
+  test("includes twoFactorEnabled=true when 2FA is set up", async () => {
+    const user = await testPrisma.user.create({
+      data: { email: "2fa@test.com", name: "2FA User", role: "user" },
+    });
+    await testPrisma.twoFactorAuth.create({
+      data: {
+        userId: user.id,
+        encryptedSecret: "encrypted",
+        enabled: true,
+        recoveryCodes: [],
+      },
+    });
+    auth.mockResolvedValueOnce({ user: { id: user.id, email: user.email } });
+    const profile = await getProfile();
+    expect(profile!.twoFactorEnabled).toBe(true);
   });
 
   // Profile includes correct permissions for an administrator.
@@ -1395,6 +1484,19 @@ describe("getPagedDepartments", () => {
     expect(result.total).toBe(0);
   });
 
+  // Returns department with its teams array populated.
+  test("returns department with teams included", async () => {
+    const dept = await testPrisma.department.create({ data: { name: "Engineering" } });
+    await testPrisma.team.create({ data: { teamName: "Backend", departmentId: dept.id } });
+    await testPrisma.team.create({ data: { teamName: "Frontend", departmentId: dept.id } });
+
+    const result = await getPagedDepartments();
+    expect(result.items).toHaveLength(1);
+    expect(result.items[0].teams).toHaveLength(2);
+    const teamNames = result.items[0].teams.map((t: { teamName: string }) => t.teamName).sort();
+    expect(teamNames).toEqual(["Backend", "Frontend"]);
+  });
+
   // Paginates departments across multiple pages.
   test("paginates departments with page and pageSize", async () => {
     for (let i = 1; i <= 5; i++) {
@@ -1467,6 +1569,24 @@ describe("getOrgChartData", () => {
     const data = await getOrgChartData();
     expect(data.unassignedTeams).toHaveLength(1);
     expect(data.unassignedTeams[0].teamName).toBe("Freelancers");
+  });
+
+  // Unassigned team with members — exercises team.members.map callback (line 249).
+  test("includes members of unassigned teams", async () => {
+    const person = await testPrisma.person.create({
+      data: { name: "Solo Dev", email: "solo@test.com" },
+    });
+    const team = await testPrisma.team.create({ data: { teamName: "Solo Team" } });
+    await testPrisma.teamMember.create({
+      data: { teamId: team.teamId, personId: person.id },
+    });
+
+    const { getOrgChartData } = await import("@/queries");
+    const data = await getOrgChartData();
+    const soloTeam = data.unassignedTeams.find((t) => t.teamName === "Solo Team")!;
+    expect(soloTeam).toBeDefined();
+    expect(soloTeam.members).toHaveLength(1);
+    expect(soloTeam.members[0].name).toBe("Solo Dev");
   });
 
   // Persons not in any team appear in unassignedPersons.
@@ -1813,6 +1933,971 @@ describe("position query permission checks", () => {
   test("getPositions throws when permission is denied", async () => {
     hasPermission.mockResolvedValueOnce(false);
     await expect(getPositions()).rejects.toThrow("Permission denied");
+  });
+});
+
+describe("getLeaveTypes data", () => {
+  beforeEach(async () => {
+    await cleanDb();
+  });
+
+  afterAll(() => cleanDb());
+
+  // Returns all active leave types sorted by name.
+  test("returns leave types sorted by name", async () => {
+    await testPrisma.leaveType.createMany({
+      data: [
+        { name: "Sick Leave", defaultDays: 10, color: "#f44336" },
+        { name: "Annual Leave", defaultDays: 25, color: "#4caf50" },
+      ],
+    });
+
+    const types = await getLeaveTypes();
+    expect(types).toHaveLength(2);
+    expect(types[0].name).toBe("Annual Leave");
+    expect(types[1].name).toBe("Sick Leave");
+  });
+
+  // Excludes soft-deleted leave types.
+  test("excludes soft-deleted leave types", async () => {
+    await testPrisma.leaveType.create({
+      data: { name: "Active", defaultDays: 10, color: "#000" },
+    });
+    await testPrisma.leaveType.create({
+      data: { name: "Deleted", defaultDays: 10, color: "#000", deletedAt: new Date() },
+    });
+
+    const types = await getLeaveTypes();
+    expect(types).toHaveLength(1);
+    expect(types[0].name).toBe("Active");
+  });
+
+  // Returns empty array when no leave types exist.
+  test("returns empty array when no leave types exist", async () => {
+    const types = await getLeaveTypes();
+    expect(types).toEqual([]);
+  });
+
+  // Filters by demo sessionId.
+  test("filters by demo sessionId", async () => {
+    await testPrisma.leaveType.create({
+      data: { name: "Prod Leave", defaultDays: 10, color: "#000", sessionId: null },
+    });
+    await testPrisma.leaveType.create({
+      data: { name: "Demo Leave", defaultDays: 10, color: "#000", sessionId: "sess-x" },
+    });
+
+    mockGetDemoSessionId.mockResolvedValueOnce("sess-x");
+    const types = await getLeaveTypes();
+    expect(types).toHaveLength(1);
+    expect(types[0].name).toBe("Demo Leave");
+  });
+});
+
+describe("getLeaveRequests data", () => {
+  beforeEach(async () => {
+    await cleanDb();
+  });
+
+  afterAll(() => cleanDb());
+
+  // Returns leave requests with person and leave type details.
+  test("returns leave requests with joined details", async () => {
+    const person = await testPrisma.person.create({ data: { name: "Alice" } });
+    const lt = await testPrisma.leaveType.create({
+      data: { name: "Annual", defaultDays: 20, color: "#4caf50" },
+    });
+    await testPrisma.leaveRequest.create({
+      data: {
+        personId: person.id,
+        leaveTypeId: lt.id,
+        startDate: new Date("2026-07-01"),
+        endDate: new Date("2026-07-05"),
+        days: 5,
+        status: "pending",
+        note: "Vacation",
+        sessionId: null,
+      },
+    });
+
+    const requests = await getLeaveRequests();
+    expect(requests).toHaveLength(1);
+    expect(requests[0].personName).toBe("Alice");
+    expect(requests[0].leaveTypeName).toBe("Annual");
+    expect(requests[0].days).toBe(5);
+    expect(requests[0].note).toBe("Vacation");
+  });
+
+  // Filters leave requests by personId.
+  test("filters by personId", async () => {
+    const p1 = await testPrisma.person.create({ data: { name: "Alice" } });
+    const p2 = await testPrisma.person.create({ data: { name: "Bob" } });
+    const lt = await testPrisma.leaveType.create({
+      data: { name: "Sick", defaultDays: 10, color: "#f44" },
+    });
+    await testPrisma.leaveRequest.create({
+      data: {
+        personId: p1.id,
+        leaveTypeId: lt.id,
+        startDate: new Date("2026-08-01"),
+        endDate: new Date("2026-08-03"),
+        days: 3,
+        status: "pending",
+        sessionId: null,
+      },
+    });
+    await testPrisma.leaveRequest.create({
+      data: {
+        personId: p2.id,
+        leaveTypeId: lt.id,
+        startDate: new Date("2026-08-05"),
+        endDate: new Date("2026-08-06"),
+        days: 2,
+        status: "pending",
+        sessionId: null,
+      },
+    });
+
+    const requests = await getLeaveRequests({ personId: p1.id });
+    expect(requests).toHaveLength(1);
+    expect(requests[0].personName).toBe("Alice");
+  });
+
+  // Filters leave requests by status.
+  test("filters by status", async () => {
+    const person = await testPrisma.person.create({ data: { name: "Charlie" } });
+    const lt = await testPrisma.leaveType.create({
+      data: { name: "Annual", defaultDays: 20, color: "#4caf50" },
+    });
+    await testPrisma.leaveRequest.create({
+      data: {
+        personId: person.id,
+        leaveTypeId: lt.id,
+        startDate: new Date("2026-07-01"),
+        endDate: new Date("2026-07-05"),
+        days: 5,
+        status: "approved",
+        sessionId: null,
+      },
+    });
+    await testPrisma.leaveRequest.create({
+      data: {
+        personId: person.id,
+        leaveTypeId: lt.id,
+        startDate: new Date("2026-08-01"),
+        endDate: new Date("2026-08-03"),
+        days: 3,
+        status: "pending",
+        sessionId: null,
+      },
+    });
+
+    const approved = await getLeaveRequests({ status: "approved" });
+    expect(approved).toHaveLength(1);
+    expect(approved[0].status).toBe("approved");
+  });
+
+  // Excludes soft-deleted leave requests.
+  test("excludes soft-deleted leave requests", async () => {
+    const person = await testPrisma.person.create({ data: { name: "Diana" } });
+    const lt = await testPrisma.leaveType.create({
+      data: { name: "Annual", defaultDays: 20, color: "#4caf50" },
+    });
+    await testPrisma.leaveRequest.create({
+      data: {
+        personId: person.id,
+        leaveTypeId: lt.id,
+        startDate: new Date("2026-07-01"),
+        endDate: new Date("2026-07-05"),
+        days: 5,
+        status: "pending",
+        deletedAt: new Date(),
+        sessionId: null,
+      },
+    });
+
+    const requests = await getLeaveRequests();
+    expect(requests).toHaveLength(0);
+  });
+});
+
+describe("getLeaveBalances data", () => {
+  beforeEach(async () => {
+    await cleanDb();
+  });
+
+  afterAll(() => cleanDb());
+
+  // Returns leave balances with person and leave type details.
+  test("returns leave balances with joined details", async () => {
+    const person = await testPrisma.person.create({ data: { name: "Alice" } });
+    const lt = await testPrisma.leaveType.create({
+      data: { name: "Annual", defaultDays: 25, color: "#4caf50" },
+    });
+    await testPrisma.leaveBalance.create({
+      data: {
+        personId: person.id,
+        leaveTypeId: lt.id,
+        year: 2026,
+        allocated: 25,
+        used: 5,
+        sessionId: null,
+      },
+    });
+
+    const balances = await getLeaveBalances();
+    expect(balances).toHaveLength(1);
+    expect(balances[0].personName).toBe("Alice");
+    expect(balances[0].leaveTypeName).toBe("Annual");
+    expect(balances[0].allocated).toBe(25);
+    expect(balances[0].used).toBe(5);
+    expect(balances[0].remaining).toBe(20);
+  });
+
+  // Filters by personId.
+  test("filters by personId", async () => {
+    const p1 = await testPrisma.person.create({ data: { name: "Alice" } });
+    const p2 = await testPrisma.person.create({ data: { name: "Bob" } });
+    const lt = await testPrisma.leaveType.create({
+      data: { name: "Sick", defaultDays: 10, color: "#f44" },
+    });
+    await testPrisma.leaveBalance.create({
+      data: {
+        personId: p1.id,
+        leaveTypeId: lt.id,
+        year: 2026,
+        allocated: 10,
+        used: 2,
+        sessionId: null,
+      },
+    });
+    await testPrisma.leaveBalance.create({
+      data: {
+        personId: p2.id,
+        leaveTypeId: lt.id,
+        year: 2026,
+        allocated: 10,
+        used: 0,
+        sessionId: null,
+      },
+    });
+
+    const result = await getLeaveBalances({ personId: p1.id });
+    expect(result).toHaveLength(1);
+    expect(result[0].personName).toBe("Alice");
+  });
+
+  // Filters by year.
+  test("filters by year", async () => {
+    const person = await testPrisma.person.create({ data: { name: "Charlie" } });
+    const lt = await testPrisma.leaveType.create({
+      data: { name: "Annual", defaultDays: 20, color: "#4caf50" },
+    });
+    await testPrisma.leaveBalance.create({
+      data: {
+        personId: person.id,
+        leaveTypeId: lt.id,
+        year: 2025,
+        allocated: 20,
+        used: 10,
+        sessionId: null,
+      },
+    });
+    await testPrisma.leaveBalance.create({
+      data: {
+        personId: person.id,
+        leaveTypeId: lt.id,
+        year: 2026,
+        allocated: 25,
+        used: 0,
+        sessionId: null,
+      },
+    });
+
+    const result = await getLeaveBalances({ year: 2025 });
+    expect(result).toHaveLength(1);
+    expect(result[0].year).toBe(2025);
+  });
+});
+
+describe("getPositions data", () => {
+  beforeEach(async () => {
+    await cleanDb();
+  });
+
+  afterAll(() => cleanDb());
+
+  // Returns positions sorted by name.
+  test("returns positions sorted by name", async () => {
+    await testPrisma.position.createMany({
+      data: [
+        { name: "Senior Engineer", sessionId: null },
+        { name: "Junior Engineer", sessionId: null },
+        { name: "Manager", sessionId: null },
+      ],
+    });
+
+    const positions = await getPositions();
+    expect(positions).toHaveLength(3);
+    expect(positions[0].name).toBe("Junior Engineer");
+    expect(positions[1].name).toBe("Manager");
+    expect(positions[2].name).toBe("Senior Engineer");
+  });
+
+  // Excludes soft-deleted positions.
+  test("excludes soft-deleted positions", async () => {
+    await testPrisma.position.create({ data: { name: "Active", sessionId: null } });
+    await testPrisma.position.create({
+      data: { name: "Deleted", deletedAt: new Date(), sessionId: null },
+    });
+
+    const positions = await getPositions();
+    expect(positions).toHaveLength(1);
+    expect(positions[0].name).toBe("Active");
+  });
+
+  // Returns empty array when no positions exist.
+  test("returns empty array when no positions exist", async () => {
+    const positions = await getPositions();
+    expect(positions).toEqual([]);
+  });
+});
+
+describe("getEmployeeProfile data", () => {
+  beforeEach(async () => {
+    await cleanDb();
+  });
+
+  afterAll(() => cleanDb());
+
+  // Returns null for a non-existent person ID.
+  test("returns null for non-existent person", async () => {
+    const { getEmployeeProfile } = require("@/queries");
+    const result = await getEmployeeProfile("00000000-0000-0000-0000-000000000000");
+    expect(result).toBeNull();
+  });
+
+  // Returns full employee profile with teams, managed teams, and headed departments.
+  test("returns full employee profile with relations", async () => {
+    const { getEmployeeProfile } = require("@/queries");
+    const person = await testPrisma.person.create({
+      data: { name: "Alice", email: "alice@test.com", position: "Manager" },
+    });
+    const managedTeam = await testPrisma.team.create({
+      data: { teamName: "Alpha Team", teamManagerId: person.id },
+    });
+    const otherTeam = await testPrisma.team.create({ data: { teamName: "Beta Team" } });
+    await testPrisma.teamMember.create({
+      data: { personId: person.id, teamId: otherTeam.teamId },
+    });
+    await testPrisma.department.create({
+      data: { name: "Engineering", headId: person.id },
+    });
+
+    const profile = await getEmployeeProfile(person.id);
+    expect(profile).not.toBeNull();
+    expect(profile!.name).toBe("Alice");
+    expect(profile!.email).toBe("alice@test.com");
+    expect(profile!.position).toBe("Manager");
+    expect(profile!.managedTeams).toHaveLength(1);
+    expect(profile!.managedTeams[0].teamName).toBe("Alpha Team");
+    expect(profile!.teams).toHaveLength(1);
+    expect(profile!.teams[0].teamName).toBe("Beta Team");
+    expect(profile!.headOfDepartments).toHaveLength(1);
+    expect(profile!.headOfDepartments[0].name).toBe("Engineering");
+  });
+
+  // Excludes soft-deleted team memberships.
+  test("excludes soft-deleted team memberships from profile", async () => {
+    const { getEmployeeProfile } = require("@/queries");
+    const person = await testPrisma.person.create({ data: { name: "Bob" } });
+    const team = await testPrisma.team.create({ data: { teamName: "Ghost Team" } });
+    await testPrisma.teamMember.create({
+      data: { personId: person.id, teamId: team.teamId, deletedAt: new Date() },
+    });
+
+    const profile = await getEmployeeProfile(person.id);
+    expect(profile!.teams).toHaveLength(0);
+  });
+});
+
+describe("getReviewTemplates data", () => {
+  beforeEach(async () => {
+    await cleanDb();
+  });
+
+  afterAll(() => cleanDb());
+
+  // Returns all active review templates sorted by createdAt.
+  test("returns active review templates", async () => {
+    await testPrisma.reviewTemplate.create({
+      data: { name: "Annual Review", questions: [], sessionId: null },
+    });
+    await testPrisma.reviewTemplate.create({
+      data: {
+        name: "Deleted Template",
+        questions: [],
+        sessionId: null,
+        deletedAt: new Date(),
+      },
+    });
+
+    const templates = await getReviewTemplates();
+    expect(templates).toHaveLength(1);
+    expect(templates[0].name).toBe("Annual Review");
+    expect(templates[0].questions).toEqual([]);
+  });
+
+  // Returns empty array when no templates exist.
+  test("returns empty array when no templates exist", async () => {
+    const templates = await getReviewTemplates();
+    expect(templates).toEqual([]);
+  });
+});
+
+describe("getReviewTemplate data", () => {
+  beforeEach(async () => {
+    await cleanDb();
+  });
+
+  afterAll(() => cleanDb());
+
+  // Returns a single review template by ID.
+  test("returns a single review template", async () => {
+    const tmpl = await testPrisma.reviewTemplate.create({
+      data: { name: "360 Review", questions: [], sessionId: null },
+    });
+
+    const result = await getReviewTemplate(tmpl.id);
+    expect(result).not.toBeNull();
+    expect(result!.name).toBe("360 Review");
+  });
+
+  // Returns null for non-existent template ID.
+  test("returns null for non-existent template", async () => {
+    const result = await getReviewTemplate("00000000-0000-0000-0000-000000000000");
+    expect(result).toBeNull();
+  });
+
+  // Returns null for soft-deleted template.
+  test("returns null for soft-deleted template", async () => {
+    const tmpl = await testPrisma.reviewTemplate.create({
+      data: {
+        name: "Old Template",
+        questions: [],
+        sessionId: null,
+        deletedAt: new Date(),
+      },
+    });
+
+    const result = await getReviewTemplate(tmpl.id);
+    expect(result).toBeNull();
+  });
+});
+
+describe("getReviewCycles data", () => {
+  beforeEach(async () => {
+    await cleanDb();
+  });
+
+  afterAll(() => cleanDb());
+
+  // Returns all active review cycles with counts.
+  test("returns review cycles with request counts", async () => {
+    const tmpl = await testPrisma.reviewTemplate.create({
+      data: { name: "Annual", questions: [], sessionId: null },
+    });
+    const cycle = await testPrisma.reviewCycle.create({
+      data: {
+        name: "Q1 2026",
+        templateId: tmpl.id,
+        status: "OPEN",
+        startDate: new Date("2026-01-01"),
+        endDate: new Date("2026-03-31"),
+        sessionId: null,
+      },
+    });
+    const p1 = await testPrisma.person.create({ data: { name: "Alice" } });
+    await testPrisma.reviewRequest.create({
+      data: {
+        cycleId: cycle.id,
+        subjectId: p1.id,
+        type: "SELF",
+        status: "PENDING",
+        sessionId: null,
+      },
+    });
+    await testPrisma.reviewRequest.create({
+      data: {
+        cycleId: cycle.id,
+        subjectId: p1.id,
+        type: "PEER",
+        status: "SUBMITTED",
+        sessionId: null,
+      },
+    });
+
+    const cycles = await getReviewCycles();
+    expect(cycles).toHaveLength(1);
+    expect(cycles[0].name).toBe("Q1 2026");
+    expect(cycles[0].requestCount).toBe(2);
+    expect(cycles[0].submittedCount).toBe(1);
+    expect(cycles[0].templateName).toBe("Annual");
+  });
+
+  // Excludes soft-deleted cycles.
+  test("excludes soft-deleted cycles", async () => {
+    await testPrisma.reviewCycle.create({
+      data: {
+        name: "Deleted Cycle",
+        status: "OPEN",
+        startDate: new Date("2026-01-01"),
+        endDate: new Date("2026-03-31"),
+        sessionId: null,
+        deletedAt: new Date(),
+      },
+    });
+
+    const cycles = await getReviewCycles();
+    expect(cycles).toHaveLength(0);
+  });
+});
+
+describe("getReviewCycle data", () => {
+  beforeEach(async () => {
+    await cleanDb();
+  });
+
+  afterAll(() => cleanDb());
+
+  // Returns null for a non-existent cycle.
+  test("returns null for non-existent cycle", async () => {
+    const result = await getReviewCycle("00000000-0000-0000-0000-000000000000");
+    expect(result).toBeNull();
+  });
+
+  // Returns cycle with all review requests and their subjects/reviewers.
+  test("returns cycle with requests and persons", async () => {
+    const subject = await testPrisma.person.create({ data: { name: "Subject Person" } });
+    const reviewer = await testPrisma.person.create({ data: { name: "Reviewer Person" } });
+    const cycle = await testPrisma.reviewCycle.create({
+      data: {
+        name: "Mid-Year Review",
+        status: "OPEN",
+        startDate: new Date("2026-06-01"),
+        endDate: new Date("2026-06-30"),
+        sessionId: null,
+      },
+    });
+    await testPrisma.reviewRequest.create({
+      data: {
+        cycleId: cycle.id,
+        subjectId: subject.id,
+        reviewerId: reviewer.id,
+        type: "PEER",
+        status: "PENDING",
+        sessionId: null,
+      },
+    });
+
+    const result = await getReviewCycle(cycle.id);
+    expect(result).not.toBeNull();
+    expect(result!.name).toBe("Mid-Year Review");
+    expect(result!.requests).toHaveLength(1);
+    expect(result!.requests[0].subjectName).toBe("Subject Person");
+    expect(result!.requests[0].reviewerName).toBe("Reviewer Person");
+  });
+});
+
+describe("getMyReviewRequests data", () => {
+  beforeEach(async () => {
+    await cleanDb();
+  });
+
+  afterAll(() => cleanDb());
+
+  // Returns empty array when no reviewerPersonId provided.
+  test("returns empty array when no reviewerPersonId", async () => {
+    const result = await getMyReviewRequests();
+    expect(result).toEqual([]);
+  });
+
+  // Returns pending review requests for the reviewer in open cycles.
+  test("returns pending requests for reviewer in open cycles", async () => {
+    const subject = await testPrisma.person.create({ data: { name: "Subject" } });
+    const reviewer = await testPrisma.person.create({ data: { name: "Reviewer" } });
+    const cycle = await testPrisma.reviewCycle.create({
+      data: {
+        name: "Open Cycle",
+        status: "OPEN",
+        startDate: new Date("2026-01-01"),
+        endDate: new Date("2026-12-31"),
+        sessionId: null,
+      },
+    });
+    await testPrisma.reviewRequest.create({
+      data: {
+        cycleId: cycle.id,
+        subjectId: subject.id,
+        reviewerId: reviewer.id,
+        type: "PEER",
+        status: "PENDING",
+        sessionId: null,
+      },
+    });
+
+    const result = await getMyReviewRequests(reviewer.id);
+    expect(result).toHaveLength(1);
+    expect(result[0].subjectName).toBe("Subject");
+  });
+
+  // Does not return requests from closed cycles.
+  test("excludes requests from closed cycles", async () => {
+    const subject = await testPrisma.person.create({ data: { name: "Subject" } });
+    const reviewer = await testPrisma.person.create({ data: { name: "Reviewer" } });
+    const closedCycle = await testPrisma.reviewCycle.create({
+      data: {
+        name: "Closed Cycle",
+        status: "CLOSED",
+        startDate: new Date("2025-01-01"),
+        endDate: new Date("2025-12-31"),
+        sessionId: null,
+      },
+    });
+    await testPrisma.reviewRequest.create({
+      data: {
+        cycleId: closedCycle.id,
+        subjectId: subject.id,
+        reviewerId: reviewer.id,
+        type: "PEER",
+        status: "PENDING",
+        sessionId: null,
+      },
+    });
+
+    const result = await getMyReviewRequests(reviewer.id);
+    expect(result).toHaveLength(0);
+  });
+});
+
+describe("getReviewRequestWithTemplate data", () => {
+  beforeEach(async () => {
+    await cleanDb();
+  });
+
+  afterAll(() => cleanDb());
+
+  // Returns null for non-existent request.
+  test("returns null for non-existent request", async () => {
+    const result = await getReviewRequestWithTemplate("00000000-0000-0000-0000-000000000000");
+    expect(result).toBeNull();
+  });
+
+  // Returns request with template when cycle has a template.
+  test("returns request and template when cycle has template", async () => {
+    const subject = await testPrisma.person.create({ data: { name: "Subject" } });
+    const tmpl = await testPrisma.reviewTemplate.create({
+      data: { name: "Standard Template", questions: [], sessionId: null },
+    });
+    const cycle = await testPrisma.reviewCycle.create({
+      data: {
+        name: "Review Cycle",
+        templateId: tmpl.id,
+        status: "OPEN",
+        startDate: new Date("2026-01-01"),
+        endDate: new Date("2026-12-31"),
+        sessionId: null,
+      },
+    });
+    const req = await testPrisma.reviewRequest.create({
+      data: {
+        cycleId: cycle.id,
+        subjectId: subject.id,
+        type: "SELF",
+        status: "PENDING",
+        sessionId: null,
+      },
+    });
+
+    const result = await getReviewRequestWithTemplate(req.id);
+    expect(result).not.toBeNull();
+    expect(result!.request.cycleId).toBe(cycle.id);
+    expect(result!.template).not.toBeNull();
+    expect(result!.template!.name).toBe("Standard Template");
+  });
+
+  // Returns request with null template when cycle has no template.
+  test("returns null template when cycle has no template", async () => {
+    const subject = await testPrisma.person.create({ data: { name: "Subject" } });
+    const cycle = await testPrisma.reviewCycle.create({
+      data: {
+        name: "No Template Cycle",
+        status: "OPEN",
+        startDate: new Date("2026-01-01"),
+        endDate: new Date("2026-12-31"),
+        sessionId: null,
+      },
+    });
+    const req = await testPrisma.reviewRequest.create({
+      data: {
+        cycleId: cycle.id,
+        subjectId: subject.id,
+        type: "SELF",
+        status: "PENDING",
+        sessionId: null,
+      },
+    });
+
+    const result = await getReviewRequestWithTemplate(req.id);
+    expect(result).not.toBeNull();
+    expect(result!.template).toBeNull();
+  });
+});
+
+describe("review queries — permission denied branches", () => {
+  // getReviewTemplates throws when the user lacks review:manage.
+  test("getReviewTemplates throws on permission denied", async () => {
+    const { hasPermission } = require("@/permissions");
+    hasPermission.mockResolvedValueOnce(false);
+    await expect(getReviewTemplates()).rejects.toThrow("Permission denied");
+  });
+
+  // getReviewTemplate throws when the user lacks review:manage.
+  test("getReviewTemplate throws on permission denied", async () => {
+    const { hasPermission } = require("@/permissions");
+    hasPermission.mockResolvedValueOnce(false);
+    await expect(getReviewTemplate("some-id")).rejects.toThrow("Permission denied");
+  });
+
+  // getMyReviewRequests throws when the user lacks review:submit.
+  test("getMyReviewRequests throws on permission denied", async () => {
+    const { hasPermission } = require("@/permissions");
+    hasPermission.mockResolvedValueOnce(false);
+    await expect(getMyReviewRequests("some-id")).rejects.toThrow("Permission denied");
+  });
+
+  // getReviewRequestWithTemplate throws when the user lacks review:submit.
+  test("getReviewRequestWithTemplate throws on permission denied", async () => {
+    const { hasPermission } = require("@/permissions");
+    hasPermission.mockResolvedValueOnce(false);
+    await expect(getReviewRequestWithTemplate("some-id")).rejects.toThrow("Permission denied");
+  });
+});
+
+describe("review template — non-array questions fallback branch", () => {
+  beforeEach(() => cleanDb());
+  afterAll(() => cleanDb());
+
+  // When the questions field in the DB contains a JSON object instead of an array,
+  // the code falls back to [] rather than crashing — tests the `!Array.isArray` branch (line 28/46).
+  test("getReviewTemplates returns empty questions array when questions is a JSON object", async () => {
+    // Insert a template with a JSON object (not an array) as questions via raw SQL workaround.
+    await testPrisma.reviewTemplate.create({
+      data: {
+        name: "Non-array Questions",
+        // Prisma will encode this as a JSON object; the query code should fall back to [].
+        questions: { unexpected: "format" } as unknown as [],
+        sessionId: null,
+      },
+    });
+
+    const templates = await getReviewTemplates();
+    expect(templates).toHaveLength(1);
+    expect(templates[0].questions).toEqual([]);
+  });
+
+  test("getReviewTemplate returns empty questions array when questions is a JSON object", async () => {
+    const template = await testPrisma.reviewTemplate.create({
+      data: {
+        name: "Non-array Template",
+        questions: { unexpected: "format" } as unknown as [],
+        sessionId: null,
+      },
+    });
+
+    const result = await getReviewTemplate(template.id);
+    expect(result).not.toBeNull();
+    expect(result!.questions).toEqual([]);
+  });
+});
+
+describe("getReviewCycles — null templateId branch", () => {
+  beforeEach(() => cleanDb());
+  afterAll(() => cleanDb());
+
+  // A cycle created without a template should have null templateId and null templateName
+  // in the returned DTO — tests the `c.templateId ?? null` and `c.template?.name ?? null` branches.
+  test("returns cycle with null templateId and templateName when no template set", async () => {
+    await testPrisma.reviewCycle.create({
+      data: {
+        name: "No-template Cycle",
+        status: "DRAFT",
+        startDate: new Date("2026-01-01"),
+        endDate: new Date("2026-12-31"),
+        sessionId: null,
+      },
+    });
+
+    const cycles = await getReviewCycles();
+    expect(cycles).toHaveLength(1);
+    expect(cycles[0].templateId).toBeNull();
+    expect(cycles[0].templateName).toBeNull();
+  });
+});
+
+describe("getReviewCycle — null subject/reviewer name branches", () => {
+  beforeEach(() => cleanDb());
+  afterAll(() => cleanDb());
+
+  // A ReviewRequest with null subjectId/reviewerId should return nulls in the parsed DTO.
+  // This covers the `r.subjectId ?? null` and `r.subject?.name ?? null` branches.
+  test("returns null subject and reviewer when IDs are null", async () => {
+    const cycle = await testPrisma.reviewCycle.create({
+      data: {
+        name: "Null Subject Cycle",
+        status: "OPEN",
+        startDate: new Date("2026-01-01"),
+        endDate: new Date("2026-12-31"),
+        sessionId: null,
+      },
+    });
+    await testPrisma.reviewRequest.create({
+      data: {
+        cycleId: cycle.id,
+        subjectId: null,
+        reviewerId: null,
+        type: "SELF",
+        status: "PENDING",
+        sessionId: null,
+      },
+    });
+
+    const result = await getReviewCycle(cycle.id);
+    expect(result).not.toBeNull();
+    expect(result!.requests).toHaveLength(1);
+    expect(result!.requests[0].subjectId).toBeNull();
+    expect(result!.requests[0].subjectName).toBeNull();
+    expect(result!.requests[0].reviewerId).toBeNull();
+    expect(result!.requests[0].reviewerName).toBeNull();
+  });
+});
+
+describe("getMyReviewRequests — null subject/reviewer name branches", () => {
+  beforeEach(() => cleanDb());
+  afterAll(() => cleanDb());
+
+  // A review request with null subjectId and null reviewerId should still be returned.
+  // Tests the `r.subjectId ?? null`, `r.subject?.name ?? null`, `r.reviewerId ?? null`,
+  // `r.reviewer?.name ?? null` null branches on lines 170-173.
+  test("returns request with null subject and reviewer fields when IDs are null", async () => {
+    const reviewer = await testPrisma.person.create({ data: { name: "Reviewer" } });
+    const cycle = await testPrisma.reviewCycle.create({
+      data: {
+        name: "Open Cycle",
+        status: "OPEN",
+        startDate: new Date("2026-01-01"),
+        endDate: new Date("2026-12-31"),
+        sessionId: null,
+      },
+    });
+    // Create a request with both subject and reviewer null — covers lines 170-173.
+    await testPrisma.reviewRequest.create({
+      data: {
+        cycleId: cycle.id,
+        subjectId: null,
+        reviewerId: reviewer.id,
+        type: "SELF",
+        status: "PENDING",
+        sessionId: null,
+      },
+    });
+    // Also create a request with null reviewerId to cover line 172-173.
+    const subject = await testPrisma.person.create({ data: { name: "Subject" } });
+    await testPrisma.reviewRequest.create({
+      data: {
+        cycleId: cycle.id,
+        subjectId: subject.id,
+        reviewerId: reviewer.id,
+        type: "PEER",
+        status: "PENDING",
+        sessionId: null,
+      },
+    });
+
+    const result = await getMyReviewRequests(reviewer.id);
+    expect(result.length).toBeGreaterThanOrEqual(1);
+    // At least one request should have null subjectId.
+    const withNullSubject = result.find((r) => r.subjectId === null);
+    expect(withNullSubject).toBeDefined();
+  });
+});
+
+describe("getReviewRequestWithTemplate — null subject/reviewer name branches", () => {
+  beforeEach(() => cleanDb());
+  afterAll(() => cleanDb());
+
+  // A request with null subjectId/reviewerId should still parse correctly.
+  test("returns null subject and reviewer when IDs are null", async () => {
+    const cycle = await testPrisma.reviewCycle.create({
+      data: {
+        name: "Null Reviewer Cycle",
+        status: "OPEN",
+        startDate: new Date("2026-01-01"),
+        endDate: new Date("2026-12-31"),
+        sessionId: null,
+      },
+    });
+    const req = await testPrisma.reviewRequest.create({
+      data: {
+        cycleId: cycle.id,
+        subjectId: null,
+        reviewerId: null,
+        type: "PEER",
+        status: "PENDING",
+        sessionId: null,
+      },
+    });
+
+    const result = await getReviewRequestWithTemplate(req.id);
+    expect(result).not.toBeNull();
+    expect(result!.request.subjectId).toBeNull();
+    expect(result!.request.reviewerId).toBeNull();
+    expect(result!.template).toBeNull();
+  });
+
+  // When the template's questions field is a JSON object (not array),
+  // the code falls back to [] — tests the `!Array.isArray` branch on line 221.
+  test("returns empty questions array when template questions is a non-array JSON", async () => {
+    const template = await testPrisma.reviewTemplate.create({
+      data: {
+        name: "Non-array Questions Template",
+        questions: { unexpected: "format" } as unknown as [],
+        sessionId: null,
+      },
+    });
+    const cycle = await testPrisma.reviewCycle.create({
+      data: {
+        name: "Cycle with Non-array Template",
+        templateId: template.id,
+        status: "OPEN",
+        startDate: new Date("2026-01-01"),
+        endDate: new Date("2026-12-31"),
+        sessionId: null,
+      },
+    });
+    const req = await testPrisma.reviewRequest.create({
+      data: {
+        cycleId: cycle.id,
+        type: "SELF",
+        status: "PENDING",
+        sessionId: null,
+      },
+    });
+
+    const result = await getReviewRequestWithTemplate(req.id);
+    expect(result).not.toBeNull();
+    expect(result!.template).not.toBeNull();
+    expect(result!.template!.questions).toEqual([]);
   });
 });
 

@@ -66,6 +66,11 @@ import {
   adminResetTwoFactor,
 } from "@/features/twoFactor/actions";
 import {
+  getTwoFactorStatus,
+  isUserTwoFactorEnabled,
+  getUserTwoFactorAuth,
+} from "@/features/twoFactor/queries";
+import {
   generateTotpSecret,
   getTotpBase32,
   generateRecoveryCodes,
@@ -97,6 +102,115 @@ describe("Two-Factor Authentication Server Actions", () => {
     });
     auth.mockResolvedValue({
       user: { id: testUser.id, email: testUser.email },
+    });
+  });
+
+  describe("getTwoFactorStatus", () => {
+    // Returns null when not authenticated
+    it("should return null when not authenticated", async () => {
+      auth.mockResolvedValue(null);
+      const result = await getTwoFactorStatus();
+      expect(result).toBeNull();
+    });
+
+    // Returns enabled=false and hasSetup=false when no 2FA record exists
+    it("should return enabled=false and hasSetup=false when no 2FA record", async () => {
+      const result = await getTwoFactorStatus();
+      expect(result).toEqual({ enabled: false, hasSetup: false });
+    });
+
+    // Returns enabled=true and hasSetup=true when 2FA is enabled
+    it("should return enabled=true and hasSetup=true when 2FA is enabled", async () => {
+      await testPrisma.twoFactorAuth.create({
+        data: {
+          userId: testUser.id,
+          encryptedSecret: "encrypted",
+          enabled: true,
+          recoveryCodes: [],
+        },
+      });
+
+      const result = await getTwoFactorStatus();
+      expect(result).toEqual({ enabled: true, hasSetup: true });
+    });
+
+    // Returns enabled=false and hasSetup=true when 2FA record exists but not enabled
+    it("should return enabled=false and hasSetup=true when record exists but not enabled", async () => {
+      await testPrisma.twoFactorAuth.create({
+        data: {
+          userId: testUser.id,
+          encryptedSecret: "encrypted",
+          enabled: false,
+          recoveryCodes: [],
+        },
+      });
+
+      const result = await getTwoFactorStatus();
+      expect(result).toEqual({ enabled: false, hasSetup: true });
+    });
+  });
+
+  describe("isUserTwoFactorEnabled", () => {
+    // Returns false when no 2FA record exists
+    it("should return false when no 2FA record exists", async () => {
+      const result = await isUserTwoFactorEnabled(testUser.id);
+      expect(result).toBe(false);
+    });
+
+    // Returns true when 2FA is enabled
+    it("should return true when 2FA is enabled", async () => {
+      await testPrisma.twoFactorAuth.create({
+        data: {
+          userId: testUser.id,
+          encryptedSecret: "encrypted",
+          enabled: true,
+          recoveryCodes: [],
+        },
+      });
+
+      const result = await isUserTwoFactorEnabled(testUser.id);
+      expect(result).toBe(true);
+    });
+
+    // Returns false when 2FA record exists but is disabled
+    it("should return false when 2FA record exists but disabled", async () => {
+      await testPrisma.twoFactorAuth.create({
+        data: {
+          userId: testUser.id,
+          encryptedSecret: "encrypted",
+          enabled: false,
+          recoveryCodes: [],
+        },
+      });
+
+      const result = await isUserTwoFactorEnabled(testUser.id);
+      expect(result).toBe(false);
+    });
+  });
+
+  describe("getUserTwoFactorAuth", () => {
+    // Returns null when no 2FA record exists
+    it("should return null when no 2FA record exists", async () => {
+      const result = await getUserTwoFactorAuth(testUser.id);
+      expect(result).toBeNull();
+    });
+
+    // Returns the 2FA record with encrypted secret and recovery codes
+    it("should return the 2FA record when it exists", async () => {
+      await testPrisma.twoFactorAuth.create({
+        data: {
+          userId: testUser.id,
+          encryptedSecret: "encrypted-secret",
+          enabled: true,
+          recoveryCodes: ["hash1", "hash2"],
+        },
+      });
+
+      const result = await getUserTwoFactorAuth(testUser.id);
+      expect(result).not.toBeNull();
+      expect(result!.encryptedSecret).toBe("encrypted-secret");
+      expect(result!.enabled).toBe(true);
+      expect(result!.recoveryCodes).toEqual(["hash1", "hash2"]);
     });
   });
 
@@ -137,6 +251,16 @@ describe("Two-Factor Authentication Server Actions", () => {
   });
 
   describe("confirmTwoFactorSetup", () => {
+    // Should reject when secret field is missing — invalidTotpSecret error (line 78).
+    it("should reject when secret is missing", async () => {
+      // code is 6 chars so it passes the length check, but secret is empty — hits line 78.
+      const result = await confirmTwoFactorSetup(
+        formData({ code: "123456", secret: "", recoveryCodes: JSON.stringify([]) }),
+      );
+      expect(result).toBeDefined();
+      expect(result?.code).toBe("invalidTotpSecret");
+    });
+
     // Should enable 2FA when given a valid code
     it("should enable 2FA with a valid TOTP code", async () => {
       const totp = generateTotpSecret(testUser.email);
@@ -196,6 +320,13 @@ describe("Two-Factor Authentication Server Actions", () => {
   });
 
   describe("disableTwoFactor", () => {
+    // Should reject when code field is missing or empty — invalidTotpCode (line 145-146).
+    it("should reject when code is missing", async () => {
+      const result = await disableTwoFactor(formData({}));
+      expect(result).toBeDefined();
+      expect(result?.code).toBe("invalidTotpCode");
+    });
+
     // Should disable 2FA when given a valid code
     it("should disable 2FA with a valid code", async () => {
       // Set up 2FA first
@@ -253,6 +384,20 @@ describe("Two-Factor Authentication Server Actions", () => {
   });
 
   describe("verifyTwoFactorLogin", () => {
+    // Should return early without error when 2FA is not enabled (line 270).
+    it("should return without error when 2FA is not enabled for user", async () => {
+      // No twoFactorAuth record exists — verifyTwoFactorLogin should just return undefined.
+      const result = await verifyTwoFactorLogin(formData({ code: "123456" }));
+      expect(result).toBeUndefined();
+    });
+
+    // Should reject when code field is missing — invalidTotpCode (line 262).
+    it("should reject when code is missing", async () => {
+      const result = await verifyTwoFactorLogin(formData({}));
+      expect(result).toBeDefined();
+      expect(result?.code).toBe("invalidTotpCode");
+    });
+
     // Should verify a valid TOTP code during login
     it("should accept a valid TOTP code", async () => {
       const totp = generateTotpSecret(testUser.email);
@@ -318,6 +463,109 @@ describe("Two-Factor Authentication Server Actions", () => {
       const result = await verifyTwoFactorLogin(formData({ code: "000000" }));
       expect(result).toBeDefined();
       expect(result?.code).toBe("invalidTotpCode");
+    });
+  });
+
+  describe("regenerateRecoveryCodes", () => {
+    // Should regenerate recovery codes when given a valid TOTP code
+    it("should regenerate recovery codes with a valid code", async () => {
+      const { regenerateRecoveryCodes } = require("@/serverActions");
+      const totp = generateTotpSecret(testUser.email);
+      const secret = getTotpBase32(totp);
+      const { encryptSecret } = require("@/lib/totpCrypto");
+      const oldCodes = generateRecoveryCodes();
+
+      await testPrisma.twoFactorAuth.create({
+        data: {
+          userId: testUser.id,
+          encryptedSecret: encryptSecret(secret),
+          enabled: true,
+          recoveryCodes: oldCodes.map(hashRecoveryCode),
+        },
+      });
+
+      const code = totp.generate();
+      const result = await regenerateRecoveryCodes(formData({ code }));
+
+      // Returns new recovery codes
+      expect(result).toHaveProperty("recoveryCodes");
+      const newCodes = (result as { recoveryCodes: string[] }).recoveryCodes;
+      expect(newCodes).toHaveLength(10);
+      // New codes should differ from old codes
+      expect(newCodes.sort().join(",")).not.toBe(oldCodes.sort().join(","));
+    });
+
+    // Should return error when not authenticated
+    it("should return error when not authenticated", async () => {
+      const { regenerateRecoveryCodes } = require("@/serverActions");
+      auth.mockResolvedValue(null);
+      const result = await regenerateRecoveryCodes(formData({ code: "123456" }));
+      expect(result).toHaveProperty("error");
+    });
+
+    // Should return error when code is too short
+    it("should return error when code is too short", async () => {
+      const { regenerateRecoveryCodes } = require("@/serverActions");
+      const result = await regenerateRecoveryCodes(formData({ code: "12" }));
+      expect(result).toHaveProperty("code", "invalidTotpCode");
+    });
+
+    // Should return error when 2FA is not enabled
+    it("should return error when 2FA is not enabled", async () => {
+      const { regenerateRecoveryCodes } = require("@/serverActions");
+      const result = await regenerateRecoveryCodes(formData({ code: "123456" }));
+      expect(result).toHaveProperty("code", "twoFactorNotEnabled");
+    });
+
+    // Should return unexpectedError when a non-ActionError is thrown — covers lines 240-243.
+    it("should return unexpectedError when DB throws a generic error", async () => {
+      const { regenerateRecoveryCodes } = require("@/serverActions");
+      const { prisma } = require("@/db");
+
+      const totp = generateTotpSecret(testUser.email);
+      const secret = getTotpBase32(totp);
+      const { encryptSecret } = require("@/lib/totpCrypto");
+
+      await testPrisma.twoFactorAuth.create({
+        data: {
+          userId: testUser.id,
+          encryptedSecret: encryptSecret(secret),
+          enabled: true,
+          recoveryCodes: [],
+        },
+      });
+
+      // Force a non-ActionError inside the try block by making $transaction throw.
+      const originalTransaction = prisma.$transaction;
+      prisma.$transaction = jest.fn().mockRejectedValueOnce(new Error("DB connection lost"));
+
+      const code = totp.generate();
+      const result = await regenerateRecoveryCodes(formData({ code }));
+
+      // Restore the original implementation.
+      prisma.$transaction = originalTransaction;
+
+      expect(result).toHaveProperty("code", "unexpectedError");
+    });
+
+    // Should return error when TOTP code is invalid
+    it("should return error when TOTP code is invalid", async () => {
+      const { regenerateRecoveryCodes } = require("@/serverActions");
+      const totp = generateTotpSecret(testUser.email);
+      const secret = getTotpBase32(totp);
+      const { encryptSecret } = require("@/lib/totpCrypto");
+
+      await testPrisma.twoFactorAuth.create({
+        data: {
+          userId: testUser.id,
+          encryptedSecret: encryptSecret(secret),
+          enabled: true,
+          recoveryCodes: [],
+        },
+      });
+
+      const result = await regenerateRecoveryCodes(formData({ code: "000000" }));
+      expect(result).toHaveProperty("code", "invalidTotpCode");
     });
   });
 

@@ -481,6 +481,21 @@ describe("seedMockData", () => {
     expect(users).toHaveLength(4);
   });
 
+  // Running seedMockData twice with clearExisting=false should not duplicate persons, teams,
+  // or memberships — the upsert/skip logic handles already-existing seed rows.
+  test("is idempotent when clearExisting is false (skips existing persons/teams/members)", async () => {
+    await seedMockData(true);
+    // Second call with clearExisting=false hits the "already exists" skip branches
+    await seedMockData(false);
+
+    const persons = await testPrisma.person.findMany({ where: { sessionId: null } });
+    expect(persons).toHaveLength(9);
+    const teams = await testPrisma.team.findMany({ where: { sessionId: null } });
+    expect(teams).toHaveLength(5);
+    const members = await testPrisma.teamMember.findMany({ where: { sessionId: null } });
+    expect(members).toHaveLength(10);
+  });
+
   // With clearExisting=false, existing data should be preserved alongside seeded data.
   test("preserves existing data when clearExisting is false", async () => {
     await createTestPerson({ name: "Pre-existing", email: "existing@test.com" });
