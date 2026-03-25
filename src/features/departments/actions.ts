@@ -186,7 +186,9 @@ export async function updateDepartmentHead(data: FormData): Promise<ActionResult
     const auditEntries: DeferredAuditEntry[] = [];
     await prisma.$transaction(async (tx) => {
       if (personID) {
-        const person = await tx.person.findFirst({ where: { id: personID, sessionId } });
+        const person = await tx.person.findFirst({
+          where: { id: personID, deletedAt: null, sessionId },
+        });
         if (!person) {
           throw new ActionError("personNotFound", t("personNotFound"));
         }

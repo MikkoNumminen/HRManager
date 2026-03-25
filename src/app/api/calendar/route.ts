@@ -1,15 +1,15 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/auth";
 import { prisma } from "@/db";
 import { getDemoSessionId } from "@/demoSession";
 import { generateICS } from "@/lib/ical";
+import { hasPermission } from "@/permissions";
 
 // Export approved leave requests as an iCal (.ics) calendar file.
 // Supports optional ?personId= query param to filter by person.
 // Requires leave:view permission.
 export async function GET(request: Request): Promise<NextResponse> {
-  const session = await auth();
-  if (!session?.user?.permissions?.["leave:view"]) {
+  const allowed = await hasPermission("leave:view");
+  if (!allowed) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
