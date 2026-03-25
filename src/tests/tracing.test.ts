@@ -9,7 +9,7 @@ import {
   dbQueryDuration,
   errorCounter,
 } from "@/lib/tracing";
-import { SpanStatusCode, trace, context, metrics } from "@opentelemetry/api";
+import { trace } from "@opentelemetry/api";
 
 describe("tracing utilities", () => {
   beforeEach(() => {
@@ -29,7 +29,7 @@ describe("tracing utilities", () => {
 
     // Should set OK status on successful span
     it("sets OK status on success", async () => {
-      await withSpan("ok-op", {}, async (span) => {
+      await withSpan("ok-op", {}, async (_span) => {
         // span.setStatus called in finally
         return "done";
       });
