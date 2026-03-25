@@ -14,7 +14,7 @@ import { Box } from "@mui/material";
 import { colors, pageContainerStyles } from "@/muiStyles";
 import type { OrgChartData } from "@/schemas";
 import { useTranslations } from "next-intl";
-import { buildNodesAndEdges, nodeColors } from "./orgChartUtils";
+import { buildNodesAndEdges } from "./orgChartUtils";
 import OrgChartToolbar from "./OrgChartToolbar";
 
 export default function OrgChartClient({ data }: { data: OrgChartData }) {
