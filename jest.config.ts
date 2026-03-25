@@ -20,6 +20,7 @@ const customJestConfig: Config = {
     "^@auth/core/(.*)$": "<rootDir>/src/tests/mocks/next-auth.js",
     "^mongodb$": "<rootDir>/src/tests/mocks/mongodb.js",
     "^mongodb/(.*)$": "<rootDir>/src/tests/mocks/mongodb.js",
+    "^@opentelemetry/api$": "<rootDir>/src/tests/mocks/opentelemetry.ts",
   },
 };
 

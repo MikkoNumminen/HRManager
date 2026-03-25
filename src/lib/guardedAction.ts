@@ -2,6 +2,7 @@ import { requirePermission, type PermissionKey } from "@/permissions";
 import { rateLimit } from "@/rateLimit";
 import { getTranslations } from "next-intl/server";
 import { safe, type ActionResult } from "@/lib/actionUtils";
+import { withSpan, actionCounter, actionDuration, errorCounter } from "@/lib/tracing";
 
 type Translations = Awaited<ReturnType<typeof getTranslations<"errors">>>;
 
@@ -14,7 +15,7 @@ type Translations = Awaited<ReturnType<typeof getTranslations<"errors">>>;
  *   3. rateLimit() — throws RateLimitError when the caller exceeds the limit
  *
  * guardedAction collapses all three into one call so individual actions only
- * contain domain logic.
+ * contain domain logic. Each invocation is traced via OpenTelemetry.
  *
  * Usage:
  *   export const createFoo = guardedAction(
@@ -35,10 +36,33 @@ export function guardedAction<TArgs extends unknown[]>(
 ): (...args: TArgs) => Promise<ActionResult> {
   return (...args: TArgs): Promise<ActionResult> => {
     return safe(async () => {
-      const t = await getTranslations("errors");
-      await requirePermission(permission);
-      await rateLimit(rateLimitKey);
-      await fn(t, ...args);
+      const start = performance.now();
+      await withSpan(
+        `action.${rateLimitKey}`,
+        {
+          "hrm.action.name": rateLimitKey,
+          "hrm.action.permission": permission,
+        },
+        async (span) => {
+          const t = await getTranslations("errors");
+          span.addEvent("auth.start");
+          await requirePermission(permission);
+          span.addEvent("auth.done");
+          await rateLimit(rateLimitKey);
+          span.addEvent("rateLimit.done");
+          await fn(t, ...args);
+          span.addEvent("action.done");
+        },
+      );
+      const durationMs = performance.now() - start;
+      actionCounter().add(1, { action: rateLimitKey, status: "success" });
+      actionDuration().record(durationMs, { action: rateLimitKey });
+    }).then((result) => {
+      if (result?.error) {
+        actionCounter().add(1, { action: rateLimitKey, status: "error" });
+        errorCounter().add(1, { action: rateLimitKey, code: result.code });
+      }
+      return result;
     });
   };
 }
