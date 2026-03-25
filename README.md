@@ -160,6 +160,12 @@ graph LR
 
 ### 🧪 Quality
 
+- **Advanced reporting & analytics** — 4 report types (headcount trends, turnover rates, leave utilization, review completion) powered by raw SQL CTEs and window functions. Tab-based UI with MUI X Charts (LineChart, BarChart, stacked BarChart), department and year filters, CSV export. Cached with `unstable_cache` (5-minute TTL). _Why raw SQL? These multi-table aggregations with running totals and partitioned window functions can't be expressed in Prisma's query builder._
+
+- **Background job queue (pg-boss)** — PostgreSQL-based async processing with no Redis dependency. Cleanup worker prunes expired rate limits and stale demo sessions. Audit export worker generates CSV/JSON from MongoDB logs. Retry with exponential backoff, dead-letter queue, 24h archival. Admin dashboard shows queue status, failed jobs, and manual trigger buttons. _Why pg-boss over BullMQ? One fewer service to deploy — the database you already have is powerful enough for job queuing._
+
+- **Custom feature flags** — Database-backed feature toggle system with 4-level resolution: environment variable override → user-specific override → global flag → default false. Two Prisma models (`FeatureFlag`, `UserFeatureFlag`), scoped as GLOBAL or USER. Admin UI for CRUD, per-user overrides, and global toggles. All changes audit-logged to MongoDB. _Why custom over LaunchDarkly? Zero external dependencies, full control, and the resolution logic itself is a portfolio talking point._
+
 - **Sentry error tracking** — `@sentry/nextjs` captures unhandled exceptions, server action failures, and client-side errors. Separate `sentry.client/server/edge.config.ts` files initialize Sentry per runtime. A reusable `SentryErrorBoundary` component wraps MUI fallback UI; `global-error.tsx` catches render-level crashes; `captureServerActionError()` helper instruments server actions. Sentry is opt-in — the app runs normally without a DSN configured. _Why opt-in? This is a portfolio project — developers shouldn't need a Sentry account to run it locally._
 
 - **1814 tests, 91.9% line coverage** — Unit tests, integration tests against real PostgreSQL + in-memory MongoDB (no database mocks), and 75 Playwright E2E tests covering full user flows. _Why real databases in tests? Mocked tests can pass while production breaks. If your test doesn't hit a real database, it's not testing what you think it's testing._
@@ -188,6 +194,7 @@ graph LR
 | Auth       | NextAuth v5 (JWT)                | Stateless auth that scales without session storage                |
 | Testing    | Jest 30 + Playwright             | Unit/integration against real DBs + E2E against production builds |
 | CI/CD      | GitHub Actions                   | Lint, format, i18n audit, test, build — on every push             |
+| Jobs       | pg-boss                          | PostgreSQL-based job queue — no Redis, retries, dead-letter queue |
 | Monitoring | Sentry                           | Client + server + edge error capture; opt-in via DSN env var      |
 
 ---
@@ -393,10 +400,7 @@ _Last updated: March 2026_
 ### Architecture & Observability
 
 - [ ] OpenTelemetry tracing — instrument full request lifecycle; export to Jaeger/Datadog; P95/P99 dashboards
-- [ ] Background job queue (Bull/Bree) — async emails, report generation, bulk imports; retry + dead-letter queue
 - [ ] WebSocket real-time updates — live notifications for person create, leave requests, activity feed
-- [ ] Feature flags — per-user or per-environment toggles; track flag changes in audit log
-- [ ] Advanced reporting & analytics — turnover rates, headcount trends, leave utilization, review completion
 - [ ] Performance at scale — load test with 10k/100k employees; identify N+1 queries and missing indexes
 
 ### Security & Compliance
