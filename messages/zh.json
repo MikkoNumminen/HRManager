@@ -50,7 +50,8 @@
     "employeePortal": "我的门户",
     "featureFlags": "功能标志",
     "reports": "报告",
-    "jobQueue": "任务队列"
+    "jobQueue": "任务队列",
+    "exitDemo": "Exit Demo"
   },
   "home": {
     "title": "人力资源管理系统",

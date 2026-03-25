@@ -50,7 +50,8 @@
     "employeePortal": "Мій портал",
     "featureFlags": "Прапорці функцій",
     "reports": "Звіти",
-    "jobQueue": "Черга завдань"
+    "jobQueue": "Черга завдань",
+    "exitDemo": "Exit Demo"
   },
   "home": {
     "title": "Система управління персоналом",

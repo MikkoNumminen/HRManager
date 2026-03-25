@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import { avatarStyles, colors } from "@/muiStyles";
 import { signIn } from "next-auth/react";
+import { DEMO_EMAIL } from "@/constants";
 import { useTranslations } from "next-intl";
 import LanguageSwitcher from "../LanguageSwitcher";
 import ThemeSwitcher from "../ThemeSwitcher";
@@ -57,6 +58,7 @@ export default function MobileDrawer({
 
   const canSeed = permissions?.["data:seed"];
   const canReset = permissions?.["data:reset"];
+  const isDemo = user?.email === DEMO_EMAIL;
 
   return (
     <Drawer
@@ -149,6 +151,26 @@ export default function MobileDrawer({
         {user && (
           <>
             <Divider sx={{ borderColor: colors.slate300 }} />
+            {isDemo && (
+              <Box sx={{ px: 2, py: 1.5 }}>
+                <Button
+                  onClick={onSignOut}
+                  fullWidth
+                  data-testid="exit-demo-button-mobile"
+                  sx={{
+                    color: colors.green400,
+                    border: `1px solid ${colors.green400}`,
+                    borderRadius: "4px",
+                    fontWeight: 600,
+                    "&:hover": {
+                      backgroundColor: colors.green900,
+                    },
+                  }}
+                >
+                  {t("exitDemo")}
+                </Button>
+              </Box>
+            )}
             <List sx={{ py: 0 }}>
               <ListItem disablePadding>
                 <ListItemButton

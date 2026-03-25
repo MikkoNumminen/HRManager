@@ -50,7 +50,8 @@
     "employeePortal": "Mon portail",
     "featureFlags": "Indicateurs de fonctionnalité",
     "reports": "Rapports",
-    "jobQueue": "File de tâches"
+    "jobQueue": "File de tâches",
+    "exitDemo": "Exit Demo"
   },
   "home": {
     "title": "Système de gestion des ressources humaines",

@@ -50,7 +50,8 @@
     "employeePortal": "मेरा पोर्टल",
     "featureFlags": "फ़ीचर फ़्लैग",
     "reports": "रिपोर्ट",
-    "jobQueue": "जॉब कतार"
+    "jobQueue": "जॉब कतार",
+    "exitDemo": "Exit Demo"
   },
   "home": {
     "title": "मानव संसाधन प्रबंधन प्रणाली",

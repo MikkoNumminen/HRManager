@@ -50,7 +50,8 @@
     "employeePortal": "マイポータル",
     "featureFlags": "機能フラグ",
     "reports": "レポート",
-    "jobQueue": "ジョブキュー"
+    "jobQueue": "ジョブキュー",
+    "exitDemo": "Exit Demo"
   },
   "home": {
     "title": "人事管理システム",

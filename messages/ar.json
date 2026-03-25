@@ -50,7 +50,8 @@
     "employeePortal": "بوابتي",
     "featureFlags": "أعلام الميزات",
     "reports": "التقارير",
-    "jobQueue": "قائمة انتظار المهام"
+    "jobQueue": "قائمة انتظار المهام",
+    "exitDemo": "Exit Demo"
   },
   "home": {
     "title": "نظام إدارة الموارد البشرية",

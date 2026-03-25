@@ -50,7 +50,8 @@
     "employeePortal": "พอร์ทัลของฉัน",
     "featureFlags": "ฟีเจอร์แฟล็ก",
     "reports": "รายงาน",
-    "jobQueue": "คิวงาน"
+    "jobQueue": "คิวงาน",
+    "exitDemo": "Exit Demo"
   },
   "home": {
     "title": "ระบบจัดการทรัพยากรบุคคล",

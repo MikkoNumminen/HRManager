@@ -50,7 +50,8 @@
     "employeePortal": "Min portal",
     "featureFlags": "Funktionsflaggor",
     "reports": "Rapporter",
-    "jobQueue": "Jobbkö"
+    "jobQueue": "Jobbkö",
+    "exitDemo": "Exit Demo"
   },
   "home": {
     "title": "Personalhanteringssystem",

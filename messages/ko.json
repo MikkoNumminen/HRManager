@@ -50,7 +50,8 @@
     "employeePortal": "내 포털",
     "featureFlags": "기능 플래그",
     "reports": "보고서",
-    "jobQueue": "작업 대기열"
+    "jobQueue": "작업 대기열",
+    "exitDemo": "Exit Demo"
   },
   "home": {
     "title": "인사 관리 시스템",

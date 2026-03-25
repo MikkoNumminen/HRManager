@@ -50,7 +50,8 @@
     "employeePortal": "Portalım",
     "featureFlags": "Özellik Bayrakları",
     "reports": "Raporlar",
-    "jobQueue": "İş Kuyruğu"
+    "jobQueue": "İş Kuyruğu",
+    "exitDemo": "Exit Demo"
   },
   "home": {
     "title": "İnsan Kaynakları Yönetim Sistemi",

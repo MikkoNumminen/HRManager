@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import { avatarStyles, colors, userMenuItemStyles, userMenuStyles } from "@/muiStyles";
 import { signIn } from "next-auth/react";
+import { DEMO_EMAIL } from "@/constants";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import NavMenu from "./NavMenu";
@@ -52,6 +53,7 @@ export default function UserMenu({
 
   const canSeed = permissions?.["data:seed"];
   const canReset = permissions?.["data:reset"];
+  const isDemo = user?.email === DEMO_EMAIL;
 
   if (!user) {
     return (
@@ -90,6 +92,25 @@ export default function UserMenu({
 
   return (
     <>
+      {isDemo && (
+        <Button
+          onClick={onSignOut}
+          data-testid="exit-demo-button"
+          sx={{
+            color: colors.green400,
+            border: `1px solid ${colors.green400}`,
+            borderRadius: "4px",
+            px: 2,
+            mr: 1,
+            fontWeight: 600,
+            "&:hover": {
+              backgroundColor: colors.green900,
+            },
+          }}
+        >
+          {t("exitDemo")}
+        </Button>
+      )}
       <IconButton
         onClick={(e) => setAnchorEl(e.currentTarget)}
         aria-label={t("userMenu")}

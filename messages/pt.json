@@ -50,7 +50,8 @@
     "employeePortal": "Meu Portal",
     "featureFlags": "Sinalizadores de funcionalidade",
     "reports": "Relatórios",
-    "jobQueue": "Fila de tarefas"
+    "jobQueue": "Fila de tarefas",
+    "exitDemo": "Exit Demo"
   },
   "home": {
     "title": "Sistema de Gestão de Recursos Humanos",

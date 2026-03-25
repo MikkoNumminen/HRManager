@@ -50,7 +50,8 @@
     "employeePortal": "Mi Portal",
     "featureFlags": "Indicadores de funcionalidad",
     "reports": "Informes",
-    "jobQueue": "Cola de tareas"
+    "jobQueue": "Cola de tareas",
+    "exitDemo": "Exit Demo"
   },
   "home": {
     "title": "Sistema de Gestión de Recursos Humanos",

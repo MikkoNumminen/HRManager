@@ -967,4 +967,78 @@ describe("TopBar", () => {
     const drawer = screen.getByTestId("mobile-drawer");
     expect(drawer).toHaveTextContent("Data Import / Export");
   });
+
+  // --- Exit Demo button tests ---
+
+  // Shows "Exit Demo" button in the desktop TopBar when the demo user is logged in
+  test("shows Exit Demo button in desktop TopBar for demo user", () => {
+    mockUseSession.mockReturnValue({
+      data: { user: { name: "Demo User", email: "demo@hrmanager.app", image: null } },
+      status: "authenticated",
+    });
+    render(<TopBar title="Home" />);
+    expect(screen.getByTestId("exit-demo-button")).toBeInTheDocument();
+    expect(screen.getByTestId("exit-demo-button")).toHaveTextContent("Exit Demo");
+  });
+
+  // Does not show "Exit Demo" button for regular (non-demo) authenticated users
+  test("does not show Exit Demo button for non-demo users", () => {
+    mockUseSession.mockReturnValue({
+      data: { user: { name: "Alice Smith", email: "alice@example.com", image: null } },
+      status: "authenticated",
+    });
+    render(<TopBar title="Home" />);
+    expect(screen.queryByTestId("exit-demo-button")).not.toBeInTheDocument();
+  });
+
+  // Clicking the desktop Exit Demo button calls signOut and clears demo localStorage
+  test("clicking Exit Demo button calls signOut and clears localStorage", () => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(["view_employees"]));
+    mockUseSession.mockReturnValue({
+      data: { user: { name: "Demo User", email: "demo@hrmanager.app", image: null } },
+      status: "authenticated",
+    });
+    render(<TopBar title="Home" />);
+    fireEvent.click(screen.getByTestId("exit-demo-button"));
+    expect(signOut).toHaveBeenCalled();
+    expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
+  });
+
+  // Shows "Exit Demo" button in the mobile drawer for demo users
+  test("shows Exit Demo button in mobile drawer for demo user", () => {
+    mockUseSession.mockReturnValue({
+      data: { user: { name: "Demo User", email: "demo@hrmanager.app", image: null } },
+      status: "authenticated",
+    });
+    render(<TopBar title="Home" />);
+    fireEvent.click(screen.getByLabelText("Menu"));
+    const drawer = screen.getByTestId("mobile-drawer");
+    expect(within(drawer).getByTestId("exit-demo-button-mobile")).toBeInTheDocument();
+    expect(within(drawer).getByTestId("exit-demo-button-mobile")).toHaveTextContent("Exit Demo");
+  });
+
+  // Does not show "Exit Demo" button in the mobile drawer for regular users
+  test("does not show Exit Demo button in mobile drawer for non-demo users", () => {
+    mockUseSession.mockReturnValue({
+      data: { user: { name: "Alice Smith", email: "alice@example.com", image: null } },
+      status: "authenticated",
+    });
+    render(<TopBar title="Home" />);
+    fireEvent.click(screen.getByLabelText("Menu"));
+    const drawer = screen.getByTestId("mobile-drawer");
+    expect(within(drawer).queryByTestId("exit-demo-button-mobile")).not.toBeInTheDocument();
+  });
+
+  // Clicking Exit Demo in the mobile drawer calls signOut
+  test("clicking Exit Demo in mobile drawer calls signOut", () => {
+    mockUseSession.mockReturnValue({
+      data: { user: { name: "Demo User", email: "demo@hrmanager.app", image: null } },
+      status: "authenticated",
+    });
+    render(<TopBar title="Home" />);
+    fireEvent.click(screen.getByLabelText("Menu"));
+    const drawer = screen.getByTestId("mobile-drawer");
+    fireEvent.click(within(drawer).getByTestId("exit-demo-button-mobile"));
+    expect(signOut).toHaveBeenCalled();
+  });
 });

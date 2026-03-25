@@ -50,7 +50,8 @@
     "employeePortal": "Mój portal",
     "featureFlags": "Flagi funkcji",
     "reports": "Raporty",
-    "jobQueue": "Kolejka zadań"
+    "jobQueue": "Kolejka zadań",
+    "exitDemo": "Exit Demo"
   },
   "home": {
     "title": "System Zarządzania Zasobami Ludzkimi",

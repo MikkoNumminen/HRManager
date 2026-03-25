@@ -50,7 +50,8 @@
     "employeePortal": "Mein Portal",
     "featureFlags": "Funktionsschalter",
     "reports": "Berichte",
-    "jobQueue": "Aufgabenwarteschlange"
+    "jobQueue": "Aufgabenwarteschlange",
+    "exitDemo": "Exit Demo"
   },
   "home": {
     "title": "Personalverwaltungssystem",

@@ -50,7 +50,8 @@
     "employeePortal": "Oma portaali",
     "featureFlags": "Ominaisuusliput",
     "reports": "Raportit",
-    "jobQueue": "Tehtäväjono"
+    "jobQueue": "Tehtäväjono",
+    "exitDemo": "Exit Demo"
   },
   "home": {
     "title": "Henkilöstöhallintajärjestelmä",

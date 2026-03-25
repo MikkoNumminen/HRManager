@@ -50,7 +50,8 @@
     "employeePortal": "My Portal",
     "featureFlags": "Feature Flags",
     "reports": "Reports",
-    "jobQueue": "Job Queue"
+    "jobQueue": "Job Queue",
+    "exitDemo": "Exit Demo"
   },
   "home": {
     "title": "Human Resources Management System",

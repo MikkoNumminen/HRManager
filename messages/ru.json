@@ -50,7 +50,8 @@
     "employeePortal": "Мой портал",
     "featureFlags": "Флаги функций",
     "reports": "Отчёты",
-    "jobQueue": "Очередь задач"
+    "jobQueue": "Очередь задач",
+    "exitDemo": "Exit Demo"
   },
   "home": {
     "title": "Система управления персоналом",
