@@ -276,9 +276,10 @@ export default function DataTable<T>({
                   )}
                 </Typography>
                 {mobileDetails?.map((detail, i) => {
-                  const rendered = detail.render(item);
-                  return rendered != null ? (
-                    <React.Fragment key={i}>{rendered}</React.Fragment>
+                  // eslint-disable-next-line testing-library/render-result-naming-convention
+                  const content = detail.render(item);
+                  return content != null ? (
+                    <React.Fragment key={i}>{content}</React.Fragment>
                   ) : null;
                 })}
               </Box>
