@@ -1,35 +1,28 @@
 "use server";
-import { prisma } from "@/db";
 import { revalidatePath } from "next/cache";
-import { requirePermission } from "@/permissions";
-import { captureAuditContext, deferAudit, DeferredAuditEntry } from "@/auditLog";
-import { rateLimit } from "@/rateLimit";
 import { ActionError } from "@/actionErrors";
 import { getDemoSessionId } from "@/demoSession";
 import { MAX_POSITION_LENGTH } from "@/schemas";
-import { getTranslations } from "next-intl/server";
-import { safe, validateUUID, type ActionResult } from "@/lib/actionUtils";
+import { validateUUID, type ActionResult } from "@/lib/actionUtils";
+import { guardedAction } from "@/lib/guardedAction";
+import { withAuditedTransaction } from "@/lib/auditedTransaction";
 
-export async function createPositionEntry(data: FormData): Promise<ActionResult> {
-  return safe(async () => {
-    const t = await getTranslations("errors");
-    await requirePermission("position:manage");
-    await rateLimit("createPositionEntry");
+export const createPositionEntry: (data: FormData) => Promise<ActionResult> = guardedAction(
+  "position:manage",
+  "createPositionEntry",
+  async (t, data: FormData) => {
     const name = data.get("name")?.toString().trim();
     if (!name) throw new ActionError("invalidName", t("invalidName"));
     if (name.length > MAX_POSITION_LENGTH)
       throw new ActionError("positionTooLong", t("positionTooLong", { max: MAX_POSITION_LENGTH }));
     const sessionId = await getDemoSessionId();
-    const ctx = await captureAuditContext();
-    const auditEntries: DeferredAuditEntry[] = [];
-    await prisma.$transaction(async (tx) => {
+    await withAuditedTransaction(async (tx, addAudit) => {
       const existing = await tx.position.findFirst({
         where: { name, sessionId, deletedAt: null },
       });
       if (existing) throw new ActionError("positionAlreadyExists", t("positionAlreadyExists"));
       const position = await tx.position.create({ data: { name, sessionId } });
-      auditEntries.push({
-        ...ctx,
+      addAudit({
         action: "create",
         entityType: "position",
         entityId: position.id,
@@ -37,30 +30,25 @@ export async function createPositionEntry(data: FormData): Promise<ActionResult>
         after: { name },
       });
     });
-    deferAudit(auditEntries);
     revalidatePath("/positions");
-  });
-}
+  },
+);
 
-export async function deletePositionEntry(data: FormData): Promise<ActionResult> {
-  return safe(async () => {
-    const t = await getTranslations("errors");
-    await requirePermission("position:manage");
-    await rateLimit("deletePositionEntry");
+export const deletePositionEntry: (data: FormData) => Promise<ActionResult> = guardedAction(
+  "position:manage",
+  "deletePositionEntry",
+  async (t, data: FormData) => {
     const id = data.get("id")?.toString();
     if (!id) throw new ActionError("positionNotFound", t("positionNotFound"));
     validateUUID(id, "id");
     const sessionId = await getDemoSessionId();
-    const ctx = await captureAuditContext();
-    const auditEntries: DeferredAuditEntry[] = [];
-    await prisma.$transaction(async (tx) => {
+    await withAuditedTransaction(async (tx, addAudit) => {
       const position = await tx.position.findFirst({
         where: { id, sessionId, deletedAt: null },
       });
       if (!position) throw new ActionError("positionNotFound", t("positionNotFound"));
       await tx.position.update({ where: { id }, data: { deletedAt: new Date() } });
-      auditEntries.push({
-        ...ctx,
+      addAudit({
         action: "delete",
         entityType: "position",
         entityId: id,
@@ -68,7 +56,6 @@ export async function deletePositionEntry(data: FormData): Promise<ActionResult>
         after: null,
       });
     });
-    deferAudit(auditEntries);
     revalidatePath("/positions");
-  });
-}
+  },
+);

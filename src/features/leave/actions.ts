@@ -1,23 +1,25 @@
 "use server";
-import { prisma } from "@/db";
 import { revalidatePath } from "next/cache";
-import { requirePermission } from "@/permissions";
-import { captureAuditContext, deferAudit, DeferredAuditEntry } from "@/auditLog";
-import { rateLimit } from "@/rateLimit";
 import { ActionError } from "@/actionErrors";
 import { getDemoSessionId } from "@/demoSession";
 import { MAX_NAME_LENGTH, MAX_DESCRIPTION_LENGTH, MAX_LEAVE_NOTE_LENGTH } from "@/schemas";
+import { validateUUID, type ActionResult } from "@/lib/actionUtils";
+import { guardedAction } from "@/lib/guardedAction";
+import { withAuditedTransaction } from "@/lib/auditedTransaction";
+// Kept for actions that cannot yet be fully converted (complex multi-step audit patterns):
+import { prisma } from "@/db";
+import { requirePermission } from "@/permissions";
+import { captureAuditContext, deferAudit, DeferredAuditEntry } from "@/auditLog";
+import { rateLimit } from "@/rateLimit";
 import { getTranslations } from "next-intl/server";
-import { safe, validateUUID, type ActionResult } from "@/lib/actionUtils";
+import { safe } from "@/lib/actionUtils";
 
 // ─── Leave Management ────────────────────────────────────────────
 
-export async function createLeaveType(data: FormData): Promise<ActionResult> {
-  return safe(async () => {
-    const t = await getTranslations("errors");
-    await requirePermission("leave:manage_types");
-    await rateLimit("createLeaveType");
-
+export const createLeaveType: (data: FormData) => Promise<ActionResult> = guardedAction(
+  "leave:manage_types",
+  "createLeaveType",
+  async (t, data: FormData) => {
     const name = data.get("name")?.valueOf();
     if (typeof name !== "string" || name.trim().length === 0)
       throw new ActionError("invalidName", t("invalidName"));
@@ -41,9 +43,7 @@ export async function createLeaveType(data: FormData): Promise<ActionResult> {
     const color = (data.get("color")?.valueOf() as string) ?? "#1976d2";
 
     const sessionId = await getDemoSessionId();
-    const ctx = await captureAuditContext();
-    const auditEntries: DeferredAuditEntry[] = [];
-    await prisma.$transaction(async (tx) => {
+    await withAuditedTransaction(async (tx, addAudit) => {
       const existing = await tx.leaveType.findFirst({
         where: { name: name.trim(), deletedAt: null, sessionId },
       });
@@ -52,25 +52,21 @@ export async function createLeaveType(data: FormData): Promise<ActionResult> {
       const leaveType = await tx.leaveType.create({
         data: { name: name.trim(), description: descStr, defaultDays, color, sessionId },
       });
-      auditEntries.push({
-        ...ctx,
+      addAudit({
         action: "create",
         entityType: "leaveType",
         entityId: leaveType.id,
         after: { name: leaveType.name, defaultDays, color },
       });
     });
-    deferAudit(auditEntries);
     revalidatePath("/leave");
-  });
-}
+  },
+);
 
-export async function updateLeaveType(data: FormData): Promise<ActionResult> {
-  return safe(async () => {
-    const t = await getTranslations("errors");
-    await requirePermission("leave:manage_types");
-    await rateLimit("updateLeaveType");
-
+export const updateLeaveType: (data: FormData) => Promise<ActionResult> = guardedAction(
+  "leave:manage_types",
+  "updateLeaveType",
+  async (t, data: FormData) => {
     const id = data.get("id")?.valueOf();
     if (typeof id !== "string") throw new ActionError("invalidId", t("invalidId"));
     validateUUID(id, "leaveTypeId");
@@ -93,9 +89,7 @@ export async function updateLeaveType(data: FormData): Promise<ActionResult> {
     const color = (data.get("color")?.valueOf() as string) ?? "#1976d2";
 
     const sessionId = await getDemoSessionId();
-    const ctx = await captureAuditContext();
-    const auditEntries: DeferredAuditEntry[] = [];
-    await prisma.$transaction(async (tx) => {
+    await withAuditedTransaction(async (tx, addAudit) => {
       const existing = await tx.leaveType.findFirst({
         where: { id, deletedAt: null, sessionId },
       });
@@ -110,8 +104,7 @@ export async function updateLeaveType(data: FormData): Promise<ActionResult> {
         where: { id },
         data: { name: name.trim(), description: descStr, defaultDays, color },
       });
-      auditEntries.push({
-        ...ctx,
+      addAudit({
         action: "update",
         entityType: "leaveType",
         entityId: id,
@@ -119,44 +112,37 @@ export async function updateLeaveType(data: FormData): Promise<ActionResult> {
         after: { name: name.trim(), defaultDays, color },
       });
     });
-    deferAudit(auditEntries);
     revalidatePath("/leave");
-  });
-}
+  },
+);
 
-export async function deleteLeaveType(data: FormData): Promise<ActionResult> {
-  return safe(async () => {
-    const t = await getTranslations("errors");
-    await requirePermission("leave:manage_types");
-    await rateLimit("deleteLeaveType");
-
+export const deleteLeaveType: (data: FormData) => Promise<ActionResult> = guardedAction(
+  "leave:manage_types",
+  "deleteLeaveType",
+  async (t, data: FormData) => {
     const id = data.get("id")?.valueOf();
     if (typeof id !== "string") throw new ActionError("invalidId", t("invalidId"));
     validateUUID(id, "leaveTypeId");
 
     const sessionId = await getDemoSessionId();
-    const ctx = await captureAuditContext();
-    const auditEntries: DeferredAuditEntry[] = [];
     const now = new Date();
-    await prisma.$transaction(async (tx) => {
+    await withAuditedTransaction(async (tx, addAudit) => {
       const existing = await tx.leaveType.findFirst({
         where: { id, deletedAt: null, sessionId },
       });
       if (!existing) throw new ActionError("leaveTypeNotFound", t("leaveTypeNotFound"));
 
       await tx.leaveType.update({ where: { id }, data: { deletedAt: now } });
-      auditEntries.push({
-        ...ctx,
+      addAudit({
         action: "delete",
         entityType: "leaveType",
         entityId: id,
         before: { name: existing.name },
       });
     });
-    deferAudit(auditEntries);
     revalidatePath("/leave");
-  });
-}
+  },
+);
 
 export async function createLeaveRequest(data: FormData): Promise<ActionResult> {
   return safe(async () => {
@@ -348,21 +334,17 @@ export async function reviewLeaveRequest(data: FormData): Promise<ActionResult> 
   });
 }
 
-export async function deleteLeaveRequest(data: FormData): Promise<ActionResult> {
-  return safe(async () => {
-    const t = await getTranslations("errors");
-    await requirePermission("leave:request");
-    await rateLimit("deleteLeaveRequest");
-
+export const deleteLeaveRequest: (data: FormData) => Promise<ActionResult> = guardedAction(
+  "leave:request",
+  "deleteLeaveRequest",
+  async (t, data: FormData) => {
     const id = data.get("id")?.valueOf();
     if (typeof id !== "string") throw new ActionError("invalidId", t("invalidId"));
     validateUUID(id, "leaveRequestId");
 
     const sessionId = await getDemoSessionId();
-    const ctx = await captureAuditContext();
-    const auditEntries: DeferredAuditEntry[] = [];
     const now = new Date();
-    await prisma.$transaction(async (tx) => {
+    await withAuditedTransaction(async (tx, addAudit) => {
       const request = await tx.leaveRequest.findFirst({
         where: { id, deletedAt: null, sessionId },
         include: { person: true, leaveType: true },
@@ -372,8 +354,7 @@ export async function deleteLeaveRequest(data: FormData): Promise<ActionResult> 
         throw new ActionError("cannotDeleteNonPendingRequest", t("cannotDeleteNonPendingRequest"));
 
       await tx.leaveRequest.update({ where: { id }, data: { deletedAt: now } });
-      auditEntries.push({
-        ...ctx,
+      addAudit({
         action: "delete",
         entityType: "leaveRequest",
         entityId: id,
@@ -386,17 +367,14 @@ export async function deleteLeaveRequest(data: FormData): Promise<ActionResult> 
         },
       });
     });
-    deferAudit(auditEntries);
     revalidatePath("/leave");
-  });
-}
+  },
+);
 
-export async function allocateLeaveBalance(data: FormData): Promise<ActionResult> {
-  return safe(async () => {
-    const t = await getTranslations("errors");
-    await requirePermission("leave:manage_types");
-    await rateLimit("allocateLeaveBalance");
-
+export const allocateLeaveBalance: (data: FormData) => Promise<ActionResult> = guardedAction(
+  "leave:manage_types",
+  "allocateLeaveBalance",
+  async (t, data: FormData) => {
     const personId = data.get("personId")?.valueOf();
     if (typeof personId !== "string")
       throw new ActionError("noPersonSelected", t("noPersonSelected"));
@@ -418,9 +396,7 @@ export async function allocateLeaveBalance(data: FormData): Promise<ActionResult
       throw new ActionError("invalidDaysValue", t("invalidDaysValue"));
 
     const sessionId = await getDemoSessionId();
-    const ctx = await captureAuditContext();
-    const auditEntries: DeferredAuditEntry[] = [];
-    await prisma.$transaction(async (tx) => {
+    await withAuditedTransaction(async (tx, addAudit) => {
       const person = await tx.person.findFirst({
         where: { id: personId, deletedAt: null, sessionId },
       });
@@ -437,8 +413,7 @@ export async function allocateLeaveBalance(data: FormData): Promise<ActionResult
         update: { allocated },
       });
 
-      auditEntries.push({
-        ...ctx,
+      addAudit({
         action: "update",
         entityType: "leaveBalance",
         entityId: balance.id,
@@ -450,7 +425,6 @@ export async function allocateLeaveBalance(data: FormData): Promise<ActionResult
         },
       });
     });
-    deferAudit(auditEntries);
     revalidatePath("/leave");
-  });
-}
+  },
+);

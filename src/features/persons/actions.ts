@@ -1,22 +1,18 @@
 "use server";
-import { prisma } from "@/db";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { requirePermission } from "@/permissions";
-import { captureAuditContext, deferAudit, DeferredAuditEntry } from "@/auditLog";
-import { rateLimit } from "@/rateLimit";
 import { ActionError } from "@/actionErrors";
 import { getDemoSessionId } from "@/demoSession";
 import { MAX_NAME_LENGTH, MAX_EMAIL_LENGTH, MAX_POSITION_LENGTH, EmailSchema } from "@/schemas";
-import { getTranslations } from "next-intl/server";
-import { safe, validateUUID, type ActionResult } from "@/lib/actionUtils";
+import { validateUUID, type ActionResult } from "@/lib/actionUtils";
+import { guardedAction } from "@/lib/guardedAction";
+import { withAuditedTransaction } from "@/lib/auditedTransaction";
 import { invalidateDashboardCache } from "@/lib/cacheInvalidation";
 
-export async function createPerson(data: FormData): Promise<ActionResult> {
-  return safe(async () => {
-    const t = await getTranslations("errors");
-    await requirePermission("person:create");
-    await rateLimit("createPerson");
+export const createPerson: (data: FormData) => Promise<ActionResult> = guardedAction(
+  "person:create",
+  "createPerson",
+  async (t, data: FormData) => {
     const name = data.get("name")?.valueOf();
     if (typeof name !== "string" || name.trim().length === 0) {
       throw new ActionError("invalidName", t("invalidName"));
@@ -37,9 +33,7 @@ export async function createPerson(data: FormData): Promise<ActionResult> {
     }
 
     const sessionId = await getDemoSessionId();
-    const ctx = await captureAuditContext();
-    const auditEntries: DeferredAuditEntry[] = [];
-    await prisma.$transaction(async (tx) => {
+    await withAuditedTransaction(async (tx, addAudit) => {
       const existingPerson = await tx.person.findFirst({
         where: { email, deletedAt: null, sessionId },
       });
@@ -55,26 +49,23 @@ export async function createPerson(data: FormData): Promise<ActionResult> {
           sessionId,
         },
       });
-      auditEntries.push({
-        ...ctx,
+      addAudit({
         action: "create",
         entityType: "person",
         entityId: person.id,
         after: { name: person.name, email: person.email },
       });
     });
-    deferAudit(auditEntries);
     revalidatePath("/managePersons");
     revalidatePath("/");
     invalidateDashboardCache();
-  });
-}
+  },
+);
 
-export async function removePerson(data: FormData): Promise<ActionResult> {
-  return safe(async () => {
-    const t = await getTranslations("errors");
-    await requirePermission("person:delete");
-    await rateLimit("removePerson");
+export const removePerson: (data: FormData) => Promise<ActionResult> = guardedAction(
+  "person:delete",
+  "removePerson",
+  async (t, data: FormData) => {
     const personIDs = data.getAll("personID").filter((v): v is string => typeof v === "string");
     if (personIDs.length === 0) {
       throw new ActionError("noPersonSelected", t("noPersonSelected"));
@@ -82,10 +73,8 @@ export async function removePerson(data: FormData): Promise<ActionResult> {
     personIDs.forEach((id) => validateUUID(id, "personID"));
 
     const sessionId = await getDemoSessionId();
-    const ctx = await captureAuditContext();
-    const auditEntries: DeferredAuditEntry[] = [];
     const now = new Date();
-    await prisma.$transaction(async (tx) => {
+    await withAuditedTransaction(async (tx, addAudit) => {
       const personsToDelete = await tx.person.findMany({
         where: { id: { in: personIDs }, deletedAt: null, sessionId },
       });
@@ -115,8 +104,7 @@ export async function removePerson(data: FormData): Promise<ActionResult> {
       });
 
       for (const person of personsToDelete) {
-        auditEntries.push({
-          ...ctx,
+        addAudit({
           action: "delete",
           entityType: "person",
           entityId: person.id,
@@ -124,20 +112,18 @@ export async function removePerson(data: FormData): Promise<ActionResult> {
         });
       }
     });
-    deferAudit(auditEntries);
     revalidatePath("/managePersons");
     revalidatePath("/manageTeams");
     revalidatePath("/manageDepartments");
     revalidatePath("/");
     invalidateDashboardCache();
-  });
-}
+  },
+);
 
-export async function updatePersonName(data: FormData): Promise<ActionResult> {
-  return safe(async () => {
-    const t = await getTranslations("errors");
-    await requirePermission("person:update_name");
-    await rateLimit("updatePersonName");
+export const updatePersonName: (data: FormData) => Promise<ActionResult> = guardedAction(
+  "person:update_name",
+  "updatePersonName",
+  async (t, data: FormData) => {
     const personID = data.get("personID")?.toString();
     if (!personID) {
       throw new ActionError("noPersonProvided", t("noPersonProvided"));
@@ -153,9 +139,7 @@ export async function updatePersonName(data: FormData): Promise<ActionResult> {
     }
 
     const sessionId = await getDemoSessionId();
-    const ctx = await captureAuditContext();
-    const auditEntries: DeferredAuditEntry[] = [];
-    await prisma.$transaction(async (tx) => {
+    await withAuditedTransaction(async (tx, addAudit) => {
       const personBefore = await tx.person.findFirst({
         where: { id: personID, sessionId },
       });
@@ -166,8 +150,7 @@ export async function updatePersonName(data: FormData): Promise<ActionResult> {
         where: { id: personID, sessionId },
         data: { name: newName },
       });
-      auditEntries.push({
-        ...ctx,
+      addAudit({
         action: "update",
         entityType: "person",
         entityId: personID,
@@ -175,18 +158,16 @@ export async function updatePersonName(data: FormData): Promise<ActionResult> {
         after: { name: newName },
       });
     });
-    deferAudit(auditEntries);
     revalidatePath("/managePersons");
     revalidatePath("/");
     invalidateDashboardCache();
-  });
-}
+  },
+);
 
-export async function updatePosition(data: FormData): Promise<ActionResult> {
-  return safe(async () => {
-    const t = await getTranslations("errors");
-    await requirePermission("person:update_position");
-    await rateLimit("updatePosition");
+export const updatePosition: (data: FormData) => Promise<ActionResult> = guardedAction(
+  "person:update_position",
+  "updatePosition",
+  async (t, data: FormData) => {
     const personID = data.get("personID")?.toString();
     if (!personID) {
       throw new ActionError("noPersonProvided", t("noPersonProvided"));
@@ -202,9 +183,7 @@ export async function updatePosition(data: FormData): Promise<ActionResult> {
     }
 
     const sessionId = await getDemoSessionId();
-    const ctx = await captureAuditContext();
-    const auditEntries: DeferredAuditEntry[] = [];
-    await prisma.$transaction(async (tx) => {
+    await withAuditedTransaction(async (tx, addAudit) => {
       const personBefore = await tx.person.findFirst({
         where: { id: personID, sessionId },
       });
@@ -222,8 +201,7 @@ export async function updatePosition(data: FormData): Promise<ActionResult> {
       if (!existingPos) {
         await tx.position.create({ data: { name: newPosition, sessionId } });
       }
-      auditEntries.push({
-        ...ctx,
+      addAudit({
         action: "update",
         entityType: "person",
         entityId: personID,
@@ -231,19 +209,17 @@ export async function updatePosition(data: FormData): Promise<ActionResult> {
         after: { position: newPosition },
       });
     });
-    deferAudit(auditEntries);
     revalidatePath("/managePersons");
     revalidatePath("/positions");
     revalidatePath("/");
     invalidateDashboardCache();
-  });
-}
+  },
+);
 
-export async function updateEmail(data: FormData): Promise<ActionResult> {
-  return safe(async () => {
-    const t = await getTranslations("errors");
-    await requirePermission("person:update_email");
-    await rateLimit("updateEmail");
+export const updateEmail: (data: FormData) => Promise<ActionResult> = guardedAction(
+  "person:update_email",
+  "updateEmail",
+  async (t, data: FormData) => {
     const personID = data.get("personID")?.toString();
     if (!personID) {
       throw new ActionError("noPersonSelected", t("noPersonSelected"));
@@ -262,9 +238,7 @@ export async function updateEmail(data: FormData): Promise<ActionResult> {
     }
 
     const sessionId = await getDemoSessionId();
-    const ctx = await captureAuditContext();
-    const auditEntries: DeferredAuditEntry[] = [];
-    await prisma.$transaction(async (tx) => {
+    await withAuditedTransaction(async (tx, addAudit) => {
       const existingPerson = await tx.person.findFirst({
         where: { email: newEmail, deletedAt: null, sessionId },
       });
@@ -282,8 +256,7 @@ export async function updateEmail(data: FormData): Promise<ActionResult> {
         where: { id: personID, sessionId },
         data: { email: newEmail },
       });
-      auditEntries.push({
-        ...ctx,
+      addAudit({
         action: "update",
         entityType: "person",
         entityId: personID,
@@ -291,16 +264,14 @@ export async function updateEmail(data: FormData): Promise<ActionResult> {
         after: { email: newEmail },
       });
     });
-    deferAudit(auditEntries);
     revalidatePath("/managePersons");
-  });
-}
+  },
+);
 
-export async function addManager(data: FormData): Promise<ActionResult> {
-  return safe(async () => {
-    const t = await getTranslations("errors");
-    await requirePermission("team:update_manager");
-    await rateLimit("addManager");
+export const addManager: (data: FormData) => Promise<ActionResult> = guardedAction(
+  "team:update_manager",
+  "addManager",
+  async (t, data: FormData) => {
     const teamIDs = data.getAll("teamID").filter((v): v is string => typeof v === "string");
     const personID = data.get("personID")?.toString();
 
@@ -314,9 +285,7 @@ export async function addManager(data: FormData): Promise<ActionResult> {
     validateUUID(personID, "personID");
 
     const sessionId = await getDemoSessionId();
-    const ctx = await captureAuditContext();
-    const auditEntries: DeferredAuditEntry[] = [];
-    await prisma.$transaction(async (tx) => {
+    await withAuditedTransaction(async (tx, addAudit) => {
       const person = await tx.person.findFirst({ where: { id: personID, sessionId } });
       if (!person) {
         throw new ActionError("personNotFound", t("personNotFound"));
@@ -331,8 +300,7 @@ export async function addManager(data: FormData): Promise<ActionResult> {
           where: { teamId: teamID, sessionId },
           data: { teamManagerId: personID },
         });
-        auditEntries.push({
-          ...ctx,
+        addAudit({
           action: "update",
           entityType: "team",
           entityId: teamID,
@@ -352,8 +320,7 @@ export async function addManager(data: FormData): Promise<ActionResult> {
               sessionId,
             },
           });
-          auditEntries.push({
-            ...ctx,
+          addAudit({
             action: "create",
             entityType: "teamMember",
             entityId: member.id,
@@ -365,8 +332,7 @@ export async function addManager(data: FormData): Promise<ActionResult> {
             where: { id: existingMember.id },
             data: { deletedAt: null },
           });
-          auditEntries.push({
-            ...ctx,
+          addAudit({
             action: "create",
             entityType: "teamMember",
             entityId: existingMember.id,
@@ -375,10 +341,9 @@ export async function addManager(data: FormData): Promise<ActionResult> {
         }
       }
     });
-    deferAudit(auditEntries);
     revalidatePath("/manageTeams");
     revalidatePath("/");
     invalidateDashboardCache();
     redirect("/manageTeams");
-  });
-}
+  },
+);
