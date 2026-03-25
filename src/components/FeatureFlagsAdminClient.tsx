@@ -50,7 +50,7 @@ interface FeatureFlagsAdminClientProps {
 
 export default function FeatureFlagsAdminClient({
   flags,
-  users,
+  users: _users,
   permissions,
 }: FeatureFlagsAdminClientProps) {
   const t = useTranslations("featureFlags");

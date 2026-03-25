@@ -15,7 +15,7 @@ import {
 } from "@mui/material";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
-import { colors, pageContainerStyles, smallButtonStyles, tableStyles } from "@/muiStyles";
+import { colors, smallButtonStyles, tableStyles } from "@/muiStyles";
 import { useTranslations } from "next-intl";
 import { useTransition } from "react";
 import { enqueueCleanupJob, enqueueAuditExportJob } from "@/features/jobs/actions";
@@ -52,7 +52,7 @@ function StatusChip({ label, count }: { label: string; count: number }) {
 
 export default function AdminJobsClient({ statuses }: AdminJobsClientProps) {
   const t = useTranslations("jobs");
-  const tn = useTranslations("notifications");
+  const _tn = useTranslations("notifications");
   const { showSnackbar } = useSnackbar();
   const [isPending, startTransition] = useTransition();
 

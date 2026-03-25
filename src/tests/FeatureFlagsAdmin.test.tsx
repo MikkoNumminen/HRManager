@@ -29,7 +29,7 @@ const makeFlag = (overrides: Partial<FeatureFlag> = {}): FeatureFlag => ({
   ...overrides,
 });
 
-const makeUser = (overrides: Partial<AppUser> = {}): AppUser => ({
+const _makeUser = (overrides: Partial<AppUser> = {}): AppUser => ({
   id: "00000000-0000-0000-0000-000000000010",
   email: "admin@example.com",
   name: "Admin",

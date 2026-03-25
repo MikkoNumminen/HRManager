@@ -44,7 +44,6 @@ import {
   exportReportCsv,
 } from "@/features/reports/queries";
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports
 const { __mockQueryRaw: mockQueryRaw } = require("@/db") as { __mockQueryRaw: jest.Mock };
 
 beforeEach(() => {
