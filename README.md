@@ -168,9 +168,11 @@ graph LR
 
 - **Sentry error tracking** — `@sentry/nextjs` captures unhandled exceptions, server action failures, and client-side errors. Separate `sentry.client/server/edge.config.ts` files initialize Sentry per runtime. A reusable `SentryErrorBoundary` component wraps MUI fallback UI; `global-error.tsx` catches render-level crashes; `captureServerActionError()` helper instruments server actions. Sentry is opt-in — the app runs normally without a DSN configured. _Why opt-in? This is a portfolio project — developers shouldn't need a Sentry account to run it locally._
 
-- **1814 tests, 91.9% line coverage** — Unit tests, integration tests against real PostgreSQL + in-memory MongoDB (no database mocks), and 75 Playwright E2E tests covering full user flows. _Why real databases in tests? Mocked tests can pass while production breaks. If your test doesn't hit a real database, it's not testing what you think it's testing._
+- **1785+ tests, 91.9% line coverage** — Unit tests, integration tests against real PostgreSQL + in-memory MongoDB (no database mocks), and 75 Playwright E2E tests covering full user flows. _Why real databases in tests? Mocked tests can pass while production breaks. If your test doesn't hit a real database, it's not testing what you think it's testing._
 
-- **Structured logging (Pino)** — JSON logs in production, human-readable in development. `createRequestLogger()` produces child loggers with traceId and userId context for request correlation. Replaces all `console.error/warn` calls. _Why Pino? It's the fastest Node.js logger, and structured JSON logs are parseable by Datadog, Grafana Loki, and CloudWatch without custom parsing rules._
+- **Structured logging (Pino) with trace correlation** — JSON logs in production, human-readable in development. Every log line automatically includes OpenTelemetry `traceId` and `spanId` via Pino's mixin — search a trace ID in your log aggregator to see every log from that request. `createRequestLogger()` adds userId context on top. _Why Pino? It's the fastest Node.js logger, and structured JSON logs are parseable by Datadog, Grafana Loki, and CloudWatch without custom parsing rules._
+
+- **OpenTelemetry tracing & metrics** — Full distributed tracing via `@opentelemetry/sdk-node`. PostgreSQL queries are auto-instrumented via `@opentelemetry/instrumentation-pg`. Every server action gets a span (`action.createPerson`, `action.approveLeaverequest`, etc.) with events for auth, rate-limit, and business logic phases. Custom metrics: `hrm.action.count`, `hrm.action.duration`, `hrm.db.query.duration`, `hrm.error.count`. Middleware injects `X-Trace-Id` and `Server-Timing` headers on every response. Exports to any OTLP-compatible backend (Jaeger, Grafana Tempo, Datadog). Opt-in via `OTEL_ENABLED=true`. _Why OpenTelemetry? It's the vendor-neutral standard — instrument once, export to any backend. Combined with Pino trace correlation, you get a complete picture: what happened (logs), how long it took (traces), and how often (metrics)._
 
 - **Health check endpoints** — `/api/health` returns status, version, and uptime (shallow probe for load balancers). `/api/ready` checks PostgreSQL (`SELECT 1`) and MongoDB connectivity, returning 503 with per-dependency error details when degraded. _Why two endpoints? Health checks should be fast and cheap; readiness checks can be slow because they verify real dependencies._
 
@@ -195,7 +197,7 @@ graph LR
 | Testing    | Jest 30 + Playwright             | Unit/integration against real DBs + E2E against production builds |
 | CI/CD      | GitHub Actions                   | Lint, format, i18n audit, test, build — on every push             |
 | Jobs       | pg-boss                          | PostgreSQL-based job queue — no Redis, retries, dead-letter queue |
-| Monitoring | Sentry                           | Client + server + edge error capture; opt-in via DSN env var      |
+| Monitoring | Sentry + OpenTelemetry           | Error capture + distributed tracing + custom metrics; both opt-in |
 
 ---
 
@@ -235,7 +237,8 @@ graph LR
 | Themes         | `themeConfig.ts`        | CSS custom properties injected before hydration; 6 palettes switchable at runtime                          |
 | i18n           | `messages/*.json`       | 18 locale files synced via AI translation pipeline                                                         |
 | CSV            | `csvUtils.ts`           | RFC 4180 parser/generator with zero dependencies; permission-gated admin page                              |
-| Logging        | `logger.ts` (Pino)      | Structured JSON in production, pretty in dev; child loggers with traceId/userId                            |
+| Logging        | `logger.ts` (Pino)      | Structured JSON in production, pretty in dev; OTEL traceId/spanId auto-injected via mixin                  |
+| Tracing        | `telemetry.ts` (OTEL)   | Auto-instrumented pg queries; server action spans with auth/rateLimit/logic events; custom metrics         |
 | Caching        | `cacheInvalidation.ts`  | Tag-based `unstable_cache` with 5-min TTL; mutations call `revalidateTag`                                  |
 | Hash chain     | `auditHashChain.ts`     | HMAC-SHA256 linking each audit entry to its predecessor; admin verification endpoint                       |
 
@@ -279,13 +282,14 @@ graph LR
 | Health endpoints   | 6        | Shallow health, deep readiness, PostgreSQL + MongoDB connectivity, degraded responses                     |
 | MongoDB schema     | 6        | `$jsonSchema` validation, required fields, BSON types, warn vs strict modes                               |
 | Structured logs    | 4        | Pino logger setup, JSON output, child loggers with context                                                |
+| OpenTelemetry      | 22       | SDK init gating, span creation/error/status, metrics caching, middleware tracing, instrumentation hook    |
 | iCal calendar      | 7        | RFC 5545 generation, DTEND exclusivity, text escaping, CRLF, multiple events                              |
 | Keyboard shortcuts | 8        | Chord navigation, help dialog, input suppression, search focus                                            |
 | Auth route         | 5        | Rate limiting on auth endpoints, CSRF, GET passthrough                                                    |
 | Reviews UI         | 86       | Cycle management, request table, submit form, templates, question CRUD, confirm dialogs                   |
 | Accessibility      | 25       | axe-core WCAG AA checks on 22 components — forms, tables, dialogs, skeletons, navigation                  |
 | E2E (Playwright)   | 75       | Auth, CRUD, detail editing, dashboard, profile, data I/O, form validation, full workflow                  |
-| **Total**          | **1763** | **91.9% line coverage · 83.5% function coverage**                                                         |
+| **Total**          | **1785** | **91.9% line coverage · 83.5% function coverage**                                                         |
 
 ```
 Statements : 90.83%    Branches : 82.47%
@@ -344,17 +348,19 @@ npx prisma migrate dev        # apply schema migrations
 npm run dev                   # start dev server at localhost:3000
 ```
 
-| Variable             | Required | Description                                                   |
-| -------------------- | -------- | ------------------------------------------------------------- |
-| `DATABASE_URL`       | Yes      | PostgreSQL connection string                                  |
-| `MONGODB_URL`        | Yes      | MongoDB connection string                                     |
-| `AUTH_SECRET`        | Yes      | NextAuth secret (`npx auth secret` generates one)             |
-| `AUTH_GOOGLE_ID`     | No       | Google OAuth client ID                                        |
-| `AUTH_GOOGLE_SECRET` | No       | Google OAuth client secret                                    |
-| `AUTH_GITHUB_ID`     | No       | GitHub OAuth client ID                                        |
-| `AUTH_GITHUB_SECRET` | No       | GitHub OAuth client secret                                    |
-| `AUDIT_HMAC_SECRET`  | No       | HMAC key for audit log hash chain (auto-generated if missing) |
-| `ANTHROPIC_API_KEY`  | No       | Claude API key (for i18n translation agent)                   |
+| Variable                             | Required | Description                                                           |
+| ------------------------------------ | -------- | --------------------------------------------------------------------- |
+| `DATABASE_URL`                       | Yes      | PostgreSQL connection string                                          |
+| `MONGODB_URL`                        | Yes      | MongoDB connection string                                             |
+| `AUTH_SECRET`                        | Yes      | NextAuth secret (`npx auth secret` generates one)                     |
+| `AUTH_GOOGLE_ID`                     | No       | Google OAuth client ID                                                |
+| `AUTH_GOOGLE_SECRET`                 | No       | Google OAuth client secret                                            |
+| `AUTH_GITHUB_ID`                     | No       | GitHub OAuth client ID                                                |
+| `AUTH_GITHUB_SECRET`                 | No       | GitHub OAuth client secret                                            |
+| `AUDIT_HMAC_SECRET`                  | No       | HMAC key for audit log hash chain (auto-generated if missing)         |
+| `ANTHROPIC_API_KEY`                  | No       | Claude API key (for i18n translation agent)                           |
+| `OTEL_ENABLED`                       | No       | Set `true` to enable OpenTelemetry tracing + metrics                  |
+| `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` | No       | OTLP trace collector URL (default: `http://localhost:4318/v1/traces`) |
 
 ---
 
@@ -399,7 +405,7 @@ _Last updated: March 2026_
 
 ### Architecture & Observability
 
-- [ ] OpenTelemetry tracing — instrument full request lifecycle; export to Jaeger/Datadog; P95/P99 dashboards
+- [x] OpenTelemetry tracing — instrument full request lifecycle; export to Jaeger/Datadog; P95/P99 dashboards
 - [ ] WebSocket real-time updates — live notifications for person create, leave requests, activity feed
 - [ ] Performance at scale — load test with 10k/100k employees; identify N+1 queries and missing indexes
 
