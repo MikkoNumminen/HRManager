@@ -183,7 +183,7 @@ export async function resolvePermissions(
   if (role !== "superuser") {
     for (const override of overrides) {
       if (override.key in result) {
-        result[override.key] = override.granted;
+        result[override.key as PermissionKey] = override.granted;
       }
     }
   }

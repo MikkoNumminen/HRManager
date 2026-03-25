@@ -1,4 +1,4 @@
-import { requirePermission } from "@/permissions";
+import { requirePermission, type PermissionKey } from "@/permissions";
 import { rateLimit } from "@/rateLimit";
 import { getTranslations } from "next-intl/server";
 import { safe, type ActionResult } from "@/lib/actionUtils";
@@ -29,7 +29,7 @@ type Translations = Awaited<ReturnType<typeof getTranslations<"errors">>>;
  *   );
  */
 export function guardedAction<TArgs extends unknown[]>(
-  permission: string,
+  permission: PermissionKey,
   rateLimitKey: string,
   fn: (t: Translations, ...args: TArgs) => Promise<void>,
 ): (...args: TArgs) => Promise<ActionResult> {

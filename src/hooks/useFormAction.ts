@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { useSnackbar } from "@/components/SnackbarProvider";
+import type { ActionResult } from "@/lib/actionUtils";
 
 export type FormState = { error: string | null; success?: boolean };
 
@@ -12,7 +13,7 @@ export type FormState = { error: string | null; success?: boolean };
  * and optionally triggering optimistic updates or callbacks.
  */
 export function useFormAction(
-  action: (formData: FormData) => Promise<{ error?: string | null; success?: boolean }>,
+  action: (formData: FormData) => Promise<ActionResult>,
   options: {
     successMessage: string;
     onOptimistic?: (...args: unknown[]) => void;
