@@ -1,5 +1,5 @@
 import { render, screen, within } from "@testing-library/react";
-import PersonTable from "@/components/PersonsTable";
+import { PersonsTable as PersonTable } from "@/components/PersonsDataTable";
 import { Person } from "@/schemas";
 
 const mockPersons: Person[] = [

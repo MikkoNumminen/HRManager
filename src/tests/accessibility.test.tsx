@@ -46,9 +46,9 @@ import ReviewSubmitClient from "../components/ReviewSubmitClient";
 import ReviewTemplateDetailClient from "../components/ReviewTemplateDetailClient";
 import ReviewTemplatesClient from "../components/ReviewTemplatesClient";
 import ReviewCycleDetailClient from "../components/ReviewCycleDetailClient";
-import PersonsTable from "../components/PersonsTable";
-import DepartmentsTable from "../components/DepartmentsTable";
-import TeamsTable from "../components/TeamsTable";
+import { PersonsTable } from "../components/PersonsDataTable";
+import { DepartmentsTable } from "../components/DepartmentsDataTable";
+import { TeamsTable } from "../components/TeamsDataTable";
 import OrgChartClient from "../components/OrgChartClient";
 
 // ─── Mocks ─────────────────────────────────────────────────────────────────

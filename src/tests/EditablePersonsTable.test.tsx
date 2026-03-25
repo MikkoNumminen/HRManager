@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, within } from "@testing-library/react";
-import EditablePersonsTable from "@/components/EditablePersonsTable";
+import { EditablePersonsTable } from "@/components/PersonsDataTable";
 import { useRouter } from "next/navigation";
 import { Person } from "@/schemas";
 

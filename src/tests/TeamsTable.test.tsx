@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen, within } from "@testing-library/react";
-import TeamsTable from "@/components/TeamsTable";
+import { TeamsTable } from "@/components/TeamsDataTable";
 
 const mockCombinedTeams = [
   {

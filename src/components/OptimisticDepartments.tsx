@@ -5,7 +5,7 @@ import { Department } from "@/schemas";
 import { Box, Typography, Pagination } from "@mui/material";
 import { pageContainerStyles } from "@/muiStyles";
 import AddDepartmentForm from "./AddDepartment";
-import EditableDepartmentsTable from "./EditableDepartmentsTable";
+import { EditableDepartmentsTable } from "./DepartmentsDataTable";
 import SearchBar from "./SearchBar";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
