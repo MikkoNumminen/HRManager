@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import RemovePersonForm from "../components/RemovePerson";
+import RemovePersonForm from "../components/RemovePersonForm";
 import { removePerson } from "@/features/persons/actions";
 import { useRouter } from "next/navigation";
 

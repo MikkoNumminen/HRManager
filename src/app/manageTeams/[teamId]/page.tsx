@@ -1,11 +1,11 @@
-import UpdateManagerForm from "@/components/UpdateManager";
-import UpdateTeamNameForm from "@/components/UpdateTeamName";
-import RemoveTeamForm from "@/components/RemoveTeam";
+import UpdateManagerForm from "@/components/UpdateManagerForm";
+import UpdateTeamNameForm from "@/components/UpdateTeamNameForm";
+import RemoveTeamForm from "@/components/RemoveTeamForm";
 import { getPersons } from "@/features/persons/queries";
 import { getTeams, getTeamDeleteImpact } from "@/features/teams/queries";
 import { Typography } from "@mui/material";
-import AddPeopleToTeam from "@/components/AddPeopleToTeam";
-import RemoveMemberFromTeam from "@/components/RemoveMemberFromTeam";
+import AddMemberForm from "@/components/AddMemberForm";
+import RemoveMemberForm from "@/components/RemoveMemberForm";
 import TopBar from "@/components/TopBar";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
@@ -56,10 +56,10 @@ export default async function TeamPage({ params }: { params: Promise<{ teamId: s
         />
       )}
       {permissions["team:add_member"] && (
-        <AddPeopleToTeam teamID={teamId} persons={persons} excludeIds={managerAndMemberIds} />
+        <AddMemberForm teamID={teamId} persons={persons} excludeIds={managerAndMemberIds} />
       )}
       {permissions["team:remove_member"] && (
-        <RemoveMemberFromTeam teamID={teamId} persons={persons} includeOnlyIds={memberIds} />
+        <RemoveMemberForm teamID={teamId} persons={persons} includeOnlyIds={memberIds} />
       )}
     </>
   );

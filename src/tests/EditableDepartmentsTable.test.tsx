@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen, fireEvent, within } from "@testing-library/react";
-import { EditableDepartmentsTable } from "@/components/DepartmentsDataTable";
+import { EditableDepartmentsTable } from "@/components/DepartmentsTable";
 import { useRouter } from "next/navigation";
 import { Department } from "@/schemas";
 

@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import AddDepartmentForm from "../components/AddDepartment";
+import AddDepartmentForm from "../components/AddDepartmentForm";
 import { createDepartment } from "@/features/departments/actions";
 
 jest.mock("@/features/departments/actions", () => ({

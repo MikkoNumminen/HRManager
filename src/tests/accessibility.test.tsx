@@ -36,8 +36,8 @@ import {
 import LanguageSwitcher from "../components/LanguageSwitcher";
 import ThemeSwitcher from "../components/ThemeSwitcher";
 import AddPersonForm from "../components/AddPersonForm";
-import AddTeamForm from "../components/AddTeam";
-import AddDepartmentForm from "../components/AddDepartment";
+import AddTeamForm from "../components/AddTeamForm";
+import AddDepartmentForm from "../components/AddDepartmentForm";
 import ProfileEditor from "../components/ProfileEditor";
 import LeaveManager from "../components/LeaveManager";
 import DataImportExport from "../components/DataImportExport";
@@ -46,9 +46,9 @@ import ReviewSubmitClient from "../components/ReviewSubmitClient";
 import ReviewTemplateDetailClient from "../components/ReviewTemplateDetailClient";
 import ReviewTemplatesClient from "../components/ReviewTemplatesClient";
 import ReviewCycleDetailClient from "../components/ReviewCycleDetailClient";
-import { PersonsTable } from "../components/PersonsDataTable";
-import { DepartmentsTable } from "../components/DepartmentsDataTable";
-import { TeamsTable } from "../components/TeamsDataTable";
+import { PersonsTable } from "../components/PersonsTable";
+import { DepartmentsTable } from "../components/DepartmentsTable";
+import { TeamsTable } from "../components/TeamsTable";
 import OrgChartClient from "../components/OrgChartClient";
 
 // ─── Mocks ─────────────────────────────────────────────────────────────────

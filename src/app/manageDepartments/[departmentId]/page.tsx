@@ -1,8 +1,8 @@
-import UpdateDepartmentForm from "@/components/UpdateDepartment";
-import UpdateDepartmentHeadForm from "@/components/UpdateDepartmentHead";
-import RemoveDepartmentForm from "@/components/RemoveDepartment";
-import AssignTeamToDepartmentForm from "@/components/AssignTeamToDepartment";
-import RemoveTeamFromDepartmentForm from "@/components/RemoveTeamFromDepartment";
+import UpdateDepartmentForm from "@/components/UpdateDepartmentForm";
+import UpdateDepartmentHeadForm from "@/components/UpdateDepartmentHeadForm";
+import RemoveDepartmentForm from "@/components/RemoveDepartmentForm";
+import AssignTeamToDepartmentForm from "@/components/AssignTeamToDepartmentForm";
+import RemoveTeamFromDepartmentForm from "@/components/RemoveTeamFromDepartmentForm";
 import { getDepartments, getDepartmentDeleteImpact } from "@/features/departments/queries";
 import { getPersons } from "@/features/persons/queries";
 import { getTeams } from "@/features/teams/queries";

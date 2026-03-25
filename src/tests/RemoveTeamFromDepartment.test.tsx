@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import RemoveTeamFromDepartmentForm from "../components/RemoveTeamFromDepartment";
+import RemoveTeamFromDepartmentForm from "../components/RemoveTeamFromDepartmentForm";
 import { removeTeamFromDepartment } from "@/features/departments/actions";
 import { CombinedTeam } from "../schemas";
 

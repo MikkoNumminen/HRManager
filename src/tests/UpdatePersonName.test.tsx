@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import UpdatePersonNameForm from "../components/UpdatePersonName";
+import UpdatePersonNameForm from "../components/UpdatePersonNameForm";
 import { updatePersonName } from "@/features/persons/actions";
 import { useRouter } from "next/navigation";
 

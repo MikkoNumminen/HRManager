@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen, within } from "@testing-library/react";
-import { DepartmentsTable } from "@/components/DepartmentsDataTable";
+import { DepartmentsTable } from "@/components/DepartmentsTable";
 import { Department } from "@/schemas";
 
 const mockDepartments: Department[] = [

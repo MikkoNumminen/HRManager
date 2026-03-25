@@ -5,7 +5,7 @@ import { Person } from "@/schemas";
 import { Box, Typography, Pagination } from "@mui/material";
 import { pageContainerStyles } from "@/muiStyles";
 import AddPersonForm from "./AddPersonForm";
-import { EditablePersonsTable as PersonTable } from "./PersonsDataTable";
+import { EditablePersonsTable as PersonTable } from "./PersonsTable";
 import SearchBar from "./SearchBar";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";

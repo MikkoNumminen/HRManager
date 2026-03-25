@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import UpdateDepartmentHeadForm from "../components/UpdateDepartmentHead";
+import UpdateDepartmentHeadForm from "../components/UpdateDepartmentHeadForm";
 import { updateDepartmentHead } from "@/features/departments/actions";
 import { Person } from "../schemas";
 

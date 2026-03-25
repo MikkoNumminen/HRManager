@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import AddPeopleToTeam from "../components/AddPeopleToTeam";
+import AddMemberForm from "../components/AddMemberForm";
 import { addMember } from "@/features/teams/actions";
 import { useRouter } from "next/navigation";
 
@@ -43,25 +43,25 @@ describe("AddPeopleToTeam Component", () => {
   });
 
   test("renders the person list", () => {
-    render(<AddPeopleToTeam teamID={teamID} persons={mockPersons} />);
+    render(<AddMemberForm teamID={teamID} persons={mockPersons} />);
     expect(screen.getByText(/Alice/)).toBeInTheDocument();
     expect(screen.getByText(/Bob/)).toBeInTheDocument();
   });
 
   test("submit button is disabled when no person is selected", () => {
-    render(<AddPeopleToTeam teamID={teamID} persons={mockPersons} />);
+    render(<AddMemberForm teamID={teamID} persons={mockPersons} />);
     expect(screen.getByRole("button", { name: /Add Member/i })).toBeDisabled();
   });
 
   test("submit button is enabled after selecting a person", () => {
-    render(<AddPeopleToTeam teamID={teamID} persons={mockPersons} />);
+    render(<AddMemberForm teamID={teamID} persons={mockPersons} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Alice" }));
     expect(screen.getByRole("button", { name: /Add Member/i })).toBeEnabled();
   });
 
   test("excludes persons with ids in excludeIds", () => {
-    render(<AddPeopleToTeam teamID={teamID} persons={mockPersons} excludeIds={["person-1"]} />);
+    render(<AddMemberForm teamID={teamID} persons={mockPersons} excludeIds={["person-1"]} />);
 
     expect(screen.queryByText(/Alice/)).not.toBeInTheDocument();
     expect(screen.getByText(/Bob/)).toBeInTheDocument();
@@ -69,7 +69,7 @@ describe("AddPeopleToTeam Component", () => {
 
   test("submits the form and calls addMember", async () => {
     (addMember as jest.Mock).mockResolvedValue(undefined);
-    render(<AddPeopleToTeam teamID={teamID} persons={mockPersons} />);
+    render(<AddMemberForm teamID={teamID} persons={mockPersons} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Alice" }));
     fireEvent.click(screen.getByRole("button", { name: /Add Member/i }));
@@ -82,7 +82,7 @@ describe("AddPeopleToTeam Component", () => {
   // Shows generic error message when addMember throws a non-Error value.
   test("shows generic error when addMember throws non-Error", async () => {
     (addMember as jest.Mock).mockResolvedValue({ error: "An unexpected error occurred" });
-    render(<AddPeopleToTeam teamID={teamID} persons={mockPersons} />);
+    render(<AddMemberForm teamID={teamID} persons={mockPersons} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Alice" }));
     fireEvent.click(screen.getByRole("button", { name: /Add Member/i }));
@@ -94,7 +94,7 @@ describe("AddPeopleToTeam Component", () => {
 
   test("shows error message when addMember fails", async () => {
     (addMember as jest.Mock).mockResolvedValue({ error: "Person is already a member" });
-    render(<AddPeopleToTeam teamID={teamID} persons={mockPersons} />);
+    render(<AddMemberForm teamID={teamID} persons={mockPersons} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Alice" }));
     fireEvent.click(screen.getByRole("button", { name: /Add Member/i }));
