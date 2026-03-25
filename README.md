@@ -178,6 +178,8 @@ graph LR
 
 - **Dashboard caching** — `unstable_cache` wraps the two most expensive dashboard queries (metrics and org chart) with a 5-minute TTL and tag-based invalidation. Every mutation that affects dashboard data calls `revalidateTag("dashboard")`. Test-safe — the cache wrapper returns the raw function in test environments. _Why cache? Dashboard queries aggregate across multiple tables with CTEs; caching turns a ~200ms query into a <1ms cache hit for most page loads._
 
+- **Performance at scale** — 14 database indexes on foreign keys and frequently queried columns, N+1 query elimination (replaced eager-loaded relation counts with `_count` aggregations and `groupBy` batching), and `select` narrowing on all relation includes to avoid fetching unused columns. Performance seeding script generates 10k employees / 200 teams / 50 departments for load testing. Benchmark script measures all major query patterns with warm-up runs and P95 reporting. Full scaling analysis in [`SCALING.md`](SCALING.md) documents known scaling cliffs and recommendations for 100k+ employees. _Why document scaling limits? A production system should be honest about where it breaks — and have a plan for when it gets there._
+
 - **Docker-ready** — `docker compose up` starts PostgreSQL + MongoDB + the app. Migrations run automatically, demo login works out of the box. _One command, zero setup, fully working._
 
 ---
@@ -331,6 +333,8 @@ npm run validate        # pre-commit gate: Prettier + ESLint + i18n audit + full
 npm run i18n:audit      # report missing, extra, and untranslated keys across all locales
 npm run i18n:fix        # auto-fill missing keys with English fallback, remove extras
 npm run i18n:translate  # auto-translate via Claude Haiku API (requires ANTHROPIC_API_KEY)
+npx tsx scripts/perf-seed.ts       # seed 10k employees for performance testing
+npx tsx scripts/perf-benchmark.ts  # benchmark all major queries with P95 reporting
 ```
 
 ---
@@ -429,7 +433,7 @@ _Last updated: March 2026_
 
 - [x] OpenTelemetry tracing — instrument full request lifecycle; export to Jaeger/Datadog; P95/P99 dashboards
 - [ ] WebSocket real-time updates — live notifications for person create, leave requests, activity feed
-- [ ] Performance at scale — load test with 10k/100k employees; identify N+1 queries and missing indexes
+- [x] Performance at scale — N+1 query fixes, 14 database indexes, load testing tools, scaling analysis
 
 ### Security & Compliance
 
