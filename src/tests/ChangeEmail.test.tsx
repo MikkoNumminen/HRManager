@@ -1,9 +1,9 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import UpdateEmailForm from "../components/UpdateEmail";
-import { updateEmail } from "../serverActions";
+import { updateEmail } from "@/features/persons/actions";
 import { useRouter } from "next/navigation";
 
-jest.mock("../serverActions", () => ({
+jest.mock("@/features/persons/actions", () => ({
   updateEmail: jest.fn(),
 }));
 

@@ -4,7 +4,7 @@ process.env.NEXT_PUBLIC_DEMO_LOGIN = "true";
 import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
 import TopBar from "../components/TopBar";
 import { useSession, signIn, signOut } from "next-auth/react";
-import { seedMockData } from "../serverActions";
+import { seedMockData } from "@/serverActions";
 import { STORAGE_KEY } from "../tutorialConfig";
 
 jest.mock("next/navigation", () => ({
@@ -17,7 +17,14 @@ jest.mock("next-auth/react", () => ({
   signOut: jest.fn(),
 }));
 
-jest.mock("../serverActions", () => ({
+// TopBar imports resetAll/seedMockData via @/serverActions barrel.
+jest.mock("@/serverActions", () => ({
+  resetAll: jest.fn(),
+  seedMockData: jest.fn(),
+}));
+
+// Also mock the feature module directly — it is imported by the test file itself.
+jest.mock("@/features/admin/actions", () => ({
   resetAll: jest.fn(),
   seedMockData: jest.fn(),
 }));

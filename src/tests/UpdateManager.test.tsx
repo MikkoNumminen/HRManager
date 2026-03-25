@@ -1,8 +1,8 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import UpdateManagerForm from "../components/UpdateManager";
-import { addManager } from "../serverActions";
+import { addManager } from "@/features/persons/actions";
 
-jest.mock("../serverActions", () => ({
+jest.mock("@/features/persons/actions", () => ({
   addManager: jest.fn(),
 }));
 

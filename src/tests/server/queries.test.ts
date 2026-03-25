@@ -101,9 +101,9 @@ afterAll(async () => {
 describe("getPersons", () => {
   beforeEach(async () => {
     await cleanDb();
-  });
+  }, 30_000);
 
-  afterAll(() => cleanDb());
+  afterAll(() => cleanDb(), 30_000);
 
   // An empty database should give back an empty list, not an error.
   test("returns empty array when no persons exist", async () => {
@@ -160,9 +160,9 @@ describe("getPersons", () => {
 describe("getTeams", () => {
   beforeEach(async () => {
     await cleanDb();
-  });
+  }, 30_000);
 
-  afterAll(() => cleanDb());
+  afterAll(() => cleanDb(), 30_000);
 
   // No teams in the database? You get an empty list, not a crash.
   test("returns empty array when no teams exist", async () => {
@@ -301,9 +301,9 @@ describe("getTeams", () => {
 describe("getUsers", () => {
   beforeEach(async () => {
     await cleanDb();
-  });
+  }, 30_000);
 
-  afterAll(() => cleanDb());
+  afterAll(() => cleanDb(), 30_000);
 
   // An empty user table should return an empty list.
   test("returns empty array when no users exist", async () => {
@@ -384,9 +384,9 @@ describe("getUsers", () => {
 describe("getUserById", () => {
   beforeEach(async () => {
     await cleanDb();
-  });
+  }, 30_000);
 
-  afterAll(() => cleanDb());
+  afterAll(() => cleanDb(), 30_000);
 
   // Look up a user by ID and get back their data plus resolved permissions.
   test("returns user with overrides and resolved permissions", async () => {
@@ -472,7 +472,7 @@ describe("getAuditLogs", () => {
   beforeEach(async () => {
     await cleanDb();
     await cleanTestMongo();
-  });
+  }, 30_000);
 
   // Returns empty result when no audit logs exist.
   test("returns empty array when no logs exist", async () => {
@@ -775,7 +775,7 @@ describe("getAuditLogUserEmails", () => {
   beforeEach(async () => {
     await cleanDb();
     await cleanTestMongo();
-  });
+  }, 30_000);
 
   // Returns empty array when no logs exist.
   test("returns empty array when no logs exist", async () => {
@@ -824,11 +824,11 @@ describe("getAuditLogUserEmails", () => {
 describe("getDepartments", () => {
   beforeEach(async () => {
     await cleanDb();
-  });
+  }, 30_000);
 
   afterAll(async () => {
     await cleanDb();
-  });
+  }, 30_000);
 
   // Returns an empty array when no departments exist.
   test("returns empty array when no departments exist", async () => {
@@ -894,7 +894,7 @@ describe("getDashboardMetrics", () => {
   beforeEach(async () => {
     await cleanDb();
     await cleanTestMongo();
-  });
+  }, 30_000);
 
   // Returns zero counts when the database is empty.
   test("returns zero counts when database is empty", async () => {
@@ -1201,13 +1201,13 @@ describe("getDataExportCounts", () => {
     await cleanDb();
     await cleanTestMongo();
     hasPermission.mockResolvedValue(true);
-  });
+  }, 30_000);
 
   afterEach(() => {
     hasPermission.mockResolvedValue(true);
   });
 
-  afterAll(() => cleanDb());
+  afterAll(() => cleanDb(), 30_000);
 
   // Returns entity counts for persons, teams, departments, and audit logs.
   test("returns correct entity counts when authorized", async () => {
@@ -1253,8 +1253,8 @@ describe("getDataExportCounts", () => {
 describe("getProfile", () => {
   beforeEach(async () => {
     await cleanDb();
-  });
-  afterAll(() => cleanDb());
+  }, 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // Returns the full profile for an authenticated user with resolved permissions.
   test("returns user profile with resolved permissions", async () => {
@@ -1373,9 +1373,9 @@ describe("getProfile", () => {
 describe("getPagedPersons", () => {
   beforeEach(async () => {
     await cleanDb();
-  });
+  }, 30_000);
 
-  afterAll(() => cleanDb());
+  afterAll(() => cleanDb(), 30_000);
 
   // Returns empty items and zero total when database is empty.
   test("returns empty items and total=0 when no persons exist", async () => {
@@ -1426,9 +1426,9 @@ describe("getPagedPersons", () => {
 describe("getPagedTeams", () => {
   beforeEach(async () => {
     await cleanDb();
-  });
+  }, 30_000);
 
-  afterAll(() => cleanDb());
+  afterAll(() => cleanDb(), 30_000);
 
   // Returns empty items and zero total when database is empty.
   test("returns empty items and total=0 when no teams exist", async () => {
@@ -1465,9 +1465,9 @@ describe("getPagedTeams", () => {
 describe("getPagedDepartments", () => {
   beforeEach(async () => {
     await cleanDb();
-  });
+  }, 30_000);
 
-  afterAll(() => cleanDb());
+  afterAll(() => cleanDb(), 30_000);
 
   // Returns empty items and zero total when database is empty.
   test("returns empty items and total=0 when no departments exist", async () => {
@@ -1516,7 +1516,7 @@ describe("getPagedDepartments", () => {
 describe("getOrgChartData", () => {
   beforeEach(async () => {
     await cleanDb();
-  });
+  }, 30_000);
 
   // Returns empty departments, teams, and persons when no data exists.
   test("returns empty data for empty database", async () => {
@@ -1610,9 +1610,9 @@ describe("getOrgChartData", () => {
 describe("getPersonDeleteImpact", () => {
   beforeEach(async () => {
     await cleanDb();
-  });
+  }, 30_000);
 
-  afterAll(() => cleanDb());
+  afterAll(() => cleanDb(), 30_000);
 
   // Returns empty arrays and zero counts when person has no references.
   test("returns empty impact for isolated person", async () => {
@@ -1651,9 +1651,9 @@ describe("getPersonDeleteImpact", () => {
 describe("getTeamDeleteImpact", () => {
   beforeEach(async () => {
     await cleanDb();
-  });
+  }, 30_000);
 
-  afterAll(() => cleanDb());
+  afterAll(() => cleanDb(), 30_000);
 
   // Returns zero members and null department for an empty team.
   test("returns empty impact for isolated team", async () => {
@@ -1683,9 +1683,9 @@ describe("getTeamDeleteImpact", () => {
 describe("getDepartmentDeleteImpact", () => {
   beforeEach(async () => {
     await cleanDb();
-  });
+  }, 30_000);
 
-  afterAll(() => cleanDb());
+  afterAll(() => cleanDb(), 30_000);
 
   // Returns empty teams array for a department with no teams.
   test("returns empty impact for isolated department", async () => {
@@ -1931,9 +1931,9 @@ describe("position query permission checks", () => {
 describe("getLeaveTypes data", () => {
   beforeEach(async () => {
     await cleanDb();
-  });
+  }, 30_000);
 
-  afterAll(() => cleanDb());
+  afterAll(() => cleanDb(), 30_000);
 
   // Returns all active leave types sorted by name.
   test("returns leave types sorted by name", async () => {
@@ -1989,9 +1989,9 @@ describe("getLeaveTypes data", () => {
 describe("getLeaveRequests data", () => {
   beforeEach(async () => {
     await cleanDb();
-  });
+  }, 30_000);
 
-  afterAll(() => cleanDb());
+  afterAll(() => cleanDb(), 30_000);
 
   // Returns leave requests with person and leave type details.
   test("returns leave requests with joined details", async () => {
@@ -2116,9 +2116,9 @@ describe("getLeaveRequests data", () => {
 describe("getLeaveBalances data", () => {
   beforeEach(async () => {
     await cleanDb();
-  });
+  }, 30_000);
 
-  afterAll(() => cleanDb());
+  afterAll(() => cleanDb(), 30_000);
 
   // Returns leave balances with person and leave type details.
   test("returns leave balances with joined details", async () => {
@@ -2215,9 +2215,9 @@ describe("getLeaveBalances data", () => {
 describe("getPositions data", () => {
   beforeEach(async () => {
     await cleanDb();
-  });
+  }, 30_000);
 
-  afterAll(() => cleanDb());
+  afterAll(() => cleanDb(), 30_000);
 
   // Returns positions sorted by name.
   test("returns positions sorted by name", async () => {
@@ -2258,9 +2258,9 @@ describe("getPositions data", () => {
 describe("getEmployeeProfile data", () => {
   beforeEach(async () => {
     await cleanDb();
-  });
+  }, 30_000);
 
-  afterAll(() => cleanDb());
+  afterAll(() => cleanDb(), 30_000);
 
   // Returns null for a non-existent person ID.
   test("returns null for non-existent person", async () => {
@@ -2316,9 +2316,9 @@ describe("getEmployeeProfile data", () => {
 describe("getReviewTemplates data", () => {
   beforeEach(async () => {
     await cleanDb();
-  });
+  }, 30_000);
 
-  afterAll(() => cleanDb());
+  afterAll(() => cleanDb(), 30_000);
 
   // Returns all active review templates sorted by createdAt.
   test("returns active review templates", async () => {
@@ -2350,9 +2350,9 @@ describe("getReviewTemplates data", () => {
 describe("getReviewTemplate data", () => {
   beforeEach(async () => {
     await cleanDb();
-  });
+  }, 30_000);
 
-  afterAll(() => cleanDb());
+  afterAll(() => cleanDb(), 30_000);
 
   // Returns a single review template by ID.
   test("returns a single review template", async () => {
@@ -2390,9 +2390,9 @@ describe("getReviewTemplate data", () => {
 describe("getReviewCycles data", () => {
   beforeEach(async () => {
     await cleanDb();
-  });
+  }, 30_000);
 
-  afterAll(() => cleanDb());
+  afterAll(() => cleanDb(), 30_000);
 
   // Returns all active review cycles with counts.
   test("returns review cycles with request counts", async () => {
@@ -2458,9 +2458,9 @@ describe("getReviewCycles data", () => {
 describe("getReviewCycle data", () => {
   beforeEach(async () => {
     await cleanDb();
-  });
+  }, 30_000);
 
-  afterAll(() => cleanDb());
+  afterAll(() => cleanDb(), 30_000);
 
   // Returns null for a non-existent cycle.
   test("returns null for non-existent cycle", async () => {
@@ -2504,9 +2504,9 @@ describe("getReviewCycle data", () => {
 describe("getMyReviewRequests data", () => {
   beforeEach(async () => {
     await cleanDb();
-  });
+  }, 30_000);
 
-  afterAll(() => cleanDb());
+  afterAll(() => cleanDb(), 30_000);
 
   // Returns empty array when no reviewerPersonId provided.
   test("returns empty array when no reviewerPersonId", async () => {
@@ -2575,9 +2575,9 @@ describe("getMyReviewRequests data", () => {
 describe("getReviewRequestWithTemplate data", () => {
   beforeEach(async () => {
     await cleanDb();
-  });
+  }, 30_000);
 
-  afterAll(() => cleanDb());
+  afterAll(() => cleanDb(), 30_000);
 
   // Returns null for non-existent request.
   test("returns null for non-existent request", async () => {
@@ -2677,8 +2677,8 @@ describe("review queries — permission denied branches", () => {
 });
 
 describe("review template — non-array questions fallback branch", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // When the questions field in the DB contains a JSON object instead of an array,
   // the code falls back to [] rather than crashing — tests the `!Array.isArray` branch (line 28/46).
@@ -2714,8 +2714,8 @@ describe("review template — non-array questions fallback branch", () => {
 });
 
 describe("getReviewCycles — null templateId branch", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // A cycle created without a template should have null templateId and null templateName
   // in the returned DTO — tests the `c.templateId ?? null` and `c.template?.name ?? null` branches.
@@ -2738,8 +2738,8 @@ describe("getReviewCycles — null templateId branch", () => {
 });
 
 describe("getReviewCycle — null subject/reviewer name branches", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // A ReviewRequest with null subjectId/reviewerId should return nulls in the parsed DTO.
   // This covers the `r.subjectId ?? null` and `r.subject?.name ?? null` branches.
@@ -2775,8 +2775,8 @@ describe("getReviewCycle — null subject/reviewer name branches", () => {
 });
 
 describe("getMyReviewRequests — null subject/reviewer name branches", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // A review request with null subjectId and null reviewerId should still be returned.
   // Tests the `r.subjectId ?? null`, `r.subject?.name ?? null`, `r.reviewerId ?? null`,
@@ -2825,8 +2825,8 @@ describe("getMyReviewRequests — null subject/reviewer name branches", () => {
 });
 
 describe("getReviewRequestWithTemplate — null subject/reviewer name branches", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // A request with null subjectId/reviewerId should still parse correctly.
   test("returns null subject and reviewer when IDs are null", async () => {

@@ -1,13 +1,13 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import OptimisticTeams from "@/components/OptimisticTeams";
 import { CombinedTeam } from "@/schemas";
-import { createTeam } from "../serverActions";
+import { createTeam } from "@/features/teams/actions";
 
 jest.mock("next/navigation", () => ({
   useRouter: jest.fn(() => ({ push: jest.fn(), replace: jest.fn() })),
 }));
 
-jest.mock("../serverActions", () => ({
+jest.mock("@/features/teams/actions", () => ({
   createTeam: jest.fn(),
 }));
 

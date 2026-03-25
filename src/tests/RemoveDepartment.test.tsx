@@ -1,9 +1,9 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import RemoveDepartmentForm from "../components/RemoveDepartment";
-import { removeDepartment } from "../serverActions";
+import { removeDepartment } from "@/features/departments/actions";
 
-jest.mock("../serverActions", () => ({
+jest.mock("@/features/departments/actions", () => ({
   removeDepartment: jest.fn(),
 }));
 

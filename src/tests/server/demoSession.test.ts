@@ -24,11 +24,11 @@ const { seedDemoData, cleanupStaleDemoSessions, getDemoSessionId } =
 const { auth } = require("../../auth") as { auth: jest.Mock };
 
 describe("demoSession", () => {
-  beforeEach(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
   afterAll(async () => {
     await cleanDb();
     await testPrisma.$disconnect();
-  });
+  }, 30_000);
 
   describe("getDemoSessionId", () => {
     // Returns null when there is no session (unauthenticated).

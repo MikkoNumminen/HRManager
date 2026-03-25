@@ -1,9 +1,9 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import RemoveTeamForm from "../components/RemoveTeam";
-import { removeTeam } from "../serverActions";
+import { removeTeam } from "@/features/teams/actions";
 
-jest.mock("../serverActions", () => ({
+jest.mock("@/features/teams/actions", () => ({
   removeTeam: jest.fn(),
 }));
 

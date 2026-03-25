@@ -1,9 +1,9 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import AssignTeamToDepartmentForm from "../components/AssignTeamToDepartment";
-import { assignTeamToDepartment } from "../serverActions";
+import { assignTeamToDepartment } from "@/features/departments/actions";
 import { CombinedTeam } from "../schemas";
 
-jest.mock("../serverActions", () => ({
+jest.mock("@/features/departments/actions", () => ({
   assignTeamToDepartment: jest.fn(),
 }));
 

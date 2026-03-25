@@ -90,8 +90,8 @@ async function cleanAll() {
 // ─── createPositionEntry ──────────────────────────────────────
 
 describe("createPositionEntry", () => {
-  beforeEach(() => cleanAll());
-  afterAll(() => cleanAll());
+  beforeEach(() => cleanAll(), 30_000);
+  afterAll(() => cleanAll(), 30_000);
 
   // Creates a position entry in the DB when given a valid name.
   test("success creates a position in the DB", async () => {
@@ -131,8 +131,8 @@ describe("createPositionEntry", () => {
 // ─── deletePositionEntry ──────────────────────────────────────
 
 describe("deletePositionEntry", () => {
-  beforeEach(() => cleanAll());
-  afterAll(() => cleanAll());
+  beforeEach(() => cleanAll(), 30_000);
+  afterAll(() => cleanAll(), 30_000);
 
   // Soft-deletes a position by setting deletedAt on success.
   test("success soft-deletes position (sets deletedAt)", async () => {
@@ -160,8 +160,8 @@ describe("deletePositionEntry", () => {
 // ─── updatePosition (catalog sync) ───────────────────────────
 
 describe("updatePosition", () => {
-  beforeEach(() => cleanAll());
-  afterAll(() => cleanAll());
+  beforeEach(() => cleanAll(), 30_000);
+  afterAll(() => cleanAll(), 30_000);
 
   // After updating a person's position, the new position name is synced into the Position catalog.
   test("syncs position name to catalog after setting person's position", async () => {

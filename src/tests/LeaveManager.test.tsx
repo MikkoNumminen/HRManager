@@ -3,6 +3,7 @@ import LeaveManager from "../components/LeaveManager";
 import type { LeaveType, LeaveRequest, LeaveBalance, Person, Permissions } from "../schemas";
 
 // Mock server actions — component tests verify UI behavior, not server logic.
+// Components import via @/serverActions barrel which re-exports from feature modules.
 jest.mock("@/serverActions", () => ({
   createLeaveType: jest.fn(),
   updateLeaveType: jest.fn(),

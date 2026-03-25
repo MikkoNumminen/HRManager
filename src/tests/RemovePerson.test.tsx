@@ -1,10 +1,10 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import RemovePersonForm from "../components/RemovePerson";
-import { removePerson } from "../serverActions";
+import { removePerson } from "@/features/persons/actions";
 import { useRouter } from "next/navigation";
 
-jest.mock("../serverActions", () => ({
+jest.mock("@/features/persons/actions", () => ({
   removePerson: jest.fn(),
 }));
 

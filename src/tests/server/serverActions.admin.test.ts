@@ -87,8 +87,8 @@ function formData(entries: Record<string, string | string[]>): FormData {
 }
 
 describe("resetAll", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // The nuclear option: wipe everything — all people, all teams, all memberships.
   // Used for starting fresh. Verify every table is empty afterward.
@@ -113,8 +113,8 @@ describe("resetAll", () => {
 });
 
 describe("updateUserRole", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // Change a user's role from "user" to "administrator" and verify it saved.
   test("updates a user's role", async () => {
@@ -208,8 +208,8 @@ describe("updateUserRole", () => {
 });
 
 describe("updateUserPermission", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // Grant a permission override to a user and verify it's stored.
   test("grants a permission override", async () => {
@@ -400,8 +400,8 @@ describe("updateUserPermission", () => {
 });
 
 describe("seedMockData", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // Seeds 9 persons into the database (shared seed data from seeds.ts).
   test("creates 9 persons", async () => {
@@ -588,8 +588,8 @@ describe("seedMockData", () => {
 });
 
 describe("initializePermissions", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // Calls seedPermissions (mocked) — verifies the function runs without error.
   test("calls seedPermissions successfully", async () => {
@@ -600,10 +600,10 @@ describe("initializePermissions", () => {
 });
 
 describe("kickOutUser", () => {
-  beforeEach(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
   afterAll(async () => {
     await cleanDb();
-  });
+  }, 30_000);
 
   // Deletes the user and all their permission overrides from the database.
   test("removes user and their permissions", async () => {

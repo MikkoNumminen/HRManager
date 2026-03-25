@@ -3,7 +3,7 @@ import PositionCatalogClient from "../components/PositionCatalogClient";
 import type { Position, Permissions } from "../schemas";
 
 // Mock server actions — component tests verify UI behavior, not server logic.
-jest.mock("@/serverActions", () => ({
+jest.mock("@/features/positions/actions", () => ({
   createPositionEntry: jest.fn(),
   deletePositionEntry: jest.fn(),
 }));

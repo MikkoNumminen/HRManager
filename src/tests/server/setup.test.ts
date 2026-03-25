@@ -11,5 +11,5 @@ describe("Test DB setup", () => {
     await cleanDb();
     const persons = await testPrisma.person.findMany();
     expect(persons).toEqual([]);
-  });
+  }, 30_000);
 });

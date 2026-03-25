@@ -34,9 +34,9 @@ import { getManagerTeamReviews } from "@/features/reviews/queries";
 describe("getManagerTeamReviews", () => {
   beforeEach(async () => {
     await cleanDb();
-  });
+  }, 30_000);
 
-  afterAll(() => cleanDb());
+  afterAll(() => cleanDb(), 30_000);
 
   // When the manager has no teams, there are no direct reports and the function
   // should return an empty array without touching the ReviewRequest table.

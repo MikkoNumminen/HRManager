@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import UserPermissionEditor from "../components/UserPermissionEditor";
-import { updateUserRole, updateUserPermission, kickOutUser } from "../serverActions";
+import { updateUserRole, updateUserPermission, kickOutUser } from "@/features/admin/actions";
 
 const mockPush = jest.fn();
 
@@ -8,10 +8,14 @@ jest.mock("next/navigation", () => ({
   useRouter: () => ({ push: mockPush }),
 }));
 
-jest.mock("../serverActions", () => ({
+jest.mock("@/features/admin/actions", () => ({
   updateUserRole: jest.fn(),
   updateUserPermission: jest.fn(),
   kickOutUser: jest.fn(),
+}));
+
+jest.mock("@/features/twoFactor/actions", () => ({
+  adminResetTwoFactor: jest.fn(),
 }));
 
 const roleDefaults: Record<string, string[]> = {

@@ -114,8 +114,8 @@ async function cleanAll() {
 // ─── isFeatureEnabled ─────────────────────────────────────────
 
 describe("isFeatureEnabled", () => {
-  beforeEach(() => cleanAll());
-  afterAll(() => cleanAll());
+  beforeEach(() => cleanAll(), 30_000);
+  afterAll(() => cleanAll(), 30_000);
 
   // Returns false when the flag name does not exist in the DB.
   test("returns false for unknown flag name", async () => {
@@ -187,8 +187,8 @@ describe("isFeatureEnabled", () => {
 // ─── getEnabledFlags ──────────────────────────────────────────
 
 describe("getEnabledFlags", () => {
-  beforeEach(() => cleanAll());
-  afterAll(() => cleanAll());
+  beforeEach(() => cleanAll(), 30_000);
+  afterAll(() => cleanAll(), 30_000);
 
   // Returns correct values for multiple flags in one call.
   test("returns correct values for multiple flags", async () => {
@@ -221,8 +221,8 @@ describe("getEnabledFlags", () => {
 // ─── createFeatureFlag action ─────────────────────────────────
 
 describe("createFeatureFlag", () => {
-  beforeEach(() => cleanAll());
-  afterAll(() => cleanAll());
+  beforeEach(() => cleanAll(), 30_000);
+  afterAll(() => cleanAll(), 30_000);
 
   // Creates a feature flag in the DB when given valid data.
   test("creates flag in the DB with valid data", async () => {
@@ -258,8 +258,8 @@ describe("createFeatureFlag", () => {
 // ─── toggleFeatureFlag action ─────────────────────────────────
 
 describe("toggleFeatureFlag", () => {
-  beforeEach(() => cleanAll());
-  afterAll(() => cleanAll());
+  beforeEach(() => cleanAll(), 30_000);
+  afterAll(() => cleanAll(), 30_000);
 
   // Flips the enabled state of a feature flag.
   test("flips enabled state", async () => {
@@ -273,8 +273,8 @@ describe("toggleFeatureFlag", () => {
 // ─── deleteFeatureFlag action ─────────────────────────────────
 
 describe("deleteFeatureFlag", () => {
-  beforeEach(() => cleanAll());
-  afterAll(() => cleanAll());
+  beforeEach(() => cleanAll(), 30_000);
+  afterAll(() => cleanAll(), 30_000);
 
   // Removes a flag and cascades deletion of user overrides.
   test("removes flag and cascades user overrides", async () => {
@@ -294,8 +294,8 @@ describe("deleteFeatureFlag", () => {
 // ─── setUserFeatureFlag action ────────────────────────────────
 
 describe("setUserFeatureFlag", () => {
-  beforeEach(() => cleanAll());
-  afterAll(() => cleanAll());
+  beforeEach(() => cleanAll(), 30_000);
+  afterAll(() => cleanAll(), 30_000);
 
   // Creates a user override for a feature flag.
   test("creates user override", async () => {
@@ -324,8 +324,8 @@ describe("setUserFeatureFlag", () => {
 // ─── removeUserFeatureFlag action ─────────────────────────────
 
 describe("removeUserFeatureFlag", () => {
-  beforeEach(() => cleanAll());
-  afterAll(() => cleanAll());
+  beforeEach(() => cleanAll(), 30_000);
+  afterAll(() => cleanAll(), 30_000);
 
   // Deletes a user override for a feature flag.
   test("deletes user override", async () => {

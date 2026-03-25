@@ -1,9 +1,9 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import AddDepartmentForm from "../components/AddDepartment";
-import { createDepartment } from "../serverActions";
+import { createDepartment } from "@/features/departments/actions";
 
-jest.mock("../serverActions", () => ({
+jest.mock("@/features/departments/actions", () => ({
   createDepartment: jest.fn(),
 }));
 

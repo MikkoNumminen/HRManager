@@ -83,8 +83,8 @@ function formData(entries: Record<string, string | string[]>): FormData {
 }
 
 describe("createPerson", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // The happy path: give it a name and email, check it actually ends up in the database.
   test("creates a person with name and email", async () => {
@@ -175,8 +175,8 @@ describe("createPerson", () => {
 });
 
 describe("removePerson", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // Delete a person and verify they're actually gone from the database.
   test("removes a person by ID", async () => {
@@ -234,8 +234,8 @@ describe("removePerson", () => {
 });
 
 describe("updatePersonName", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // Change someone's name and verify the database actually saved it.
   test("updates a person's name", async () => {
@@ -289,8 +289,8 @@ describe("updatePersonName", () => {
 });
 
 describe("updatePosition", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // Change someone's job title and verify the database actually saved it.
   test("updates a person's position", async () => {
@@ -370,8 +370,8 @@ describe("updatePosition", () => {
 });
 
 describe("updateEmail", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // Change someone's email and make sure the new one is saved.
   test("updates a person's email", async () => {

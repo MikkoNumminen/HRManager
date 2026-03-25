@@ -103,7 +103,7 @@ describe("Two-Factor Authentication Server Actions", () => {
     auth.mockResolvedValue({
       user: { id: testUser.id, email: testUser.email },
     });
-  });
+  }, 30_000);
 
   describe("getTwoFactorStatus", () => {
     // Returns null when not authenticated
@@ -217,7 +217,7 @@ describe("Two-Factor Authentication Server Actions", () => {
   afterAll(async () => {
     await cleanDb();
     await testPrisma.$disconnect();
-  });
+  }, 30_000);
 
   describe("beginTwoFactorSetup", () => {
     // Should return a TOTP URI, secret, and recovery codes

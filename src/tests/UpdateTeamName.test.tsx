@@ -1,9 +1,9 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import UpdateTeamNameForm from "../components/UpdateTeamName";
-import { updateTeamName } from "../serverActions";
+import { updateTeamName } from "@/features/teams/actions";
 import { useRouter } from "next/navigation";
 
-jest.mock("../serverActions", () => ({
+jest.mock("@/features/teams/actions", () => ({
   updateTeamName: jest.fn(),
 }));
 

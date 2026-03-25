@@ -7,7 +7,7 @@ jest.mock("next/navigation", () => ({
 }));
 
 const mockImportPersonsCsv = jest.fn();
-jest.mock("../serverActions", () => ({
+jest.mock("@/features/data/actions", () => ({
   importPersonsCsv: (...args: unknown[]) => mockImportPersonsCsv(...args),
 }));
 

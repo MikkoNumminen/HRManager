@@ -76,12 +76,12 @@ function formData(entries: Record<string, string>): FormData {
 describe("Session Management", () => {
   beforeEach(async () => {
     await cleanDb();
-  });
+  }, 30_000);
 
   afterAll(async () => {
     await cleanDb();
     await testPrisma.$disconnect();
-  });
+  }, 30_000);
 
   // Creates a test user and returns the user record
   async function createUser(email = `test-${Date.now()}@example.com`) {

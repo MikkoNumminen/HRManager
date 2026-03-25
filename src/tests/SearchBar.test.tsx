@@ -12,9 +12,15 @@ jest.mock("next/navigation", () => ({
   useRouter: jest.fn(() => ({ push: mockPush, replace: mockReplace })),
 }));
 
-jest.mock("../serverActions", () => ({
+jest.mock("@/features/persons/actions", () => ({
   createPerson: jest.fn(),
+}));
+
+jest.mock("@/features/teams/actions", () => ({
   createTeam: jest.fn(),
+}));
+
+jest.mock("@/features/departments/actions", () => ({
   createDepartment: jest.fn(),
 }));
 

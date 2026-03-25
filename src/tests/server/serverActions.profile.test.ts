@@ -63,8 +63,8 @@ function formData(entries: Record<string, string>): FormData {
 // ─── updateProfileName ─────────────────────────────────────────
 
 describe("updateProfileName", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // Returns notAuthenticated when auth() returns no session.
   test("returns error when not authenticated", async () => {
@@ -112,8 +112,8 @@ describe("updateProfileName", () => {
 // ─── updateProfileImage ─────────────────────────────────────────
 
 describe("updateProfileImage", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // Returns notAuthenticated when auth() returns no session.
   test("returns error when not authenticated", async () => {
@@ -219,8 +219,8 @@ describe("updateProfileImage", () => {
 // ─── getProfile ─────────────────────────────────────────
 
 describe("getProfile", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // Returns null when not authenticated.
   test("returns null when not authenticated", async () => {

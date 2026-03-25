@@ -51,12 +51,12 @@ beforeAll(() => {
 
 beforeEach(async () => {
   await cleanDb();
-});
+}, 30_000);
 
 afterAll(async () => {
   await cleanDb();
   await testPrisma.$disconnect();
-});
+}, 30_000);
 
 describe("auth.ts callbacks", () => {
   describe("signIn callback", () => {

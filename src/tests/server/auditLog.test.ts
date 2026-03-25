@@ -84,7 +84,7 @@ beforeEach(async () => {
   jest.clearAllMocks();
   await cleanDb();
   await cleanTestMongo();
-});
+}, 30_000);
 
 afterAll(async () => {
   await teardownTestMongo();

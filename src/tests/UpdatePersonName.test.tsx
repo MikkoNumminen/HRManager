@@ -1,9 +1,9 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import UpdatePersonNameForm from "../components/UpdatePersonName";
-import { updatePersonName } from "../serverActions";
+import { updatePersonName } from "@/features/persons/actions";
 import { useRouter } from "next/navigation";
 
-jest.mock("../serverActions", () => ({
+jest.mock("@/features/persons/actions", () => ({
   updatePersonName: jest.fn(),
 }));
 

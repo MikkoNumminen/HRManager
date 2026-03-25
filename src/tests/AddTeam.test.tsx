@@ -1,9 +1,9 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import AddTeamForm from "../components/AddTeam";
-import { createTeam } from "../serverActions";
+import { createTeam } from "@/features/teams/actions";
 
-jest.mock("../serverActions", () => ({
+jest.mock("@/features/teams/actions", () => ({
   createTeam: jest.fn(),
 }));
 

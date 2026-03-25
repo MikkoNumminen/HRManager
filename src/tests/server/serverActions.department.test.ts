@@ -90,10 +90,10 @@ function formData(entries: Record<string, string | string[]>): FormData {
 }
 
 describe("createDepartment", () => {
-  beforeEach(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
   afterAll(async () => {
     await cleanDb();
-  });
+  }, 30_000);
 
   // Creates a department with name and description.
   test("creates a department with name and description", async () => {
@@ -144,10 +144,10 @@ describe("createDepartment", () => {
 });
 
 describe("removeDepartment", () => {
-  beforeEach(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
   afterAll(async () => {
     await cleanDb();
-  });
+  }, 30_000);
 
   // Removes a department and unlinks its teams.
   test("removes department and unlinks teams", async () => {
@@ -181,10 +181,10 @@ describe("removeDepartment", () => {
 });
 
 describe("updateDepartment", () => {
-  beforeEach(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
   afterAll(async () => {
     await cleanDb();
-  });
+  }, 30_000);
 
   // Updates department name and description.
   test("updates department name and description", async () => {
@@ -243,10 +243,10 @@ describe("updateDepartment", () => {
 });
 
 describe("updateDepartmentHead", () => {
-  beforeEach(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
   afterAll(async () => {
     await cleanDb();
-  });
+  }, 30_000);
 
   // Sets the department head to a person.
   test("sets department head", async () => {
@@ -305,10 +305,10 @@ describe("updateDepartmentHead", () => {
 });
 
 describe("assignTeamToDepartment", () => {
-  beforeEach(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
   afterAll(async () => {
     await cleanDb();
-  });
+  }, 30_000);
 
   // Assigns a team to a department.
   test("assigns a team to a department", async () => {
@@ -365,10 +365,10 @@ describe("assignTeamToDepartment", () => {
 });
 
 describe("removeTeamFromDepartment", () => {
-  beforeEach(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
   afterAll(async () => {
     await cleanDb();
-  });
+  }, 30_000);
 
   // Removes a team from its department.
   test("removes a team from its department", async () => {

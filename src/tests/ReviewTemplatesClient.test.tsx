@@ -3,7 +3,7 @@ import ReviewTemplatesClient from "../components/ReviewTemplatesClient";
 import type { ReviewTemplate } from "../schemas";
 
 // Mock server actions — component tests verify UI behavior, not server logic.
-jest.mock("@/serverActions", () => ({
+jest.mock("@/features/reviews/actions", () => ({
   createReviewTemplate: jest.fn(),
   deleteReviewTemplate: jest.fn(),
 }));

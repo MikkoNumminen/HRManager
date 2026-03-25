@@ -46,7 +46,9 @@ export default function LeaveManager({
   const canManageTypes = permissions["leave:manage_types"];
 
   const filteredRequests =
-    statusFilter === "all" ? leaveRequests : leaveRequests.filter((r) => r.status === statusFilter);
+    statusFilter === "all"
+      ? leaveRequests
+      : leaveRequests.filter((r) => r.status.toLowerCase() === statusFilter);
 
   return (
     <Box sx={pageContainerStyles}>

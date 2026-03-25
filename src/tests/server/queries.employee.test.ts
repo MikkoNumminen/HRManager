@@ -34,9 +34,9 @@ function mockAuthUser(email: string | null) {
 beforeEach(async () => {
   await cleanDb();
   mockGetDemoSessionId.mockResolvedValue(null);
-});
+}, 30_000);
 
-afterAll(() => cleanDb());
+afterAll(() => cleanDb(), 30_000);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // getLinkedPerson

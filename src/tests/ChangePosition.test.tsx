@@ -1,9 +1,9 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import UpdatePositionForm from "../components/UpdatePosition";
-import { updatePosition } from "../serverActions";
+import { updatePosition } from "@/features/persons/actions";
 import { useRouter } from "next/navigation";
 
-jest.mock("../serverActions", () => ({
+jest.mock("@/features/persons/actions", () => ({
   updatePosition: jest.fn(),
 }));
 

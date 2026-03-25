@@ -1,13 +1,13 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import OptimisticDepartments from "@/components/OptimisticDepartments";
 import { Department } from "@/schemas";
-import { createDepartment } from "../serverActions";
+import { createDepartment } from "@/features/departments/actions";
 
 jest.mock("next/navigation", () => ({
   useRouter: jest.fn(() => ({ push: jest.fn(), replace: jest.fn() })),
 }));
 
-jest.mock("../serverActions", () => ({
+jest.mock("@/features/departments/actions", () => ({
   createDepartment: jest.fn(),
 }));
 

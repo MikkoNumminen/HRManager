@@ -64,12 +64,8 @@ jest.mock("next/navigation", () => ({
   useSearchParams: () => new URLSearchParams(),
 }));
 
+// Components that still import from @/serverActions (TopBar, LeaveManager)
 jest.mock("@/serverActions", () => ({
-  createPerson: jest.fn(),
-  createTeam: jest.fn(),
-  createDepartment: jest.fn(),
-  updateProfileName: jest.fn(),
-  updateProfileImage: jest.fn(),
   createLeaveType: jest.fn(),
   updateLeaveType: jest.fn(),
   deleteLeaveType: jest.fn(),
@@ -77,11 +73,41 @@ jest.mock("@/serverActions", () => ({
   reviewLeaveRequest: jest.fn(),
   deleteLeaveRequest: jest.fn(),
   allocateLeaveBalance: jest.fn(),
+  resetAll: jest.fn(),
+  seedMockData: jest.fn(),
+}));
+
+// Components that import directly from @/features/*/actions
+jest.mock("@/features/persons/actions", () => ({
+  createPerson: jest.fn(),
+}));
+jest.mock("@/features/teams/actions", () => ({
+  createTeam: jest.fn(),
+}));
+jest.mock("@/features/departments/actions", () => ({
+  createDepartment: jest.fn(),
+}));
+jest.mock("@/features/profile/actions", () => ({
+  updateProfileName: jest.fn(),
+  updateProfileImage: jest.fn(),
+}));
+jest.mock("@/features/leave/actions", () => ({
+  createLeaveType: jest.fn(),
+  updateLeaveType: jest.fn(),
+  deleteLeaveType: jest.fn(),
+  createLeaveRequest: jest.fn(),
+  reviewLeaveRequest: jest.fn(),
+  deleteLeaveRequest: jest.fn(),
+  allocateLeaveBalance: jest.fn(),
+}));
+jest.mock("@/features/data/actions", () => ({
   exportPersonsCsv: jest.fn(),
   exportTeamsCsv: jest.fn(),
   exportDepartmentsCsv: jest.fn(),
   exportAuditLogsCsv: jest.fn(),
   importPersonsCsv: jest.fn(),
+}));
+jest.mock("@/features/reviews/actions", () => ({
   submitReview: jest.fn(),
   addReviewQuestion: jest.fn(),
   removeReviewQuestion: jest.fn(),
@@ -92,8 +118,12 @@ jest.mock("@/serverActions", () => ({
   addReviewRequest: jest.fn(),
   removeReviewRequest: jest.fn(),
   deleteReviewCycle: jest.fn(),
+}));
+jest.mock("@/features/admin/actions", () => ({
   resetAll: jest.fn(),
   seedMockData: jest.fn(),
+}));
+jest.mock("@/features/twoFactor/actions", () => ({
   beginTwoFactorSetup: jest.fn(),
   confirmTwoFactorSetup: jest.fn(),
   disableTwoFactor: jest.fn(),

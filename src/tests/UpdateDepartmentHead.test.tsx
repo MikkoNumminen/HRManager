@@ -1,9 +1,9 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import UpdateDepartmentHeadForm from "../components/UpdateDepartmentHead";
-import { updateDepartmentHead } from "../serverActions";
+import { updateDepartmentHead } from "@/features/departments/actions";
 import { Person } from "../schemas";
 
-jest.mock("../serverActions", () => ({
+jest.mock("@/features/departments/actions", () => ({
   updateDepartmentHead: jest.fn(),
 }));
 

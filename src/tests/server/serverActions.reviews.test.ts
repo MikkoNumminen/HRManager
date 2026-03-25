@@ -84,8 +84,8 @@ function formData(entries: Record<string, string>): FormData {
 }
 
 describe("createReviewTemplate", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // Happy path: create a template with just a name and confirm it lands in the DB
   // with an empty questions array.
@@ -129,8 +129,8 @@ describe("createReviewTemplate", () => {
 });
 
 describe("deleteReviewTemplate", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // Soft-delete sets deletedAt so records are preserved for audit history.
   test("soft-deletes a template", async () => {
@@ -160,8 +160,8 @@ describe("deleteReviewTemplate", () => {
 });
 
 describe("addReviewQuestion", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // A RATING question stores scaleMin/scaleMax; after adding it the questions
   // array on the template should contain exactly one item.
@@ -247,8 +247,8 @@ describe("addReviewQuestion", () => {
 });
 
 describe("removeReviewQuestion", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // After adding a question and then removing it by its generated ID,
   // the questions array should be empty again.
@@ -347,8 +347,8 @@ describe("removeReviewQuestion", () => {
 });
 
 describe("createReviewCycle", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // A newly created cycle must always start in DRAFT so it can be reviewed
   // before participants are notified.
@@ -430,8 +430,8 @@ describe("createReviewCycle", () => {
 });
 
 describe("deleteReviewCycle", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // Soft-delete sets deletedAt; the cycle record remains for audit history.
   test("soft-deletes a cycle", async () => {
@@ -467,8 +467,8 @@ describe("deleteReviewCycle", () => {
 });
 
 describe("openReviewCycle / closeReviewCycle", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // Transitioning from DRAFT to OPEN makes the cycle available for submissions.
   test("opens a DRAFT cycle", async () => {
@@ -587,8 +587,8 @@ describe("openReviewCycle / closeReviewCycle", () => {
 });
 
 describe("addReviewRequest", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // The happy path: two persons, an existing cycle, and a request linking them.
   // After the action the DB should contain exactly one ReviewRequest.
@@ -720,8 +720,8 @@ describe("addReviewRequest", () => {
 });
 
 describe("removeReviewRequest", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // Create a request and then delete it; confirm the row is gone from the DB.
   test("removes a review request", async () => {
@@ -804,8 +804,8 @@ describe("removeReviewRequest", () => {
 });
 
 describe("submitReview", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // Full happy-path: person has an OPEN cycle with a PENDING request.
   // After submission the request status must be SUBMITTED and a ReviewSubmission must exist.

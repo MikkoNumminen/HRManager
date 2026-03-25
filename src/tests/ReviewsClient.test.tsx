@@ -3,7 +3,7 @@ import ReviewsClient from "../components/ReviewsClient";
 import type { ReviewCycle } from "../schemas";
 
 // Mock server actions — component tests verify UI behavior, not server logic.
-jest.mock("@/serverActions", () => ({
+jest.mock("@/features/reviews/actions", () => ({
   createReviewCycle: jest.fn(),
 }));
 

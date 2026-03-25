@@ -84,8 +84,8 @@ function formData(entries: Record<string, string | string[]>): FormData {
 }
 
 describe("createTeam", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // Create a team and verify it shows up in the database with no manager assigned yet.
   test("creates a team with null manager", async () => {
@@ -129,8 +129,8 @@ describe("createTeam", () => {
 });
 
 describe("updateTeamName", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // Rename a team and verify the database actually saved it.
   test("renames a team", async () => {
@@ -184,8 +184,8 @@ describe("updateTeamName", () => {
 });
 
 describe("removeTeam", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // Delete a team and confirm it's soft-deleted.
   test("removes a team", async () => {
@@ -231,8 +231,8 @@ describe("removeTeam", () => {
 });
 
 describe("addManager", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // Assign a person as the team's manager and verify it sticks.
   test("assigns a manager to a team", async () => {
@@ -326,8 +326,8 @@ describe("addManager", () => {
 });
 
 describe("addMember", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // Add a person to a team and check the membership record exists.
   test("adds a person as a team member", async () => {
@@ -404,8 +404,8 @@ describe("addMember", () => {
 });
 
 describe("removeMember", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // Remove someone from a team. They still exist as a person, just not on this team anymore.
   test("removes a member from a team", async () => {
@@ -488,10 +488,10 @@ describe("removeMember", () => {
 });
 
 describe("addManager (extended)", () => {
-  beforeEach(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
   afterAll(async () => {
     await cleanDb();
-  });
+  }, 30_000);
 
   // Sets a person as manager of a single team.
   test("sets person as manager of a team", async () => {

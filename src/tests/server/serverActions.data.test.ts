@@ -117,8 +117,8 @@ function formData(entries: Record<string, string | string[]>): FormData {
 describe("updateProfileName", () => {
   beforeEach(async () => {
     await cleanDb();
-  });
-  afterAll(() => cleanDb());
+  }, 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // The happy path: update the display name for the logged-in user.
   test("updates the user's display name", async () => {
@@ -217,8 +217,8 @@ describe("updateProfileName", () => {
 describe("updateProfileImage", () => {
   beforeEach(async () => {
     await cleanDb();
-  });
-  afterAll(() => cleanDb());
+  }, 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // Set a custom profile picture URL and verify it saved.
   test("sets a custom profile image URL", async () => {
@@ -366,8 +366,8 @@ describe("updateProfileImage", () => {
 });
 
 describe("importPersonsCsv", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // Helper to create a FormData with a File attached
   function importFormData(csvContent: string, filename = "test.csv"): FormData {
@@ -493,8 +493,8 @@ describe("importPersonsCsv", () => {
 });
 
 describe("exportPersonsCsv", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // Exports persons as CSV with headers and data
   test("exports persons as CSV", async () => {
@@ -546,8 +546,8 @@ describe("exportPersonsCsv", () => {
 });
 
 describe("exportTeamsCsv", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // Exports teams with headers
   test("exports teams as CSV with headers", async () => {
@@ -603,8 +603,8 @@ describe("exportTeamsCsv", () => {
 });
 
 describe("exportDepartmentsCsv", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // Exports departments with headers
   test("exports departments as CSV with headers", async () => {

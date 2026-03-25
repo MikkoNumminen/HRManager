@@ -1,15 +1,18 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import ProfileEditor from "../components/ProfileEditor";
-import { updateProfileName, updateProfileImage } from "../serverActions";
+import { updateProfileName, updateProfileImage } from "@/features/profile/actions";
 import { UserProfile } from "../schemas";
 
 jest.mock("next/navigation", () => ({
   useRouter: () => ({ push: jest.fn() }),
 }));
 
-jest.mock("../serverActions", () => ({
+jest.mock("@/features/profile/actions", () => ({
   updateProfileName: jest.fn(),
   updateProfileImage: jest.fn(),
+}));
+
+jest.mock("@/features/twoFactor/actions", () => ({
   beginTwoFactorSetup: jest.fn(),
   confirmTwoFactorSetup: jest.fn(),
   disableTwoFactor: jest.fn(),

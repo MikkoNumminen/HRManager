@@ -1,13 +1,13 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import OptimisticPersons from "@/components/OptimisticPersons";
 import { Person } from "@/schemas";
-import { createPerson } from "../serverActions";
+import { createPerson } from "@/features/persons/actions";
 
 jest.mock("next/navigation", () => ({
   useRouter: jest.fn(() => ({ push: jest.fn(), replace: jest.fn() })),
 }));
 
-jest.mock("../serverActions", () => ({
+jest.mock("@/features/persons/actions", () => ({
   createPerson: jest.fn(),
 }));
 

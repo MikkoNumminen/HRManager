@@ -117,8 +117,8 @@ async function createTestBalance(
 // ─── createLeaveType ─────────────────────────────────────────
 
 describe("createLeaveType", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // Creates a leave type with all fields.
   test("creates a leave type with name, description, defaultDays, color", async () => {
@@ -217,8 +217,8 @@ describe("createLeaveType", () => {
 // ─── updateLeaveType ─────────────────────────────────────────
 
 describe("updateLeaveType", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // Updates an existing leave type.
   test("updates name and defaultDays", async () => {
@@ -341,8 +341,8 @@ describe("updateLeaveType", () => {
 // ─── deleteLeaveType ─────────────────────────────────────────
 
 describe("deleteLeaveType", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // Soft-deletes a leave type.
   test("soft-deletes a leave type", async () => {
@@ -368,8 +368,8 @@ describe("deleteLeaveType", () => {
 // ─── createLeaveRequest ──────────────────────────────────────
 
 describe("createLeaveRequest", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // Creates a leave request with valid data.
   test("creates a leave request", async () => {
@@ -591,8 +591,8 @@ describe("createLeaveRequest", () => {
 // ─── reviewLeaveRequest ──────────────────────────────────────
 
 describe("reviewLeaveRequest", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // Approves a pending leave request and updates balance.
   test("approves a pending request and increments used balance", async () => {
@@ -730,7 +730,7 @@ describe("reviewLeaveRequest", () => {
 
   // Rejects missing id field — invalidId error (line 271).
   test("rejects missing id field on review", async () => {
-    const result = await reviewLeaveRequest(formData({ action: "approved" }));
+    const result = await reviewLeaveRequest(formData({ action: "APPROVED" }));
     expect(result).toMatchObject({ error: expect.any(String) });
   });
 
@@ -747,17 +747,17 @@ describe("reviewLeaveRequest", () => {
         startDate: new Date("2026-09-01"),
         endDate: new Date("2026-09-05"),
         days: 5,
-        status: "pending",
+        status: "PENDING",
         sessionId: null,
       },
     });
 
     const result = await reviewLeaveRequest(
-      formData({ id: request.id, action: "approved", reviewerId: reviewer.id }),
+      formData({ id: request.id, action: "APPROVED", reviewerId: reviewer.id }),
     );
     expect(result).toBeUndefined();
     const updated = await testPrisma.leaveRequest.findUnique({ where: { id: request.id } });
-    expect(updated!.status).toBe("approved");
+    expect(updated!.status).toBe("APPROVED");
     expect(updated!.reviewerId).toBe(reviewer.id);
   });
 
@@ -773,16 +773,16 @@ describe("reviewLeaveRequest", () => {
         startDate: new Date("2026-07-01"),
         endDate: new Date("2026-07-05"),
         days: 5,
-        status: "pending",
+        status: "PENDING",
         sessionId: null,
       },
     });
 
     // No reviewerId provided — should succeed.
-    const result = await reviewLeaveRequest(formData({ id: request.id, action: "approved" }));
+    const result = await reviewLeaveRequest(formData({ id: request.id, action: "APPROVED" }));
     expect(result).toBeUndefined();
     const updated = await testPrisma.leaveRequest.findUnique({ where: { id: request.id } });
-    expect(updated!.status).toBe("approved");
+    expect(updated!.status).toBe("APPROVED");
     expect(updated!.reviewerId).toBeNull();
   });
 
@@ -798,13 +798,13 @@ describe("reviewLeaveRequest", () => {
         startDate: new Date("2026-07-01"),
         endDate: new Date("2026-07-05"),
         days: 5,
-        status: "pending",
+        status: "PENDING",
         sessionId: null,
       },
     });
 
     const result = await reviewLeaveRequest(
-      formData({ id: request.id, action: "approved", reviewNote: "a".repeat(1001) }),
+      formData({ id: request.id, action: "APPROVED", reviewNote: "a".repeat(1001) }),
     );
     expect(result).toMatchObject({ error: expect.any(String) });
   });
@@ -813,8 +813,8 @@ describe("reviewLeaveRequest", () => {
 // ─── deleteLeaveRequest ──────────────────────────────────────
 
 describe("deleteLeaveRequest", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // Soft-deletes a pending leave request.
   test("soft-deletes a pending leave request", async () => {
@@ -878,8 +878,8 @@ describe("deleteLeaveRequest", () => {
 // ─── allocateLeaveBalance ────────────────────────────────────
 
 describe("allocateLeaveBalance", () => {
-  beforeEach(() => cleanDb());
-  afterAll(() => cleanDb());
+  beforeEach(() => cleanDb(), 30_000);
+  afterAll(() => cleanDb(), 30_000);
 
   // Creates a new balance allocation.
   test("creates a new leave balance", async () => {
