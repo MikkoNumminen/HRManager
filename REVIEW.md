@@ -5,6 +5,8 @@
 **Scope:** Full codebase — UI layer, business logic layer, configuration & types layer
 **Method:** 3 parallel subagents reviewing 307 source files across all layers
 
+> **⚠️ Note (2026-03-26):** File paths in this report reference the **pre-modularization** flat structure (e.g. `src/components/X`, `src/serverActions.ts`, `src/queries.ts`). After the modularization on 2026-03-26, these files now live in `src/features/*/` modules. See `CLAUDE.md` Architecture rules for the current structure.
+
 ---
 
 ## Table of Contents

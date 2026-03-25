@@ -8,9 +8,9 @@ graph LR
     Proxy -->|Next.js App Router| Next["Next.js"]
     Next -->|auth()| Auth["NextAuth v5<br/>(JWT)"]
     Next -->|Server Component| SC["Page (async)"]
-    SC -->|read| Q["queries.ts<br/>Zod-validated"]
+    SC -->|read| Q["features/*/queries.ts<br/>Zod-validated"]
     SC -->|props| CC["Client Component<br/>(React 19)"]
-    CC -->|action=| SA["serverActions.ts"]
+    CC -->|action=| SA["features/*/actions.ts"]
     SA -->|requirePermission| RBAC["permissions.ts"]
     SA -->|$transaction| Prisma
     SA -->|after()| Audit["auditLog.ts"]
@@ -129,7 +129,7 @@ flowchart TD
 ```mermaid
 sequenceDiagram
     participant C as Client Component
-    participant SA as Server Action
+    participant SA as features/*/actions.ts
     participant RBAC as permissions.ts
     participant TX as prisma.$transaction
     participant AL as auditLog.ts
