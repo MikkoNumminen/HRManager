@@ -18,13 +18,12 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 > 📋 **Audit research:** All items below marked "(found by audit)" have detailed file:line references in `AUDIT_REPORT.md` and `AUDIT_RESULTS.md`. Read before starting any audit-tagged task.
 
 - 🟢⚡ CI pipeline monitoring & auto-fix [Claude 4, main]
-- 🔴🧠 Modularization Phase 2 — move 80 flat components to feature dirs [neekeri, main]
+- 🔴⚡ Modularization Phase 3 — co-locate tests + shared mock helper [neekeri, main]
 
 ## Backlog
 
 ### Modularization (see memory: project_modularization_plan.md)
 
-- 🔴⚡ Modularization Phase 3 — co-locate tests + shared mock helper
 - 🟡⚡ Modularization Phase 4 — split 5 mega components (>400 lines each)
 - 🟢⚡ Modularization Phase 5 — split large action files (>300 lines)
 
