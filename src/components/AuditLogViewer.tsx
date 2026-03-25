@@ -25,6 +25,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { memo, useMemo, useCallback, useState } from "react";
 import { colors, mobileCardStyles } from "@/muiStyles";
+import { formatDate } from "@/utils/formatDate";
 import { AuditLog } from "@/schemas";
 
 const actionColors: Record<string, string> = {
@@ -446,7 +447,7 @@ function AuditLogViewer({
                     <TableCell
                       sx={{ whiteSpace: "nowrap", fontSize: { xs: "0.75rem", sm: "0.8rem" } }}
                     >
-                      {new Date(log.createdAt).toLocaleString()}
+                      {formatDate(log.createdAt)}
                     </TableCell>
                     <TableCell
                       sx={{
@@ -566,7 +567,7 @@ function AuditLogViewer({
                 <Typography variant="caption" sx={{ color: colors.slate400 }}>
                   {(log.userEmail && userNames[log.userEmail]) ?? log.userEmail ?? t("system")}
                   {" · "}
-                  {new Date(log.createdAt).toLocaleString()}
+                  {formatDate(log.createdAt)}
                 </Typography>
               </Box>
             ))}

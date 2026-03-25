@@ -9,12 +9,10 @@ import {
 } from "@/muiStyles";
 import { createTeam } from "@/features/teams/actions";
 import { Box, Button, TextField, Tooltip, Typography } from "@mui/material";
-import { useActionState, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { completeTutorialStep } from "@/tutorialConfig";
-import { useSnackbar } from "./SnackbarProvider";
-
-type FormState = { error: string | null; success: boolean };
+import { useFormAction } from "@/hooks/useFormAction";
 
 interface AddTeamFormProps {
   onOptimisticAdd?: (teamName: string) => void;
@@ -24,20 +22,16 @@ const AddTeamForm: React.FC<AddTeamFormProps> = ({ onOptimisticAdd }) => {
   const t = useTranslations("teams");
   const tc = useTranslations("common");
   const tn = useTranslations("notifications");
-  const { showSnackbar } = useSnackbar();
   const [name, setName] = useState("");
   const isValid = name.trim().length > 0;
 
-  const [state, formAction, isPending] = useActionState(
-    async (_prev: FormState, formData: FormData): Promise<FormState> => {
+  const [state, formAction, isPending] = useFormAction(
+    async (formData) => {
       onOptimisticAdd?.(formData.get("name") as string);
       completeTutorialStep("create_team");
-      const result = await createTeam(formData);
-      if (result?.error) return { error: result.error, success: false };
-      showSnackbar(tn("teamCreated"));
-      return { error: null, success: true };
+      return createTeam(formData);
     },
-    { error: null, success: false },
+    { successMessage: tn("teamCreated") },
   );
 
   useEffect(() => {

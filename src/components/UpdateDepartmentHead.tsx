@@ -6,16 +6,15 @@ import {
   formButtonContainerStyles,
   formStyles,
   headerStyles,
+  personSelectGridSx,
   smallButtonStyles,
 } from "@/muiStyles";
 import { Box, Button, Typography } from "@mui/material";
-import { useActionState, useState } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { useSnackbar } from "./SnackbarProvider";
+import { useFormAction } from "@/hooks/useFormAction";
 import { PersonSelectCard } from "./PersonSelectCard";
 import { Person } from "@/schemas";
-
-type FormState = { error: string | null };
 
 const UpdateDepartmentHeadForm: React.FC<{
   departmentID: string;
@@ -25,18 +24,11 @@ const UpdateDepartmentHeadForm: React.FC<{
   const t = useTranslations("departments");
 
   const tn = useTranslations("notifications");
-  const { showSnackbar } = useSnackbar();
   const [newHead, setNewHead] = useState<string>("");
 
-  const [state, formAction, isPending] = useActionState(
-    async (_prev: FormState, formData: FormData): Promise<FormState> => {
-      const result = await updateDepartmentHead(formData);
-      if (result?.error) return { error: result.error };
-      showSnackbar(tn("departmentHeadUpdated"));
-      return { error: null };
-    },
-    { error: null },
-  );
+  const [state, formAction, isPending] = useFormAction(updateDepartmentHead, {
+    successMessage: tn("departmentHeadUpdated"),
+  });
 
   const filteredPersons = persons.filter((p) => !excludeIds.includes(p.id));
 
@@ -54,14 +46,7 @@ const UpdateDepartmentHeadForm: React.FC<{
       <input type="hidden" name="departmentID" value={departmentID} />
       <input type="hidden" name="personID" value={newHead} />
 
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))",
-          gap: 1,
-          mb: 1,
-        }}
-      >
+      <Box sx={personSelectGridSx}>
         {filteredPersons.map((p) => (
           <PersonSelectCard
             key={p.id}

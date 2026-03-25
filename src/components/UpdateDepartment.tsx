@@ -9,11 +9,9 @@ import {
 } from "@/muiStyles";
 import { updateDepartment } from "@/features/departments/actions";
 import { Box, Button, TextField, Tooltip, Typography } from "@mui/material";
-import { useActionState, useState } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { useSnackbar } from "./SnackbarProvider";
-
-type FormState = { error: string | null };
+import { useFormAction } from "@/hooks/useFormAction";
 
 const UpdateDepartmentForm: React.FC<{
   departmentID: string;
@@ -23,22 +21,15 @@ const UpdateDepartmentForm: React.FC<{
   const t = useTranslations("departments");
   const tc = useTranslations("common");
   const tn = useTranslations("notifications");
-  const { showSnackbar } = useSnackbar();
   const [name, setName] = useState(currentName);
   const [description, setDescription] = useState(currentDescription ?? "");
   const isChanged =
     name.trim() !== currentName || description.trim() !== (currentDescription ?? "");
   const isValid = name.trim().length > 0 && isChanged;
 
-  const [state, formAction, isPending] = useActionState(
-    async (_prev: FormState, formData: FormData): Promise<FormState> => {
-      const result = await updateDepartment(formData);
-      if (result?.error) return { error: result.error };
-      showSnackbar(tn("departmentUpdated"));
-      return { error: null };
-    },
-    { error: null },
-  );
+  const [state, formAction, isPending] = useFormAction(updateDepartment, {
+    successMessage: tn("departmentUpdated"),
+  });
 
   return (
     <Box component="form" action={formAction} sx={formStyles}>

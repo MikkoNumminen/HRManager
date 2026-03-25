@@ -35,7 +35,7 @@ import {
 } from "../components/PageSkeletons";
 import LanguageSwitcher from "../components/LanguageSwitcher";
 import ThemeSwitcher from "../components/ThemeSwitcher";
-import AddPersonForm from "../components/AddPeople";
+import AddPersonForm from "../components/AddPersonForm";
 import AddTeamForm from "../components/AddTeam";
 import AddDepartmentForm from "../components/AddDepartment";
 import ProfileEditor from "../components/ProfileEditor";

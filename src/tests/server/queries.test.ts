@@ -2006,7 +2006,7 @@ describe("getLeaveRequests data", () => {
         startDate: new Date("2026-07-01"),
         endDate: new Date("2026-07-05"),
         days: 5,
-        status: "pending",
+        status: "PENDING",
         note: "Vacation",
         sessionId: null,
       },
@@ -2034,7 +2034,7 @@ describe("getLeaveRequests data", () => {
         startDate: new Date("2026-08-01"),
         endDate: new Date("2026-08-03"),
         days: 3,
-        status: "pending",
+        status: "PENDING",
         sessionId: null,
       },
     });
@@ -2045,7 +2045,7 @@ describe("getLeaveRequests data", () => {
         startDate: new Date("2026-08-05"),
         endDate: new Date("2026-08-06"),
         days: 2,
-        status: "pending",
+        status: "PENDING",
         sessionId: null,
       },
     });
@@ -2068,7 +2068,7 @@ describe("getLeaveRequests data", () => {
         startDate: new Date("2026-07-01"),
         endDate: new Date("2026-07-05"),
         days: 5,
-        status: "approved",
+        status: "APPROVED",
         sessionId: null,
       },
     });
@@ -2079,14 +2079,14 @@ describe("getLeaveRequests data", () => {
         startDate: new Date("2026-08-01"),
         endDate: new Date("2026-08-03"),
         days: 3,
-        status: "pending",
+        status: "PENDING",
         sessionId: null,
       },
     });
 
-    const approved = await getLeaveRequests({ status: "approved" });
+    const approved = await getLeaveRequests({ status: "APPROVED" });
     expect(approved).toHaveLength(1);
-    expect(approved[0].status).toBe("approved");
+    expect(approved[0].status).toBe("APPROVED");
   });
 
   // Excludes soft-deleted leave requests.
@@ -2102,7 +2102,7 @@ describe("getLeaveRequests data", () => {
         startDate: new Date("2026-07-01"),
         endDate: new Date("2026-07-05"),
         days: 5,
-        status: "pending",
+        status: "PENDING",
         deletedAt: new Date(),
         sessionId: null,
       },

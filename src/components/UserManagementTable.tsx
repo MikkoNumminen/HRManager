@@ -15,6 +15,8 @@ import {
 } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { colors } from "@/muiStyles";
+import { formatDate } from "@/utils/formatDate";
+import { onActivateKeyDown } from "@/utils/keyboardHandlers";
 import { AppUser } from "@/schemas";
 import { useTranslations } from "next-intl";
 
@@ -66,12 +68,7 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({ users }) => {
                   hover
                   tabIndex={0}
                   onClick={() => router.push(`/admin/${user.id}`)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      router.push(`/admin/${user.id}`);
-                    }
-                  }}
+                  onKeyDown={onActivateKeyDown(() => router.push(`/admin/${user.id}`))}
                   sx={{
                     "&:hover, &:focus-visible": {
                       cursor: "pointer",
@@ -94,7 +91,7 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({ users }) => {
                       variant="outlined"
                     />
                   </TableCell>
-                  <TableCell>{new Date(user.createdAt).toLocaleString()}</TableCell>
+                  <TableCell>{formatDate(user.createdAt)}</TableCell>
                 </TableRow>
               </Tooltip>
             ))

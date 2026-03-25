@@ -1,6 +1,6 @@
 "use client";
 
-import { colors } from "@/muiStyles";
+import { colors, dialogPaperSx } from "@/muiStyles";
 import {
   Button,
   Dialog,
@@ -39,11 +39,7 @@ export default function ConfirmDialog({
       aria-describedby="confirm-dialog-description"
       slotProps={{
         paper: {
-          sx: {
-            backgroundColor: colors.slate700,
-            border: `1px solid ${colors.slate300}`,
-            borderRadius: "8px",
-          },
+          sx: dialogPaperSx,
         },
       }}
     >

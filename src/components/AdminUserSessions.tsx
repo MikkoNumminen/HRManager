@@ -2,6 +2,7 @@
 
 import { adminForceLogoutSession, adminForceLogoutAllSessions } from "@/features/sessions/actions";
 import { colors, formStyles, headerStyles, smallButtonStyles } from "@/muiStyles";
+import { formatDate } from "@/utils/formatDate";
 import { Box, Button, Typography } from "@mui/material";
 import { useActionState } from "react";
 import { useTranslations } from "next-intl";
@@ -119,7 +120,7 @@ function AdminSessionRow({ session }: { session: UserSession }) {
         </Typography>
         <Typography variant="caption" sx={{ color: colors.slate400 }}>
           {session.ipAddress ?? t("unknownIp")} &middot;{" "}
-          {t("lastActive", { time: session.lastActiveAt.toLocaleString() })}
+          {t("lastActive", { time: formatDate(session.lastActiveAt) })}
         </Typography>
         {state.error && (
           <Typography color="error" variant="caption" sx={{ display: "block" }}>

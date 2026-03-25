@@ -9,13 +9,11 @@ import {
   textFieldStyles,
 } from "@/muiStyles";
 import { Box, Button, MenuItem, TextField, Typography } from "@mui/material";
-import { useActionState, useState } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { completeTutorialStep } from "@/tutorialConfig";
-import { useSnackbar } from "./SnackbarProvider";
+import { useFormAction } from "@/hooks/useFormAction";
 import { CombinedTeam } from "@/schemas";
-
-type FormState = { error: string | null };
 
 const AssignTeamToDepartmentForm: React.FC<{
   departmentID: string;
@@ -24,18 +22,14 @@ const AssignTeamToDepartmentForm: React.FC<{
   const t = useTranslations("departments");
   const tc = useTranslations("common");
   const tn = useTranslations("notifications");
-  const { showSnackbar } = useSnackbar();
   const [selectedTeam, setSelectedTeam] = useState<string>("");
 
-  const [state, formAction, isPending] = useActionState(
-    async (_prev: FormState, formData: FormData): Promise<FormState> => {
+  const [state, formAction, isPending] = useFormAction(
+    async (formData) => {
       completeTutorialStep("assign_team_to_department");
-      const result = await assignTeamToDepartment(formData);
-      if (result?.error) return { error: result.error };
-      showSnackbar(tn("teamAssigned"));
-      return { error: null };
+      return assignTeamToDepartment(formData);
     },
-    { error: null },
+    { successMessage: tn("teamAssigned") },
   );
 
   return (
