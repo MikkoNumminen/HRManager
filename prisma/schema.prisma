@@ -27,6 +27,8 @@ model Person {
 
   @@index([deletedAt])
   @@index([sessionId])
+  @@index([email])
+  @@index([name])
 }
 
 model Department {
@@ -43,6 +45,7 @@ model Department {
 
   @@index([deletedAt])
   @@index([sessionId])
+  @@index([headId])
 }
 
 model Team {
@@ -60,6 +63,8 @@ model Team {
 
   @@index([deletedAt])
   @@index([sessionId])
+  @@index([teamManagerId])
+  @@index([departmentId])
 }
 
 model TeamMember {
@@ -77,6 +82,8 @@ model TeamMember {
   @@unique([personId, teamId])
   @@index([deletedAt])
   @@index([sessionId])
+  @@index([personId])
+  @@index([teamId])
 }
 
 model User {
@@ -229,6 +236,7 @@ model ReviewCycle {
   @@index([deletedAt])
   @@index([sessionId])
   @@index([status])
+  @@index([templateId])
 }
 
 model ReviewRequest {
@@ -250,6 +258,8 @@ model ReviewRequest {
   @@index([status])
   @@index([reviewerId])
   @@index([cycleId])
+  @@index([subjectId])
+  @@index([sessionId])
 }
 
 model ReviewSubmission {
@@ -319,6 +329,8 @@ model LeaveRequest {
   @@index([status])
   @@index([deletedAt])
   @@index([sessionId])
+  @@index([startDate, endDate])
+  @@index([reviewerId])
 }
 
 model LeaveBalance {
@@ -338,6 +350,7 @@ model LeaveBalance {
   @@unique([personId, leaveTypeId, year])
   @@index([personId])
   @@index([sessionId])
+  @@index([leaveTypeId])
 }
 
 enum FeatureFlagScope {

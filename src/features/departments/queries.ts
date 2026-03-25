@@ -9,11 +9,12 @@ export async function getDepartments(): Promise<Department[]> {
   const allowed = await hasPermission("department:read");
   if (!allowed) throw new ActionError("permissionDenied", "Permission denied");
   const sessionId = await getDemoSessionId();
+  // Use select on head to avoid fetching full Person record (N+1 prevention).
   const departments = await prisma.department.findMany({
     where: { deletedAt: null, sessionId },
     include: {
-      head: true,
-      teams: { where: { deletedAt: null, sessionId } },
+      head: { select: { name: true } },
+      teams: { where: { deletedAt: null, sessionId }, select: { teamId: true, teamName: true } },
     },
   });
 
@@ -60,8 +61,8 @@ export async function getPagedDepartments(
     prisma.department.findMany({
       where: baseWhere,
       include: {
-        head: true,
-        teams: { where: { deletedAt: null, sessionId } },
+        head: { select: { name: true } },
+        teams: { where: { deletedAt: null, sessionId }, select: { teamId: true, teamName: true } },
       },
       orderBy: { name: "asc" },
       skip: (page - 1) * pageSize,

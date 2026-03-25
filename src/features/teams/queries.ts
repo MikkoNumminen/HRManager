@@ -9,15 +9,16 @@ export async function getTeams(): Promise<CombinedTeam[]> {
   const allowed = await hasPermission("team:read");
   if (!allowed) throw new ActionError("permissionDenied", "Permission denied");
   const sessionId = await getDemoSessionId();
+  // Use select on relations to avoid fetching full records (performance at scale).
   const teams = await prisma.team.findMany({
     where: { deletedAt: null, sessionId },
     include: {
-      manager: true,
-      department: true,
+      manager: { select: { name: true } },
+      department: { select: { name: true } },
       members: {
         where: { deletedAt: null, sessionId },
         include: {
-          person: true,
+          person: { select: { name: true, email: true } },
         },
       },
     },
@@ -73,11 +74,11 @@ export async function getPagedTeams(
     prisma.team.findMany({
       where: baseWhere,
       include: {
-        manager: true,
-        department: true,
+        manager: { select: { name: true } },
+        department: { select: { name: true } },
         members: {
           where: { deletedAt: null, sessionId },
-          include: { person: true },
+          include: { person: { select: { name: true, email: true } } },
         },
       },
       orderBy: { teamName: "asc" },

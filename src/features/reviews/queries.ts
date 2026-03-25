@@ -53,15 +53,29 @@ export async function getReviewCycles(): Promise<ReviewCycle[]> {
   if (!permissions["review:view"] && !permissions["review:manage"] && !permissions["review:submit"])
     throw new ActionError("permissionDenied", "Permission denied");
   const sessionId = await getDemoSessionId();
+  // Use _count and raw count for submitted to avoid fetching all request rows.
+  // At scale, fetching all requests just to count statuses is O(N) per cycle.
   const cycles = await prisma.reviewCycle.findMany({
     where: { deletedAt: null, sessionId },
     include: {
       template: { select: { name: true } },
-      requests: { select: { status: true } },
+      _count: { select: { requests: true } },
     },
     omit: { sessionId: true, deletedAt: true },
     orderBy: { createdAt: "desc" },
   });
+
+  // Batch-fetch submitted counts for all cycles in a single query
+  const cycleIds = cycles.map((c) => c.id);
+  const submittedCounts =
+    cycleIds.length > 0
+      ? await prisma.reviewRequest.groupBy({
+          by: ["cycleId"],
+          where: { cycleId: { in: cycleIds }, status: "SUBMITTED" },
+          _count: { id: true },
+        })
+      : [];
+  const submittedMap = new Map(submittedCounts.map((r) => [r.cycleId, r._count.id]));
 
   return cycles.map((c) =>
     ReviewCycleSchema.parse({
@@ -72,8 +86,8 @@ export async function getReviewCycles(): Promise<ReviewCycle[]> {
       status: c.status,
       startDate: c.startDate,
       endDate: c.endDate,
-      requestCount: c.requests.length,
-      submittedCount: c.requests.filter((r) => r.status === "SUBMITTED").length,
+      requestCount: c._count.requests,
+      submittedCount: submittedMap.get(c.id) ?? 0,
       createdAt: c.createdAt,
       updatedAt: c.updatedAt,
     }),
@@ -234,12 +248,13 @@ export async function getManagerTeamReviews(managerPersonId: string): Promise<Te
 
   const sessionId = await getDemoSessionId();
 
+  // Only fetch member person IDs — we don't need names from this query.
   const teams = await prisma.team.findMany({
     where: { teamManagerId: managerPersonId, deletedAt: null, sessionId },
-    include: {
+    select: {
       members: {
         where: { deletedAt: null },
-        include: { person: { select: { id: true, name: true } } },
+        select: { personId: true },
       },
     },
   });
