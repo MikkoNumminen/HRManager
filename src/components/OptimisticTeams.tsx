@@ -5,7 +5,7 @@ import { CombinedTeam } from "@/schemas";
 import { Box, Typography, Pagination } from "@mui/material";
 import { pageContainerStyles } from "@/muiStyles";
 import AddTeamForm from "./AddTeam";
-import EditableTeamsTable from "./EditableTeamsTable";
+import { EditableTeamsTable } from "./TeamsDataTable";
 import SearchBar from "./SearchBar";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";

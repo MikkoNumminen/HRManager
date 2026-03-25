@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen, fireEvent, within } from "@testing-library/react";
-import EditableTeamsTable from "@/components/EditableTeamsTable";
+import { EditableTeamsTable } from "@/components/TeamsDataTable";
 import { useRouter } from "next/navigation";
 
 jest.mock("next/navigation", () => ({
