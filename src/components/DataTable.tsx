@@ -276,9 +276,9 @@ export default function DataTable<T>({
                   )}
                 </Typography>
                 {mobileDetails?.map((detail, i) => {
-                  const content = detail.render(item);
-                  return content != null ? (
-                    <React.Fragment key={i}>{content}</React.Fragment>
+                  const rendered = detail.render(item);
+                  return rendered != null ? (
+                    <React.Fragment key={i}>{rendered}</React.Fragment>
                   ) : null;
                 })}
               </Box>

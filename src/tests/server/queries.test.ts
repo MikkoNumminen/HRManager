@@ -2275,7 +2275,7 @@ describe("getEmployeeProfile data", () => {
     const person = await testPrisma.person.create({
       data: { name: "Alice", email: "alice@test.com", position: "Manager" },
     });
-    const managedTeam = await testPrisma.team.create({
+    const _managedTeam = await testPrisma.team.create({
       data: { teamName: "Alpha Team", teamManagerId: person.id },
     });
     const otherTeam = await testPrisma.team.create({ data: { teamName: "Beta Team" } });

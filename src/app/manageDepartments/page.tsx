@@ -35,7 +35,7 @@ export default async function ManageDepartmentsPage({
         total={total}
         page={page}
         search={q}
-        canCreate={permissions["department:create"]}
+        canCreate={!!permissions["department:create"]}
       />
     </>
   );

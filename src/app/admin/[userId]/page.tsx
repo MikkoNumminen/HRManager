@@ -42,7 +42,7 @@ export default async function UserPermissionPage({
     return <Typography variant="h4">{t("notFound")}</Typography>;
   }
 
-  const canAssignPermissions = permissions["admin:assign_permissions"];
+  const canAssignPermissions = permissions["admin:assign_permissions"] ?? false;
   const demoSessionId = await getDemoSessionId();
 
   return (

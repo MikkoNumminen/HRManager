@@ -6,7 +6,7 @@
  * are mocked via Storybook's fn() so dialogs can be opened without a live API.
  */
 import type { Meta, StoryObj } from "@storybook/react";
-import { fn } from "@storybook/test";
+import { fn as _fn } from "@storybook/test";
 import TwoFactorSetup from "@/components/TwoFactorSetup";
 
 // Silence next-intl missing-provider errors in Storybook by aliasing to mock

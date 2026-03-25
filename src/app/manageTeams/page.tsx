@@ -36,7 +36,7 @@ export default async function ManageTeamsPage({
         total={total}
         page={page}
         search={q}
-        canCreate={permissions["team:create"]}
+        canCreate={!!permissions["team:create"]}
       />
     </>
   );

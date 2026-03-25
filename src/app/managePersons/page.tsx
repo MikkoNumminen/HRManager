@@ -35,7 +35,7 @@ export default async function ManagePersonsPage({
         total={total}
         page={page}
         search={q}
-        canCreate={permissions["person:create"]}
+        canCreate={!!permissions["person:create"]}
       />
     </>
   );
