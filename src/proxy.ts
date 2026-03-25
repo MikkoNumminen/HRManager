@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@/auth";
 
 /**
  * Generates a random nonce for Content-Security-Policy headers.
@@ -42,7 +43,21 @@ function buildCsp(nonce: string): string {
   return directives.join("; ");
 }
 
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // Enforce 2FA verification: redirect users who have 2FA enabled but haven't verified
+  if (
+    !pathname.startsWith("/api") &&
+    !pathname.startsWith("/auth") &&
+    !pathname.startsWith("/_next")
+  ) {
+    const session = await auth();
+    if (session?.user?.twoFactorRequired && !session?.user?.twoFactorVerified) {
+      return NextResponse.redirect(new URL("/auth/verify-2fa", request.nextUrl.origin));
+    }
+  }
+
   const nonce = generateNonce();
   const csp = buildCsp(nonce);
 
