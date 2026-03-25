@@ -18,6 +18,8 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 > 📋 **Audit research:** All items below marked "(found by audit)" have detailed file:line references in `AUDIT_REPORT.md` and `AUDIT_RESULTS.md`. Read before starting any audit-tagged task.
 
 - 🟢⚡ CI pipeline monitoring & auto-fix [Claude 4, main]
+- 🟢⚡ DRY-02 remaining: apply useFormAction hook to remaining ~16 form components [Claude 1, main]
+- 🟡⚡ Test coverage scan — run coverage report, identify gaps, write missing tests [Claude 2, main]
 
 ## Backlog
 
@@ -39,16 +41,13 @@ In Progress items must show the owner: `[Claude 1, main]`, `[Claude 2, worktree-
 
 ### Code Quality / Architecture (found by audit)
 
-- 🟢⚡ DRY-02 remaining: apply useFormAction hook to remaining ~16 form components not yet converted (REVIEW.md DRY-02)
 - 🟡🧠 WebSocket / real-time updates — live person create, leave request notifications, activity feed via Socket.io
 - 🔴🧠 Data encryption at rest — application-level encryption on sensitive fields; versioned key IDs; key rotation without downtime
 - 🔴🧠 GDPR right-to-deletion policy — anonymize personal data after 7yr, retain audit logs 10yr, soft-delete recovery 30d, user self-service data export
 - 🟡🧠 Database migration rollback — document + test Prisma rollback; test restore-from-backup procedure
-- 🟡🧠 Performance at scale — load test with 10k/100k employees; identify N+1 queries, missing indexes; document scaling cliffs
 
 ### Testing (found by audit)
 
-- 🟡⚡ Test coverage scan — run coverage report, identify all files/branches below 100%, write missing tests until 100% line+branch coverage
 - 🔴⚡ Storybook + Chromatic visual regression — install @storybook/react + @storybook/nextjs + chromatic; write stories for all ~80 components (key prop variations); set up Chromatic project + GitHub secret; add CI workflow; snapshot all 6 themes × all components as baselines; diff on PRs
 - 🟡🧠 Load & performance benchmarks (k6) — 100 concurrent users; performance budgets (dashboard < 2s, mutations < 500ms); CI fails if exceeded
 - 🟡⚡ Mutation testing (Stryker) — mutate code; verify tests catch mutations; target > 80% mutation score
