@@ -83,3 +83,10 @@ export {
   verifyTwoFactorLogin,
   adminResetTwoFactor,
 } from "../features/twoFactor/actions";
+export {
+  createFeatureFlag,
+  toggleFeatureFlag,
+  deleteFeatureFlag,
+  setUserFeatureFlag,
+  removeUserFeatureFlag,
+} from "../features/featureFlags/actions";

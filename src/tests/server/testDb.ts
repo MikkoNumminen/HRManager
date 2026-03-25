@@ -10,6 +10,8 @@ export const testPrisma = new PrismaClient({ adapter });
 export async function cleanDb() {
   await testPrisma.$executeRawUnsafe(`
     TRUNCATE TABLE
+      "UserFeatureFlag",
+      "FeatureFlag",
       "TwoFactorAuth",
       "UserSession",
       "UserPermission",

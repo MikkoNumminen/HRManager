@@ -93,6 +93,9 @@ export type ErrorCode =
   | "sessionNotFound"
   | "sessionAlreadyInactive"
   | "cannotDeactivateOwnSession"
+  // Feature flags
+  | "featureFlagNotFound"
+  | "featureFlagAlreadyExists"
   // Two-factor authentication
   | "invalidTotpCode"
   | "invalidTotpSecret"
