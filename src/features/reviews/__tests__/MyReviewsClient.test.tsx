@@ -19,6 +19,7 @@ describe("MyReviewsClient", () => {
     render(<MyReviewsClient />);
     const link = screen.getByText("Review Cycles");
     expect(link).toBeInTheDocument();
+    // eslint-disable-next-line testing-library/no-node-access
     expect(link.closest("a")).toHaveAttribute("href", "/reviews");
   });
 

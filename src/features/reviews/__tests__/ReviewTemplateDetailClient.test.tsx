@@ -89,6 +89,7 @@ describe("ReviewTemplateDetailClient", () => {
   test("has add question submit button", () => {
     render(<ReviewTemplateDetailClient {...defaultProps} />);
     const buttons = screen.getAllByText("Add Question");
+    // eslint-disable-next-line testing-library/no-node-access
     const submitButton = buttons.find((el) => el.closest("button[type='submit']"));
     expect(submitButton).toBeDefined();
   });
@@ -152,6 +153,7 @@ describe("ReviewTemplateDetailClient", () => {
   test("opens confirm dialog when delete is clicked", () => {
     render(<ReviewTemplateDetailClient {...defaultProps} />);
     const deleteIcons = screen.getAllByTestId("DeleteIcon");
+    // eslint-disable-next-line testing-library/no-node-access
     fireEvent.click(deleteIcons[0].closest("button")!);
     expect(
       screen.getByText("Are you sure you want to remove this review request?"),
@@ -162,6 +164,7 @@ describe("ReviewTemplateDetailClient", () => {
   test("cancel button is present in confirm dialog", () => {
     render(<ReviewTemplateDetailClient {...defaultProps} />);
     const deleteIcons = screen.getAllByTestId("DeleteIcon");
+    // eslint-disable-next-line testing-library/no-node-access
     fireEvent.click(deleteIcons[0].closest("button")!);
     expect(screen.getByText("Cancel")).toBeInTheDocument();
     expect(screen.getByText("Remove")).toBeInTheDocument();

@@ -134,6 +134,7 @@ describe("ReviewCycleDetailClient", () => {
     render(<ReviewCycleDetailClient {...defaultProps} cycle={makeCycle({ status: "OPEN" })} />);
     // The "Add Request" form section should not appear — only the heading text.
     const addRequestTexts = screen.queryAllByText("Add Request");
+    // eslint-disable-next-line testing-library/no-node-access
     const formsWithAddRequest = addRequestTexts.filter((el) => el.closest("form"));
     expect(formsWithAddRequest).toHaveLength(0);
   });
@@ -142,6 +143,7 @@ describe("ReviewCycleDetailClient", () => {
   test("hides add request form when canManage is false", () => {
     render(<ReviewCycleDetailClient {...defaultProps} canManage={false} />);
     const addRequestTexts = screen.queryAllByText("Add Request");
+    // eslint-disable-next-line testing-library/no-node-access
     const formsWithAddRequest = addRequestTexts.filter((el) => el.closest("form"));
     expect(formsWithAddRequest).toHaveLength(0);
   });
@@ -187,6 +189,7 @@ describe("ReviewCycleDetailClient", () => {
   test("shows delete button on request rows for DRAFT with canManage", () => {
     render(<ReviewCycleDetailClient {...defaultProps} />);
     const deleteIcons = screen.getAllByTestId("DeleteIcon");
+    // eslint-disable-next-line testing-library/no-node-access
     const rowDeleteIcons = deleteIcons.filter((icon) => icon.closest("tbody"));
     expect(rowDeleteIcons.length).toBeGreaterThanOrEqual(1);
   });
@@ -195,6 +198,7 @@ describe("ReviewCycleDetailClient", () => {
   test("hides row delete buttons when status is OPEN", () => {
     render(<ReviewCycleDetailClient {...defaultProps} cycle={makeCycle({ status: "OPEN" })} />);
     const deleteIcons = screen.queryAllByTestId("DeleteIcon");
+    // eslint-disable-next-line testing-library/no-node-access
     const rowDeleteIcons = deleteIcons.filter((icon) => icon.closest("tbody"));
     expect(rowDeleteIcons).toHaveLength(0);
   });
@@ -233,8 +237,10 @@ describe("ReviewCycleDetailClient", () => {
   // Opens delete request confirm dialog when row delete is clicked.
   test("opens delete request confirm dialog", () => {
     render(<ReviewCycleDetailClient {...defaultProps} />);
+    // eslint-disable-next-line testing-library/no-node-access
     const deleteIcon = screen.getAllByTestId("DeleteIcon").find((icon) => icon.closest("tbody"));
     expect(deleteIcon).toBeDefined();
+    // eslint-disable-next-line testing-library/no-node-access
     fireEvent.click(deleteIcon!.closest("button")!);
     expect(
       screen.getByText("Are you sure you want to remove this review request?"),

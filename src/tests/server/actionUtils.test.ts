@@ -84,7 +84,6 @@ describe("actionUtils safe()", () => {
   // Returns a translated unexpectedError when a non-Error value is thrown.
   test("handles non-Error throws and returns unexpectedError", async () => {
     const result = await safe(async () => {
-      // eslint-disable-next-line @typescript-eslint/only-throw-error
       throw "just a string error";
     });
     expect(result).toHaveProperty("code", "unexpectedError");

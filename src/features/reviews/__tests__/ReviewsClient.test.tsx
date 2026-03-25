@@ -74,6 +74,7 @@ describe("ReviewsClient", () => {
   test("shows templates link when canManage is true", () => {
     render(<ReviewsClient {...defaultProps} />);
     const link = screen.getByText("Templates");
+    // eslint-disable-next-line testing-library/no-node-access
     expect(link.closest("a")).toHaveAttribute("href", "/reviews/templates");
   });
 
@@ -152,6 +153,7 @@ describe("ReviewsClient", () => {
     render(<ReviewsClient {...defaultProps} />);
     // "Create Cycle" appears as both heading and button.
     const buttons = screen.getAllByText("Create Cycle");
+    // eslint-disable-next-line testing-library/no-node-access
     const submitButton = buttons.find((el) => el.closest("button"));
     expect(submitButton).toBeDefined();
   });
@@ -160,6 +162,7 @@ describe("ReviewsClient", () => {
   test("My Reviews button links correctly", () => {
     render(<ReviewsClient {...defaultProps} />);
     const link = screen.getByText("My Reviews");
+    // eslint-disable-next-line testing-library/no-node-access
     expect(link.closest("a")).toHaveAttribute("href", "/reviews/my-reviews");
   });
 
@@ -167,6 +170,7 @@ describe("ReviewsClient", () => {
   test("shows Team Reviews button when canView is true", () => {
     render(<ReviewsClient {...defaultProps} canView={true} />);
     const link = screen.getByText("Team Reviews");
+    // eslint-disable-next-line testing-library/no-node-access
     expect(link.closest("a")).toHaveAttribute("href", "/reviews/team-reviews");
   });
 
