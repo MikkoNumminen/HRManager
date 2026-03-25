@@ -210,9 +210,9 @@ graph LR
     Browser -->|HTTP| Proxy["proxy.ts<br/><i>CSP + security headers</i>"]
     Proxy --> Next["Next.js App Router"]
     Next -->|Server Component| SC["Page (async)<br/><i>fetches data server-side</i>"]
-    SC -->|read| Q["queries.ts<br/><i>Zod-validated reads</i>"]
-    SC -->|props| CC["Client Component<br/><i>renders UI</i>"]
-    CC -->|"action="| SA["serverActions.ts<br/><i>mutations + validation</i>"]
+    SC -->|read| Q["features/*/queries.ts<br/><i>Zod-validated reads</i>"]
+    SC -->|props| CC["features/*/components<br/><i>Client Components</i>"]
+    CC -->|"action="| SA["features/*/actions.ts<br/><i>mutations + validation</i>"]
     SA -->|$transaction| Prisma
     SA -->|"after()"| Audit["auditLog.ts"]
     Audit -->|deferred write| Mongo[(MongoDB<br/><i>audit logs</i>)]
@@ -225,10 +225,10 @@ graph LR
 
 | What           | Where                   | How it works                                                                                               |
 | -------------- | ----------------------- | ---------------------------------------------------------------------------------------------------------- |
-| Reads          | `queries.ts`            | Zod-validated, no `"use server"`. Dashboard uses raw SQL with CTEs for complex aggregations                |
-| Mutations      | `serverActions.ts`      | Always inside `$transaction` — even single operations, because consistency beats micro-optimization        |
+| Reads          | `features/*/queries.ts` | Zod-validated, no `"use server"`. Dashboard uses raw SQL with CTEs for complex aggregations                |
+| Mutations      | `features/*/actions.ts` | Always inside `$transaction` — even single operations, because consistency beats micro-optimization        |
 | Audit logging  | `auditLog.ts` → MongoDB | Deferred via `after()` so it never slows down the user's response                                          |
-| Types          | `schemas.ts`            | Zod schemas → `z.infer` → TypeScript types. One source of truth, used everywhere                           |
+| Types          | `features/*/schemas.ts` | Zod schemas → `z.infer` → TypeScript types. Feature-local schemas, barrel re-exported via `schemas/`       |
 | Auth           | `auth.ts`               | JWT with permission-enriched tokens. `permissionsVersion` detects stale permissions without extra DB calls |
 | RBAC           | `permissions.ts`        | Resolution order: superuser (all) → user override → role default                                           |
 | Demo isolation | `demoSession.ts`        | `sessionId` column on all entities — `NULL` = real user, UUID = demo sandbox                               |
@@ -241,6 +241,28 @@ graph LR
 | Tracing        | `telemetry.ts` (OTEL)   | Auto-instrumented pg queries; server action spans with auth/rateLimit/logic events; custom metrics         |
 | Caching        | `cacheInvalidation.ts`  | Tag-based `unstable_cache` with 5-min TTL; mutations call `revalidateTag`                                  |
 | Hash chain     | `auditHashChain.ts`     | HMAC-SHA256 linking each audit entry to its predecessor; admin verification endpoint                       |
+
+**Feature-based module structure** — each domain (persons, teams, departments, reviews, leave, admin, etc.) is a self-contained module under `src/features/` with its own schemas, queries, actions, components, and co-located tests. Shared infrastructure (auth, permissions, audit, rate limiting) lives in `src/lib/`. This encapsulation means changes to one domain rarely touch other domains, reducing merge conflicts and making the codebase navigable at scale.
+
+```
+src/features/
+├── persons/          # schemas, queries, actions, components, __tests__
+├── teams/
+├── departments/
+├── reviews/
+├── leave/
+├── admin/            # user management, permissions, feature flags, audit
+├── employee/         # employee portal views
+├── dashboard/
+├── reports/          # org chart, analytics
+├── positions/
+├── profile/
+├── sessions/
+├── twoFactor/
+├── data/             # CSV import/export
+├── featureFlags/
+└── jobs/             # background job queue
+```
 
 ---
 
