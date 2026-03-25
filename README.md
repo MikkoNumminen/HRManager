@@ -148,11 +148,19 @@ graph LR
 
 - **Three-tab UI** — Requests (with status filtering, approve/reject/cancel actions), Types (CRUD with color picker), and Balances (allocation with remaining calculation and color-coded indicators). Permission-gated controls: only users with `leave:approve` see the approve/reject buttons; only `leave:manage_types` can configure types and allocate balances.
 
+### 👤 Employee Self-Service Portal
+
+- **Read-only employee view** — Authenticated users can access their own profile, team, manager, leave balance + request history, and performance reviews via `/employee`. All data is fetched server-side and scoped to the session — IDOR-safe by design (queries derive `personId` from the session email, never from caller-supplied IDs). Graceful "profile not linked" state when the auth email doesn't match a Person record. _Why read-only? GDPR and data-integrity reasons: employees should see their data, not unilaterally edit it — changes go through HR workflows with audit trails._
+
+- **GDPR notice** — Profile page displays a GDPR-compliant notice informing the user what personal data is stored. _Why surface this? Transparency is a legal requirement under GDPR Art. 13/14, and it builds user trust._
+
 ### 📁 Position Catalog
 
 - **Standardized job title catalog** — A dedicated `Position` model stores the organization's official position names. Administrators manage the catalog via `/positions` (add/delete entries). When HR updates a person's position field, the name is automatically synced into the catalog via an in-transaction `findFirst`+`create` — keeping it current without manual maintenance. The `UpdatePosition` form uses a `freeSolo` MUI Autocomplete: pick from the catalog or type anything. One new Prisma model, 2 server actions, 1 permission key (`position:manage`).
 
 ### 🧪 Quality
+
+- **Sentry error tracking** — `@sentry/nextjs` captures unhandled exceptions, server action failures, and client-side errors. Separate `sentry.client/server/edge.config.ts` files initialize Sentry per runtime. A reusable `SentryErrorBoundary` component wraps MUI fallback UI; `global-error.tsx` catches render-level crashes; `captureServerActionError()` helper instruments server actions. Sentry is opt-in — the app runs normally without a DSN configured. _Why opt-in? This is a portfolio project — developers shouldn't need a Sentry account to run it locally._
 
 - **1814 tests, 91.9% line coverage** — Unit tests, integration tests against real PostgreSQL + in-memory MongoDB (no database mocks), and 75 Playwright E2E tests covering full user flows. _Why real databases in tests? Mocked tests can pass while production breaks. If your test doesn't hit a real database, it's not testing what you think it's testing._
 
@@ -180,6 +188,7 @@ graph LR
 | Auth       | NextAuth v5 (JWT)                | Stateless auth that scales without session storage                |
 | Testing    | Jest 30 + Playwright             | Unit/integration against real DBs + E2E against production builds |
 | CI/CD      | GitHub Actions                   | Lint, format, i18n audit, test, build — on every push             |
+| Monitoring | Sentry                           | Client + server + edge error capture; opt-in via DSN env var      |
 
 ---
 
@@ -346,6 +355,23 @@ npm run dev                   # start dev server at localhost:3000
 
 Deployed on **Vercel** with **Vercel Postgres** (Neon) and **MongoDB Atlas** (free tier). Build: `prisma generate && prisma migrate deploy && next build`. The first OAuth user is auto-promoted to superuser. Demo login available for visitors to explore without OAuth.
 
+### Kubernetes / Helm
+
+Production-grade Kubernetes manifests and a Helm chart are provided in `k8s/`:
+
+- **`k8s/manifests/`** — Namespace, Deployment (2 replicas, rolling update, resource limits, liveness/readiness probes on `/api/health`), Service, Ingress (NGINX, TLS, rate limiting 100 rps/IP), ConfigMap, Secret, HorizontalPodAutoscaler (2–10 replicas, CPU 70%), PodDisruptionBudget.
+- **`k8s/helm/hrmanager/`** — Helm chart with parameterized templates, `_helpers.tpl`, and `NOTES.txt` post-install instructions. Supports `existingSecret` escape hatch for external secret managers.
+
+```bash
+# Raw manifests
+kubectl apply -f k8s/manifests/
+
+# Helm
+helm install hrmanager k8s/helm/hrmanager/ --set image.tag=latest
+```
+
+See [`k8s/README.md`](k8s/README.md) for full setup including TLS, secrets, upgrade, and rollback instructions.
+
 ---
 
 ## Roadmap
@@ -359,7 +385,6 @@ _Last updated: March 2026_
 - [ ] Tutorial UX overhaul — visual guidance with MUI highlighting/effects, improved back-button behavior
 - [ ] Bulk actions on tables — multi-select persons/teams and apply batch operations
 - [ ] Manager approval workflow & escalation — route leave requests to manager; auto-escalate after 5 days
-- [ ] Employee self-service portal — read-only view: own profile, team, manager, leave balance, reviews
 - [ ] Full-text search — PostgreSQL tsvector across persons/teams/departments/reviews; ranked results
 - [ ] Document management — upload/store employee contracts and certs; PDF preview; soft-delete
 - [ ] Org chart drag-and-drop — drag person to new team/department with confirmation + audit trail
@@ -371,7 +396,6 @@ _Last updated: March 2026_
 - [ ] Background job queue (Bull/Bree) — async emails, report generation, bulk imports; retry + dead-letter queue
 - [ ] WebSocket real-time updates — live notifications for person create, leave requests, activity feed
 - [ ] Feature flags — per-user or per-environment toggles; track flag changes in audit log
-- [ ] Error tracking (Sentry) — capture unhandled exceptions, server action failures, client errors
 - [ ] Advanced reporting & analytics — turnover rates, headcount trends, leave utilization, review completion
 - [ ] Performance at scale — load test with 10k/100k employees; identify N+1 queries and missing indexes
 
@@ -388,7 +412,6 @@ _Last updated: March 2026_
 
 ### DevOps & Infrastructure
 
-- [ ] Kubernetes manifests & Helm charts — Deployment, Service, Ingress, ConfigMap, Secret; readiness probes
 - [ ] Blue-green deployment strategy — two production environments; zero-downtime upgrades + instant rollback
 - [ ] Staging environment parity — staging with anonymized production data; E2E before prod
 
