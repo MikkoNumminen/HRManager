@@ -1,4 +1,5 @@
 import { prisma } from "@/db";
+import { ActionError } from "@/actionErrors";
 import {
   DashboardMetricsSchema,
   DashboardRecentActivitySchema,
@@ -54,7 +55,7 @@ const CACHE_TTL = 300;
 export async function getDashboardMetrics(): Promise<DashboardMetrics> {
   const allowed = await hasPermission("dashboard:view");
   if (!allowed) {
-    throw new Error("Permission denied");
+    throw new ActionError("permissionDenied", "Permission denied");
   }
   const sessionId = await getDemoSessionId();
   return fetchDashboardMetricsCached(sessionId);
@@ -167,7 +168,7 @@ async function fetchDashboardMetricsUncached(sessionId: string | null): Promise<
 
 export async function getOrgChartData(): Promise<OrgChartData> {
   const allowed = await hasPermission("dashboard:view");
-  if (!allowed) throw new Error("Permission denied");
+  if (!allowed) throw new ActionError("permissionDenied", "Permission denied");
   const sessionId = await getDemoSessionId();
   return fetchOrgChartDataCached(sessionId);
 }

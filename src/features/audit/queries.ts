@@ -1,4 +1,5 @@
 import { AuditLogSchema, AuditLogFilterSchema, AuditLog, AuditLogFilter } from "@/schemas";
+import { ActionError } from "@/actionErrors";
 import { hasPermission } from "@/permissions";
 import { getDemoSessionId } from "@/demoSession";
 import { getAuditLogCollection, isMongoAvailable } from "@/mongoDb";
@@ -14,7 +15,7 @@ export async function getAuditLogs(
 ): Promise<{ logs: AuditLog[]; total: number }> {
   const allowed = await hasPermission("admin:view_audit_log");
   if (!allowed) {
-    throw new Error("Permission denied");
+    throw new ActionError("permissionDenied", "Permission denied");
   }
   const parsed = AuditLogFilterSchema.parse(filters ?? {});
   const { userEmail, action, entityType, dateFrom, dateTo, page, pageSize } = parsed;
@@ -76,7 +77,7 @@ export async function getAuditLogs(
 export async function getAuditLogUserEmails(): Promise<string[]> {
   const allowed = await hasPermission("admin:view_audit_log");
   if (!allowed) {
-    throw new Error("Permission denied");
+    throw new ActionError("permissionDenied", "Permission denied");
   }
   if (!isMongoAvailable()) {
     return [];

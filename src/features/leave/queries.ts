@@ -1,4 +1,5 @@
 import { prisma } from "@/db";
+import { ActionError } from "@/actionErrors";
 import {
   LeaveTypeSchema,
   LeaveRequestSchema,
@@ -12,7 +13,7 @@ import { hasPermission } from "@/permissions";
 
 export async function getLeaveTypes(): Promise<LeaveType[]> {
   const allowed = await hasPermission("leave:view");
-  if (!allowed) throw new Error("Permission denied");
+  if (!allowed) throw new ActionError("permissionDenied", "Permission denied");
   const sessionId = await getDemoSessionId();
   const types = await prisma.leaveType.findMany({
     where: { deletedAt: null, sessionId },
@@ -37,7 +38,7 @@ export async function getLeaveRequests(filters?: {
   status?: string;
 }): Promise<LeaveRequest[]> {
   const allowed = await hasPermission("leave:view");
-  if (!allowed) throw new Error("Permission denied");
+  if (!allowed) throw new ActionError("permissionDenied", "Permission denied");
 
   const sessionId = await getDemoSessionId();
   const where: Record<string, unknown> = { deletedAt: null, sessionId };
@@ -81,7 +82,7 @@ export async function getLeaveBalances(filters?: {
   year?: number;
 }): Promise<LeaveBalance[]> {
   const allowed = await hasPermission("leave:view");
-  if (!allowed) throw new Error("Permission denied");
+  if (!allowed) throw new ActionError("permissionDenied", "Permission denied");
 
   const sessionId = await getDemoSessionId();
   const where: Record<string, unknown> = { sessionId };

@@ -1,4 +1,5 @@
 import { prisma } from "@/db";
+import { ActionError } from "@/actionErrors";
 import { UserSchema, AppUser } from "@/schemas";
 import { resolvePermissions, PERMISSION_KEYS, hasPermission } from "@/permissions";
 import { getDemoSessionId } from "@/demoSession";
@@ -7,7 +8,7 @@ import { DEMO_EMAIL } from "@/constants";
 
 export async function getUsers(): Promise<AppUser[]> {
   const allowed = await hasPermission("admin:manage_users");
-  if (!allowed) throw new Error("Permission denied");
+  if (!allowed) throw new ActionError("permissionDenied", "Permission denied");
   const demoSessionId = await getDemoSessionId();
   const users = await prisma.user.findMany({
     // Demo sessions only see the demo user — prevents leaking real OAuth user emails
@@ -21,7 +22,7 @@ export async function getUsers(): Promise<AppUser[]> {
 
 export async function getUserById(userId: string) {
   const allowed = await hasPermission("admin:manage_users");
-  if (!allowed) throw new Error("Permission denied");
+  if (!allowed) throw new ActionError("permissionDenied", "Permission denied");
   const demoSessionId = await getDemoSessionId();
   const user = await prisma.user.findUnique({
     where: { id: userId },
@@ -52,7 +53,7 @@ export async function getUserById(userId: string) {
 
 export async function getAllPermissionKeys(): Promise<string[]> {
   const allowed = await hasPermission("admin:assign_permissions");
-  if (!allowed) throw new Error("Permission denied");
+  if (!allowed) throw new ActionError("permissionDenied", "Permission denied");
   return [...PERMISSION_KEYS];
 }
 
@@ -66,7 +67,7 @@ export interface DataExportCounts {
 export async function getDataExportCounts(): Promise<DataExportCounts> {
   const allowed = await hasPermission("data:export");
   if (!allowed) {
-    throw new Error("Permission denied");
+    throw new ActionError("permissionDenied", "Permission denied");
   }
   const sessionId = await getDemoSessionId();
   const [persons, teams, departments, auditLogs] = await Promise.all([

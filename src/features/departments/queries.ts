@@ -1,4 +1,5 @@
 import { prisma } from "@/db";
+import { ActionError } from "@/actionErrors";
 import { DepartmentSchema, Department } from "@/schemas";
 import { getDemoSessionId } from "@/demoSession";
 import { hasPermission } from "@/permissions";
@@ -6,7 +7,7 @@ import { PAGE_SIZE, DepartmentDeleteImpact } from "@/constants";
 
 export async function getDepartments(): Promise<Department[]> {
   const allowed = await hasPermission("department:read");
-  if (!allowed) throw new Error("Permission denied");
+  if (!allowed) throw new ActionError("permissionDenied", "Permission denied");
   const sessionId = await getDemoSessionId();
   const departments = await prisma.department.findMany({
     where: { deletedAt: null, sessionId },
@@ -37,7 +38,7 @@ export async function getPagedDepartments(
   opts: { page?: number; pageSize?: number; search?: string } = {},
 ): Promise<{ items: Department[]; total: number }> {
   const allowed = await hasPermission("department:read");
-  if (!allowed) throw new Error("Permission denied");
+  if (!allowed) throw new ActionError("permissionDenied", "Permission denied");
   const { page = 1, pageSize = PAGE_SIZE, search = "" } = opts;
   const sessionId = await getDemoSessionId();
   const q = search.trim();
@@ -91,7 +92,7 @@ export async function getDepartmentDeleteImpact(
   departmentId: string,
 ): Promise<DepartmentDeleteImpact> {
   const allowed = await hasPermission("department:read");
-  if (!allowed) throw new Error("Permission denied");
+  if (!allowed) throw new ActionError("permissionDenied", "Permission denied");
   const sessionId = await getDemoSessionId();
   const teams = await prisma.team.findMany({
     where: { departmentId, deletedAt: null, sessionId },

@@ -157,13 +157,13 @@ export async function updatePersonName(data: FormData): Promise<ActionResult> {
     const auditEntries: DeferredAuditEntry[] = [];
     await prisma.$transaction(async (tx) => {
       const personBefore = await tx.person.findFirst({
-        where: { id: personID, sessionId },
+        where: { id: personID, deletedAt: null, sessionId },
       });
       if (!personBefore) {
         throw new ActionError("personNotFound", t("personNotFound"));
       }
       await tx.person.updateMany({
-        where: { id: personID, sessionId },
+        where: { id: personID, deletedAt: null, sessionId },
         data: { name: newName },
       });
       auditEntries.push({
@@ -206,13 +206,13 @@ export async function updatePosition(data: FormData): Promise<ActionResult> {
     const auditEntries: DeferredAuditEntry[] = [];
     await prisma.$transaction(async (tx) => {
       const personBefore = await tx.person.findFirst({
-        where: { id: personID, sessionId },
+        where: { id: personID, deletedAt: null, sessionId },
       });
       if (!personBefore) {
         throw new ActionError("personNotFound", t("personNotFound"));
       }
       await tx.person.updateMany({
-        where: { id: personID, sessionId },
+        where: { id: personID, deletedAt: null, sessionId },
         data: { position: newPosition },
       });
       // Sync position name into the catalog
@@ -273,13 +273,13 @@ export async function updateEmail(data: FormData): Promise<ActionResult> {
       }
 
       const personBefore = await tx.person.findFirst({
-        where: { id: personID, sessionId },
+        where: { id: personID, deletedAt: null, sessionId },
       });
       if (!personBefore) {
         throw new ActionError("personNotFound", t("personNotFound"));
       }
       await tx.person.updateMany({
-        where: { id: personID, sessionId },
+        where: { id: personID, deletedAt: null, sessionId },
         data: { email: newEmail },
       });
       auditEntries.push({
@@ -317,7 +317,9 @@ export async function addManager(data: FormData): Promise<ActionResult> {
     const ctx = await captureAuditContext();
     const auditEntries: DeferredAuditEntry[] = [];
     await prisma.$transaction(async (tx) => {
-      const person = await tx.person.findFirst({ where: { id: personID, sessionId } });
+      const person = await tx.person.findFirst({
+        where: { id: personID, deletedAt: null, sessionId },
+      });
       if (!person) {
         throw new ActionError("personNotFound", t("personNotFound"));
       }

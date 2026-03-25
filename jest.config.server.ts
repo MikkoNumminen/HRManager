@@ -14,9 +14,10 @@ const config: Config = {
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
     "^next-intl/server$": "<rootDir>/src/tests/mocks/next-intl-server.ts",
+    "^pg-boss$": "<rootDir>/src/tests/mocks/pg-boss.ts",
   },
   // Prisma 7 ships ESM — transform its .mjs files so Jest (CJS) can parse them
-  transformIgnorePatterns: ["node_modules/(?!(@prisma/client|pg-boss)/)"],
+  transformIgnorePatterns: ["node_modules/(?!(@prisma/client)/)"],
 };
 
 export default createJestConfig(config);

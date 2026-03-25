@@ -1,4 +1,5 @@
 import { prisma } from "@/db";
+import { ActionError } from "@/actionErrors";
 import { auth } from "@/auth";
 import { hasPermission } from "@/permissions";
 import { UserSessionSchema, UserSession } from "@/schemas";
@@ -25,7 +26,7 @@ export async function getMyActiveSessions(): Promise<UserSession[]> {
  */
 export async function getUserActiveSessions(userId: string): Promise<UserSession[]> {
   const allowed = await hasPermission("admin:manage_users");
-  if (!allowed) throw new Error("Permission denied");
+  if (!allowed) throw new ActionError("permissionDenied", "Permission denied");
 
   const sessions = await prisma.userSession.findMany({
     where: { userId, active: true },

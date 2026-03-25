@@ -1,4 +1,5 @@
 import { prisma } from "@/db";
+import { ActionError } from "@/actionErrors";
 import { PersonSchema, Person, EmployeeProfileSchema, EmployeeProfile } from "@/schemas";
 import { getDemoSessionId } from "@/demoSession";
 import { hasPermission } from "@/permissions";
@@ -6,7 +7,7 @@ import { PAGE_SIZE, PersonDeleteImpact } from "@/constants";
 
 export async function getPersons(): Promise<Person[]> {
   const allowed = await hasPermission("person:read");
-  if (!allowed) throw new Error("Permission denied");
+  if (!allowed) throw new ActionError("permissionDenied", "Permission denied");
   const sessionId = await getDemoSessionId();
   const persons = await prisma.person.findMany({
     where: { deletedAt: null, sessionId },
@@ -20,7 +21,7 @@ export async function getPagedPersons(
   opts: { page?: number; pageSize?: number; search?: string } = {},
 ): Promise<{ items: Person[]; total: number }> {
   const allowed = await hasPermission("person:read");
-  if (!allowed) throw new Error("Permission denied");
+  if (!allowed) throw new ActionError("permissionDenied", "Permission denied");
   const { page = 1, pageSize = PAGE_SIZE, search = "" } = opts;
   const sessionId = await getDemoSessionId();
   const q = search.trim();
@@ -52,7 +53,7 @@ export async function getPagedPersons(
 
 export async function getEmployeeProfile(id: string): Promise<EmployeeProfile | null> {
   const allowed = await hasPermission("person:read");
-  if (!allowed) throw new Error("Permission denied");
+  if (!allowed) throw new ActionError("permissionDenied", "Permission denied");
   const sessionId = await getDemoSessionId();
   const person = await prisma.person.findFirst({
     where: { id, deletedAt: null, sessionId },
@@ -101,7 +102,7 @@ export async function getEmployeeProfile(id: string): Promise<EmployeeProfile | 
 
 export async function getPersonDeleteImpact(personId: string): Promise<PersonDeleteImpact> {
   const allowed = await hasPermission("person:read");
-  if (!allowed) throw new Error("Permission denied");
+  if (!allowed) throw new ActionError("permissionDenied", "Permission denied");
   const sessionId = await getDemoSessionId();
   const [managedTeams, headedDepartments, teamMemberships, leaveRequests, reviewRequests] =
     await Promise.all([
