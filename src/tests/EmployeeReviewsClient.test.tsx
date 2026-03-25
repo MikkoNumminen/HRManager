@@ -53,7 +53,8 @@ describe("EmployeeReviewsClient", () => {
   // Shows type chip for manager review.
   test("renders MANAGER review type chip", () => {
     render(<EmployeeReviewsClient reviews={[makeReview({ type: "MANAGER" })]} />);
-    expect(screen.getByText(/manager/i)).toBeInTheDocument();
+    // Use exact text to avoid matching "HRManager" in the read-only notice
+    expect(screen.getByText("Manager")).toBeInTheDocument();
   });
 
   // Shows type chip for self review.

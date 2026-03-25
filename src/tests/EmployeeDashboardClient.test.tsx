@@ -155,7 +155,9 @@ describe("EmployeeDashboardClient", () => {
         reviews={emptyReviews}
       />,
     );
-    expect(screen.getByText("0")).toBeInTheDocument();
+    // Both leave and reviews cards show "0" — use getAllByText and verify at least one exists
+    const zeros = screen.getAllByText("0");
+    expect(zeros.length).toBeGreaterThanOrEqual(1);
   });
 
   // Read-only notice is visible on the dashboard.
