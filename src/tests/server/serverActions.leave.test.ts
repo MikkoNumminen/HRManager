@@ -274,7 +274,7 @@ describe("createLeaveRequest", () => {
     expect(requests[0].personId).toBe(person.id);
     expect(requests[0].leaveTypeId).toBe(lt.id);
     expect(requests[0].days).toBe(5);
-    expect(requests[0].status).toBe("pending");
+    expect(requests[0].status).toBe("PENDING");
     expect(requests[0].note).toBe("Summer vacation");
   });
 
@@ -395,15 +395,15 @@ describe("reviewLeaveRequest", () => {
         startDate: new Date("2026-07-01"),
         endDate: new Date("2026-07-05"),
         days: 5,
-        status: "pending",
+        status: "PENDING",
         sessionId: null,
       },
     });
 
-    await reviewLeaveRequest(formData({ id: request.id, action: "approved" }));
+    await reviewLeaveRequest(formData({ id: request.id, action: "APPROVED" }));
 
     const updated = await testPrisma.leaveRequest.findUnique({ where: { id: request.id } });
-    expect(updated!.status).toBe("approved");
+    expect(updated!.status).toBe("APPROVED");
     expect(updated!.reviewedAt).not.toBeNull();
 
     const updatedBalance = await testPrisma.leaveBalance.findUnique({
@@ -425,17 +425,17 @@ describe("reviewLeaveRequest", () => {
         startDate: new Date("2026-08-01"),
         endDate: new Date("2026-08-03"),
         days: 3,
-        status: "pending",
+        status: "PENDING",
         sessionId: null,
       },
     });
 
     await reviewLeaveRequest(
-      formData({ id: request.id, action: "rejected", reviewNote: "Not now" }),
+      formData({ id: request.id, action: "REJECTED", reviewNote: "Not now" }),
     );
 
     const updated = await testPrisma.leaveRequest.findUnique({ where: { id: request.id } });
-    expect(updated!.status).toBe("rejected");
+    expect(updated!.status).toBe("REJECTED");
     expect(updated!.reviewNote).toBe("Not now");
 
     const updatedBalance = await testPrisma.leaveBalance.findUnique({
@@ -456,13 +456,13 @@ describe("reviewLeaveRequest", () => {
         startDate: new Date("2026-07-01"),
         endDate: new Date("2026-07-05"),
         days: 5,
-        status: "approved",
+        status: "APPROVED",
         reviewedAt: new Date(),
         sessionId: null,
       },
     });
 
-    const result = await reviewLeaveRequest(formData({ id: request.id, action: "rejected" }));
+    const result = await reviewLeaveRequest(formData({ id: request.id, action: "REJECTED" }));
     expect(result).toMatchObject({ error: expect.any(String) });
   });
 
@@ -478,12 +478,12 @@ describe("reviewLeaveRequest", () => {
         startDate: new Date("2026-07-01"),
         endDate: new Date("2026-07-03"),
         days: 3,
-        status: "pending",
+        status: "PENDING",
         sessionId: null,
       },
     });
 
-    await reviewLeaveRequest(formData({ id: request.id, action: "approved" }));
+    await reviewLeaveRequest(formData({ id: request.id, action: "APPROVED" }));
 
     const balance = await testPrisma.leaveBalance.findUnique({
       where: {
@@ -507,7 +507,7 @@ describe("reviewLeaveRequest", () => {
         startDate: new Date("2026-07-01"),
         endDate: new Date("2026-07-05"),
         days: 5,
-        status: "pending",
+        status: "PENDING",
         sessionId: null,
       },
     });
@@ -535,7 +535,7 @@ describe("deleteLeaveRequest", () => {
         startDate: new Date("2026-07-01"),
         endDate: new Date("2026-07-05"),
         days: 5,
-        status: "pending",
+        status: "PENDING",
         sessionId: null,
       },
     });
@@ -557,7 +557,7 @@ describe("deleteLeaveRequest", () => {
         startDate: new Date("2026-08-01"),
         endDate: new Date("2026-08-03"),
         days: 3,
-        status: "approved",
+        status: "APPROVED",
         reviewedAt: new Date(),
         sessionId: null,
       },

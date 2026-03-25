@@ -27,7 +27,7 @@ const makeRequest = (overrides: Partial<LeaveRequest> = {}): LeaveRequest => ({
   endDate: new Date("2025-07-05"),
   days: 5,
   note: null,
-  status: "pending",
+  status: "PENDING",
   reviewerId: null,
   reviewerName: null,
   reviewNote: null,
@@ -89,7 +89,7 @@ describe("EmployeeLeaveClient", () => {
     render(
       <EmployeeLeaveClient
         leaveBalances={[]}
-        leaveRequests={[makeRequest({ status: "pending" })]}
+        leaveRequests={[makeRequest({ status: "PENDING" })]}
       />,
     );
     expect(screen.getByText(/pending/i)).toBeInTheDocument();
@@ -100,7 +100,7 @@ describe("EmployeeLeaveClient", () => {
     render(
       <EmployeeLeaveClient
         leaveBalances={[]}
-        leaveRequests={[makeRequest({ status: "approved" })]}
+        leaveRequests={[makeRequest({ status: "APPROVED" })]}
       />,
     );
     expect(screen.getByText(/approved/i)).toBeInTheDocument();
@@ -111,7 +111,7 @@ describe("EmployeeLeaveClient", () => {
     render(
       <EmployeeLeaveClient
         leaveBalances={[]}
-        leaveRequests={[makeRequest({ status: "rejected" })]}
+        leaveRequests={[makeRequest({ status: "REJECTED" })]}
       />,
     );
     expect(screen.getByText(/rejected/i)).toBeInTheDocument();

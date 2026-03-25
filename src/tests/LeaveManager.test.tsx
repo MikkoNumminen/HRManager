@@ -43,7 +43,7 @@ const makeLeaveRequest = (overrides: Partial<LeaveRequest> = {}): LeaveRequest =
   endDate: new Date("2026-07-05"),
   days: 5,
   note: "Summer vacation",
-  status: "pending",
+  status: "PENDING",
   reviewerId: null,
   reviewerName: null,
   reviewNote: null,
@@ -190,7 +190,7 @@ describe("LeaveManager", () => {
   // Does not show approve/reject for already-approved requests.
   test("no approve/reject buttons for approved requests", () => {
     render(
-      <LeaveManager {...defaultProps} leaveRequests={[makeLeaveRequest({ status: "approved" })]} />,
+      <LeaveManager {...defaultProps} leaveRequests={[makeLeaveRequest({ status: "APPROVED" })]} />,
     );
     expect(screen.queryByLabelText("Approve")).not.toBeInTheDocument();
     expect(screen.queryByLabelText("Reject")).not.toBeInTheDocument();
@@ -285,9 +285,9 @@ describe("LeaveManager", () => {
   // Multiple leave request statuses render correctly.
   test("renders multiple requests with different statuses", () => {
     const requests = [
-      makeLeaveRequest({ id: "lr-1", status: "pending", personName: "Alice" }),
-      makeLeaveRequest({ id: "lr-2", status: "approved", personName: "Bob" }),
-      makeLeaveRequest({ id: "lr-3", status: "rejected", personName: "Charlie" }),
+      makeLeaveRequest({ id: "lr-1", status: "PENDING", personName: "Alice" }),
+      makeLeaveRequest({ id: "lr-2", status: "APPROVED", personName: "Bob" }),
+      makeLeaveRequest({ id: "lr-3", status: "REJECTED", personName: "Charlie" }),
     ];
     render(<LeaveManager {...defaultProps} leaveRequests={requests} />);
     expect(screen.getByText("Pending")).toBeInTheDocument();

@@ -360,7 +360,7 @@ export type ReviewSubmission = z.infer<typeof ReviewSubmissionSchema>;
 
 export const MAX_LEAVE_NOTE_LENGTH = 500;
 
-export const LeaveRequestStatusSchema = z.enum(["pending", "approved", "rejected"]);
+export const LeaveRequestStatusSchema = z.enum(["PENDING", "APPROVED", "REJECTED"]);
 
 export const LeaveTypeSchema = z.object({
   id: z.string().uuid(),
