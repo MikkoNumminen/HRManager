@@ -1,6 +1,6 @@
 import { prisma } from "@/db";
 import { auth } from "@/auth";
-import { UserProfileSchema, UserProfile } from "@/schemas";
+import { UserProfileSchema, UserProfile } from "./schemas";
 import { resolvePermissions } from "@/permissions";
 
 export async function getProfile(): Promise<UserProfile | null> {

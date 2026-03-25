@@ -1,6 +1,6 @@
 import { prisma } from "@/db";
 import { ActionError } from "@/actionErrors";
-import { TeamSchema, CombinedTeam } from "@/schemas";
+import { TeamSchema, CombinedTeam } from "./schemas";
 import { getDemoSessionId } from "@/demoSession";
 import { hasPermission } from "@/permissions";
 import { PAGE_SIZE, TeamDeleteImpact } from "@/constants";

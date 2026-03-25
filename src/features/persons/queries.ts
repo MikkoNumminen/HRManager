@@ -1,6 +1,7 @@
 import { prisma } from "@/db";
 import { ActionError } from "@/actionErrors";
-import { PersonSchema, Person, EmployeeProfileSchema, EmployeeProfile } from "@/schemas";
+import { PersonSchema, Person } from "./schemas";
+import { EmployeeProfileSchema, EmployeeProfile } from "@/features/employee/schemas";
 import { getDemoSessionId } from "@/demoSession";
 import { hasPermission } from "@/permissions";
 import { PAGE_SIZE, PersonDeleteImpact } from "@/constants";

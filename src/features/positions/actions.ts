@@ -2,7 +2,7 @@
 import { revalidatePath } from "next/cache";
 import { ActionError } from "@/actionErrors";
 import { getDemoSessionId } from "@/demoSession";
-import { MAX_POSITION_LENGTH } from "@/schemas";
+import { MAX_POSITION_LENGTH } from "@/schemas/shared";
 import { validateUUID, type ActionResult } from "@/lib/actionUtils";
 import { guardedAction } from "@/lib/guardedAction";
 import { withAuditedTransaction } from "@/lib/auditedTransaction";

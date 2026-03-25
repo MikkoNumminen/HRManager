@@ -3,7 +3,12 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { ActionError } from "@/actionErrors";
 import { getDemoSessionId } from "@/demoSession";
-import { MAX_NAME_LENGTH, MAX_EMAIL_LENGTH, MAX_POSITION_LENGTH, EmailSchema } from "@/schemas";
+import {
+  MAX_NAME_LENGTH,
+  MAX_EMAIL_LENGTH,
+  MAX_POSITION_LENGTH,
+  EmailSchema,
+} from "@/schemas/shared";
 import { validateUUID, type ActionResult } from "@/lib/actionUtils";
 import { guardedAction } from "@/lib/guardedAction";
 import { withAuditedTransaction } from "@/lib/auditedTransaction";

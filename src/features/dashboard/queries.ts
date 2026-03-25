@@ -1,12 +1,7 @@
 import { prisma } from "@/db";
 import { ActionError } from "@/actionErrors";
-import {
-  DashboardMetricsSchema,
-  DashboardRecentActivitySchema,
-  DashboardMetrics,
-  OrgChartDataSchema,
-  OrgChartData,
-} from "@/schemas";
+import { DashboardMetricsSchema, DashboardRecentActivitySchema, DashboardMetrics } from "./schemas";
+import { OrgChartDataSchema, OrgChartData } from "@/features/reports/schemas";
 import { hasPermission } from "@/permissions";
 import { getDemoSessionId } from "@/demoSession";
 import { getAuditLogCollection, isMongoAvailable } from "@/mongoDb";

@@ -1,6 +1,6 @@
 import { prisma } from "@/db";
 import { ActionError } from "@/actionErrors";
-import { DepartmentSchema, Department } from "@/schemas";
+import { DepartmentSchema, Department } from "./schemas";
 import { getDemoSessionId } from "@/demoSession";
 import { hasPermission } from "@/permissions";
 import { PAGE_SIZE, DepartmentDeleteImpact } from "@/constants";

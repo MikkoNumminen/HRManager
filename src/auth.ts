@@ -6,7 +6,7 @@ import { prisma } from "@/db";
 import { resolvePermissions } from "@/permissions";
 import { seedDemoData, cleanupStaleDemoSessions } from "@/demoSession";
 import { DEMO_EMAIL } from "@/constants";
-import { MAX_CONCURRENT_SESSIONS } from "@/schemas";
+import { MAX_CONCURRENT_SESSIONS } from "@/features/sessions/schemas";
 import { headers } from "next/headers";
 
 /**

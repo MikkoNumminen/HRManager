@@ -50,3 +50,40 @@ export const ReviewCompletionSchema = z.object({
 });
 
 export type ReviewCompletion = z.infer<typeof ReviewCompletionSchema>;
+
+export const OrgChartMemberSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  position: z.string().nullable(),
+  email: z.string().nullable(),
+});
+
+export type OrgChartMember = z.infer<typeof OrgChartMemberSchema>;
+
+export const OrgChartTeamSchema = z.object({
+  teamId: z.string().uuid(),
+  teamName: z.string(),
+  managerId: z.string().uuid().nullable(),
+  managerName: z.string().nullable(),
+  members: z.array(OrgChartMemberSchema),
+});
+
+export type OrgChartTeam = z.infer<typeof OrgChartTeamSchema>;
+
+export const OrgChartDepartmentSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  headId: z.string().uuid().nullable(),
+  headName: z.string().nullable(),
+  teams: z.array(OrgChartTeamSchema),
+});
+
+export type OrgChartDepartment = z.infer<typeof OrgChartDepartmentSchema>;
+
+export const OrgChartDataSchema = z.object({
+  departments: z.array(OrgChartDepartmentSchema),
+  unassignedTeams: z.array(OrgChartTeamSchema),
+  unassignedPersons: z.array(OrgChartMemberSchema),
+});
+
+export type OrgChartData = z.infer<typeof OrgChartDataSchema>;

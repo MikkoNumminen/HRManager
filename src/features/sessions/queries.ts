@@ -2,7 +2,7 @@ import { prisma } from "@/db";
 import { ActionError } from "@/actionErrors";
 import { auth } from "@/auth";
 import { hasPermission } from "@/permissions";
-import { UserSessionSchema, UserSession } from "@/schemas";
+import { UserSessionSchema, UserSession } from "./schemas";
 
 /**
  * Get all active sessions for the currently logged-in user.

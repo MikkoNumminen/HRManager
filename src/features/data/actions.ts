@@ -5,7 +5,7 @@ import { requirePermission } from "@/permissions";
 import { captureAuditContext, deferAudit, deferAuditLog, DeferredAuditEntry } from "@/auditLog";
 import { rateLimit } from "@/rateLimit";
 import { getDemoSessionId } from "@/demoSession";
-import { MAX_IMPORT_ROWS, MAX_IMPORT_FILE_SIZE, MAX_EXPORT_ROWS } from "@/schemas";
+import { MAX_IMPORT_ROWS, MAX_IMPORT_FILE_SIZE, MAX_EXPORT_ROWS } from "./schemas";
 import { parseCSV, generateCSV, validatePersonImportRows } from "@/csvUtils";
 import { getTranslations } from "next-intl/server";
 import type { ErrorCode } from "@/actionErrors";

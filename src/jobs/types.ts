@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { AuditActionSchema, AuditEntityTypeSchema } from "@/schemas";
+import { AuditActionSchema, AuditEntityTypeSchema } from "@/features/audit/schemas";
 
 /** Data payload for cleanup queue jobs. */
 export const CleanupJobDataSchema = z.object({

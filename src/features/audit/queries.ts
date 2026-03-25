@@ -1,4 +1,4 @@
-import { AuditLogSchema, AuditLogFilterSchema, AuditLog, AuditLogFilter } from "@/schemas";
+import { AuditLogSchema, AuditLogFilterSchema, AuditLog, AuditLogFilter } from "./schemas";
 import { ActionError } from "@/actionErrors";
 import { hasPermission } from "@/permissions";
 import { getDemoSessionId } from "@/demoSession";

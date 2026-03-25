@@ -1,6 +1,6 @@
 import { prisma } from "@/db";
 import { ActionError } from "@/actionErrors";
-import { UserSchema, AppUser } from "@/schemas";
+import { UserSchema, AppUser } from "./schemas";
 import { resolvePermissions, PERMISSION_KEYS, hasPermission } from "@/permissions";
 import { getDemoSessionId } from "@/demoSession";
 import { getAuditLogCollection, isMongoAvailable } from "@/mongoDb";

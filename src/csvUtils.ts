@@ -1,4 +1,4 @@
-import { CsvPersonImportRowSchema, CsvPersonImportRow } from "@/schemas";
+import { CsvPersonImportRowSchema, CsvPersonImportRow } from "@/features/data/schemas";
 
 export interface CsvValidationError {
   row: number;

@@ -2,7 +2,8 @@
 import { revalidatePath } from "next/cache";
 import { ActionError } from "@/actionErrors";
 import { getDemoSessionId } from "@/demoSession";
-import { MAX_NAME_LENGTH, type ReviewQuestion } from "@/schemas";
+import { MAX_NAME_LENGTH } from "@/schemas/shared";
+import { type ReviewQuestion } from "./schemas";
 import { type ActionResult } from "@/lib/actionUtils";
 import { guardedAction } from "@/lib/guardedAction";
 import { withAuditedTransaction } from "@/lib/auditedTransaction";

@@ -8,7 +8,7 @@ import {
   ReviewCycle,
   ReviewRequest,
   TeamReviewCycle,
-} from "@/schemas";
+} from "./schemas";
 import { getDemoSessionId } from "@/demoSession";
 import { hasPermission, getUserPermissions } from "@/permissions";
 import { ActionError } from "@/actionErrors";

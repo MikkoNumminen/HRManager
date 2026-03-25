@@ -7,7 +7,7 @@ import {
   LeaveType,
   LeaveRequest,
   LeaveBalance,
-} from "@/schemas";
+} from "./schemas";
 import { getDemoSessionId } from "@/demoSession";
 import { hasPermission } from "@/permissions";
 

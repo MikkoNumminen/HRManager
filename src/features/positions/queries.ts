@@ -1,6 +1,6 @@
 import { prisma } from "@/db";
 import { ActionError } from "@/actionErrors";
-import { PositionSchema, Position } from "@/schemas";
+import { PositionSchema, Position } from "./schemas";
 import { getDemoSessionId } from "@/demoSession";
 import { hasPermission } from "@/permissions";
 

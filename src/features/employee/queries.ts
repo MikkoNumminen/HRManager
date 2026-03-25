@@ -1,16 +1,14 @@
 import { prisma } from "@/db";
 import { auth } from "@/auth";
 import { getDemoSessionId } from "@/demoSession";
+import { EmployeeProfileSchema, EmployeeProfile } from "./schemas";
 import {
-  EmployeeProfileSchema,
-  EmployeeProfile,
   LeaveRequestSchema,
   LeaveRequest,
   LeaveBalanceSchema,
   LeaveBalance,
-  ReviewRequestSchema,
-  ReviewRequest,
-} from "@/schemas";
+} from "@/features/leave/schemas";
+import { ReviewRequestSchema, ReviewRequest } from "@/features/reviews/schemas";
 
 /**
  * Look up the Person record whose email matches the authenticated user's email.

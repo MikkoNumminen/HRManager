@@ -1,7 +1,7 @@
 import { getAuditLogCollection, isMongoAvailable } from "@/mongoDb";
 import { auth } from "@/auth";
 import { getDemoSessionId } from "@/demoSession";
-import { AuditActionSchema, AuditEntityTypeSchema } from "@/schemas";
+import { AuditActionSchema, AuditEntityTypeSchema } from "@/features/audit/schemas";
 import { computeHash, getLatestHash } from "@/lib/auditHashChain";
 import logger from "@/lib/logger";
 import { after } from "next/server";

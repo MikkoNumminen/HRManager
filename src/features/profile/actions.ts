@@ -5,7 +5,7 @@ import { auth } from "@/auth";
 import { captureAuditContext, deferAudit, DeferredAuditEntry } from "@/auditLog";
 import { rateLimit } from "@/rateLimit";
 import { ActionError } from "@/actionErrors";
-import { MAX_NAME_LENGTH, MAX_URL_LENGTH, ImageUrlSchema } from "@/schemas";
+import { MAX_NAME_LENGTH, MAX_URL_LENGTH, ImageUrlSchema } from "@/schemas/shared";
 import { getTranslations } from "next-intl/server";
 import { safe, type ActionResult } from "@/lib/actionUtils";
 
