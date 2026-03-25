@@ -48,6 +48,7 @@ jest.mock("@/demoSession", () => ({
 // Mock Next.js server functions.
 jest.mock("next/cache", () => ({
   revalidatePath: jest.fn(),
+  revalidateTag: jest.fn(),
 }));
 jest.mock("next/navigation", () => ({
   redirect: jest.fn(),

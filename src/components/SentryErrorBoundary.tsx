@@ -1,11 +1,11 @@
 "use client";
 import * as Sentry from "@sentry/nextjs";
-import { ReactNode } from "react";
+import { ReactElement, ReactNode } from "react";
 import { Alert, Box, Button, Typography } from "@mui/material";
 
 interface Props {
   children: ReactNode;
-  fallback?: ReactNode;
+  fallback?: ReactElement;
 }
 
 export function SentryErrorBoundary({ children, fallback }: Props) {

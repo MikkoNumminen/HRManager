@@ -84,6 +84,7 @@ jest.mock("@/demoSession", () => ({
 // but the server actions call them after every mutation.
 jest.mock("next/cache", () => ({
   revalidatePath: jest.fn(),
+  revalidateTag: jest.fn(),
 }));
 jest.mock("next/navigation", () => ({
   redirect: jest.fn(),
