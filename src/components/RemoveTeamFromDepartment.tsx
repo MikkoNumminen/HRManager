@@ -1,6 +1,6 @@
 "use client";
 
-import { removeTeamFromDepartment } from "@/serverActions";
+import { removeTeamFromDepartment } from "@/features/departments/actions";
 import {
   activeButtonStyles,
   formButtonContainerStyles,

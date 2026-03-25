@@ -1,6 +1,6 @@
 import TopBar from "@/components/TopBar";
 import OptimisticDepartments from "@/components/OptimisticDepartments";
-import { getPagedDepartments } from "@/queries";
+import { getPagedDepartments } from "@/features/departments/queries";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getUserPermissions } from "@/permissions";

@@ -15,13 +15,13 @@ import UploadFileIcon from "@mui/icons-material/UploadFile";
 import { useState, useTransition } from "react";
 import { colors, boxStyles } from "@/muiStyles";
 import { Permissions } from "@/schemas";
-import { DataExportCounts } from "@/queries";
+import { type DataExportCounts } from "@/features/admin/queries";
 import {
   exportPersonsCsv,
   exportTeamsCsv,
   exportDepartmentsCsv,
   exportAuditLogsCsv,
-} from "@/serverActions";
+} from "@/features/data/actions";
 import CsvImportDialog from "./CsvImportDialog";
 import { useTranslations } from "next-intl";
 

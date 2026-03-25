@@ -1,6 +1,7 @@
 import TopBar from "@/components/TopBar";
 import LeaveManager from "@/components/LeaveManager";
-import { getLeaveTypes, getLeaveRequests, getLeaveBalances, getPersons } from "@/queries";
+import { getLeaveTypes, getLeaveRequests, getLeaveBalances } from "@/features/leave/queries";
+import { getPersons } from "@/features/persons/queries";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getUserPermissions } from "@/permissions";

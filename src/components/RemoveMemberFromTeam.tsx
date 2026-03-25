@@ -1,6 +1,6 @@
 "use client";
 
-import { removeMember } from "@/serverActions";
+import { removeMember } from "@/features/teams/actions";
 import {
   activeButtonStyles,
   formButtonContainerStyles,

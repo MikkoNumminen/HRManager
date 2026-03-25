@@ -1,7 +1,7 @@
 import TopBar from "@/components/TopBar";
 import DashboardKPICards from "@/components/DashboardKPICards";
 import DashboardCharts from "@/components/DashboardCharts";
-import { getDashboardMetrics } from "@/queries";
+import { getDashboardMetrics } from "@/features/dashboard/queries";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getUserPermissions } from "@/permissions";

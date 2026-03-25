@@ -1,6 +1,6 @@
 "use client";
 
-import { signOutOtherSessions } from "@/serverActions";
+import { signOutOtherSessions } from "@/features/sessions/actions";
 import { colors, formStyles, headerStyles, smallButtonStyles } from "@/muiStyles";
 import { Box, Button, Chip, Typography } from "@mui/material";
 import { useActionState } from "react";

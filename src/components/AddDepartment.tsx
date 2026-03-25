@@ -7,7 +7,7 @@ import {
   smallButtonStyles,
   textFieldStyles,
 } from "@/muiStyles";
-import { createDepartment } from "@/serverActions";
+import { createDepartment } from "@/features/departments/actions";
 import { Box, Button, TextField, Tooltip, Typography } from "@mui/material";
 import { useActionState, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";

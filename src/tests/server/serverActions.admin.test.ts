@@ -68,7 +68,7 @@ import {
   updateUserRole,
   updateUserPermission,
   kickOutUser,
-} from "@/serverActions";
+} from "@/features/admin/actions";
 
 const { auth } = require("@/auth");
 

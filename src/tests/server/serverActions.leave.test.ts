@@ -62,7 +62,7 @@ import {
   reviewLeaveRequest,
   deleteLeaveRequest,
   allocateLeaveBalance,
-} from "@/serverActions";
+} from "@/features/leave/actions";
 
 // Helper to build FormData from key-value pairs.
 function formData(entries: Record<string, string>): FormData {

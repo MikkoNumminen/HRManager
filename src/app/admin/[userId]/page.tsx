@@ -5,9 +5,9 @@ import { Typography } from "@mui/material";
 import {
   getUserById,
   getAllPermissionKeys,
-  getUserActiveSessions,
-  isUserTwoFactorEnabled,
-} from "@/queries";
+} from "@/features/admin/queries";
+import { getUserActiveSessions } from "@/features/sessions/queries";
+import { isUserTwoFactorEnabled } from "@/features/twoFactor/queries";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getUserPermissions, ROLE_DEFAULTS } from "@/permissions";

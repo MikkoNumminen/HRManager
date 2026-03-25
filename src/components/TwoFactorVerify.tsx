@@ -3,7 +3,7 @@
 import { useActionState, useState } from "react";
 import { Box, Button, TextField, Typography, Alert, Paper, Link as MuiLink } from "@mui/material";
 import SecurityIcon from "@mui/icons-material/Security";
-import { verifyTwoFactorLogin } from "@/serverActions";
+import { verifyTwoFactorLogin } from "@/features/twoFactor/actions";
 import { colors, textFieldStyles, smallButtonStyles, activeButtonStyles } from "@/muiStyles";
 import { useTranslations } from "next-intl";
 import { useSession } from "next-auth/react";

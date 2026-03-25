@@ -72,7 +72,7 @@ import {
   addReviewRequest,
   removeReviewRequest,
   submitReview,
-} from "@/serverActions";
+} from "@/features/reviews/actions";
 
 // Helper to build FormData — server actions receive form submissions,
 // so we simulate that by packing key-value pairs into a FormData object.

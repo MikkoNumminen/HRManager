@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 export const dynamic = "force-dynamic";
 import { formStyles, headerStyles, smallButtonStyles, textFieldStyles } from "@/muiStyles";
-import { updateEmail } from "@/serverActions";
-import { getPersons } from "@/queries";
+import { updateEmail } from "@/features/persons/actions";
+import { getPersons } from "@/features/persons/queries";
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { RemovePersonCheckBoxList } from "@/components/RemovePersonCheckBoxList";
 

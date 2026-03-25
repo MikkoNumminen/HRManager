@@ -1,7 +1,8 @@
 import UpdateManagerForm from "@/components/UpdateManager";
 import UpdateTeamNameForm from "@/components/UpdateTeamName";
 import RemoveTeamForm from "@/components/RemoveTeam";
-import { getPersons, getTeams, getTeamDeleteImpact } from "@/queries";
+import { getPersons } from "@/features/persons/queries";
+import { getTeams, getTeamDeleteImpact } from "@/features/teams/queries";
 import { Typography } from "@mui/material";
 import AddPeopleToTeam from "@/components/AddPeopleToTeam";
 import RemoveMemberFromTeam from "@/components/RemoveMemberFromTeam";

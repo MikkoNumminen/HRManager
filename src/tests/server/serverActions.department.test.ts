@@ -73,7 +73,7 @@ import {
   updateDepartmentHead,
   assignTeamToDepartment,
   removeTeamFromDepartment,
-} from "@/serverActions";
+} from "@/features/departments/actions";
 
 // Helper to build FormData — server actions receive form submissions,
 // so we simulate that by packing key-value pairs into a FormData object.

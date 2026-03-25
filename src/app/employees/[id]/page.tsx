@@ -1,4 +1,4 @@
-import { getEmployeeProfile } from "@/queries";
+import { getEmployeeProfile } from "@/features/persons/queries";
 import EmployeeProfileClient from "@/components/EmployeeProfileClient";
 import TopBar from "@/components/TopBar";
 import { Typography } from "@mui/material";

@@ -22,7 +22,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useActionState, useCallback, useState } from "react";
 import { colors } from "@/muiStyles";
 import { parseCSV, validatePersonImportRows } from "@/csvUtils";
-import { importPersonsCsv, ImportResult } from "@/serverActions";
+import { importPersonsCsv, type ImportResult } from "@/features/data/actions";
 import { MAX_IMPORT_FILE_SIZE, MAX_IMPORT_ROWS } from "@/schemas";
 import { useSnackbar } from "./SnackbarProvider";
 import { useTranslations } from "next-intl";

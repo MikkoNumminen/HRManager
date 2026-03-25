@@ -1,6 +1,6 @@
 import TopBar from "@/components/TopBar";
 import OptimisticTeams from "@/components/OptimisticTeams";
-import { getPagedTeams } from "@/queries";
+import { getPagedTeams } from "@/features/teams/queries";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getUserPermissions } from "@/permissions";

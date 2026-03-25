@@ -35,7 +35,7 @@ import {
   addReviewRequest,
   removeReviewRequest,
   deleteReviewCycle,
-} from "@/serverActions";
+} from "@/features/reviews/actions";
 import { useSnackbar } from "./SnackbarProvider";
 import ConfirmDialog from "./ConfirmDialog";
 import { useTranslations } from "next-intl";

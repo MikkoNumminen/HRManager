@@ -1,6 +1,6 @@
 "use client";
 
-import { addManager } from "@/serverActions";
+import { addManager } from "@/features/persons/actions";
 import {
   activeButtonStyles,
   formButtonContainerStyles,

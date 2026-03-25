@@ -1,11 +1,7 @@
 "use client";
 
-import {
-  updateUserRole,
-  updateUserPermission,
-  kickOutUser,
-  adminResetTwoFactor,
-} from "@/serverActions";
+import { updateUserRole, updateUserPermission, kickOutUser } from "@/features/admin/actions";
+import { adminResetTwoFactor } from "@/features/twoFactor/actions";
 import {
   colors,
   formButtonContainerStyles,

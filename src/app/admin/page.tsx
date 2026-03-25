@@ -2,7 +2,7 @@ import { Box, Typography } from "@mui/material";
 import TopBar from "@/components/TopBar";
 import UserManagementTable from "@/components/UserManagementTable";
 import { pageContainerStyles } from "@/muiStyles";
-import { getUsers } from "@/queries";
+import { getUsers } from "@/features/admin/queries";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getUserPermissions, seedPermissions } from "@/permissions";

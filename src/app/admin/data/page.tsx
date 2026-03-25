@@ -2,7 +2,7 @@ import { Box } from "@mui/material";
 import TopBar from "@/components/TopBar";
 import DataImportExport from "@/components/DataImportExport";
 import { pageContainerStyles } from "@/muiStyles";
-import { getDataExportCounts } from "@/queries";
+import { getDataExportCounts } from "@/features/admin/queries";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getUserPermissions } from "@/permissions";

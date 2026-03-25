@@ -64,7 +64,7 @@ import {
   disableTwoFactor,
   verifyTwoFactorLogin,
   adminResetTwoFactor,
-} from "@/serverActions";
+} from "@/features/twoFactor/actions";
 import {
   generateTotpSecret,
   getTotpBase32,
