@@ -1,0 +1,106 @@
+name: Mutation Testing
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  mutation:
+    name: Stryker Mutation Score
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: hrmanager_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      mongodb:
+        image: mongo:8
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.runCommand({ ping: 1 })'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Push test schema
+        run: npx prisma db push --accept-data-loss
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/hrmanager_test
+
+      - name: Run Stryker mutation tests
+        id: stryker
+        run: npx stryker run
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/hrmanager_test
+          MONGODB_URI: mongodb://localhost:27017/hrmanager_audit_test
+          NEXTAUTH_SECRET: test-secret-for-ci
+          NEXTAUTH_URL: http://localhost:3000
+          NODE_ENV: test
+        continue-on-error: true
+
+      - name: Upload mutation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mutation-report
+          path: reports/mutation/
+          retention-days: 14
+
+      - name: Comment mutation score on PR
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let body;
+            try {
+              // Stryker writes a JSON summary alongside the HTML report
+              const reportPath = 'reports/mutation/mutation.html';
+              const exists = fs.existsSync(reportPath);
+              body = exists
+                ? '### Mutation Testing Results\n\nStryker mutation report generated — see the [artifact](../actions/runs/${{ github.run_id }}) for details.'
+                : '### Mutation Testing\n\nMutation report was not generated (Stryker may have failed). Check the [workflow logs](../actions/runs/${{ github.run_id }}).';
+            } catch (e) {
+              body = `### Mutation Testing\n\nCould not read mutation report: ${e.message}`;
+            }
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body,
+            });
+
+      - name: Fail if Stryker exited with error
+        if: steps.stryker.outcome == 'failure'
+        run: |
+          echo "Stryker run failed or mutation score fell below the break threshold (60%)."
+          exit 1

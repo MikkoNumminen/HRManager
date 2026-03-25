@@ -2,10 +2,7 @@ import TopBar from "@/components/TopBar";
 import UserPermissionEditor from "@/components/UserPermissionEditor";
 import AdminUserSessions from "@/components/AdminUserSessions";
 import { Typography } from "@mui/material";
-import {
-  getUserById,
-  getAllPermissionKeys,
-} from "@/features/admin/queries";
+import { getUserById, getAllPermissionKeys } from "@/features/admin/queries";
 import { getUserActiveSessions } from "@/features/sessions/queries";
 import { isUserTwoFactorEnabled } from "@/features/twoFactor/queries";
 import { auth } from "@/auth";

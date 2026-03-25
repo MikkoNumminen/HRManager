@@ -43,40 +43,32 @@ jest.mock("@/demoSession", () => ({
   getDemoSessionId: () => mockGetDemoSessionId(),
 }));
 
+import { getPersons, getPagedPersons, getPersonDeleteImpact } from "@/features/persons/queries";
+import { getTeams, getPagedTeams, getTeamDeleteImpact } from "@/features/teams/queries";
 import {
-  getPersons,
-  getPagedPersons,
-  getPersonDeleteImpact,
-  getTeams,
-  getPagedTeams,
-  getTeamDeleteImpact,
   getDepartments,
   getPagedDepartments,
   getDepartmentDeleteImpact,
+} from "@/features/departments/queries";
+import {
   getUsers,
   getUserById,
   getAllPermissionKeys,
   getDataExportCounts,
-  getAuditLogs,
-  getAuditLogUserEmails,
-  getDashboardMetrics,
-  getOrgChartData,
-  getProfile,
-  getLeaveRequests,
-  getLeaveBalances,
-  getLeaveTypes,
+} from "@/features/admin/queries";
+import { getAuditLogs, getAuditLogUserEmails } from "@/features/audit/queries";
+import { getDashboardMetrics, getOrgChartData } from "@/features/dashboard/queries";
+import { getProfile } from "@/features/profile/queries";
+import { getLeaveRequests, getLeaveBalances, getLeaveTypes } from "@/features/leave/queries";
+import {
   getReviewTemplates,
   getReviewTemplate,
   getReviewCycles,
   getReviewCycle,
   getMyReviewRequests,
   getReviewRequestWithTemplate,
-  getManagerTeamReviews,
-  getTwoFactorStatus,
-  isUserTwoFactorEnabled,
-  getUserTwoFactorAuth,
-  getPositions,
-} from "@/queries";
+} from "@/features/reviews/queries";
+import { getPositions } from "@/features/positions/queries";
 
 const { auth } = require("@/auth");
 
