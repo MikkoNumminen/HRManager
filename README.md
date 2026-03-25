@@ -352,8 +352,45 @@ Deployed on **Vercel** with **Vercel Postgres** (Neon) and **MongoDB Atlas** (fr
 
 _Last updated: March 2026_
 
-- [ ] Preview/staging deployments with branch protection — zero-downtime deploys, no broken commits in production
-- [ ] Additional theme screenshots in docs — showcase all 6 visual themes
+### Features
+
+- [ ] Email notifications — Resend/SendGrid for leave approvals, review requests, role changes + preferences page
+- [ ] Leave balance carryover & accrual — year-end carryover logic, expiry dates, accrual schedules
+- [ ] Tutorial UX overhaul — visual guidance with MUI highlighting/effects, improved back-button behavior
+- [ ] Bulk actions on tables — multi-select persons/teams and apply batch operations
+- [ ] Manager approval workflow & escalation — route leave requests to manager; auto-escalate after 5 days
+- [ ] Employee self-service portal — read-only view: own profile, team, manager, leave balance, reviews
+- [ ] Full-text search — PostgreSQL tsvector across persons/teams/departments/reviews; ranked results
+- [ ] Document management — upload/store employee contracts and certs; PDF preview; soft-delete
+- [ ] Org chart drag-and-drop — drag person to new team/department with confirmation + audit trail
+- [ ] Onboarding/offboarding workflows — checklists per employee; assign tasks to managers; track completion
+
+### Architecture & Observability
+
+- [ ] OpenTelemetry tracing — instrument full request lifecycle; export to Jaeger/Datadog; P95/P99 dashboards
+- [ ] Background job queue (Bull/Bree) — async emails, report generation, bulk imports; retry + dead-letter queue
+- [ ] WebSocket real-time updates — live notifications for person create, leave requests, activity feed
+- [ ] Feature flags — per-user or per-environment toggles; track flag changes in audit log
+- [ ] Error tracking (Sentry) — capture unhandled exceptions, server action failures, client errors
+- [ ] Advanced reporting & analytics — turnover rates, headcount trends, leave utilization, review completion
+- [ ] Performance at scale — load test with 10k/100k employees; identify N+1 queries and missing indexes
+
+### Security & Compliance
+
+- [ ] Data encryption at rest — application-level encryption on sensitive fields; key rotation without downtime
+- [ ] GDPR right-to-deletion — anonymize personal data after 7yr, retain audit logs 10yr, soft-delete recovery 30d
+
+### Testing
+
+- [ ] Visual regression testing (Chromatic) — snapshot all components in all 6 themes; diff on PRs
+- [ ] Load & performance benchmarks (k6) — 100 concurrent users; performance budgets; CI enforcement
+- [ ] Mutation testing (Stryker) — verify tests catch code mutations; target >80% mutation score
+
+### DevOps & Infrastructure
+
+- [ ] Kubernetes manifests & Helm charts — Deployment, Service, Ingress, ConfigMap, Secret; readiness probes
+- [ ] Blue-green deployment strategy — two production environments; zero-downtime upgrades + instant rollback
+- [ ] Staging environment parity — staging with anonymized production data; E2E before prod
 
 ---
 
