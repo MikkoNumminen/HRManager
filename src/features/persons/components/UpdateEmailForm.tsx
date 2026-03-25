@@ -10,13 +10,11 @@ import {
 import { updateEmail } from "@/features/persons/actions";
 import { Box, Button, TextField, Tooltip, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
-import { useActionState, useState } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { useSnackbar } from "@/components/shared/SnackbarProvider";
+import { useFormAction } from "@/hooks/useFormAction";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-type FormState = { error: string | null };
 
 const UpdateEmailForm: React.FC<{ personID: string; currentEmail?: string }> = ({
   personID,
@@ -25,22 +23,15 @@ const UpdateEmailForm: React.FC<{ personID: string; currentEmail?: string }> = (
   const t = useTranslations("persons");
   const tc = useTranslations("common");
   const tn = useTranslations("notifications");
-  const { showSnackbar } = useSnackbar();
   const [newEmail, setNewEmail] = useState(currentEmail ?? "");
   const isChanged = newEmail.trim() !== (currentEmail ?? "");
   const isValid = EMAIL_REGEX.test(newEmail.trim()) && isChanged;
   const router = useRouter();
 
-  const [state, formAction, isPending] = useActionState(
-    async (_prev: FormState, formData: FormData): Promise<FormState> => {
-      const result = await updateEmail(formData);
-      if (result?.error) return { error: result.error };
-      showSnackbar(tn("emailUpdated"));
-      router.push("/managePersons");
-      return { error: null };
-    },
-    { error: null },
-  );
+  const [state, formAction, isPending] = useFormAction(updateEmail, {
+    successMessage: tn("emailUpdated"),
+    onSuccess: () => router.push("/managePersons"),
+  });
 
   return (
     <Box component="form" action={formAction} sx={formStyles}>

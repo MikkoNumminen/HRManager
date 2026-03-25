@@ -18,12 +18,10 @@ import {
   Select,
   Typography,
 } from "@mui/material";
-import { useActionState, useState } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { updateUserRole } from "@/features/admin/actions";
-import { useSnackbar } from "@/components/shared/SnackbarProvider";
-
-type FormState = { error: string | null };
+import { useFormAction } from "@/hooks/useFormAction";
 
 const roleColors: Record<string, string> = {
   superuser: colors.warning,
@@ -52,7 +50,6 @@ export default function RoleSelector({
   const t = useTranslations("admin");
   const tc = useTranslations("common");
   const tn = useTranslations("notifications");
-  const { showSnackbar } = useSnackbar();
   const [selectedRole, setSelectedRole] = useState(currentRole);
   const roleChanged = selectedRole !== currentRole;
 
@@ -63,15 +60,9 @@ export default function RoleSelector({
     guest: t("roleGuest"),
   };
 
-  const [roleState, roleAction, roleIsPending] = useActionState(
-    async (_prev: FormState, formData: FormData): Promise<FormState> => {
-      const result = await updateUserRole(formData);
-      if (result?.error) return { error: result.error };
-      showSnackbar(tn("roleUpdated"));
-      return { error: null };
-    },
-    { error: null },
-  );
+  const [roleState, roleAction, roleIsPending] = useFormAction(updateUserRole, {
+    successMessage: tn("roleUpdated"),
+  });
 
   return (
     <Box component="form" action={roleAction} sx={formStyles}>

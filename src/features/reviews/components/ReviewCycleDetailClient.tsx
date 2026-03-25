@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useTransition, useState } from "react";
+import { useTransition, useState } from "react";
 import {
   Box,
   Button,
@@ -37,6 +37,7 @@ import {
   deleteReviewCycle,
 } from "@/features/reviews/actions";
 import { useSnackbar } from "@/components/shared/SnackbarProvider";
+import { useFormAction } from "@/hooks/useFormAction";
 import ConfirmDialog from "@/components/shared/ConfirmDialog";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -46,8 +47,6 @@ interface Props {
   persons: Person[];
   canManage: boolean;
 }
-
-type FormState = { error: string | null };
 
 const statusColors: Record<string, "default" | "success" | "error"> = {
   DRAFT: "default",
@@ -74,26 +73,14 @@ export default function ReviewCycleDetailClient({ cycle, persons, canManage }: P
   const [openCycleOpen, setOpenCycleOpen] = useState(false);
   const [closeCycleOpen, setCloseCycleOpen] = useState(false);
 
-  const [addState, addAction, isAdding] = useActionState(
-    async (_prev: FormState, formData: FormData): Promise<FormState> => {
-      const result = await addReviewRequest(formData);
-      if (result?.error) return { error: result.error };
-      showSnackbar(tn("requestAdded"));
-      return { error: null };
-    },
-    { error: null },
-  );
+  const [addState, addAction, isAdding] = useFormAction(addReviewRequest, {
+    successMessage: tn("requestAdded"),
+  });
 
-  const [removeState, removeAction, isRemoving] = useActionState(
-    async (_prev: FormState, formData: FormData): Promise<FormState> => {
-      const result = await removeReviewRequest(formData);
-      if (result?.error) return { error: result.error };
-      showSnackbar(tn("requestRemoved"));
-      setDeleteRequestId(null);
-      return { error: null };
-    },
-    { error: null },
-  );
+  const [removeState, removeAction, isRemoving] = useFormAction(removeReviewRequest, {
+    successMessage: tn("requestRemoved"),
+    onSuccess: () => setDeleteRequestId(null),
+  });
 
   const handleOpenCycle = () => {
     setOpenCycleOpen(false);

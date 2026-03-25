@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useTransition } from "react";
+import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
   Box,
@@ -25,7 +25,7 @@ import {
 } from "@/muiStyles";
 import { ReviewTemplate } from "@/schemas";
 import { createReviewTemplate, deleteReviewTemplate } from "@/features/reviews/actions";
-import { useSnackbar } from "@/components/shared/SnackbarProvider";
+import { useFormAction } from "@/hooks/useFormAction";
 import ConfirmDialog from "@/components/shared/ConfirmDialog";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
@@ -34,37 +34,22 @@ interface Props {
   templates: ReviewTemplate[];
 }
 
-type FormState = { error: string | null };
-
 export default function ReviewTemplatesClient({ templates }: Props) {
   const t = useTranslations("reviews");
   const tc = useTranslations("common");
   const tn = useTranslations("reviewNotifications");
-  const { showSnackbar } = useSnackbar();
   const router = useRouter();
   const [, startTransition] = useTransition();
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const [createState, createAction, isCreating] = useActionState(
-    async (_prev: FormState, formData: FormData): Promise<FormState> => {
-      const result = await createReviewTemplate(formData);
-      if (result?.error) return { error: result.error };
-      showSnackbar(tn("templateCreated"));
-      return { error: null };
-    },
-    { error: null },
-  );
+  const [createState, createAction, isCreating] = useFormAction(createReviewTemplate, {
+    successMessage: tn("templateCreated"),
+  });
 
-  const [deleteState, deleteAction, isDeleting] = useActionState(
-    async (_prev: FormState, formData: FormData): Promise<FormState> => {
-      const result = await deleteReviewTemplate(formData);
-      if (result?.error) return { error: result.error };
-      showSnackbar(tn("templateDeleted"));
-      setDeleteId(null);
-      return { error: null };
-    },
-    { error: null },
-  );
+  const [deleteState, deleteAction, isDeleting] = useFormAction(deleteReviewTemplate, {
+    successMessage: tn("templateDeleted"),
+    onSuccess: () => setDeleteId(null),
+  });
 
   return (
     <Box>

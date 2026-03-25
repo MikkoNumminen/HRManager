@@ -11,17 +11,15 @@ import {
   formButtonContainerStyles,
 } from "@/muiStyles";
 import { Avatar, Box, Button, Chip, TextField, Tooltip, Typography } from "@mui/material";
-import { useActionState, useState } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { useSnackbar } from "@/components/shared/SnackbarProvider";
+import { useFormAction } from "@/hooks/useFormAction";
 import { UserProfile } from "@/schemas";
 import TwoFactorSetup from "@/features/twoFactor/components/TwoFactorSetup";
 
 interface ProfileEditorProps {
   profile: UserProfile;
 }
-
-type FormState = { error: string | null };
 
 const roleColors: Record<string, string> = {
   superuser: colors.warning,
@@ -35,7 +33,6 @@ export default function ProfileEditor({ profile }: ProfileEditorProps) {
   const tc = useTranslations("common");
   const ta = useTranslations("admin");
   const tn = useTranslations("notifications");
-  const { showSnackbar } = useSnackbar();
 
   const [nameValue, setNameValue] = useState(profile.name ?? "");
   const nameChanged = nameValue.trim() !== (profile.name ?? "");
@@ -50,25 +47,13 @@ export default function ProfileEditor({ profile }: ProfileEditorProps) {
     guest: ta("roleGuest"),
   };
 
-  const [nameState, nameAction, nameIsPending] = useActionState(
-    async (_prev: FormState, formData: FormData): Promise<FormState> => {
-      const result = await updateProfileName(formData);
-      if (result?.error) return { error: result.error };
-      showSnackbar(tn("profileNameUpdated"));
-      return { error: null };
-    },
-    { error: null },
-  );
+  const [nameState, nameAction, nameIsPending] = useFormAction(updateProfileName, {
+    successMessage: tn("profileNameUpdated"),
+  });
 
-  const [imageState, imageAction, imageIsPending] = useActionState(
-    async (_prev: FormState, formData: FormData): Promise<FormState> => {
-      const result = await updateProfileImage(formData);
-      if (result?.error) return { error: result.error };
-      showSnackbar(tn("profileImageUpdated"));
-      return { error: null };
-    },
-    { error: null },
-  );
+  const [imageState, imageAction, imageIsPending] = useFormAction(updateProfileImage, {
+    successMessage: tn("profileImageUpdated"),
+  });
 
   const groupedPermissions = Object.entries(profile.resolvedPermissions).reduce(
     (acc, [key, value]) => {

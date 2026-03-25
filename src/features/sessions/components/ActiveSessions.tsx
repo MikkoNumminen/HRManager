@@ -4,9 +4,8 @@ import { signOutOtherSessions } from "@/features/sessions/actions";
 import { colors, formStyles, headerStyles, smallButtonStyles } from "@/muiStyles";
 import { formatDate } from "@/utils/formatDate";
 import { Box, Button, Chip, Typography } from "@mui/material";
-import { useActionState } from "react";
 import { useTranslations } from "next-intl";
-import { useSnackbar } from "@/components/shared/SnackbarProvider";
+import { useFormAction } from "@/hooks/useFormAction";
 import { UserSession } from "@/schemas";
 
 interface ActiveSessionsProps {
@@ -38,22 +37,13 @@ function parseDeviceInfo(userAgent: string | null): string {
   return `${browser} on ${os}`;
 }
 
-type FormState = { error: string | null };
-
 export default function ActiveSessions({ sessions, currentSessionId }: ActiveSessionsProps) {
   const t = useTranslations("sessions");
   const tn = useTranslations("notifications");
-  const { showSnackbar } = useSnackbar();
 
-  const [state, action, isPending] = useActionState(
-    async (_prev: FormState): Promise<FormState> => {
-      const result = await signOutOtherSessions();
-      if (result?.error) return { error: result.error };
-      showSnackbar(tn("otherSessionsSignedOut"));
-      return { error: null };
-    },
-    { error: null },
-  );
+  const [state, action, isPending] = useFormAction(async () => signOutOtherSessions(), {
+    successMessage: tn("otherSessionsSignedOut"),
+  });
 
   const otherSessionCount = sessions.filter((s) => s.id !== currentSessionId).length;
 

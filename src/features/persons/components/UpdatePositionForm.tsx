@@ -10,12 +10,10 @@ import {
 import { updatePosition } from "@/features/persons/actions";
 import { Autocomplete, Box, Button, TextField, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
-import { useActionState, useState } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { useSnackbar } from "@/components/shared/SnackbarProvider";
+import { useFormAction } from "@/hooks/useFormAction";
 import type { Position } from "@/schemas";
-
-type FormState = { error: string | null };
 
 const UpdatePositionForm: React.FC<{
   personID: string;
@@ -25,22 +23,15 @@ const UpdatePositionForm: React.FC<{
   const t = useTranslations("persons");
   const tc = useTranslations("common");
   const tn = useTranslations("notifications");
-  const { showSnackbar } = useSnackbar();
   const [newPosition, setNewPosition] = useState(currentPosition ?? "");
   const isChanged = newPosition.trim() !== (currentPosition ?? "");
   const isValid = newPosition.trim().length > 0 && isChanged;
   const router = useRouter();
 
-  const [state, formAction, isPending] = useActionState(
-    async (_prev: FormState, formData: FormData): Promise<FormState> => {
-      const result = await updatePosition(formData);
-      if (result?.error) return { error: result.error };
-      showSnackbar(tn("positionUpdated"));
-      router.push("/managePersons");
-      return { error: null };
-    },
-    { error: null },
-  );
+  const [state, formAction, isPending] = useFormAction(updatePosition, {
+    successMessage: tn("positionUpdated"),
+    onSuccess: () => router.push("/managePersons"),
+  });
 
   const positionOptions = positions.map((p) => p.name);
 

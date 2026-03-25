@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useTransition } from "react";
+import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
   Box,
@@ -27,7 +27,7 @@ import {
 } from "@/muiStyles";
 import { ReviewCycle } from "@/schemas";
 import { createReviewCycle } from "@/features/reviews/actions";
-import { useSnackbar } from "@/components/shared/SnackbarProvider";
+import { useFormAction } from "@/hooks/useFormAction";
 import { useTranslations } from "next-intl";
 
 interface Props {
@@ -36,8 +36,6 @@ interface Props {
   canSubmit: boolean;
   canView: boolean;
 }
-
-type FormState = { error: string | null };
 
 const statusColors: Record<string, "default" | "success" | "error"> = {
   DRAFT: "default",
@@ -48,19 +46,12 @@ const statusColors: Record<string, "default" | "success" | "error"> = {
 export default function ReviewsClient({ cycles, canManage, canSubmit, canView }: Props) {
   const t = useTranslations("reviews");
   const tn = useTranslations("reviewNotifications");
-  const { showSnackbar } = useSnackbar();
   const router = useRouter();
   const [, startTransition] = useTransition();
 
-  const [state, formAction, isPending] = useActionState(
-    async (_prev: FormState, formData: FormData): Promise<FormState> => {
-      const result = await createReviewCycle(formData);
-      if (result?.error) return { error: result.error };
-      showSnackbar(tn("cycleCreated"));
-      return { error: null };
-    },
-    { error: null },
-  );
+  const [state, formAction, isPending] = useFormAction(createReviewCycle, {
+    successMessage: tn("cycleCreated"),
+  });
 
   return (
     <Box>

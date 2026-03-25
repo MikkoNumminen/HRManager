@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useActionState } from "react";
+import { useState } from "react";
 import { Box, Button, Typography } from "@mui/material";
 import SecurityIcon from "@mui/icons-material/Security";
 import {
@@ -20,6 +20,7 @@ import {
 } from "@/muiStyles";
 import { useTranslations } from "next-intl";
 import { useSnackbar } from "@/components/shared/SnackbarProvider";
+import { useFormAction } from "@/hooks/useFormAction";
 import SetupDialog from "./SetupDialog";
 import DisableDialog from "./DisableDialog";
 import RegenerateDialog from "./RegenerateDialog";
@@ -27,8 +28,6 @@ import RegenerateDialog from "./RegenerateDialog";
 interface TwoFactorSetupProps {
   enabled: boolean;
 }
-
-type FormState = { error: string | null };
 
 export default function TwoFactorSetup({ enabled }: TwoFactorSetupProps) {
   const t = useTranslations("twoFactor");
@@ -55,31 +54,24 @@ export default function TwoFactorSetup({ enabled }: TwoFactorSetupProps) {
   };
 
   // Setup flow — step 2: verify code
-  const [confirmState, confirmAction, confirmPending] = useActionState(
-    async (_prev: FormState, formData: FormData): Promise<FormState> => {
-      if (!setupData) return { error: t("setupError") };
+  const [confirmState, confirmAction, confirmPending] = useFormAction(
+    async (formData) => {
+      if (!setupData) return { error: t("setupError"), code: "unexpectedError" as const };
       formData.set("secret", setupData.secret);
       formData.set("recoveryCodes", JSON.stringify(setupData.recoveryCodes));
-      const result = await confirmTwoFactorSetup(formData);
-      if (result?.error) return { error: result.error };
-      setActiveStep(2); // Show recovery codes
-      showSnackbar(t("enabled"));
-      return { error: null };
+      return confirmTwoFactorSetup(formData);
     },
-    { error: null },
+    {
+      successMessage: t("enabled"),
+      onSuccess: () => setActiveStep(2),
+    },
   );
 
   // Disable 2FA
-  const [disableState, disableAction, disablePending] = useActionState(
-    async (_prev: FormState, formData: FormData): Promise<FormState> => {
-      const result = await disableTwoFactor(formData);
-      if (result?.error) return { error: result.error };
-      setDisableOpen(false);
-      showSnackbar(t("disabled"));
-      return { error: null };
-    },
-    { error: null },
-  );
+  const [disableState, disableAction, disablePending] = useFormAction(disableTwoFactor, {
+    successMessage: t("disabled"),
+    onSuccess: () => setDisableOpen(false),
+  });
 
   // Regenerate recovery codes
   const handleRegenerate = async (formData: FormData) => {

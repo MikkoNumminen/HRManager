@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Box, Button, Chip, Slider, TextField, Typography, Alert } from "@mui/material";
 import {
@@ -12,7 +12,7 @@ import {
 } from "@/muiStyles";
 import { ReviewRequest, ReviewTemplate } from "@/schemas";
 import { submitReview } from "@/features/reviews/actions";
-import { useSnackbar } from "@/components/shared/SnackbarProvider";
+import { useFormAction } from "@/hooks/useFormAction";
 import ConfirmDialog from "@/components/shared/ConfirmDialog";
 import { useTranslations } from "next-intl";
 
@@ -21,14 +21,11 @@ interface Props {
   template: ReviewTemplate | null;
 }
 
-type FormState = { error: string | null };
-
 type Answer = { questionId: string; ratingValue: number | null; textValue: string | null };
 
 export default function ReviewSubmitClient({ request, template }: Props) {
   const t = useTranslations("reviews");
   const tn = useTranslations("reviewNotifications");
-  const { showSnackbar } = useSnackbar();
   const router = useRouter();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [answers, setAnswers] = useState<Answer[]>(
@@ -39,16 +36,15 @@ export default function ReviewSubmitClient({ request, template }: Props) {
     })) ?? [],
   );
 
-  const [state, formAction, isPending] = useActionState(
-    async (_prev: FormState, formData: FormData): Promise<FormState> => {
+  const [state, formAction, isPending] = useFormAction(
+    async (formData) => {
       formData.set("answers", JSON.stringify(answers));
-      const result = await submitReview(formData);
-      if (result?.error) return { error: result.error };
-      showSnackbar(tn("reviewSubmitted"));
-      router.push("/reviews/my-reviews");
-      return { error: null };
+      return submitReview(formData);
     },
-    { error: null },
+    {
+      successMessage: tn("reviewSubmitted"),
+      onSuccess: () => router.push("/reviews/my-reviews"),
+    },
   );
 
   const updateRating = (questionId: string, value: number) => {

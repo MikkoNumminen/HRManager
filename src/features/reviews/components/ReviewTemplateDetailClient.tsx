@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useTransition, useState } from "react";
+import { useTransition, useState } from "react";
 import {
   Box,
   Button,
@@ -30,7 +30,7 @@ import {
 } from "@/muiStyles";
 import { ReviewTemplate } from "@/schemas";
 import { addReviewQuestion, removeReviewQuestion } from "@/features/reviews/actions";
-import { useSnackbar } from "@/components/shared/SnackbarProvider";
+import { useFormAction } from "@/hooks/useFormAction";
 import ConfirmDialog from "@/components/shared/ConfirmDialog";
 import { useTranslations } from "next-intl";
 
@@ -38,37 +38,22 @@ interface Props {
   template: ReviewTemplate;
 }
 
-type FormState = { error: string | null };
-
 export default function ReviewTemplateDetailClient({ template }: Props) {
   const t = useTranslations("reviews");
   const tc = useTranslations("common");
   const tn = useTranslations("reviewNotifications");
-  const { showSnackbar } = useSnackbar();
   const [, startTransition] = useTransition();
   const [questionType, setQuestionType] = useState<"RATING" | "TEXT">("RATING");
   const [deleteQuestionId, setDeleteQuestionId] = useState<string | null>(null);
 
-  const [addState, addAction, isAdding] = useActionState(
-    async (_prev: FormState, formData: FormData): Promise<FormState> => {
-      const result = await addReviewQuestion(formData);
-      if (result?.error) return { error: result.error };
-      showSnackbar(tn("questionAdded"));
-      return { error: null };
-    },
-    { error: null },
-  );
+  const [addState, addAction, isAdding] = useFormAction(addReviewQuestion, {
+    successMessage: tn("questionAdded"),
+  });
 
-  const [removeState, removeAction, isRemoving] = useActionState(
-    async (_prev: FormState, formData: FormData): Promise<FormState> => {
-      const result = await removeReviewQuestion(formData);
-      if (result?.error) return { error: result.error };
-      showSnackbar(tn("questionRemoved"));
-      setDeleteQuestionId(null);
-      return { error: null };
-    },
-    { error: null },
-  );
+  const [removeState, removeAction, isRemoving] = useFormAction(removeReviewQuestion, {
+    successMessage: tn("questionRemoved"),
+    onSuccess: () => setDeleteQuestionId(null),
+  });
 
   return (
     <Box>

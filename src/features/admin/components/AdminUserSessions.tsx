@@ -4,9 +4,8 @@ import { adminForceLogoutSession, adminForceLogoutAllSessions } from "@/features
 import { colors, formStyles, headerStyles, smallButtonStyles } from "@/muiStyles";
 import { formatDate } from "@/utils/formatDate";
 import { Box, Button, Typography } from "@mui/material";
-import { useActionState } from "react";
 import { useTranslations } from "next-intl";
-import { useSnackbar } from "@/components/shared/SnackbarProvider";
+import { useFormAction } from "@/hooks/useFormAction";
 import { UserSession } from "@/schemas";
 
 interface AdminUserSessionsProps {
@@ -38,21 +37,13 @@ function parseDeviceInfo(userAgent: string | null): string {
   return `${browser} on ${os}`;
 }
 
-type FormState = { error: string | null };
-
 export default function AdminUserSessions({ sessions, userId, userName }: AdminUserSessionsProps) {
   const t = useTranslations("sessions");
   const tn = useTranslations("notifications");
-  const { showSnackbar } = useSnackbar();
 
-  const [logoutAllState, logoutAllAction, logoutAllPending] = useActionState(
-    async (_prev: FormState, formData: FormData): Promise<FormState> => {
-      const result = await adminForceLogoutAllSessions(formData);
-      if (result?.error) return { error: result.error };
-      showSnackbar(tn("allSessionsForceLoggedOut", { name: userName ?? "User" }));
-      return { error: null };
-    },
-    { error: null },
+  const [logoutAllState, logoutAllAction, logoutAllPending] = useFormAction(
+    adminForceLogoutAllSessions,
+    { successMessage: tn("allSessionsForceLoggedOut", { name: userName ?? "User" }) },
   );
 
   return (
@@ -91,17 +82,10 @@ export default function AdminUserSessions({ sessions, userId, userName }: AdminU
 function AdminSessionRow({ session }: { session: UserSession }) {
   const t = useTranslations("sessions");
   const tn = useTranslations("notifications");
-  const { showSnackbar } = useSnackbar();
 
-  const [state, action, isPending] = useActionState(
-    async (_prev: FormState, formData: FormData): Promise<FormState> => {
-      const result = await adminForceLogoutSession(formData);
-      if (result?.error) return { error: result.error };
-      showSnackbar(tn("sessionForceLoggedOut"));
-      return { error: null };
-    },
-    { error: null },
-  );
+  const [state, action, isPending] = useFormAction(adminForceLogoutSession, {
+    successMessage: tn("sessionForceLoggedOut"),
+  });
 
   return (
     <Box
