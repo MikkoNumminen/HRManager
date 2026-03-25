@@ -198,6 +198,14 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
                   >
                     {t("profile")}
                   </MenuItem>
+                  <MenuItem
+                    component={Link}
+                    href="/employee"
+                    onClick={() => setAnchorEl(null)}
+                    sx={userMenuItemStyles}
+                  >
+                    {t("employeePortal")}
+                  </MenuItem>
                   {(session?.user?.permissions?.["review:view"] ||
                     session?.user?.permissions?.["review:manage"] ||
                     session?.user?.permissions?.["review:submit"]) && (
@@ -417,6 +425,21 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
                   }}
                 >
                   <ListItemText primary={t("profile")} />
+                </ListItemButton>
+              </ListItem>
+            )}
+            {user && (
+              <ListItem disablePadding>
+                <ListItemButton
+                  component={Link}
+                  href="/employee"
+                  onClick={() => setDrawerOpen(false)}
+                  sx={{
+                    color: colors.slate100,
+                    "&:hover": { backgroundColor: colors.hoverOverlay },
+                  }}
+                >
+                  <ListItemText primary={t("employeePortal")} />
                 </ListItemButton>
               </ListItem>
             )}

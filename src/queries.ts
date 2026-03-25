@@ -41,6 +41,13 @@ export {
 } from "./features/reviews/queries";
 export { getMyActiveSessions, getUserActiveSessions } from "./features/sessions/queries";
 export {
+  getLinkedPerson,
+  getSelfProfile,
+  getSelfLeaveRequests,
+  getSelfLeaveBalances,
+  getSelfReviews,
+} from "./features/employee/queries";
+export {
   getTwoFactorStatus,
   isUserTwoFactorEnabled,
   getUserTwoFactorAuth,
