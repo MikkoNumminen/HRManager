@@ -201,6 +201,8 @@ export const AuditEntityTypeSchema = z.enum([
   "leaveBalance",
   "position",
   "userSession",
+  "featureFlag",
+  "job",
 ]);
 
 export const AuditLogSchema = z.object({

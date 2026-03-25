@@ -37,6 +37,10 @@ export const PERMISSION_KEYS = [
   "leave:approve",
   "leave:manage_types",
   "position:manage",
+  "reports:view",
+  "reports:export",
+  "admin:manage_jobs",
+  "admin:manage_feature_flags",
 ] as const;
 
 export type PermissionKey = (typeof PERMISSION_KEYS)[number];
@@ -73,6 +77,10 @@ export const ROLE_DEFAULTS: Record<string, PermissionKey[]> = {
     "leave:approve",
     "leave:manage_types",
     "position:manage",
+    "reports:view",
+    "reports:export",
+    "admin:manage_jobs",
+    "admin:manage_feature_flags",
   ],
   user: [
     "person:read",
@@ -82,6 +90,7 @@ export const ROLE_DEFAULTS: Record<string, PermissionKey[]> = {
     "review:submit",
     "leave:view",
     "leave:request",
+    "reports:view",
   ],
   guest: ["person:read", "team:read", "department:read"],
 };
@@ -134,6 +143,10 @@ function formatPermissionDescription(key: PermissionKey): string {
     "leave:approve": "Approve or reject leave requests",
     "leave:manage_types": "Create and manage leave types",
     "position:manage": "Create and manage position catalog",
+    "reports:view": "View reports and analytics",
+    "reports:export": "Export report data to CSV",
+    "admin:manage_jobs": "Manage background job queues",
+    "admin:manage_feature_flags": "Manage feature flags and user overrides",
   };
   return descriptions[key];
 }

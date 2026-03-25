@@ -71,8 +71,11 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
   const canSeed = permissions?.["data:seed"];
   const canReset = permissions?.["data:reset"];
   const canDataIO = permissions?.["data:import"] || permissions?.["data:export"];
+  const canReports = permissions?.["reports:view"];
+  const canJobs = permissions?.["admin:manage_jobs"];
   const canLeave = permissions?.["leave:view"];
   const canPositions = permissions?.["position:manage"];
+  const canFeatureFlags = permissions?.["admin:manage_feature_flags"];
   const demoEnabled = process.env.NEXT_PUBLIC_DEMO_LOGIN !== "false";
 
   const handleSeed = (clearExisting: boolean) => {
@@ -238,6 +241,16 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
                       {t("dashboard")}
                     </MenuItem>
                   )}
+                  {canReports && (
+                    <MenuItem
+                      component={Link}
+                      href="/reports"
+                      onClick={() => setAnchorEl(null)}
+                      sx={userMenuItemStyles}
+                    >
+                      {t("reports")}
+                    </MenuItem>
+                  )}
                   {session?.user?.permissions?.["admin:manage_users"] && (
                     <MenuItem
                       component={Link}
@@ -260,6 +273,16 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
                       {t("auditLog")}
                     </MenuItem>
                   )}
+                  {canFeatureFlags && (
+                    <MenuItem
+                      component={Link}
+                      href="/admin/feature-flags"
+                      onClick={() => setAnchorEl(null)}
+                      sx={userMenuItemStyles}
+                    >
+                      {t("featureFlags")}
+                    </MenuItem>
+                  )}
                   {canDataIO && (
                     <MenuItem
                       component={Link}
@@ -268,6 +291,16 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
                       sx={userMenuItemStyles}
                     >
                       {t("dataImportExport")}
+                    </MenuItem>
+                  )}
+                  {canJobs && (
+                    <MenuItem
+                      component={Link}
+                      href="/admin/jobs"
+                      onClick={() => setAnchorEl(null)}
+                      sx={userMenuItemStyles}
+                    >
+                      {t("jobQueue")}
                     </MenuItem>
                   )}
                   {canLeave && (
@@ -490,6 +523,21 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
                 </ListItemButton>
               </ListItem>
             )}
+            {canReports && (
+              <ListItem disablePadding>
+                <ListItemButton
+                  component={Link}
+                  href="/reports"
+                  onClick={() => setDrawerOpen(false)}
+                  sx={{
+                    color: colors.slate100,
+                    "&:hover": { backgroundColor: colors.hoverOverlay },
+                  }}
+                >
+                  <ListItemText primary={t("reports")} />
+                </ListItemButton>
+              </ListItem>
+            )}
             {session?.user?.permissions?.["admin:manage_users"] && (
               <ListItem disablePadding>
                 <ListItemButton
@@ -522,6 +570,21 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
                 </ListItemButton>
               </ListItem>
             )}
+            {canFeatureFlags && (
+              <ListItem disablePadding>
+                <ListItemButton
+                  component={Link}
+                  href="/admin/feature-flags"
+                  onClick={() => setDrawerOpen(false)}
+                  sx={{
+                    color: colors.slate100,
+                    "&:hover": { backgroundColor: colors.hoverOverlay },
+                  }}
+                >
+                  <ListItemText primary={t("featureFlags")} />
+                </ListItemButton>
+              </ListItem>
+            )}
             {canDataIO && (
               <ListItem disablePadding>
                 <ListItemButton
@@ -534,6 +597,21 @@ export default function TopBar({ title, backHref, permissions }: TopBarProps) {
                   }}
                 >
                   <ListItemText primary={t("dataImportExport")} />
+                </ListItemButton>
+              </ListItem>
+            )}
+            {canJobs && (
+              <ListItem disablePadding>
+                <ListItemButton
+                  component={Link}
+                  href="/admin/jobs"
+                  onClick={() => setDrawerOpen(false)}
+                  sx={{
+                    color: colors.slate100,
+                    "&:hover": { backgroundColor: colors.hoverOverlay },
+                  }}
+                >
+                  <ListItemText primary={t("jobQueue")} />
                 </ListItemButton>
               </ListItem>
             )}

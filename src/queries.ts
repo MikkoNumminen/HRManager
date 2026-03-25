@@ -52,3 +52,16 @@ export {
   isUserTwoFactorEnabled,
   getUserTwoFactorAuth,
 } from "./features/twoFactor/queries";
+export {
+  getHeadcountTrends,
+  getTurnoverRates,
+  getLeaveUtilization,
+  getReviewCompletionRates,
+  exportReportCsv,
+} from "./features/reports/queries";
+export { getJobQueueStatuses, getRecentJobs, getJobById } from "./features/jobs/queries";
+export {
+  getFeatureFlags,
+  getFeatureFlagById,
+  getUserFeatureFlags,
+} from "./features/featureFlags/queries";
