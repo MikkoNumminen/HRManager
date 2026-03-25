@@ -25,13 +25,13 @@ jest.mock("@opentelemetry/sdk-metrics", () => ({
 }));
 
 jest.mock("@opentelemetry/resources", () => ({
-  Resource: jest.fn(),
+  resourceFromAttributes: jest.fn(),
 }));
 
 jest.mock("@opentelemetry/semantic-conventions", () => ({
   ATTR_SERVICE_NAME: "service.name",
   ATTR_SERVICE_VERSION: "service.version",
-  ATTR_DEPLOYMENT_ENVIRONMENT_NAME: "deployment.environment.name",
+  SEMRESATTRS_DEPLOYMENT_ENVIRONMENT: "deployment.environment",
 }));
 
 jest.mock("@opentelemetry/instrumentation-pg", () => ({
