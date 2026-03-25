@@ -1,21 +1,16 @@
 "use server";
-import { prisma } from "@/db";
 import { revalidatePath } from "next/cache";
-import { requirePermission } from "@/permissions";
-import { captureAuditContext, deferAudit, DeferredAuditEntry } from "@/auditLog";
-import { rateLimit } from "@/rateLimit";
 import { ActionError } from "@/actionErrors";
 import { getDemoSessionId } from "@/demoSession";
 import { MAX_NAME_LENGTH, type ReviewQuestion } from "@/schemas";
-import { getTranslations } from "next-intl/server";
-import { safe, type ActionResult } from "@/lib/actionUtils";
+import { type ActionResult } from "@/lib/actionUtils";
+import { guardedAction } from "@/lib/guardedAction";
+import { withAuditedTransaction } from "@/lib/auditedTransaction";
 
-export async function createReviewTemplate(data: FormData): Promise<ActionResult> {
-  return safe(async () => {
-    const t = await getTranslations("errors");
-    await requirePermission("review:manage");
-    await rateLimit("createReviewTemplate");
-
+export const createReviewTemplate: (data: FormData) => Promise<ActionResult> = guardedAction(
+  "review:manage",
+  "createReviewTemplate",
+  async (t, data: FormData) => {
     const name = data.get("name");
     const description = data.get("description");
 
@@ -30,10 +25,7 @@ export async function createReviewTemplate(data: FormData): Promise<ActionResult
     }
 
     const sessionId = await getDemoSessionId();
-    const ctx = await captureAuditContext();
-    const auditEntries: DeferredAuditEntry[] = [];
-
-    await prisma.$transaction(async (tx) => {
+    await withAuditedTransaction(async (tx, addAudit) => {
       const template = await tx.reviewTemplate.create({
         data: {
           name: name.trim(),
@@ -43,37 +35,29 @@ export async function createReviewTemplate(data: FormData): Promise<ActionResult
         },
       });
 
-      auditEntries.push({
-        ...ctx,
+      addAudit({
         action: "create",
         entityType: "reviewTemplate",
         entityId: template.id,
         after: { name: template.name },
       });
     });
-
-    deferAudit(auditEntries);
     revalidatePath("/reviews/templates");
     revalidatePath("/reviews");
-  });
-}
+  },
+);
 
-export async function deleteReviewTemplate(data: FormData): Promise<ActionResult> {
-  return safe(async () => {
-    const t = await getTranslations("errors");
-    await requirePermission("review:manage");
-    await rateLimit("deleteReviewTemplate");
-
+export const deleteReviewTemplate: (data: FormData) => Promise<ActionResult> = guardedAction(
+  "review:manage",
+  "deleteReviewTemplate",
+  async (t, data: FormData) => {
     const templateId = data.get("templateId");
     if (typeof templateId !== "string" || !templateId.trim()) {
       throw new ActionError("unexpectedError", t("unexpectedError"));
     }
 
     const sessionId = await getDemoSessionId();
-    const ctx = await captureAuditContext();
-    const auditEntries: DeferredAuditEntry[] = [];
-
-    await prisma.$transaction(async (tx) => {
+    await withAuditedTransaction(async (tx, addAudit) => {
       const template = await tx.reviewTemplate.findFirst({
         where: { id: templateId, deletedAt: null, sessionId },
       });
@@ -84,27 +68,22 @@ export async function deleteReviewTemplate(data: FormData): Promise<ActionResult
         data: { deletedAt: new Date() },
       });
 
-      auditEntries.push({
-        ...ctx,
+      addAudit({
         action: "delete",
         entityType: "reviewTemplate",
         entityId: templateId,
         before: { name: template.name },
       });
     });
-
-    deferAudit(auditEntries);
     revalidatePath("/reviews/templates");
     revalidatePath("/reviews");
-  });
-}
+  },
+);
 
-export async function addReviewQuestion(data: FormData): Promise<ActionResult> {
-  return safe(async () => {
-    const t = await getTranslations("errors");
-    await requirePermission("review:manage");
-    await rateLimit("addReviewQuestion");
-
+export const addReviewQuestion: (data: FormData) => Promise<ActionResult> = guardedAction(
+  "review:manage",
+  "addReviewQuestion",
+  async (t, data: FormData) => {
     const templateId = data.get("templateId");
     const text = data.get("text");
     const type = data.get("type");
@@ -127,10 +106,7 @@ export async function addReviewQuestion(data: FormData): Promise<ActionResult> {
     const required = requiredRaw !== "false";
 
     const sessionId = await getDemoSessionId();
-    const ctx = await captureAuditContext();
-    const auditEntries: DeferredAuditEntry[] = [];
-
-    await prisma.$transaction(async (tx) => {
+    await withAuditedTransaction(async (tx, addAudit) => {
       const template = await tx.reviewTemplate.findFirst({
         where: { id: templateId, deletedAt: null, sessionId },
       });
@@ -154,26 +130,21 @@ export async function addReviewQuestion(data: FormData): Promise<ActionResult> {
         data: { questions: [...existingQuestions, newQuestion] },
       });
 
-      auditEntries.push({
-        ...ctx,
+      addAudit({
         action: "update",
         entityType: "reviewTemplate",
         entityId: templateId,
         after: { addedQuestion: newQuestion.text },
       });
     });
-
-    deferAudit(auditEntries);
     revalidatePath(`/reviews/templates/${templateId}`);
-  });
-}
+  },
+);
 
-export async function removeReviewQuestion(data: FormData): Promise<ActionResult> {
-  return safe(async () => {
-    const t = await getTranslations("errors");
-    await requirePermission("review:manage");
-    await rateLimit("removeReviewQuestion");
-
+export const removeReviewQuestion: (data: FormData) => Promise<ActionResult> = guardedAction(
+  "review:manage",
+  "removeReviewQuestion",
+  async (t, data: FormData) => {
     const templateId = data.get("templateId");
     const questionId = data.get("questionId");
 
@@ -185,10 +156,7 @@ export async function removeReviewQuestion(data: FormData): Promise<ActionResult
     }
 
     const sessionId = await getDemoSessionId();
-    const ctx = await captureAuditContext();
-    const auditEntries: DeferredAuditEntry[] = [];
-
-    await prisma.$transaction(async (tx) => {
+    await withAuditedTransaction(async (tx, addAudit) => {
       const template = await tx.reviewTemplate.findFirst({
         where: { id: templateId, deletedAt: null, sessionId },
       });
@@ -206,26 +174,21 @@ export async function removeReviewQuestion(data: FormData): Promise<ActionResult
         data: { questions: filtered },
       });
 
-      auditEntries.push({
-        ...ctx,
+      addAudit({
         action: "update",
         entityType: "reviewTemplate",
         entityId: templateId,
         after: { removedQuestion: questionId },
       });
     });
-
-    deferAudit(auditEntries);
     revalidatePath(`/reviews/templates/${templateId}`);
-  });
-}
+  },
+);
 
-export async function createReviewCycle(data: FormData): Promise<ActionResult> {
-  return safe(async () => {
-    const t = await getTranslations("errors");
-    await requirePermission("review:manage");
-    await rateLimit("createReviewCycle");
-
+export const createReviewCycle: (data: FormData) => Promise<ActionResult> = guardedAction(
+  "review:manage",
+  "createReviewCycle",
+  async (t, data: FormData) => {
     const name = data.get("name");
     const templateId = data.get("templateId");
     const startDateRaw = data.get("startDate");
@@ -251,10 +214,7 @@ export async function createReviewCycle(data: FormData): Promise<ActionResult> {
       typeof templateId === "string" && templateId.trim() ? templateId.trim() : null;
 
     const sessionId = await getDemoSessionId();
-    const ctx = await captureAuditContext();
-    const auditEntries: DeferredAuditEntry[] = [];
-
-    await prisma.$transaction(async (tx) => {
+    await withAuditedTransaction(async (tx, addAudit) => {
       if (resolvedTemplateId) {
         const tpl = await tx.reviewTemplate.findFirst({
           where: { id: resolvedTemplateId, deletedAt: null, sessionId },
@@ -273,36 +233,28 @@ export async function createReviewCycle(data: FormData): Promise<ActionResult> {
         },
       });
 
-      auditEntries.push({
-        ...ctx,
+      addAudit({
         action: "create",
         entityType: "reviewCycle",
         entityId: cycle.id,
         after: { name: cycle.name, status: cycle.status },
       });
     });
-
-    deferAudit(auditEntries);
     revalidatePath("/reviews");
-  });
-}
+  },
+);
 
-export async function deleteReviewCycle(data: FormData): Promise<ActionResult> {
-  return safe(async () => {
-    const t = await getTranslations("errors");
-    await requirePermission("review:manage");
-    await rateLimit("deleteReviewCycle");
-
+export const deleteReviewCycle: (data: FormData) => Promise<ActionResult> = guardedAction(
+  "review:manage",
+  "deleteReviewCycle",
+  async (t, data: FormData) => {
     const cycleId = data.get("cycleId");
     if (typeof cycleId !== "string" || !cycleId.trim()) {
       throw new ActionError("unexpectedError", t("unexpectedError"));
     }
 
     const sessionId = await getDemoSessionId();
-    const ctx = await captureAuditContext();
-    const auditEntries: DeferredAuditEntry[] = [];
-
-    await prisma.$transaction(async (tx) => {
+    await withAuditedTransaction(async (tx, addAudit) => {
       const cycle = await tx.reviewCycle.findFirst({
         where: { id: cycleId, deletedAt: null, sessionId },
       });
@@ -313,36 +265,28 @@ export async function deleteReviewCycle(data: FormData): Promise<ActionResult> {
         data: { deletedAt: new Date() },
       });
 
-      auditEntries.push({
-        ...ctx,
+      addAudit({
         action: "delete",
         entityType: "reviewCycle",
         entityId: cycleId,
         before: { name: cycle.name, status: cycle.status },
       });
     });
-
-    deferAudit(auditEntries);
     revalidatePath("/reviews");
-  });
-}
+  },
+);
 
-export async function openReviewCycle(data: FormData): Promise<ActionResult> {
-  return safe(async () => {
-    const t = await getTranslations("errors");
-    await requirePermission("review:manage");
-    await rateLimit("openReviewCycle");
-
+export const openReviewCycle: (data: FormData) => Promise<ActionResult> = guardedAction(
+  "review:manage",
+  "openReviewCycle",
+  async (t, data: FormData) => {
     const cycleId = data.get("cycleId");
     if (typeof cycleId !== "string" || !cycleId.trim()) {
       throw new ActionError("unexpectedError", t("unexpectedError"));
     }
 
     const sessionId = await getDemoSessionId();
-    const ctx = await captureAuditContext();
-    const auditEntries: DeferredAuditEntry[] = [];
-
-    await prisma.$transaction(async (tx) => {
+    await withAuditedTransaction(async (tx, addAudit) => {
       const cycle = await tx.reviewCycle.findFirst({
         where: { id: cycleId, deletedAt: null, sessionId },
       });
@@ -355,8 +299,7 @@ export async function openReviewCycle(data: FormData): Promise<ActionResult> {
         data: { status: "OPEN" },
       });
 
-      auditEntries.push({
-        ...ctx,
+      addAudit({
         action: "update",
         entityType: "reviewCycle",
         entityId: cycleId,
@@ -364,29 +307,22 @@ export async function openReviewCycle(data: FormData): Promise<ActionResult> {
         after: { status: "OPEN" },
       });
     });
-
-    deferAudit(auditEntries);
     revalidatePath(`/reviews/cycles/${cycleId}`);
     revalidatePath("/reviews");
-  });
-}
+  },
+);
 
-export async function closeReviewCycle(data: FormData): Promise<ActionResult> {
-  return safe(async () => {
-    const t = await getTranslations("errors");
-    await requirePermission("review:manage");
-    await rateLimit("closeReviewCycle");
-
+export const closeReviewCycle: (data: FormData) => Promise<ActionResult> = guardedAction(
+  "review:manage",
+  "closeReviewCycle",
+  async (t, data: FormData) => {
     const cycleId = data.get("cycleId");
     if (typeof cycleId !== "string" || !cycleId.trim()) {
       throw new ActionError("unexpectedError", t("unexpectedError"));
     }
 
     const sessionId = await getDemoSessionId();
-    const ctx = await captureAuditContext();
-    const auditEntries: DeferredAuditEntry[] = [];
-
-    await prisma.$transaction(async (tx) => {
+    await withAuditedTransaction(async (tx, addAudit) => {
       const cycle = await tx.reviewCycle.findFirst({
         where: { id: cycleId, deletedAt: null, sessionId },
       });
@@ -401,8 +337,7 @@ export async function closeReviewCycle(data: FormData): Promise<ActionResult> {
         data: { status: "CLOSED" },
       });
 
-      auditEntries.push({
-        ...ctx,
+      addAudit({
         action: "update",
         entityType: "reviewCycle",
         entityId: cycleId,
@@ -410,19 +345,15 @@ export async function closeReviewCycle(data: FormData): Promise<ActionResult> {
         after: { status: "CLOSED" },
       });
     });
-
-    deferAudit(auditEntries);
     revalidatePath(`/reviews/cycles/${cycleId}`);
     revalidatePath("/reviews");
-  });
-}
+  },
+);
 
-export async function addReviewRequest(data: FormData): Promise<ActionResult> {
-  return safe(async () => {
-    const t = await getTranslations("errors");
-    await requirePermission("review:manage");
-    await rateLimit("addReviewRequest");
-
+export const addReviewRequest: (data: FormData) => Promise<ActionResult> = guardedAction(
+  "review:manage",
+  "addReviewRequest",
+  async (t, data: FormData) => {
     const cycleId = data.get("cycleId");
     const subjectId = data.get("subjectId");
     const reviewerId = data.get("reviewerId");
@@ -442,10 +373,7 @@ export async function addReviewRequest(data: FormData): Promise<ActionResult> {
     }
 
     const sessionId = await getDemoSessionId();
-    const ctx = await captureAuditContext();
-    const auditEntries: DeferredAuditEntry[] = [];
-
-    await prisma.$transaction(async (tx) => {
+    await withAuditedTransaction(async (tx, addAudit) => {
       const cycle = await tx.reviewCycle.findFirst({
         where: { id: cycleId, deletedAt: null, sessionId },
       });
@@ -474,26 +402,21 @@ export async function addReviewRequest(data: FormData): Promise<ActionResult> {
         },
       });
 
-      auditEntries.push({
-        ...ctx,
+      addAudit({
         action: "create",
         entityType: "reviewRequest",
         entityId: req.id,
         after: { cycleId, type },
       });
     });
-
-    deferAudit(auditEntries);
     revalidatePath(`/reviews/cycles/${cycleId}`);
-  });
-}
+  },
+);
 
-export async function removeReviewRequest(data: FormData): Promise<ActionResult> {
-  return safe(async () => {
-    const t = await getTranslations("errors");
-    await requirePermission("review:manage");
-    await rateLimit("removeReviewRequest");
-
+export const removeReviewRequest: (data: FormData) => Promise<ActionResult> = guardedAction(
+  "review:manage",
+  "removeReviewRequest",
+  async (t, data: FormData) => {
     const requestId = data.get("requestId");
     const cycleId = data.get("cycleId");
 
@@ -502,10 +425,7 @@ export async function removeReviewRequest(data: FormData): Promise<ActionResult>
     }
 
     const sessionId = await getDemoSessionId();
-    const ctx = await captureAuditContext();
-    const auditEntries: DeferredAuditEntry[] = [];
-
-    await prisma.$transaction(async (tx) => {
+    await withAuditedTransaction(async (tx, addAudit) => {
       const req = await tx.reviewRequest.findFirst({
         where: { id: requestId, sessionId },
       });
@@ -513,28 +433,23 @@ export async function removeReviewRequest(data: FormData): Promise<ActionResult>
 
       await tx.reviewRequest.delete({ where: { id: requestId } });
 
-      auditEntries.push({
-        ...ctx,
+      addAudit({
         action: "delete",
         entityType: "reviewRequest",
         entityId: requestId,
         before: { type: req.type, status: req.status },
       });
     });
-
-    deferAudit(auditEntries);
     if (typeof cycleId === "string" && cycleId.trim()) {
       revalidatePath(`/reviews/cycles/${cycleId}`);
     }
-  });
-}
+  },
+);
 
-export async function submitReview(data: FormData): Promise<ActionResult> {
-  return safe(async () => {
-    const t = await getTranslations("errors");
-    await requirePermission("review:submit");
-    await rateLimit("submitReview");
-
+export const submitReview: (data: FormData) => Promise<ActionResult> = guardedAction(
+  "review:submit",
+  "submitReview",
+  async (t, data: FormData) => {
     const requestId = data.get("requestId");
     const answersRaw = data.get("answers");
 
@@ -556,10 +471,7 @@ export async function submitReview(data: FormData): Promise<ActionResult> {
     }
 
     const sessionId = await getDemoSessionId();
-    const ctx = await captureAuditContext();
-    const auditEntries: DeferredAuditEntry[] = [];
-
-    await prisma.$transaction(async (tx) => {
+    await withAuditedTransaction(async (tx, addAudit) => {
       const req = await tx.reviewRequest.findFirst({
         where: { id: requestId, sessionId },
         include: { cycle: true },
@@ -583,17 +495,14 @@ export async function submitReview(data: FormData): Promise<ActionResult> {
         data: { status: "SUBMITTED" },
       });
 
-      auditEntries.push({
-        ...ctx,
+      addAudit({
         action: "create",
         entityType: "reviewSubmission",
         entityId: submission.id,
         after: { requestId, answerCount: answers.length },
       });
     });
-
-    deferAudit(auditEntries);
     revalidatePath("/reviews/my-reviews");
     revalidatePath(`/reviews/cycles/${data.get("cycleId")}`);
-  });
-}
+  },
+);

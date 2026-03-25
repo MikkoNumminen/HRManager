@@ -6,7 +6,8 @@ import { rateLimit } from "@/rateLimit";
 import { ActionError } from "@/actionErrors";
 import { getTranslations } from "next-intl/server";
 import { safe, validateUUID, type ActionResult } from "@/lib/actionUtils";
-import { requirePermission } from "@/permissions";
+import { guardedAction } from "@/lib/guardedAction";
+import { withAuditedTransaction } from "@/lib/auditedTransaction";
 import { revalidatePath } from "next/cache";
 import {
   generateTotpSecret,
@@ -100,10 +101,7 @@ export async function confirmTwoFactorSetup(data: FormData): Promise<ActionResul
     // Encrypt the secret
     const encryptedSecret = encryptSecret(secret);
 
-    const ctx = await captureAuditContext();
-    const auditEntries: DeferredAuditEntry[] = [];
-
-    await prisma.$transaction(async (tx) => {
+    await withAuditedTransaction(async (tx, addAudit) => {
       await tx.twoFactorAuth.upsert({
         where: { userId: session.user.id! },
         update: {
@@ -119,8 +117,7 @@ export async function confirmTwoFactorSetup(data: FormData): Promise<ActionResul
         },
       });
 
-      auditEntries.push({
-        ...ctx,
+      addAudit({
         action: "update",
         entityType: "user",
         entityId: session.user.id!,
@@ -128,7 +125,6 @@ export async function confirmTwoFactorSetup(data: FormData): Promise<ActionResul
       });
     });
 
-    deferAudit(auditEntries);
     revalidatePath("/profile");
   });
 }
@@ -160,16 +156,12 @@ export async function disableTwoFactor(data: FormData): Promise<ActionResult> {
       throw new ActionError("invalidTotpCode", t("invalidTotpCode"));
     }
 
-    const ctx = await captureAuditContext();
-    const auditEntries: DeferredAuditEntry[] = [];
-
-    await prisma.$transaction(async (tx) => {
+    await withAuditedTransaction(async (tx, addAudit) => {
       await tx.twoFactorAuth.delete({
         where: { userId: session.user.id! },
       });
 
-      auditEntries.push({
-        ...ctx,
+      addAudit({
         action: "update",
         entityType: "user",
         entityId: session.user.id!,
@@ -177,7 +169,6 @@ export async function disableTwoFactor(data: FormData): Promise<ActionResult> {
       });
     });
 
-    deferAudit(auditEntries);
     revalidatePath("/profile");
   });
 }
@@ -285,16 +276,12 @@ export async function verifyTwoFactorLogin(data: FormData): Promise<ActionResult
       const updatedCodes = [...tfa.recoveryCodes];
       updatedCodes.splice(matchIndex, 1);
 
-      const ctx = await captureAuditContext();
-      const auditEntries: DeferredAuditEntry[] = [];
-
-      await prisma.$transaction(async (tx) => {
+      await withAuditedTransaction(async (tx, addAudit) => {
         await tx.twoFactorAuth.update({
           where: { userId },
           data: { recoveryCodes: updatedCodes },
         });
-        auditEntries.push({
-          ...ctx,
+        addAudit({
           action: "update",
           entityType: "user",
           entityId: userId,
@@ -302,7 +289,6 @@ export async function verifyTwoFactorLogin(data: FormData): Promise<ActionResult
         });
       });
 
-      deferAudit(auditEntries);
       return;
     }
 
@@ -311,12 +297,10 @@ export async function verifyTwoFactorLogin(data: FormData): Promise<ActionResult
 }
 
 /** Admin action: reset a user's 2FA. Requires admin:manage_users permission. */
-export async function adminResetTwoFactor(data: FormData): Promise<ActionResult> {
-  return safe(async () => {
-    const t = await getTranslations("errors");
-    await requirePermission("admin:manage_users");
-    await rateLimit("adminResetTwoFactor");
-
+export const adminResetTwoFactor: (data: FormData) => Promise<ActionResult> = guardedAction(
+  "admin:manage_users",
+  "adminResetTwoFactor",
+  async (t, data: FormData) => {
     const userId = data.get("userId")?.toString();
     if (!userId) throw new ActionError("noUserProvided", t("noUserProvided"));
     validateUUID(userId, "userId");
@@ -333,16 +317,12 @@ export async function adminResetTwoFactor(data: FormData): Promise<ActionResult>
       return;
     }
 
-    const ctx = await captureAuditContext();
-    const auditEntries: DeferredAuditEntry[] = [];
-
-    await prisma.$transaction(async (tx) => {
+    await withAuditedTransaction(async (tx, addAudit) => {
       await tx.twoFactorAuth.delete({
         where: { userId },
       });
 
-      auditEntries.push({
-        ...ctx,
+      addAudit({
         action: "update",
         entityType: "user",
         entityId: userId,
@@ -353,7 +333,6 @@ export async function adminResetTwoFactor(data: FormData): Promise<ActionResult>
       });
     });
 
-    deferAudit(auditEntries);
     revalidatePath("/admin");
-  });
-}
+  },
+);

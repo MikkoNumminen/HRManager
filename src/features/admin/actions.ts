@@ -11,6 +11,8 @@ import { getDemoSessionId } from "@/demoSession";
 import { DEMO_EMAIL } from "@/constants";
 import { getTranslations } from "next-intl/server";
 import { safe, validateUUID, type ActionResult } from "@/lib/actionUtils";
+import { guardedAction } from "@/lib/guardedAction";
+import { withAuditedTransaction } from "@/lib/auditedTransaction";
 import { invalidateDashboardCache } from "@/lib/cacheInvalidation";
 import { requireAdminIp } from "@/lib/ipAllowlist";
 import {
@@ -21,14 +23,12 @@ import {
   LEAVE_TYPE_SEEDS,
 } from "@/seeds";
 
-export async function resetAll(): Promise<ActionResult> {
-  return safe(async () => {
-    await requirePermission("data:reset");
-    await rateLimit("resetAll");
+export const resetAll: () => Promise<ActionResult> = guardedAction(
+  "data:reset",
+  "resetAll",
+  async () => {
     const sessionId = await getDemoSessionId();
-    const ctx = await captureAuditContext();
-    const auditEntries: DeferredAuditEntry[] = [];
-    await prisma.$transaction(async (tx) => {
+    await withAuditedTransaction(async (tx, addAudit) => {
       const sessionWhere = { sessionId };
       const counts = {
         teamMembers: await tx.teamMember.count({ where: sessionWhere }),
@@ -43,27 +43,25 @@ export async function resetAll(): Promise<ActionResult> {
       await tx.team.deleteMany({ where: sessionWhere });
       await tx.department.deleteMany({ where: sessionWhere });
       await tx.person.deleteMany({ where: sessionWhere });
-      auditEntries.push({
-        ...ctx,
+      addAudit({
         action: "reset",
         entityType: "person",
         before: counts,
       });
     });
-    deferAudit(auditEntries);
     revalidatePath("/");
     invalidateDashboardCache();
     revalidatePath("/managePersons");
     revalidatePath("/manageTeams");
     revalidatePath("/manageDepartments");
     revalidatePath("/leave");
-  });
-}
+  },
+);
 
-export async function seedMockData(clearExisting: boolean = true): Promise<ActionResult> {
-  return safe(async () => {
-    await requirePermission("data:seed");
-    await rateLimit("seedMockData");
+export const seedMockData: (clearExisting?: boolean) => Promise<ActionResult> = guardedAction(
+  "data:seed",
+  "seedMockData",
+  async (_t, clearExisting: boolean = true) => {
     const sessionId = await getDemoSessionId();
     const sessionWhere = { sessionId };
     await prisma.$transaction(async (prisma) => {
@@ -329,8 +327,8 @@ export async function seedMockData(clearExisting: boolean = true): Promise<Actio
     revalidatePath("/manageTeams");
     revalidatePath("/manageDepartments");
     revalidatePath("/admin");
-  });
-}
+  },
+);
 
 export async function initializePermissions() {
   await requireAdminIp();
