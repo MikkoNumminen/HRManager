@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "hrmanager.fullname" . }}-svc
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "hrmanager.labels" . | nindent 4 }}
+    app.kubernetes.io/component: service
+spec:
+  type: {{ .Values.service.type }}
+  selector:
+    {{- include "hrmanager.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: app
+  ports:
+    - name: http
+      port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP

@@ -1,0 +1,16 @@
+{{- if .Values.podDisruptionBudget.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "hrmanager.fullname" . }}-pdb
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "hrmanager.labels" . | nindent 4 }}
+    app.kubernetes.io/component: pdb
+spec:
+  minAvailable: {{ .Values.podDisruptionBudget.minAvailable }}
+  selector:
+    matchLabels:
+      {{- include "hrmanager.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: app
+{{- end }}

@@ -6,3 +6,7 @@ prisma/migrations/
 coverage/
 test-results/
 playwright-report/
+# Helm templates use Go template syntax which is not valid YAML
+k8s/helm/hrmanager/templates/
+# Helm _helpers.tpl is Go template syntax
+k8s/helm/hrmanager/templates/_helpers.tpl

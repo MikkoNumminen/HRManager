@@ -1,0 +1,88 @@
+HRManager has been deployed successfully!
+
+Release name : {{ .Release.Name }}
+Namespace    : {{ .Release.Namespace }}
+App version  : {{ .Chart.AppVersion }}
+
+=============================================================================
+ACCESS THE APPLICATION
+=============================================================================
+
+{{- if .Values.ingress.enabled }}
+The application is exposed via Ingress at:
+
+  https://{{ .Values.ingress.host }}
+
+Ensure your DNS points {{ .Values.ingress.host }} to your ingress controller's
+external IP. To find the IP:
+
+  kubectl get svc -n ingress-nginx ingress-nginx-controller \
+    -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+
+{{- else }}
+Ingress is disabled. To access the application via port-forward:
+
+  kubectl port-forward -n {{ .Release.Namespace }} \
+    svc/{{ include "hrmanager.fullname" . }}-svc 3000:3000
+
+Then open http://localhost:3000
+
+{{- end }}
+
+=============================================================================
+HEALTH CHECK
+=============================================================================
+
+Verify the deployment is healthy:
+
+  kubectl rollout status deployment/{{ include "hrmanager.fullname" . }}-app \
+    -n {{ .Release.Namespace }}
+
+  curl https://{{ .Values.ingress.host }}/api/health
+
+=============================================================================
+SCALING
+=============================================================================
+
+{{- if .Values.autoscaling.enabled }}
+HPA is active: {{ .Values.autoscaling.minReplicas }}–{{ .Values.autoscaling.maxReplicas }} replicas,
+CPU target: {{ .Values.autoscaling.targetCPUUtilizationPercentage }}%
+
+  kubectl get hpa -n {{ .Release.Namespace }}
+{{- else }}
+Autoscaling is disabled. Current replicas: {{ .Values.replicaCount }}
+
+To scale manually:
+  kubectl scale deployment/{{ include "hrmanager.fullname" . }}-app \
+    -n {{ .Release.Namespace }} --replicas=<N>
+{{- end }}
+
+=============================================================================
+SECRETS
+=============================================================================
+
+{{- if .Values.secrets.existingSecret }}
+Using existing secret: {{ .Values.secrets.existingSecret }}
+{{- else }}
+Secrets are managed by this release. To rotate a secret:
+
+  helm upgrade {{ .Release.Name }} k8s/helm/hrmanager \
+    --reuse-values \
+    --set secrets.data.DATABASE_URL='<new-value>'
+{{- end }}
+
+=============================================================================
+UPGRADE / ROLLBACK
+=============================================================================
+
+Upgrade:
+  helm upgrade {{ .Release.Name }} k8s/helm/hrmanager \
+    --namespace {{ .Release.Namespace }} \
+    --reuse-values
+
+Rollback to previous release:
+  helm rollback {{ .Release.Name }} 0 \
+    --namespace {{ .Release.Namespace }}
+
+View history:
+  helm history {{ .Release.Name }} --namespace {{ .Release.Namespace }}

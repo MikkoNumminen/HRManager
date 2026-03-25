@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hrmanager-config
+  namespace: hrmanager
+  labels:
+    app.kubernetes.io/name: hrmanager
+    app.kubernetes.io/component: config
+    app.kubernetes.io/managed-by: kubectl
+data:
+  NODE_ENV: "production"
+  NEXTAUTH_URL: "https://hrmanager.example.com"
+  # MongoDB connection (non-sensitive host/db part — put full URI in secret)
+  MONGO_DB_NAME: "hrmanager_audit"
+  # Next.js performance tuning
+  NEXT_TELEMETRY_DISABLED: "1"

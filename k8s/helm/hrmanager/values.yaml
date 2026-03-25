@@ -1,0 +1,150 @@
+# Default values for hrmanager Helm chart.
+# Override any of these in your own values file or with --set flags.
+
+# -- Number of application replicas
+replicaCount: 2
+
+image:
+  # -- Container image repository
+  repository: ghcr.io/your-org/hrmanager
+  # -- Image pull policy
+  pullPolicy: Always
+  # -- Image tag. Defaults to chart appVersion when empty.
+  tag: ""
+
+# -- Image pull secrets (for private registries)
+imagePullSecrets: []
+
+# -- Override the chart name
+nameOverride: ""
+# -- Override the full resource name prefix
+fullnameOverride: ""
+
+serviceAccount:
+  # -- Create a dedicated service account
+  create: false
+  # -- Service account name (auto-generated if empty and create=true)
+  name: ""
+
+# -- Pod-level annotations
+podAnnotations: {}
+
+# -- Pod security context
+podSecurityContext:
+  fsGroup: 1001
+
+# -- Container security context
+securityContext:
+  allowPrivilegeEscalation: false
+  runAsNonRoot: true
+  runAsUser: 1001
+  readOnlyRootFilesystem: false
+  capabilities:
+    drop:
+      - ALL
+
+service:
+  # -- Service type
+  type: ClusterIP
+  # -- Service port
+  port: 3000
+
+ingress:
+  # -- Enable ingress
+  enabled: true
+  # -- Ingress class name
+  className: nginx
+  # -- Ingress annotations
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/limit-rps: "100"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  # -- Ingress hostname
+  host: hrmanager.example.com
+  # -- TLS configuration
+  tls:
+    enabled: true
+    secretName: hrmanager-tls
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 512Mi
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+
+autoscaling:
+  # -- Enable HorizontalPodAutoscaler
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+podDisruptionBudget:
+  # -- Enable PodDisruptionBudget
+  enabled: true
+  minAvailable: 1
+
+# -- Topology spread constraints for HA
+topologySpreadConstraints:
+  - maxSkew: 1
+    topologyKey: kubernetes.io/hostname
+    whenUnsatisfiable: DoNotSchedule
+
+# -- Node selector
+nodeSelector: {}
+
+# -- Tolerations
+tolerations: []
+
+# -- Affinity rules
+affinity: {}
+
+# -- Application environment variables (non-sensitive)
+config:
+  NODE_ENV: "production"
+  NEXTAUTH_URL: "https://hrmanager.example.com"
+  MONGO_DB_NAME: "hrmanager_audit"
+  NEXT_TELEMETRY_DISABLED: "1"
+
+# -- Sensitive environment variables.
+# All values should be base64-encoded or provided via external secret manager.
+# Set to empty string to skip (use existingSecret instead).
+secrets:
+  # -- Use an existing Secret instead of creating one.
+  # If set, the 'data' block below is ignored.
+  existingSecret: ""
+  data:
+    # Replace all placeholder values with actual base64-encoded secrets before deploying.
+    DATABASE_URL: ""
+    NEXTAUTH_SECRET: ""
+    GOOGLE_CLIENT_ID: ""
+    GOOGLE_CLIENT_SECRET: ""
+    GITHUB_CLIENT_ID: ""
+    GITHUB_CLIENT_SECRET: ""
+    MONGODB_URI: ""
+
+# -- Liveness probe configuration
+livenessProbe:
+  httpGet:
+    path: /api/health
+    port: http
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+# -- Readiness probe configuration
+readinessProbe:
+  httpGet:
+    path: /api/health
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3

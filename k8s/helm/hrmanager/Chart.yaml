@@ -1,0 +1,17 @@
+apiVersion: v2
+name: hrmanager
+description: >
+  HRManager — production-grade HR management system built with Next.js 16,
+  React 19, MUI v7, PostgreSQL, and MongoDB.
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - hrmanager
+  - nextjs
+  - hr
+  - management
+home: https://github.com/your-org/hrmanager
+maintainers:
+  - name: HRManager Team
+    email: maintainers@example.com
