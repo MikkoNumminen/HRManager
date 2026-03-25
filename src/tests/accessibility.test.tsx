@@ -250,7 +250,7 @@ const makeLeaveRequest = (overrides: Partial<LeaveRequest> = {}): LeaveRequest =
   endDate: new Date("2026-07-05"),
   days: 5,
   note: "Summer vacation",
-  status: "pending",
+  status: "PENDING",
   reviewerId: null,
   reviewerName: null,
   reviewNote: null,

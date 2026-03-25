@@ -41,7 +41,7 @@ export default function EmployeeDashboardClient({
     .toUpperCase()
     .slice(0, 2);
 
-  const pendingLeave = leaveRequests.filter((r) => r.status === "pending").length;
+  const pendingLeave = leaveRequests.filter((r) => r.status === "PENDING").length;
   const pendingReviews = reviews.filter((r) => r.status === "PENDING").length;
   const totalLeaveRemaining = leaveBalances.reduce((sum, b) => sum + b.remaining, 0);
 

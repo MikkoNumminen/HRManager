@@ -8,22 +8,22 @@ datasource db {
 }
 
 model Person {
-  id        String      @id @default(uuid())
-  name      String
-  position  String?
-  email     String?
-  sessionId String?
-  deletedAt DateTime?
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  teams             TeamMember[]
-  managedTeams      Team[]
-  headOfDepartments   Department[]
-  reviewsAsSubject    ReviewRequest[] @relation("ReviewSubject")
-  reviewsAsReviewer   ReviewRequest[] @relation("ReviewReviewer")
-  leaveRequests       LeaveRequest[]
-  leaveRequestsReviewed LeaveRequest[] @relation("LeaveReviewer")
-  leaveBalances       LeaveBalance[]
+  id                    String          @id @default(uuid())
+  name                  String
+  position              String?
+  email                 String?
+  sessionId             String?
+  deletedAt             DateTime?
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+  teams                 TeamMember[]
+  managedTeams          Team[]
+  headOfDepartments     Department[]
+  reviewsAsSubject      ReviewRequest[] @relation("ReviewSubject")
+  reviewsAsReviewer     ReviewRequest[] @relation("ReviewReviewer")
+  leaveRequests         LeaveRequest[]
+  leaveRequestsReviewed LeaveRequest[]  @relation("LeaveReviewer")
+  leaveBalances         LeaveBalance[]
 
   @@index([deletedAt])
   @@index([sessionId])
@@ -46,16 +46,16 @@ model Department {
 }
 
 model Team {
-  teamId        String      @id @default(uuid())
+  teamId        String       @id @default(uuid())
   teamName      String
   teamManagerId String?
   departmentId  String?
-  manager       Person?     @relation(fields: [teamManagerId], references: [id], onDelete: SetNull)
-  department    Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  manager       Person?      @relation(fields: [teamManagerId], references: [id], onDelete: SetNull)
+  department    Department?  @relation(fields: [departmentId], references: [id], onDelete: SetNull)
   sessionId     String?
   deletedAt     DateTime?
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
   members       TeamMember[]
 
   @@index([deletedAt])
@@ -115,10 +115,10 @@ model UserPermission {
 }
 
 model RateLimit {
-  id         String   @id @default(uuid())
-  identifier String
-  action     String
-  count      Int      @default(1)
+  id          String   @id @default(uuid())
+  identifier  String
+  action      String
+  count       Int      @default(1)
   windowStart DateTime @default(now())
 
   @@unique([identifier, action])
@@ -188,6 +188,12 @@ enum ReviewType {
 enum RequestStatus {
   PENDING
   SUBMITTED
+}
+
+enum LeaveRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 model ReviewTemplate {
@@ -270,38 +276,38 @@ model Position {
 }
 
 model LeaveType {
-  id             String         @id @default(uuid())
-  name           String
-  description    String?
-  defaultDays    Int            @default(0)
-  color          String         @default("#1976d2")
-  sessionId      String?
-  deletedAt      DateTime?
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
-  leaveRequests  LeaveRequest[]
-  leaveBalances  LeaveBalance[]
+  id            String         @id @default(uuid())
+  name          String
+  description   String?
+  defaultDays   Int            @default(0)
+  color         String         @default("#1976d2")
+  sessionId     String?
+  deletedAt     DateTime?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  leaveRequests LeaveRequest[]
+  leaveBalances LeaveBalance[]
 
   @@index([deletedAt])
   @@index([sessionId])
 }
 
 model LeaveRequest {
-  id           String    @id @default(uuid())
-  personId     String
-  leaveTypeId  String
-  startDate    DateTime
-  endDate      DateTime
-  days         Int
-  note         String?
-  status       String    @default("pending") // pending, approved, rejected
-  reviewerId   String?
-  reviewNote   String?
-  reviewedAt   DateTime?
-  sessionId    String?
-  deletedAt    DateTime?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  id          String             @id @default(uuid())
+  personId    String
+  leaveTypeId String
+  startDate   DateTime
+  endDate     DateTime
+  days        Int
+  note        String?
+  status      LeaveRequestStatus @default(PENDING)
+  reviewerId  String?
+  reviewNote  String?
+  reviewedAt  DateTime?
+  sessionId   String?
+  deletedAt   DateTime?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
 
   person    Person    @relation(fields: [personId], references: [id])
   leaveType LeaveType @relation(fields: [leaveTypeId], references: [id])

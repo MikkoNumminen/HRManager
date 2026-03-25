@@ -191,7 +191,7 @@ describe("getSelfLeaveRequests", () => {
         startDate: new Date("2025-07-01"),
         endDate: new Date("2025-07-05"),
         days: 5,
-        status: "pending",
+        status: "PENDING",
       },
     });
 
@@ -203,7 +203,7 @@ describe("getSelfLeaveRequests", () => {
         startDate: new Date("2025-08-01"),
         endDate: new Date("2025-08-03"),
         days: 3,
-        status: "approved",
+        status: "APPROVED",
       },
     });
 
@@ -228,7 +228,7 @@ describe("getSelfLeaveRequests", () => {
         startDate: new Date("2025-06-01"),
         endDate: new Date("2025-06-02"),
         days: 2,
-        status: "approved",
+        status: "APPROVED",
       },
     });
 

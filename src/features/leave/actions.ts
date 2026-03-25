@@ -1,5 +1,6 @@
 "use server";
 import { prisma } from "@/db";
+import { LeaveRequestStatus } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { requirePermission } from "@/permissions";
 import { captureAuditContext, deferAudit, DeferredAuditEntry } from "@/auditLog";
@@ -215,7 +216,7 @@ export async function createLeaveRequest(data: FormData): Promise<ActionResult> 
           personId,
           deletedAt: null,
           sessionId,
-          status: { not: "rejected" },
+          status: { not: LeaveRequestStatus.REJECTED },
           startDate: { lte: endDate },
           endDate: { gte: startDate },
         },
@@ -272,7 +273,7 @@ export async function reviewLeaveRequest(data: FormData): Promise<ActionResult> 
     validateUUID(id, "leaveRequestId");
 
     const action = data.get("action")?.valueOf();
-    if (action !== "approved" && action !== "rejected")
+    if (action !== LeaveRequestStatus.APPROVED && action !== LeaveRequestStatus.REJECTED)
       throw new ActionError("invalidLeaveAction", t("invalidLeaveAction"));
 
     const reviewerId = data.get("reviewerId")?.valueOf();
@@ -290,7 +291,7 @@ export async function reviewLeaveRequest(data: FormData): Promise<ActionResult> 
     const auditEntries: DeferredAuditEntry[] = [];
     await prisma.$transaction(async (tx) => {
       const request = await tx.leaveRequest.findFirst({
-        where: { id, deletedAt: null, sessionId, status: "pending" },
+        where: { id, deletedAt: null, sessionId, status: LeaveRequestStatus.PENDING },
         include: { person: true, leaveType: true },
       });
       if (!request) throw new ActionError("leaveRequestNotFound", t("leaveRequestNotFound"));
@@ -306,7 +307,7 @@ export async function reviewLeaveRequest(data: FormData): Promise<ActionResult> 
       });
 
       // If approved, update the balance
-      if (action === "approved") {
+      if (action === LeaveRequestStatus.APPROVED) {
         const year = request.startDate.getFullYear();
         await tx.leaveBalance.upsert({
           where: {
@@ -330,10 +331,10 @@ export async function reviewLeaveRequest(data: FormData): Promise<ActionResult> 
 
       auditEntries.push({
         ...ctx,
-        action: action === "approved" ? "approve" : "reject",
+        action: action === LeaveRequestStatus.APPROVED ? "approve" : "reject",
         entityType: "leaveRequest",
         entityId: id,
-        before: { status: "pending" },
+        before: { status: LeaveRequestStatus.PENDING },
         after: {
           status: action,
           personName: request.person.name,
@@ -368,7 +369,7 @@ export async function deleteLeaveRequest(data: FormData): Promise<ActionResult> 
         include: { person: true, leaveType: true },
       });
       if (!request) throw new ActionError("leaveRequestNotFound", t("leaveRequestNotFound"));
-      if (request.status !== "pending")
+      if (request.status !== LeaveRequestStatus.PENDING)
         throw new ActionError("cannotDeleteNonPendingRequest", t("cannotDeleteNonPendingRequest"));
 
       await tx.leaveRequest.update({ where: { id }, data: { deletedAt: now } });

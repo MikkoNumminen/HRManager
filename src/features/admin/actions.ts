@@ -1,5 +1,6 @@
 "use server";
 import { prisma } from "@/db";
+import { LeaveRequestStatus } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { requirePermission, seedPermissions } from "@/permissions";
 import { auth } from "@/auth";
@@ -217,7 +218,7 @@ export async function seedMockData(clearExisting: boolean = true): Promise<Actio
           endDate: new Date(nextWeek.getTime() + 4 * 86400000),
           days: 5,
           note: "Family vacation",
-          status: "approved",
+          status: LeaveRequestStatus.APPROVED,
           reviewerId: frank.id,
           reviewedAt: today,
           sessionId,
@@ -233,7 +234,7 @@ export async function seedMockData(clearExisting: boolean = true): Promise<Actio
           endDate: new Date(nextNextWeek.getTime() + 1 * 86400000),
           days: 2,
           note: "Medical appointment",
-          status: "pending",
+          status: LeaveRequestStatus.PENDING,
           sessionId,
         },
       });

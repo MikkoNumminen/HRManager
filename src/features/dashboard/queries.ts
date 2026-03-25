@@ -11,6 +11,32 @@ import { getDemoSessionId } from "@/demoSession";
 import { getAuditLogCollection, isMongoAvailable } from "@/mongoDb";
 import { DEMO_EMAIL } from "@/constants";
 import { unstable_cache as nextCache } from "next/cache";
+import { z } from "zod";
+
+// Zod schemas for raw SQL query results — validate DB output before use.
+const DashboardCountsRowSchema = z.object({
+  totalPersons: z.number().int().nonnegative(),
+  totalTeams: z.number().int().nonnegative(),
+  totalDepartments: z.number().int().nonnegative(),
+  totalUsers: z.number().int().nonnegative(),
+});
+
+const TeamSizeRowSchema = z.object({
+  teamName: z.string(),
+  memberCount: z.number().int().nonnegative(),
+});
+
+const DepartmentSizeRowSchema = z.object({
+  departmentName: z.string(),
+  teamCount: z.number().int().nonnegative(),
+});
+
+const GrowthTimelineRowSchema = z.object({
+  date: z.string(),
+  persons: z.number().int().nonnegative(),
+  teams: z.number().int().nonnegative(),
+  departments: z.number().int().nonnegative(),
+});
 
 // In test environments, unstable_cache requires incrementalCache (Next.js runtime).
 // Fall back to a passthrough wrapper so tests call the function directly.
@@ -25,27 +51,12 @@ function cache<T extends (...args: any[]) => Promise<any>>(
 }
 
 // Raw SQL result types for dashboard queries (unnamed parameterized queries
-// instead of Prisma Typed SQL named prepared statements — PgBouncer compatible)
-interface DashboardCountsRow {
-  totalPersons: number;
-  totalTeams: number;
-  totalDepartments: number;
-  totalUsers: number;
-}
-interface TeamSizeRow {
-  teamName: string;
-  memberCount: number;
-}
-interface DepartmentSizeRow {
-  departmentName: string;
-  teamCount: number;
-}
-interface GrowthTimelineRow {
-  date: string;
-  persons: number;
-  teams: number;
-  departments: number;
-}
+// instead of Prisma Typed SQL named prepared statements — PgBouncer compatible).
+// Inferred from Zod schemas above.
+type DashboardCountsRow = z.infer<typeof DashboardCountsRowSchema>;
+type TeamSizeRow = z.infer<typeof TeamSizeRowSchema>;
+type DepartmentSizeRow = z.infer<typeof DepartmentSizeRowSchema>;
+type GrowthTimelineRow = z.infer<typeof GrowthTimelineRowSchema>;
 
 // Cache TTL: 5 minutes. Dashboard data changes infrequently relative to page views.
 // Invalidated via revalidateTag("dashboard") from server actions.
@@ -139,7 +150,13 @@ async function fetchDashboardMetricsUncached(sessionId: string | null): Promise<
         : Promise.resolve([]),
     ]);
 
-  const counts = countsRows[0];
+  // Validate raw SQL results with Zod before use.
+  const validatedCountsRows = z.array(DashboardCountsRowSchema).parse(countsRows);
+  const validatedTeamSizes = z.array(TeamSizeRowSchema).parse(teamSizes);
+  const validatedDepartmentSizes = z.array(DepartmentSizeRowSchema).parse(departmentSizes);
+  const validatedGrowthTimeline = z.array(GrowthTimelineRowSchema).parse(growthTimeline);
+
+  const counts = validatedCountsRows[0];
   const recentActivity = recentActivityDocs.map((log) => DashboardRecentActivitySchema.parse(log));
 
   return DashboardMetricsSchema.parse({
@@ -147,15 +164,15 @@ async function fetchDashboardMetricsUncached(sessionId: string | null): Promise<
     totalTeams: counts?.totalTeams ?? 0,
     totalDepartments: counts?.totalDepartments ?? 0,
     totalUsers: counts?.totalUsers ?? 0,
-    teamSizes: teamSizes.map((t) => ({
+    teamSizes: validatedTeamSizes.map((t) => ({
       teamName: t.teamName,
       memberCount: t.memberCount ?? 0,
     })),
-    departmentSizes: departmentSizes.map((d) => ({
+    departmentSizes: validatedDepartmentSizes.map((d) => ({
       departmentName: d.departmentName,
       teamCount: d.teamCount ?? 0,
     })),
-    growthTimeline: growthTimeline.map((g) => ({
+    growthTimeline: validatedGrowthTimeline.map((g) => ({
       date: g.date ?? "",
       persons: g.persons ?? 0,
       teams: g.teams ?? 0,

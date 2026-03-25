@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/db";
+import { LeaveRequestStatus } from "@prisma/client";
 import { getDemoSessionId } from "@/demoSession";
 import { generateICS } from "@/lib/ical";
 
@@ -18,7 +19,7 @@ export async function GET(request: Request): Promise<NextResponse> {
   const personId = url.searchParams.get("personId");
 
   const where: Record<string, unknown> = {
-    status: "approved",
+    status: LeaveRequestStatus.APPROVED,
     deletedAt: null,
     sessionId,
   };

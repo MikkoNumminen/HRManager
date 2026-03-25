@@ -1,4 +1,5 @@
 import "next-auth";
+import type { PermissionKey } from "@/types/permissions";
 
 declare module "next-auth" {
   interface User {
@@ -12,7 +13,7 @@ declare module "next-auth" {
       name?: string | null;
       image?: string | null;
       role?: string;
-      permissions?: Record<string, boolean>;
+      permissions?: Partial<Record<PermissionKey, boolean>>;
       demoSessionId?: string;
       sessionId?: string;
       twoFactorRequired?: boolean;
@@ -24,7 +25,7 @@ declare module "next-auth" {
 declare module "next-auth/jwt" {
   interface JWT {
     role?: string;
-    permissions?: Record<string, boolean>;
+    permissions?: Partial<Record<PermissionKey, boolean>>;
     userId?: string;
     demoSessionId?: string;
     sessionId?: string;

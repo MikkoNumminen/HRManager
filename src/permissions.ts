@@ -157,11 +157,11 @@ export async function getCurrentUser() {
 export async function resolvePermissions(
   role: string,
   overrides: { key: string; granted: boolean }[],
-): Promise<Record<string, boolean>> {
+): Promise<Partial<Record<PermissionKey, boolean>>> {
   // Unknown/corrupted roles get zero permissions (deny-all) rather than
   // falling back to guest which grants read access.
   const defaults = ROLE_DEFAULTS[role] ?? [];
-  const result: Record<string, boolean> = {};
+  const result: Partial<Record<PermissionKey, boolean>> = {};
 
   for (const key of PERMISSION_KEYS) {
     result[key] = defaults.includes(key);
@@ -178,7 +178,9 @@ export async function resolvePermissions(
   return result;
 }
 
-export async function getUserPermissions(userId?: string): Promise<Record<string, boolean>> {
+export async function getUserPermissions(
+  userId?: string,
+): Promise<Partial<Record<PermissionKey, boolean>>> {
   if (userId) {
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -206,12 +208,12 @@ export async function getUserPermissions(userId?: string): Promise<Record<string
   return resolvePermissions(user.role, overrides);
 }
 
-export async function hasPermission(permissionKey: string): Promise<boolean> {
+export async function hasPermission(permissionKey: PermissionKey): Promise<boolean> {
   const permissions = await getUserPermissions();
   return permissions[permissionKey] ?? false;
 }
 
-export async function requirePermission(permissionKey: string): Promise<void> {
+export async function requirePermission(permissionKey: PermissionKey): Promise<void> {
   const allowed = await hasPermission(permissionKey);
   if (!allowed) {
     // Lazy import to avoid circular dependency (permissions → auditLog → auth → permissions)

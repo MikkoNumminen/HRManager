@@ -181,14 +181,14 @@ function RequestsTab({
     undefined,
   );
 
-  function handleReview(id: string, action: "approved" | "rejected") {
+  function handleReview(id: string, action: "APPROVED" | "REJECTED") {
     startTransition(async () => {
       const formData = new FormData();
       formData.set("id", id);
       formData.set("action", action);
       const result = await reviewLeaveRequest(formData);
       if (!result?.error) {
-        showSnackbar(action === "approved" ? tn("requestApproved") : tn("requestRejected"));
+        showSnackbar(action === "APPROVED" ? tn("requestApproved") : tn("requestRejected"));
       } else {
         showSnackbar(result.error);
       }
@@ -230,9 +230,9 @@ function RequestsTab({
           sx={{ ...textFieldStyles, minWidth: 140 }}
         >
           <MenuItem value="all">{t("filterAll")}</MenuItem>
-          <MenuItem value="pending">{t("filterPending")}</MenuItem>
-          <MenuItem value="approved">{t("filterApproved")}</MenuItem>
-          <MenuItem value="rejected">{t("filterRejected")}</MenuItem>
+          <MenuItem value="PENDING">{t("filterPending")}</MenuItem>
+          <MenuItem value="APPROVED">{t("filterApproved")}</MenuItem>
+          <MenuItem value="REJECTED">{t("filterRejected")}</MenuItem>
         </TextField>
       </Box>
 
@@ -371,12 +371,12 @@ function RequestsTab({
                   <TableCell sx={{ color: colors.slate300 }}>{r.reviewerName ?? "—"}</TableCell>
                   {(canApprove || canRequest) && (
                     <TableCell>
-                      {r.status === "pending" && canApprove && (
+                      {r.status === "PENDING" && canApprove && (
                         <>
                           <IconButton
                             size="small"
                             sx={{ color: colors.success }}
-                            onClick={() => handleReview(r.id, "approved")}
+                            onClick={() => handleReview(r.id, "APPROVED")}
                             aria-label={t("approve")}
                           >
                             <CheckIcon fontSize="small" />
@@ -384,14 +384,14 @@ function RequestsTab({
                           <IconButton
                             size="small"
                             sx={{ color: colors.error }}
-                            onClick={() => handleReview(r.id, "rejected")}
+                            onClick={() => handleReview(r.id, "REJECTED")}
                             aria-label={t("reject")}
                           >
                             <CloseIcon fontSize="small" />
                           </IconButton>
                         </>
                       )}
-                      {r.status === "pending" && canRequest && (
+                      {r.status === "PENDING" && canRequest && (
                         <IconButton
                           size="small"
                           sx={{ color: colors.slate300 }}
@@ -421,14 +421,14 @@ function StatusChip({
   t: ReturnType<typeof useTranslations<"leave">>;
 }) {
   const colorMap: Record<string, string> = {
-    pending: colors.warning,
-    approved: colors.success,
-    rejected: colors.error,
+    PENDING: colors.warning,
+    APPROVED: colors.success,
+    REJECTED: colors.error,
   };
   const labelMap: Record<string, () => string> = {
-    pending: () => t("statusPending"),
-    approved: () => t("statusApproved"),
-    rejected: () => t("statusRejected"),
+    PENDING: () => t("statusPending"),
+    APPROVED: () => t("statusApproved"),
+    REJECTED: () => t("statusRejected"),
   };
   return (
     <Chip
