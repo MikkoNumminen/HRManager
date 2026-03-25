@@ -43,7 +43,16 @@ function buildCsp(nonce: string): string {
   return directives.join("; ");
 }
 
+function generateTraceId(): string {
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes)
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
 export async function proxy(request: NextRequest) {
+  const start = Date.now();
   const { pathname } = request.nextUrl;
 
   // Enforce 2FA verification: redirect users who have 2FA enabled but haven't verified
@@ -61,6 +70,10 @@ export async function proxy(request: NextRequest) {
   const nonce = generateNonce();
   const csp = buildCsp(nonce);
 
+  // Use incoming traceparent header or generate a new trace ID
+  const incoming = request.headers.get("traceparent");
+  const traceId = incoming ? incoming.split("-")[1] : generateTraceId();
+
   // Pass nonce to layout.tsx via a custom request header
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-nonce", nonce);
@@ -75,6 +88,11 @@ export async function proxy(request: NextRequest) {
   response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   response.headers.set("X-Frame-Options", "DENY");
   response.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+
+  // Tracing headers
+  response.headers.set("X-Trace-Id", traceId);
+  const duration = Date.now() - start;
+  response.headers.set("Server-Timing", `proxy;dur=${duration}`);
 
   return response;
 }
