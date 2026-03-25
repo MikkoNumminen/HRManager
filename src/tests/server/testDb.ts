@@ -1,8 +1,17 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
+import pg from "pg";
 
+// Default pool for Prisma — needs multiple connections for interactive transactions.
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL!,
+});
+
+// Dedicated single-connection pool for TRUNCATE — bypasses Prisma's pool entirely
+// so ACCESS EXCLUSIVE lock never contends with idle Prisma pool connections.
+const cleanPool = new pg.Pool({
+  connectionString: process.env.DATABASE_URL!,
+  max: 1,
 });
 
 export const testPrisma = new PrismaClient({ adapter });
@@ -11,38 +20,39 @@ export const testPrisma = new PrismaClient({ adapter });
 export const CLEAN_DB_TIMEOUT = 30_000;
 
 export async function cleanDb() {
-  // Run all deletes inside an interactive transaction so they share a single
-  // DB connection, avoiding deadlocks from Prisma's pool holding idle locks.
-  // DO NOT replace with TRUNCATE CASCADE — it requires ACCESS EXCLUSIVE locks
-  // that deadlock with the PrismaPg adapter's connection pool.
-  await testPrisma.$transaction(
-    async (tx) => {
-      await tx.userFeatureFlag.deleteMany();
-      await tx.featureFlag.deleteMany();
-      await tx.twoFactorAuth.deleteMany();
-      await tx.userSession.deleteMany();
-      await tx.userPermission.deleteMany();
-      await tx.demoSession.deleteMany();
-      await tx.reviewSubmission.deleteMany();
-      await tx.reviewRequest.deleteMany();
-      await tx.reviewCycle.deleteMany();
-      await tx.reviewTemplate.deleteMany();
-      await tx.leaveRequest.deleteMany();
-      await tx.leaveBalance.deleteMany();
-      await tx.leaveType.deleteMany();
-      await tx.teamMember.deleteMany();
-      await tx.team.updateMany({ data: { teamManagerId: null } });
-      await tx.department.updateMany({ data: { headId: null } });
-      await tx.team.deleteMany();
-      await tx.department.deleteMany();
-      await tx.person.deleteMany();
-      await tx.position.deleteMany();
-      await tx.user.deleteMany();
-      await tx.permission.deleteMany();
-      await tx.rateLimit.deleteMany();
-    },
-    { timeout: CLEAN_DB_TIMEOUT },
-  );
+  // First disconnect Prisma to release all pool connections and their locks,
+  // then TRUNCATE via dedicated pool. Prisma reconnects lazily on next query.
+  await testPrisma.$disconnect();
+  const client = await cleanPool.connect();
+  try {
+    await client.query(`
+      TRUNCATE TABLE
+        "UserFeatureFlag",
+        "FeatureFlag",
+        "TwoFactorAuth",
+        "UserSession",
+        "UserPermission",
+        "DemoSession",
+        "ReviewSubmission",
+        "ReviewRequest",
+        "ReviewCycle",
+        "ReviewTemplate",
+        "LeaveRequest",
+        "LeaveBalance",
+        "LeaveType",
+        "TeamMember",
+        "Team",
+        "Department",
+        "Person",
+        "Position",
+        "User",
+        "Permission",
+        "RateLimit"
+      CASCADE
+    `);
+  } finally {
+    client.release();
+  }
 }
 
 // Factory: create a test person with optional overrides
