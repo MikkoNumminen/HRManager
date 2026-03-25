@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import EmployeeDashboardClient from "@/components/EmployeeDashboardClient";
+import EmployeeDashboardClient from "@/features/employee/components/EmployeeDashboardClient";
 import { EmployeeProfile, LeaveBalance, LeaveRequest, ReviewRequest } from "@/schemas";
 
 jest.mock("next/link", () => {

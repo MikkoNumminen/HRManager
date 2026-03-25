@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import ReportsDashboard from "../components/ReportsDashboard";
+import ReportsDashboard from "@/features/reports/components/ReportsDashboard";
 import type {
   HeadcountTrend,
   TurnoverRate,

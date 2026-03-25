@@ -21,7 +21,7 @@ import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { tableStyles, textFieldStyles, formStyles, smallButtonStyles, colors } from "@/muiStyles";
-import { useSnackbar } from "../SnackbarProvider";
+import { useSnackbar } from "../shared/SnackbarProvider";
 import { useTranslations } from "next-intl";
 import type { LeaveType, LeaveRequest, Person } from "@/schemas";
 import { createLeaveRequest, reviewLeaveRequest, deleteLeaveRequest } from "@/serverActions";

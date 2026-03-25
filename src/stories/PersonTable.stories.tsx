@@ -3,7 +3,7 @@
  * empty states, and linked profile variant.
  */
 import type { Meta, StoryObj } from "@storybook/react";
-import PersonTable from "@/components/PersonsTable";
+import PersonTable from "@/features/persons/components/PersonsTable";
 import type { Person } from "@/schemas";
 
 // next-intl requires a locale provider — provide stub translations via mock

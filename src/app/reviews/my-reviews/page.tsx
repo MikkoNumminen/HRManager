@@ -1,5 +1,5 @@
 import TopBar from "@/components/TopBar";
-import MyReviewsClient from "@/components/MyReviewsClient";
+import MyReviewsClient from "@/features/reviews/components/MyReviewsClient";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getUserPermissions } from "@/permissions";

@@ -1,5 +1,5 @@
 import TopBar from "@/components/TopBar";
-import OrgChartClient from "@/components/OrgChartClient";
+import OrgChartClient from "@/features/reports/components/OrgChartClient";
 import { getOrgChartData } from "@/features/dashboard/queries";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";

@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
-import TutorialSpotlight from "../components/TutorialSpotlight";
-import { useTutorial } from "../components/TutorialProvider";
+import TutorialSpotlight from "../components/shared/TutorialSpotlight";
+import { useTutorial } from "../components/shared/TutorialProvider";
 import { TutorialStepId } from "../tutorialConfig";
 
 jest.mock("next-auth/react", () => ({
@@ -11,7 +11,7 @@ jest.mock("next/navigation", () => ({
   usePathname: jest.fn().mockReturnValue("/managePersons"),
 }));
 
-jest.mock("../components/TutorialProvider", () => ({
+jest.mock("../components/shared/TutorialProvider", () => ({
   __esModule: true,
   default: ({ children }: { children: React.ReactNode }) => children,
   useTutorial: jest.fn(),

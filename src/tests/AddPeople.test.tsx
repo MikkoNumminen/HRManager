@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import AddPersonForm from "../components/AddPersonForm";
+import AddPersonForm from "@/features/persons/components/AddPersonForm";
 import { createPerson } from "@/features/persons/actions";
 
 jest.mock("@/features/persons/actions", () => ({

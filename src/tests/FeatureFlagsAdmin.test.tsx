@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import FeatureFlagsAdminClient from "../components/FeatureFlagsAdminClient";
+import FeatureFlagsAdminClient from "../features/admin/components/FeatureFlagsAdminClient";
 import type { FeatureFlag } from "../features/featureFlags/schemas";
 import type { AppUser, Permissions } from "../schemas";
 

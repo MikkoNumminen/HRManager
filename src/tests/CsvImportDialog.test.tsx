@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import CsvImportDialog from "../components/CsvImportDialog";
+import CsvImportDialog from "../features/admin/components/CsvImportDialog";
 
 jest.mock("next/navigation", () => ({
   useRouter: jest.fn(),

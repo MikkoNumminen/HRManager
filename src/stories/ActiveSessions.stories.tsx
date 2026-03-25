@@ -6,7 +6,7 @@
  * the "Sign out other sessions" button appears only when other sessions exist.
  */
 import type { Meta, StoryObj } from "@storybook/react";
-import ActiveSessions from "@/components/ActiveSessions";
+import ActiveSessions from "@/features/sessions/components/ActiveSessions";
 import type { UserSession } from "@/schemas";
 
 const meta: Meta<typeof ActiveSessions> = {

@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { colors } from "@/muiStyles";
 import { useTranslations } from "next-intl";
-import ConfirmDialog from "../ConfirmDialog";
+import ConfirmDialog from "../shared/ConfirmDialog";
 
 interface AdminDialogsProps {
   seedDialogOpen: boolean;

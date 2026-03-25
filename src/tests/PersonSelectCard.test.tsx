@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import { PersonSelectCard } from "../components/PersonSelectCard";
+import { PersonSelectCard } from "@/features/persons/components/PersonSelectCard";
 import { Person } from "../schemas";
 
 const mockPerson: Person = {

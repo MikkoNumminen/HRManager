@@ -1,5 +1,5 @@
 import TopBar from "@/components/TopBar";
-import EmployeeLeaveClient from "@/components/EmployeeLeaveClient";
+import EmployeeLeaveClient from "@/features/employee/components/EmployeeLeaveClient";
 import {
   getSelfLeaveBalances,
   getSelfLeaveRequests,

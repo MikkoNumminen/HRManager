@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import LanguageSwitcher from "../components/LanguageSwitcher";
+import LanguageSwitcher from "../components/shared/LanguageSwitcher";
 import { locales, localeNames } from "../i18n/config";
 
 jest.mock("next/navigation", () => ({

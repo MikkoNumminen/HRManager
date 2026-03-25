@@ -3,7 +3,7 @@
  * empty states, single team, and teams without a manager.
  */
 import type { Meta, StoryObj } from "@storybook/react";
-import TeamsTable from "@/components/TeamsTable";
+import TeamsTable from "@/features/teams/components/TeamsTable";
 import type { CombinedTeam } from "@/schemas";
 
 const meta: Meta<typeof TeamsTable> = {

@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import EmployeeLeaveClient from "@/components/EmployeeLeaveClient";
+import EmployeeLeaveClient from "@/features/employee/components/EmployeeLeaveClient";
 import { LeaveBalance, LeaveRequest } from "@/schemas";
 
 const makeBalance = (overrides: Partial<LeaveBalance> = {}): LeaveBalance => ({

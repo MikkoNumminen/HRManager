@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import RemoveMemberForm from "../components/RemoveMemberForm";
+import RemoveMemberForm from "@/features/teams/components/RemoveMemberForm";
 import { removeMember } from "@/features/teams/actions";
 import { useRouter } from "next/navigation";
 

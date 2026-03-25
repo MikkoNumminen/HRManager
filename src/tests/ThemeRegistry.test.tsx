@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import ThemeRegistry, { useTheme } from "../components/ThemeRegistry";
+import ThemeRegistry, { useTheme } from "../components/shared/ThemeRegistry";
 import { THEME_STORAGE_KEY, DEFAULT_THEME } from "../themeConfig";
 
 jest.mock("next/navigation", () => ({

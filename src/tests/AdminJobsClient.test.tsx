@@ -8,7 +8,7 @@ jest.mock("next-intl", () => ({
 
 // Mock SnackbarProvider
 const mockShowSnackbar = jest.fn();
-jest.mock("@/components/SnackbarProvider", () => ({
+jest.mock("@/components/shared/SnackbarProvider", () => ({
   useSnackbar: () => ({ showSnackbar: mockShowSnackbar }),
 }));
 
@@ -30,7 +30,7 @@ jest.mock("@mui/icons-material/FileDownload", () => ({
   default: () => <span data-testid="download-icon" />,
 }));
 
-import AdminJobsClient from "@/components/AdminJobsClient";
+import AdminJobsClient from "@/features/admin/components/AdminJobsClient";
 import type { JobStatusResponse } from "@/jobs/types";
 
 const mockStatuses: JobStatusResponse[] = [

@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { useSnackbar } from "@/components/SnackbarProvider";
+import { useSnackbar } from "@/components/shared/SnackbarProvider";
 import type { ActionResult } from "@/lib/actionUtils";
 
 export type FormState = { error: string | null; success?: boolean };

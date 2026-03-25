@@ -1,6 +1,6 @@
 import { Box } from "@mui/material";
 import TopBar from "@/components/TopBar";
-import DataImportExport from "@/components/DataImportExport";
+import DataImportExport from "@/features/admin/components/DataImportExport";
 import { pageContainerStyles } from "@/muiStyles";
 import { getDataExportCounts } from "@/features/admin/queries";
 import { auth } from "@/auth";

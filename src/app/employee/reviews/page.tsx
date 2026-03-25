@@ -1,5 +1,5 @@
 import TopBar from "@/components/TopBar";
-import EmployeeReviewsClient from "@/components/EmployeeReviewsClient";
+import EmployeeReviewsClient from "@/features/employee/components/EmployeeReviewsClient";
 import { getSelfReviews, getLinkedPerson } from "@/features/employee/queries";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";

@@ -1,7 +1,7 @@
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 
 // Unmock SnackbarProvider so we can test the real implementation
-jest.unmock("../components/SnackbarProvider");
+jest.unmock("../components/shared/SnackbarProvider");
 
 // Use fake timers to prevent MUI Snackbar's autoHideDuration (4000ms) from keeping
 // Jest alive after tests complete. We advance timers explicitly where needed.
@@ -9,7 +9,7 @@ beforeAll(() => jest.useFakeTimers());
 afterAll(() => jest.useRealTimers());
 
 // Must import AFTER unmock
-import SnackbarProvider, { useSnackbar } from "../components/SnackbarProvider";
+import SnackbarProvider, { useSnackbar } from "../components/shared/SnackbarProvider";
 
 // Helper component that exposes the snackbar context for testing
 function SnackbarConsumer() {

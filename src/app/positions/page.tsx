@@ -1,5 +1,5 @@
 import TopBar from "@/components/TopBar";
-import PositionCatalogClient from "@/components/PositionCatalogClient";
+import PositionCatalogClient from "@/features/positions/components/PositionCatalogClient";
 import { getPositions } from "@/features/positions/queries";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";

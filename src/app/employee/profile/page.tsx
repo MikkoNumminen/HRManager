@@ -1,5 +1,5 @@
 import TopBar from "@/components/TopBar";
-import EmployeeSelfProfileClient from "@/components/EmployeeSelfProfileClient";
+import EmployeeSelfProfileClient from "@/features/employee/components/EmployeeSelfProfileClient";
 import { getSelfProfile } from "@/features/employee/queries";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";

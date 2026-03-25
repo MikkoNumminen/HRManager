@@ -1,8 +1,8 @@
 import { render, screen, fireEvent, act, waitFor } from "@testing-library/react";
-import SearchBar from "@/components/SearchBar";
-import OptimisticPersons from "@/components/OptimisticPersons";
-import OptimisticTeams from "@/components/OptimisticTeams";
-import OptimisticDepartments from "@/components/OptimisticDepartments";
+import SearchBar from "@/components/shared/SearchBar";
+import OptimisticPersons from "@/features/persons/components/OptimisticPersons";
+import OptimisticTeams from "@/features/teams/components/OptimisticTeams";
+import OptimisticDepartments from "@/features/departments/components/OptimisticDepartments";
 import { Person, CombinedTeam, Department } from "@/schemas";
 
 const mockPush = jest.fn();

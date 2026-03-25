@@ -1,7 +1,7 @@
-import RemovePersonForm from "@/components/RemovePersonForm";
-import UpdatePersonNameForm from "@/components/UpdatePersonNameForm";
-import UpdateEmailForm from "@/components/UpdateEmailForm";
-import UpdatePositionForm from "@/components/UpdatePositionForm";
+import RemovePersonForm from "@/features/persons/components/RemovePersonForm";
+import UpdatePersonNameForm from "@/features/persons/components/UpdatePersonNameForm";
+import UpdateEmailForm from "@/features/persons/components/UpdateEmailForm";
+import UpdatePositionForm from "@/features/persons/components/UpdatePositionForm";
 import TopBar from "@/components/TopBar";
 import { getPersons, getPersonDeleteImpact } from "@/features/persons/queries";
 import { getPositions } from "@/features/positions/queries";

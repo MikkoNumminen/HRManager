@@ -4,7 +4,7 @@ import { formStyles, headerStyles, smallButtonStyles, textFieldStyles } from "@/
 import { updateEmail } from "@/features/persons/actions";
 import { getPersons } from "@/features/persons/queries";
 import { Box, Button, TextField, Typography } from "@mui/material";
-import { RemovePersonCheckBoxList } from "@/components/RemovePersonCheckBoxList";
+import { RemovePersonCheckBoxList } from "@/features/persons/components/RemovePersonCheckBoxList";
 
 async function handleSubmit(data: FormData) {
   "use server";

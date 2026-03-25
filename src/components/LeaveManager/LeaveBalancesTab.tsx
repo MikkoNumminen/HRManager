@@ -17,7 +17,7 @@ import {
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { tableStyles, textFieldStyles, formStyles, smallButtonStyles, colors } from "@/muiStyles";
-import { useSnackbar } from "../SnackbarProvider";
+import { useSnackbar } from "../shared/SnackbarProvider";
 import { useTranslations } from "next-intl";
 import type { LeaveType, LeaveBalance, Person } from "@/schemas";
 import { allocateLeaveBalance } from "@/serverActions";

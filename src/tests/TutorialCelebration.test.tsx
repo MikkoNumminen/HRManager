@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, act } from "@testing-library/react";
-import TutorialCelebration from "../components/TutorialCelebration";
-import { useTutorial } from "../components/TutorialProvider";
+import TutorialCelebration from "../components/shared/TutorialCelebration";
+import { useTutorial } from "../components/shared/TutorialProvider";
 import { TutorialStepId } from "../tutorialConfig";
 
 jest.mock("next-auth/react", () => ({
@@ -15,7 +15,7 @@ jest.mock("next/navigation", () => ({
 const mockConfetti = jest.fn();
 jest.mock("canvas-confetti", () => ({ __esModule: true, default: mockConfetti }));
 
-jest.mock("../components/TutorialProvider", () => ({
+jest.mock("../components/shared/TutorialProvider", () => ({
   __esModule: true,
   default: ({ children }: { children: React.ReactNode }) => children,
   useTutorial: jest.fn(),

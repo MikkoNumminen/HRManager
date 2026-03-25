@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import EmployeeSelfProfileClient from "@/components/EmployeeSelfProfileClient";
+import EmployeeSelfProfileClient from "@/features/employee/components/EmployeeSelfProfileClient";
 import { EmployeeProfile } from "@/schemas";
 
 const baseProfile: EmployeeProfile = {

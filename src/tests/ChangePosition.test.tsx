@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import UpdatePositionForm from "../components/UpdatePositionForm";
+import UpdatePositionForm from "@/features/persons/components/UpdatePositionForm";
 import { updatePosition } from "@/features/persons/actions";
 import { useRouter } from "next/navigation";
 

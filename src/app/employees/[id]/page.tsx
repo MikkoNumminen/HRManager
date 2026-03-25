@@ -1,5 +1,5 @@
 import { getEmployeeProfile } from "@/features/persons/queries";
-import EmployeeProfileClient from "@/components/EmployeeProfileClient";
+import EmployeeProfileClient from "@/features/employee/components/EmployeeProfileClient";
 import TopBar from "@/components/TopBar";
 import { Typography } from "@mui/material";
 import { auth } from "@/auth";

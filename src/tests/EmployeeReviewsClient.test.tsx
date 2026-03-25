@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import EmployeeReviewsClient from "@/components/EmployeeReviewsClient";
+import EmployeeReviewsClient from "@/features/employee/components/EmployeeReviewsClient";
 import { ReviewRequest } from "@/schemas";
 
 const makeReview = (overrides: Partial<ReviewRequest> = {}): ReviewRequest => ({

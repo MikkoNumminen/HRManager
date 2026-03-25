@@ -1,5 +1,5 @@
 import TopBar from "@/components/TopBar";
-import ReportsDashboard from "@/components/ReportsDashboard";
+import ReportsDashboard from "@/features/reports/components/ReportsDashboard";
 import {
   getHeadcountTrends,
   getTurnoverRates,

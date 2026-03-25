@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 export const dynamic = "force-dynamic";
-import { RemovePersonCheckBoxList } from "@/components/RemovePersonCheckBoxList";
+import { RemovePersonCheckBoxList } from "@/features/persons/components/RemovePersonCheckBoxList";
 import { formStyles, headerStyles, smallButtonStyles } from "@/muiStyles";
 import { removePerson } from "@/features/persons/actions";
 import { getPersons } from "@/features/persons/queries";

@@ -22,7 +22,7 @@ if (typeof global.Request === "undefined") {
 
 // Mock SnackbarProvider globally so all components using useSnackbar work in tests.
 const mockShowSnackbar = jest.fn();
-jest.mock("./src/components/SnackbarProvider", () => ({
+jest.mock("./src/components/shared/SnackbarProvider", () => ({
   __esModule: true,
   default: ({ children }: { children: React.ReactNode }) => children,
   useSnackbar: () => ({ showSnackbar: mockShowSnackbar }),

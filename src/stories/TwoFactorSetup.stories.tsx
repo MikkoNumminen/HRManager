@@ -7,7 +7,7 @@
  */
 import type { Meta, StoryObj } from "@storybook/react";
 import { fn as _fn } from "@storybook/test";
-import TwoFactorSetup from "@/components/TwoFactorSetup";
+import TwoFactorSetup from "@/features/twoFactor/components/TwoFactorSetup";
 
 // Silence next-intl missing-provider errors in Storybook by aliasing to mock
 // (next-intl is mocked via __mocks__ or moduleNameMapper in jest, but for

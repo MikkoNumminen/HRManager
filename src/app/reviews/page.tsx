@@ -1,5 +1,5 @@
 import TopBar from "@/components/TopBar";
-import ReviewsClient from "@/components/ReviewsClient";
+import ReviewsClient from "@/features/reviews/components/ReviewsClient";
 import { getReviewCycles } from "@/features/reviews/queries";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";

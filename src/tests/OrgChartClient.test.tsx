@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import OrgChartClient from "@/components/OrgChartClient";
+import OrgChartClient from "@/features/reports/components/OrgChartClient";
 import type { OrgChartData } from "@/schemas";
 
 // ---------------------------------------------------------------------------

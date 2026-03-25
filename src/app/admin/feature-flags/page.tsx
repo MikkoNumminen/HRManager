@@ -1,6 +1,6 @@
 import { Box, Typography } from "@mui/material";
 import TopBar from "@/components/TopBar";
-import FeatureFlagsAdminClient from "@/components/FeatureFlagsAdminClient";
+import FeatureFlagsAdminClient from "@/features/admin/components/FeatureFlagsAdminClient";
 import { pageContainerStyles } from "@/muiStyles";
 import { getFeatureFlags } from "@/queries";
 import { getUsers } from "@/queries";

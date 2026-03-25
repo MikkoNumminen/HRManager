@@ -1,7 +1,7 @@
 import { Box, Link, Tooltip, Typography } from "@mui/material";
-import { PersonsTable as PersonTable } from "@/components/PersonsTable";
-import { TeamsTable } from "@/components/TeamsTable";
-import { DepartmentsTable } from "@/components/DepartmentsTable";
+import { PersonsTable as PersonTable } from "@/features/persons/components/PersonsTable";
+import { TeamsTable } from "@/features/teams/components/TeamsTable";
+import { DepartmentsTable } from "@/features/departments/components/DepartmentsTable";
 import TopBar from "@/components/TopBar";
 import { boxStyles } from "@/muiStyles";
 import { getPersons } from "@/features/persons/queries";

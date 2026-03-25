@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
-import TwoFactorVerify from "@/components/TwoFactorVerify";
+import TwoFactorVerify from "@/features/twoFactor/components/TwoFactorVerify";
 
 export default async function Verify2FAPage() {
   const session = await auth();

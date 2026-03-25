@@ -22,7 +22,7 @@ import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { tableStyles, textFieldStyles, formStyles, smallButtonStyles, colors } from "@/muiStyles";
-import { useSnackbar } from "../SnackbarProvider";
+import { useSnackbar } from "../shared/SnackbarProvider";
 import { useTranslations } from "next-intl";
 import type { LeaveType } from "@/schemas";
 import { createLeaveType, updateLeaveType, deleteLeaveType } from "@/serverActions";

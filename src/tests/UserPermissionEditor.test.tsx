@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import UserPermissionEditor from "../components/UserPermissionEditor";
+import UserPermissionEditor from "../features/admin/components/UserPermissionEditor";
 import { updateUserRole, updateUserPermission, kickOutUser } from "@/features/admin/actions";
 
 const mockPush = jest.fn();

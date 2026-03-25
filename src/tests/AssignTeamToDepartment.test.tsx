@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import AssignTeamToDepartmentForm from "../components/AssignTeamToDepartmentForm";
+import AssignTeamToDepartmentForm from "@/features/departments/components/AssignTeamToDepartmentForm";
 import { assignTeamToDepartment } from "@/features/departments/actions";
 import { CombinedTeam } from "../schemas";
 

@@ -16,7 +16,7 @@ jest.mock("@/serverActions", () => ({
 
 // Mock the snackbar provider — captures snackbar calls.
 const mockShowSnackbar = jest.fn();
-jest.mock("../components/SnackbarProvider", () => ({
+jest.mock("../components/shared/SnackbarProvider", () => ({
   useSnackbar: () => ({ showSnackbar: mockShowSnackbar }),
 }));
 

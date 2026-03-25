@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import UpdateEmailForm from "../components/UpdateEmailForm";
+import UpdateEmailForm from "@/features/persons/components/UpdateEmailForm";
 import { updateEmail } from "@/features/persons/actions";
 import { useRouter } from "next/navigation";
 

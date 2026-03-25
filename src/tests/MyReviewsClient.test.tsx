@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import MyReviewsClient from "../components/MyReviewsClient";
+import MyReviewsClient from "../features/reviews/components/MyReviewsClient";
 
 describe("MyReviewsClient", () => {
   // Renders the pending reviews heading.

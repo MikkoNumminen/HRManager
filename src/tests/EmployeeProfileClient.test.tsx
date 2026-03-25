@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import EmployeeProfileClient from "@/components/EmployeeProfileClient";
+import EmployeeProfileClient from "@/features/employee/components/EmployeeProfileClient";
 import { EmployeeProfile } from "@/schemas";
 
 jest.mock("next/link", () => {

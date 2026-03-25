@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import AddMemberForm from "../components/AddMemberForm";
+import AddMemberForm from "@/features/teams/components/AddMemberForm";
 import { addMember } from "@/features/teams/actions";
 import { useRouter } from "next/navigation";
 

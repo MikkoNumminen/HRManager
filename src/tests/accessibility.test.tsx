@@ -23,33 +23,33 @@ import type { DataExportCounts } from "../queries";
 
 // ─── Component Imports ─────────────────────────────────────────────────────
 
-import MyReviewsClient from "../components/MyReviewsClient";
-import EmptyState from "../components/EmptyState";
-import ConfirmDialog from "../components/ConfirmDialog";
-import SearchBar from "../components/SearchBar";
-import TopBar from "../components/TopBar";
+import MyReviewsClient from "../features/reviews/components/MyReviewsClient";
+import EmptyState from "@/components/shared/EmptyState";
+import ConfirmDialog from "@/components/shared/ConfirmDialog";
+import SearchBar from "@/components/shared/SearchBar";
+import TopBar from "@/components/TopBar";
 import {
   TablePageSkeleton,
   DetailPageSkeleton,
   DashboardSkeleton,
-} from "../components/PageSkeletons";
-import LanguageSwitcher from "../components/LanguageSwitcher";
-import ThemeSwitcher from "../components/ThemeSwitcher";
-import AddPersonForm from "../components/AddPersonForm";
-import AddTeamForm from "../components/AddTeamForm";
-import AddDepartmentForm from "../components/AddDepartmentForm";
-import ProfileEditor from "../components/ProfileEditor";
-import LeaveManager from "../components/LeaveManager";
-import DataImportExport from "../components/DataImportExport";
-import AuditLogViewer from "../components/AuditLogViewer";
-import ReviewSubmitClient from "../components/ReviewSubmitClient";
-import ReviewTemplateDetailClient from "../components/ReviewTemplateDetailClient";
-import ReviewTemplatesClient from "../components/ReviewTemplatesClient";
-import ReviewCycleDetailClient from "../components/ReviewCycleDetailClient";
-import { PersonsTable } from "../components/PersonsTable";
-import { DepartmentsTable } from "../components/DepartmentsTable";
-import { TeamsTable } from "../components/TeamsTable";
-import OrgChartClient from "../components/OrgChartClient";
+} from "@/components/shared/PageSkeletons";
+import LanguageSwitcher from "@/components/shared/LanguageSwitcher";
+import ThemeSwitcher from "@/components/shared/ThemeSwitcher";
+import AddPersonForm from "@/features/persons/components/AddPersonForm";
+import AddTeamForm from "@/features/teams/components/AddTeamForm";
+import AddDepartmentForm from "@/features/departments/components/AddDepartmentForm";
+import ProfileEditor from "@/features/profile/components/ProfileEditor";
+import LeaveManager from "@/components/LeaveManager";
+import DataImportExport from "../features/admin/components/DataImportExport";
+import AuditLogViewer from "../features/admin/components/AuditLogViewer";
+import ReviewSubmitClient from "../features/reviews/components/ReviewSubmitClient";
+import ReviewTemplateDetailClient from "../features/reviews/components/ReviewTemplateDetailClient";
+import ReviewTemplatesClient from "../features/reviews/components/ReviewTemplatesClient";
+import ReviewCycleDetailClient from "../features/reviews/components/ReviewCycleDetailClient";
+import { PersonsTable } from "@/features/persons/components/PersonsTable";
+import { DepartmentsTable } from "@/features/departments/components/DepartmentsTable";
+import { TeamsTable } from "@/features/teams/components/TeamsTable";
+import OrgChartClient from "@/features/reports/components/OrgChartClient";
 
 // ─── Mocks ─────────────────────────────────────────────────────────────────
 
@@ -130,7 +130,7 @@ jest.mock("@/features/twoFactor/actions", () => ({
   regenerateRecoveryCodes: jest.fn(),
 }));
 
-jest.mock("../components/CsvImportDialog", () => {
+jest.mock("../features/admin/components/CsvImportDialog", () => {
   return function MockCsvImportDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
     return open ? (
       <div data-testid="csv-import-dialog">

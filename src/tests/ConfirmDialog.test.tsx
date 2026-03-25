@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import ConfirmDialog from "@/components/ConfirmDialog";
+import ConfirmDialog from "@/components/shared/ConfirmDialog";
 
 const defaultProps = {
   open: true,

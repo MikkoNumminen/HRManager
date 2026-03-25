@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { RemovePersonCheckBoxList } from "@/components/RemovePersonCheckBoxList";
+import { RemovePersonCheckBoxList } from "@/features/persons/components/RemovePersonCheckBoxList";
 
 describe("RemovePersonCheckBoxList", () => {
   const defaultProps = {

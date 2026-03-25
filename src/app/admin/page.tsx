@@ -1,6 +1,6 @@
 import { Box, Typography } from "@mui/material";
 import TopBar from "@/components/TopBar";
-import UserManagementTable from "@/components/UserManagementTable";
+import UserManagementTable from "@/features/admin/components/UserManagementTable";
 import { pageContainerStyles } from "@/muiStyles";
 import { getUsers } from "@/features/admin/queries";
 import { auth } from "@/auth";

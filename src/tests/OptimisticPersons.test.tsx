@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import OptimisticPersons from "@/components/OptimisticPersons";
+import OptimisticPersons from "@/features/persons/components/OptimisticPersons";
 import { Person } from "@/schemas";
 import { createPerson } from "@/features/persons/actions";
 

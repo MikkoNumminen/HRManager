@@ -1,5 +1,8 @@
 import { render, screen, act, fireEvent } from "@testing-library/react";
-import TutorialProvider, { useTutorial, useTutorialMaybe } from "../components/TutorialProvider";
+import TutorialProvider, {
+  useTutorial,
+  useTutorialMaybe,
+} from "../components/shared/TutorialProvider";
 import { useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import { STORAGE_KEY } from "../tutorialConfig";

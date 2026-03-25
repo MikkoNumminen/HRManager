@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, within } from "@testing-library/react";
-import AuditLogViewer from "../components/AuditLogViewer";
+import AuditLogViewer from "../features/admin/components/AuditLogViewer";
 import { AuditLog } from "../schemas";
 
 const mockPush = jest.fn();

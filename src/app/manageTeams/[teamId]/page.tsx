@@ -1,11 +1,11 @@
-import UpdateManagerForm from "@/components/UpdateManagerForm";
-import UpdateTeamNameForm from "@/components/UpdateTeamNameForm";
-import RemoveTeamForm from "@/components/RemoveTeamForm";
+import UpdateManagerForm from "@/features/persons/components/UpdateManagerForm";
+import UpdateTeamNameForm from "@/features/teams/components/UpdateTeamNameForm";
+import RemoveTeamForm from "@/features/teams/components/RemoveTeamForm";
 import { getPersons } from "@/features/persons/queries";
 import { getTeams, getTeamDeleteImpact } from "@/features/teams/queries";
 import { Typography } from "@mui/material";
-import AddMemberForm from "@/components/AddMemberForm";
-import RemoveMemberForm from "@/components/RemoveMemberForm";
+import AddMemberForm from "@/features/teams/components/AddMemberForm";
+import RemoveMemberForm from "@/features/teams/components/RemoveMemberForm";
 import TopBar from "@/components/TopBar";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";

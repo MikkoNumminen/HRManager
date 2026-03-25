@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import ReviewCycleDetailClient from "../components/ReviewCycleDetailClient";
+import ReviewCycleDetailClient from "../features/reviews/components/ReviewCycleDetailClient";
 import type { ReviewCycle, ReviewRequest, Person } from "../schemas";
 
 // Mock server actions — component tests verify UI behavior, not server logic.

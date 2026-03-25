@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import { PersonSelectCard } from "../components/PersonSelectCard";
-import { PersonCheckBoxList } from "../components/PersonCheckboxList";
+import { PersonSelectCard } from "@/features/persons/components/PersonSelectCard";
+import { PersonCheckBoxList } from "@/features/persons/components/PersonCheckboxList";
 import { Person } from "@/schemas";
 
 const defaultPerson: Person = {

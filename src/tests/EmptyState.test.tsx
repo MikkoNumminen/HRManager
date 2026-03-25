@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { PeopleOutlined } from "@mui/icons-material";
-import EmptyState from "../components/EmptyState";
+import EmptyState from "../components/shared/EmptyState";
 
 describe("EmptyState", () => {
   // Renders icon, title, and optional subtitle.

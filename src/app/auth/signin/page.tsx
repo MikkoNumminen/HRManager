@@ -1,4 +1,4 @@
-import SignInClient from "@/components/SignInClient";
+import SignInClient from "@/components/shared/SignInClient";
 
 interface SignInPageProps {
   searchParams: Promise<{ callbackUrl?: string; error?: string }>;

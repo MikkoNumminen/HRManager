@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import KeyboardShortcutsProvider, {
   useKeyboardShortcuts,
-} from "../components/KeyboardShortcutsProvider";
+} from "../components/shared/KeyboardShortcutsProvider";
 
 // Mock next/navigation
 const mockPush = jest.fn();

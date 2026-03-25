@@ -7,7 +7,7 @@ import {
   AuditLogSkeleton,
   DataPageSkeleton,
   AdminPageSkeleton,
-} from "../components/PageSkeletons";
+} from "../components/shared/PageSkeletons";
 
 // Each skeleton must render without throwing and produce visible skeleton elements.
 

@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import UpdateDepartmentForm from "../components/UpdateDepartmentForm";
+import UpdateDepartmentForm from "@/features/departments/components/UpdateDepartmentForm";
 import { updateDepartment } from "@/features/departments/actions";
 
 jest.mock("@/features/departments/actions", () => ({

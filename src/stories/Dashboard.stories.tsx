@@ -3,7 +3,7 @@
  * zero state, large numbers, and single-card extremes.
  */
 import type { Meta, StoryObj } from "@storybook/react";
-import DashboardKPICards from "@/components/DashboardKPICards";
+import DashboardKPICards from "@/features/dashboard/components/DashboardKPICards";
 
 const meta: Meta<typeof DashboardKPICards> = {
   title: "Components/DashboardKPICards",

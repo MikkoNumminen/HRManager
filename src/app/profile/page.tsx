@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
 import TopBar from "@/components/TopBar";
-import ProfileEditor from "@/components/ProfileEditor";
-import ActiveSessions from "@/components/ActiveSessions";
+import ProfileEditor from "@/features/profile/components/ProfileEditor";
+import ActiveSessions from "@/features/sessions/components/ActiveSessions";
 import { pageContainerStyles } from "@/muiStyles";
 import { getProfile } from "@/features/profile/queries";
 import { getMyActiveSessions } from "@/features/sessions/queries";

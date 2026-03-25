@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import OptimisticDepartments from "@/components/OptimisticDepartments";
+import OptimisticDepartments from "@/features/departments/components/OptimisticDepartments";
 import { Department } from "@/schemas";
 import { createDepartment } from "@/features/departments/actions";
 

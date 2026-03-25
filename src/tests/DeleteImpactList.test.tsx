@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import DeleteImpactList from "@/components/DeleteImpactList";
+import DeleteImpactList from "@/components/shared/DeleteImpactList";
 
 describe("DeleteImpactList", () => {
   // Renders nothing when all impact items are empty.

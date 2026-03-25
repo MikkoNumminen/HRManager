@@ -1,5 +1,5 @@
 import TopBar from "@/components/TopBar";
-import TeamReviewsDashboardClient from "@/components/TeamReviewsDashboardClient";
+import TeamReviewsDashboardClient from "@/features/reviews/components/TeamReviewsDashboardClient";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getUserPermissions } from "@/permissions";

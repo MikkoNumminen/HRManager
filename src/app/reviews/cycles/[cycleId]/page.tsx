@@ -1,5 +1,5 @@
 import TopBar from "@/components/TopBar";
-import ReviewCycleDetailClient from "@/components/ReviewCycleDetailClient";
+import ReviewCycleDetailClient from "@/features/reviews/components/ReviewCycleDetailClient";
 import { getReviewCycle } from "@/features/reviews/queries";
 import { getPersons } from "@/features/persons/queries";
 import { auth } from "@/auth";

@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import UserManagementTable from "../components/UserManagementTable";
+import UserManagementTable from "../features/admin/components/UserManagementTable";
 import { AppUser } from "../schemas";
 
 const mockPush = jest.fn();

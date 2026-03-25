@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import DashboardCharts from "../components/DashboardCharts";
+import DashboardCharts from "@/features/dashboard/components/DashboardCharts";
 import type {
   DashboardTeamSize,
   DashboardDepartmentSize,

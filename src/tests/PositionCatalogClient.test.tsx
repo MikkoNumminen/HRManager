@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import PositionCatalogClient from "../components/PositionCatalogClient";
+import PositionCatalogClient from "@/features/positions/components/PositionCatalogClient";
 import type { Position, Permissions } from "../schemas";
 
 // Mock server actions — component tests verify UI behavior, not server logic.
@@ -10,7 +10,7 @@ jest.mock("@/features/positions/actions", () => ({
 
 // Mock the snackbar provider — captures snackbar calls.
 const mockShowSnackbar = jest.fn();
-jest.mock("../components/SnackbarProvider", () => ({
+jest.mock("../components/shared/SnackbarProvider", () => ({
   useSnackbar: () => ({ showSnackbar: mockShowSnackbar }),
 }));
 

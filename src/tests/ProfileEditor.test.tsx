@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import ProfileEditor from "../components/ProfileEditor";
+import ProfileEditor from "@/features/profile/components/ProfileEditor";
 import { updateProfileName, updateProfileImage } from "@/features/profile/actions";
 import { UserProfile } from "../schemas";
 

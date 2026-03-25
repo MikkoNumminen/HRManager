@@ -1,6 +1,6 @@
 import { Box, Typography } from "@mui/material";
 import TopBar from "@/components/TopBar";
-import AdminJobsClient from "@/components/AdminJobsClient";
+import AdminJobsClient from "@/features/admin/components/AdminJobsClient";
 import { pageContainerStyles } from "@/muiStyles";
 import { getJobQueueStatuses } from "@/queries";
 import { auth } from "@/auth";

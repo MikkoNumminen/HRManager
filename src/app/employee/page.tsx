@@ -1,5 +1,5 @@
 import TopBar from "@/components/TopBar";
-import EmployeeDashboardClient from "@/components/EmployeeDashboardClient";
+import EmployeeDashboardClient from "@/features/employee/components/EmployeeDashboardClient";
 import {
   getSelfProfile,
   getSelfLeaveBalances,

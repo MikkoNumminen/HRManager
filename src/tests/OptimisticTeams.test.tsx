@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import OptimisticTeams from "@/components/OptimisticTeams";
+import OptimisticTeams from "@/features/teams/components/OptimisticTeams";
 import { CombinedTeam } from "@/schemas";
 import { createTeam } from "@/features/teams/actions";
 

@@ -1,12 +1,12 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import ThemeSwitcher from "../components/ThemeSwitcher";
+import ThemeSwitcher from "../components/shared/ThemeSwitcher";
 import { THEME_NAMES, THEME_LABELS } from "../themeConfig";
 
 const mockSetTheme = jest.fn();
 let mockCurrentTheme = "dark";
 
-jest.mock("../components/ThemeRegistry", () => ({
+jest.mock("../components/shared/ThemeRegistry", () => ({
   useTheme: () => ({ currentTheme: mockCurrentTheme, setTheme: mockSetTheme }),
 }));
 

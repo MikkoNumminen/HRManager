@@ -1,5 +1,5 @@
 import TopBar from "@/components/TopBar";
-import ReviewTemplateDetailClient from "@/components/ReviewTemplateDetailClient";
+import ReviewTemplateDetailClient from "@/features/reviews/components/ReviewTemplateDetailClient";
 import { getReviewTemplate } from "@/features/reviews/queries";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";

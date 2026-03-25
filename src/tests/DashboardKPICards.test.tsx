@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import DashboardKPICards from "../components/DashboardKPICards";
+import DashboardKPICards from "@/features/dashboard/components/DashboardKPICards";
 
 describe("DashboardKPICards", () => {
   const defaultProps = {

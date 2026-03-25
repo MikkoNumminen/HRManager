@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import DataImportExport from "../components/DataImportExport";
+import DataImportExport from "../features/admin/components/DataImportExport";
 import { Permissions } from "../schemas";
 import { DataExportCounts } from "../queries";
 
@@ -20,7 +20,7 @@ jest.mock("@/features/data/actions", () => ({
   importPersonsCsv: jest.fn(),
 }));
 
-jest.mock("../components/CsvImportDialog", () => {
+jest.mock("../features/admin/components/CsvImportDialog", () => {
   return function MockCsvImportDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
     return open ? (
       <div data-testid="csv-import-dialog">
@@ -33,7 +33,7 @@ jest.mock("../components/CsvImportDialog", () => {
   };
 });
 
-jest.mock("../components/SnackbarProvider", () => ({
+jest.mock("../components/shared/SnackbarProvider", () => ({
   useSnackbar: () => ({ showSnackbar: jest.fn() }),
 }));
 
