@@ -1,22 +1,7 @@
 "use client";
 
-import { useState, useActionState, useEffect } from "react";
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Typography,
-  Alert,
-  Stepper,
-  Step,
-  StepLabel,
-  IconButton,
-} from "@mui/material";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import { useState, useActionState } from "react";
+import { Box, Button, Typography } from "@mui/material";
 import SecurityIcon from "@mui/icons-material/Security";
 import {
   beginTwoFactorSetup,
@@ -29,13 +14,15 @@ import {
   colors,
   formStyles,
   headerStyles,
-  textFieldStyles,
   smallButtonStyles,
   activeButtonStyles,
   formButtonContainerStyles,
 } from "@/muiStyles";
 import { useTranslations } from "next-intl";
 import { useSnackbar } from "@/components/shared/SnackbarProvider";
+import SetupDialog from "./SetupDialog";
+import DisableDialog from "./DisableDialog";
+import RegenerateDialog from "./RegenerateDialog";
 
 interface TwoFactorSetupProps {
   enabled: boolean;
@@ -45,7 +32,6 @@ type FormState = { error: string | null };
 
 export default function TwoFactorSetup({ enabled }: TwoFactorSetupProps) {
   const t = useTranslations("twoFactor");
-  const tc = useTranslations("common");
   const { showSnackbar } = useSnackbar();
 
   const [setupOpen, setSetupOpen] = useState(false);
@@ -112,7 +98,23 @@ export default function TwoFactorSetup({ enabled }: TwoFactorSetupProps) {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const steps = [t("stepScan"), t("stepVerify"), t("stepRecovery")];
+  const handleCopySecret = () => {
+    if (setupData) {
+      navigator.clipboard.writeText(setupData.secret);
+      showSnackbar(t("secretCopied"));
+    }
+  };
+
+  const handleSetupDone = () => {
+    setSetupOpen(false);
+    setSetupData(null);
+    setActiveStep(0);
+  };
+
+  const handleRegenClose = () => {
+    setRegenOpen(false);
+    setRegenCodes(null);
+  };
 
   return (
     <Box sx={formStyles}>
@@ -147,356 +149,37 @@ export default function TwoFactorSetup({ enabled }: TwoFactorSetupProps) {
         </Box>
       )}
 
-      {/* Setup Dialog */}
-      <Dialog
+      <SetupDialog
         open={setupOpen}
-        onClose={() => activeStep < 2 && setSetupOpen(false)}
-        maxWidth="sm"
-        fullWidth
-        PaperProps={{
-          sx: {
-            backgroundColor: "var(--hrm-slate700)",
-            border: `1px solid ${colors.slate300}`,
-          },
-        }}
-      >
-        <DialogTitle sx={{ color: colors.slate100 }}>{t("setupTitle")}</DialogTitle>
-        <DialogContent>
-          <Stepper activeStep={activeStep} sx={{ mb: 3, mt: 1 }}>
-            {steps.map((label) => (
-              <Step key={label}>
-                <StepLabel
-                  sx={{
-                    "& .MuiStepLabel-label": { color: colors.slate300 },
-                    "& .MuiStepLabel-label.Mui-active": { color: colors.slate100 },
-                    "& .MuiStepLabel-label.Mui-completed": { color: colors.green400 },
-                  }}
-                >
-                  {label}
-                </StepLabel>
-              </Step>
-            ))}
-          </Stepper>
+        onClose={() => setSetupOpen(false)}
+        setupData={setupData}
+        activeStep={activeStep}
+        onStepChange={setActiveStep}
+        confirmAction={confirmAction}
+        confirmState={confirmState}
+        confirmPending={confirmPending}
+        onDone={handleSetupDone}
+        copied={copied}
+        onCopyRecoveryCodes={copyRecoveryCodes}
+        onCopySecret={handleCopySecret}
+      />
 
-          {/* Step 0: QR Code + secret */}
-          {activeStep === 0 && setupData && (
-            <Box sx={{ textAlign: "center" }}>
-              <Typography variant="body2" sx={{ color: colors.slate300, mb: 2 }}>
-                {t("scanInstructions")}
-              </Typography>
-              {/* QR code rendered as a data URI via the otpauth URI */}
-              <Box
-                sx={{
-                  backgroundColor: "#fff",
-                  borderRadius: 2,
-                  p: 2,
-                  display: "inline-block",
-                  mb: 2,
-                }}
-              >
-                <img id="totp-qr-code" alt={t("qrCodeAlt")} style={{ width: 200, height: 200 }} />
-              </Box>
-              <QrCodeRenderer uri={setupData.uri} />
-              <Typography variant="body2" sx={{ color: colors.slate400, mb: 1 }}>
-                {t("manualEntry")}
-              </Typography>
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 1,
-                  backgroundColor: colors.slate600,
-                  borderRadius: 1,
-                  p: 1,
-                  mb: 2,
-                }}
-              >
-                <Typography
-                  variant="body1"
-                  sx={{
-                    color: colors.slate100,
-                    fontFamily: "monospace",
-                    letterSpacing: "0.1em",
-                    wordBreak: "break-all",
-                  }}
-                >
-                  {setupData.secret}
-                </Typography>
-                <IconButton
-                  size="small"
-                  onClick={() => {
-                    navigator.clipboard.writeText(setupData.secret);
-                    showSnackbar(t("secretCopied"));
-                  }}
-                  sx={{ color: colors.slate300 }}
-                >
-                  <ContentCopyIcon fontSize="small" />
-                </IconButton>
-              </Box>
-              <Button
-                onClick={() => setActiveStep(1)}
-                sx={{ ...smallButtonStyles, ...activeButtonStyles }}
-              >
-                {t("next")}
-              </Button>
-            </Box>
-          )}
-
-          {/* Step 1: Verify code */}
-          {activeStep === 1 && (
-            <Box component="form" action={confirmAction}>
-              <Typography variant="body2" sx={{ color: colors.slate300, mb: 2 }}>
-                {t("verifyInstructions")}
-              </Typography>
-              {confirmState.error && (
-                <Alert severity="error" sx={{ mb: 2 }}>
-                  {confirmState.error}
-                </Alert>
-              )}
-              <TextField
-                name="code"
-                label={t("codeLabel")}
-                placeholder="000000"
-                autoComplete="one-time-code"
-                inputProps={{ maxLength: 6, pattern: "[0-9]*", inputMode: "numeric" }}
-                fullWidth
-                sx={{ ...textFieldStyles, mb: 2 }}
-              />
-              <Box sx={formButtonContainerStyles}>
-                <Button onClick={() => setActiveStep(0)} sx={smallButtonStyles}>
-                  {t("back")}
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={confirmPending}
-                  sx={{ ...smallButtonStyles, ...activeButtonStyles }}
-                >
-                  {t("verifyAndEnable")}
-                </Button>
-              </Box>
-            </Box>
-          )}
-
-          {/* Step 2: Recovery codes */}
-          {activeStep === 2 && setupData && (
-            <Box>
-              <Alert severity="warning" sx={{ mb: 2 }}>
-                {t("recoveryWarning")}
-              </Alert>
-              <RecoveryCodesList codes={setupData.recoveryCodes} onCopy={copyRecoveryCodes} />
-              {copied && (
-                <Typography variant="body2" sx={{ color: colors.green400, textAlign: "center" }}>
-                  {t("codesCopied")}
-                </Typography>
-              )}
-            </Box>
-          )}
-        </DialogContent>
-        {activeStep === 2 && (
-          <DialogActions sx={{ px: 3, pb: 2 }}>
-            <Button
-              onClick={() => {
-                setSetupOpen(false);
-                setSetupData(null);
-                setActiveStep(0);
-              }}
-              sx={{ ...smallButtonStyles, ...activeButtonStyles }}
-            >
-              {t("done")}
-            </Button>
-          </DialogActions>
-        )}
-      </Dialog>
-
-      {/* Disable Dialog */}
-      <Dialog
+      <DisableDialog
         open={disableOpen}
         onClose={() => setDisableOpen(false)}
-        maxWidth="xs"
-        fullWidth
-        PaperProps={{
-          sx: {
-            backgroundColor: "var(--hrm-slate700)",
-            border: `1px solid ${colors.slate300}`,
-          },
-        }}
-      >
-        <DialogTitle sx={{ color: colors.slate100 }}>{t("disableTitle")}</DialogTitle>
-        <DialogContent>
-          <Typography variant="body2" sx={{ color: colors.slate300, mb: 2 }}>
-            {t("disableInstructions")}
-          </Typography>
-          <Box component="form" action={disableAction}>
-            {disableState.error && (
-              <Alert severity="error" sx={{ mb: 2 }}>
-                {disableState.error}
-              </Alert>
-            )}
-            <TextField
-              name="code"
-              label={t("codeLabel")}
-              placeholder="000000"
-              autoComplete="one-time-code"
-              inputProps={{ maxLength: 6, pattern: "[0-9]*", inputMode: "numeric" }}
-              fullWidth
-              sx={{ ...textFieldStyles, mb: 2 }}
-            />
-            <Box sx={formButtonContainerStyles}>
-              <Button onClick={() => setDisableOpen(false)} sx={smallButtonStyles}>
-                {tc("cancel")}
-              </Button>
-              <Button
-                type="submit"
-                disabled={disablePending}
-                sx={{ ...smallButtonStyles, color: colors.error, borderColor: colors.error }}
-              >
-                {t("disable")}
-              </Button>
-            </Box>
-          </Box>
-        </DialogContent>
-      </Dialog>
+        disableAction={disableAction}
+        disableState={disableState}
+        disablePending={disablePending}
+      />
 
-      {/* Regenerate Recovery Codes Dialog */}
-      <Dialog
+      <RegenerateDialog
         open={regenOpen}
-        onClose={() => {
-          setRegenOpen(false);
-          setRegenCodes(null);
-        }}
-        maxWidth="xs"
-        fullWidth
-        PaperProps={{
-          sx: {
-            backgroundColor: "var(--hrm-slate700)",
-            border: `1px solid ${colors.slate300}`,
-          },
-        }}
-      >
-        <DialogTitle sx={{ color: colors.slate100 }}>{t("regenerateTitle")}</DialogTitle>
-        <DialogContent>
-          {!regenCodes ? (
-            <Box component="form" action={handleRegenerate}>
-              <Typography variant="body2" sx={{ color: colors.slate300, mb: 2 }}>
-                {t("regenerateInstructions")}
-              </Typography>
-              <TextField
-                name="code"
-                label={t("codeLabel")}
-                placeholder="000000"
-                autoComplete="one-time-code"
-                inputProps={{ maxLength: 6, pattern: "[0-9]*", inputMode: "numeric" }}
-                fullWidth
-                sx={{ ...textFieldStyles, mb: 2 }}
-              />
-              <Box sx={formButtonContainerStyles}>
-                <Button onClick={() => setRegenOpen(false)} sx={smallButtonStyles}>
-                  {tc("cancel")}
-                </Button>
-                <Button type="submit" sx={{ ...smallButtonStyles, ...activeButtonStyles }}>
-                  {t("regenerateCodes")}
-                </Button>
-              </Box>
-            </Box>
-          ) : (
-            <Box>
-              <Alert severity="warning" sx={{ mb: 2 }}>
-                {t("recoveryWarning")}
-              </Alert>
-              <RecoveryCodesList codes={regenCodes} onCopy={copyRecoveryCodes} />
-              {copied && (
-                <Typography variant="body2" sx={{ color: colors.green400, textAlign: "center" }}>
-                  {t("codesCopied")}
-                </Typography>
-              )}
-            </Box>
-          )}
-        </DialogContent>
-        {regenCodes && (
-          <DialogActions sx={{ px: 3, pb: 2 }}>
-            <Button
-              onClick={() => {
-                setRegenOpen(false);
-                setRegenCodes(null);
-              }}
-              sx={{ ...smallButtonStyles, ...activeButtonStyles }}
-            >
-              {t("done")}
-            </Button>
-          </DialogActions>
-        )}
-      </Dialog>
+        onClose={handleRegenClose}
+        onRegenerate={handleRegenerate}
+        regenCodes={regenCodes}
+        copied={copied}
+        onCopyRecoveryCodes={copyRecoveryCodes}
+      />
     </Box>
   );
-}
-
-/** Renders recovery codes in a grid with a copy button. */
-function RecoveryCodesList({
-  codes,
-  onCopy,
-}: {
-  codes: string[];
-  onCopy: (codes: string[]) => void;
-}) {
-  const t = useTranslations("twoFactor");
-  return (
-    <Box sx={{ textAlign: "center", mb: 2 }}>
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: "repeat(2, 1fr)",
-          gap: 1,
-          backgroundColor: colors.slate600,
-          borderRadius: 1,
-          p: 2,
-          mb: 2,
-        }}
-      >
-        {codes.map((code) => (
-          <Typography
-            key={code}
-            variant="body2"
-            sx={{ fontFamily: "monospace", color: colors.slate100, letterSpacing: "0.05em" }}
-          >
-            {code}
-          </Typography>
-        ))}
-      </Box>
-      <Button
-        onClick={() => onCopy(codes)}
-        startIcon={<ContentCopyIcon />}
-        sx={{ color: colors.slate300 }}
-      >
-        {t("copyCodes")}
-      </Button>
-    </Box>
-  );
-}
-
-/**
- * Client-side QR code renderer.
- * Uses the qrcode library to render the otpauth URI into the img element.
- */
-function QrCodeRenderer({ uri }: { uri: string }) {
-  useEffect(() => {
-    let cancelled = false;
-    // Dynamic import of qrcode to avoid SSR issues
-    import("qrcode").then((QRCode) => {
-      if (cancelled) return;
-      const img = document.getElementById("totp-qr-code") as HTMLImageElement | null;
-      if (img) {
-        QRCode.toDataURL(uri, { width: 200, margin: 1 }).then((dataUrl: string) => {
-          if (!cancelled && img) {
-            img.src = dataUrl;
-          }
-        });
-      }
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [uri]);
-
-  return null;
 }
