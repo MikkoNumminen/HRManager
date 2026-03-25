@@ -23,11 +23,14 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
+        env:
+          DATABASE_URL: postgresql://localhost:5432/dummy
+          DIRECT_URL: postgresql://localhost:5432/dummy
 
       - name: Build Storybook and publish to Chromatic
         run: npm run chromatic -- --exit-zero-on-changes
