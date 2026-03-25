@@ -16,6 +16,8 @@ import { PeopleOutlined } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 import { colors, mobileCardClickableStyles } from "@/muiStyles";
 import { Person } from "@/schemas";
+import { formatDate } from "@/utils/formatDate";
+import { onActivateKeyDown } from "@/utils/keyboardHandlers";
 import { useTranslations } from "next-intl";
 import EmptyState from "./EmptyState";
 
@@ -73,12 +75,7 @@ const PersonTable: React.FC<PersonTableProps> = ({ persons, canCreate }) => {
                       hover
                       tabIndex={0}
                       onClick={() => handleRowClick(person.id)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          e.preventDefault();
-                          handleRowClick(person.id);
-                        }
-                      }}
+                      onKeyDown={onActivateKeyDown(() => handleRowClick(person.id))}
                       sx={{
                         "&:hover, &:focus-visible": {
                           cursor: "pointer",
@@ -89,8 +86,8 @@ const PersonTable: React.FC<PersonTableProps> = ({ persons, canCreate }) => {
                       <TableCell>{person.name}</TableCell>
                       <TableCell>{person.position ?? ""}</TableCell>
                       <TableCell>{person.email ?? ""}</TableCell>
-                      <TableCell>{new Date(person.createdAt).toLocaleString()}</TableCell>
-                      <TableCell>{new Date(person.updatedAt).toLocaleString()}</TableCell>
+                      <TableCell>{formatDate(person.createdAt)}</TableCell>
+                      <TableCell>{formatDate(person.updatedAt)}</TableCell>
                     </TableRow>
                   </Tooltip>
                 ))
@@ -111,12 +108,7 @@ const PersonTable: React.FC<PersonTableProps> = ({ persons, canCreate }) => {
                 role="button"
                 aria-label={t("clickToManage", { name: person.name })}
                 onClick={() => handleRowClick(person.id)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    handleRowClick(person.id);
-                  }
-                }}
+                onKeyDown={onActivateKeyDown(() => handleRowClick(person.id))}
                 sx={mobileCardClickableStyles}
               >
                 <Typography variant="subtitle1" sx={{ color: colors.slate100, fontWeight: 600 }}>
@@ -136,7 +128,7 @@ const PersonTable: React.FC<PersonTableProps> = ({ persons, canCreate }) => {
                   variant="caption"
                   sx={{ color: colors.slate400, mt: 0.5, display: "block" }}
                 >
-                  {tc("createdAt")}: {new Date(person.createdAt).toLocaleString()}
+                  {tc("createdAt")}: {formatDate(person.createdAt)}
                 </Typography>
               </Box>
             ))}

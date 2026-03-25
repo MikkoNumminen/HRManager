@@ -173,3 +173,18 @@ export const boxStyles = {
     backgroundColor: colors.hoverOverlay,
   },
 };
+
+// Shared dialog paper styles — used in ConfirmDialog, CsvImportDialog, TwoFactorSetup, LeaveManager
+export const dialogPaperSx = {
+  backgroundColor: colors.slate700,
+  border: `1px solid ${colors.slate300}`,
+  borderRadius: "8px",
+} as const;
+
+// Person select grid — used in UpdateManager, UpdateDepartmentHead, AddPeopleToTeam, RemoveMemberFromTeam
+export const personSelectGridSx = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))",
+  gap: 1,
+  mb: 1,
+} as const;

@@ -16,6 +16,7 @@ import {
 } from "@mui/material";
 import { CombinedTeam } from "@/schemas";
 import { colors, mobileCardStyles } from "@/muiStyles";
+import { formatDate } from "@/utils/formatDate";
 import { useTranslations } from "next-intl";
 
 interface CombinedTeamProps {
@@ -108,8 +109,8 @@ const TeamsTable: React.FC<CombinedTeamProps> = ({ combinedTeams, minimal = fals
                         ))}
                       </Box>
                     </TableCell>
-                    <TableCell>{new Date(team.createdAt).toLocaleString()}</TableCell>
-                    <TableCell>{new Date(team.updatedAt).toLocaleString()}</TableCell>
+                    <TableCell>{formatDate(team.createdAt)}</TableCell>
+                    <TableCell>{formatDate(team.updatedAt)}</TableCell>
                   </TableRow>
                 ))
               )}
@@ -150,7 +151,7 @@ const TeamsTable: React.FC<CombinedTeamProps> = ({ combinedTeams, minimal = fals
                   variant="caption"
                   sx={{ color: colors.slate400, mt: 0.5, display: "block" }}
                 >
-                  {tc("createdAt")}: {new Date(team.createdAt).toLocaleString()}
+                  {tc("createdAt")}: {formatDate(team.createdAt)}
                 </Typography>
               </Box>
             ))}

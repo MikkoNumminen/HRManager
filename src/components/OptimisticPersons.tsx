@@ -4,7 +4,7 @@ import { useOptimistic, useState, useRef } from "react";
 import { Person } from "@/schemas";
 import { Box, Typography, Pagination } from "@mui/material";
 import { pageContainerStyles } from "@/muiStyles";
-import AddPersonForm from "./AddPeople";
+import AddPersonForm from "./AddPersonForm";
 import PersonTable from "./EditablePersonsTable";
 import SearchBar from "./SearchBar";
 import { useTranslations } from "next-intl";

@@ -2,6 +2,7 @@
 
 import { signOutOtherSessions } from "@/serverActions";
 import { colors, formStyles, headerStyles, smallButtonStyles } from "@/muiStyles";
+import { formatDate } from "@/utils/formatDate";
 import { Box, Button, Chip, Typography } from "@mui/material";
 import { useActionState } from "react";
 import { useTranslations } from "next-intl";
@@ -125,7 +126,7 @@ export default function ActiveSessions({ sessions, currentSessionId }: ActiveSes
                 </Box>
                 <Typography variant="caption" sx={{ color: colors.slate400 }}>
                   {session.ipAddress ?? t("unknownIp")} &middot;{" "}
-                  {t("lastActive", { time: session.lastActiveAt.toLocaleString() })}
+                  {t("lastActive", { time: formatDate(session.lastActiveAt) })}
                 </Typography>
               </Box>
             </Box>

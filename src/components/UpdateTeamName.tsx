@@ -10,11 +10,9 @@ import {
 import { updateTeamName } from "@/serverActions";
 import { Box, Button, TextField, Tooltip, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
-import { useActionState, useState } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { useSnackbar } from "./SnackbarProvider";
-
-type FormState = { error: string | null };
+import { useFormAction } from "@/hooks/useFormAction";
 
 const UpdateTeamNameForm: React.FC<{ teamID: string; currentName: string }> = ({
   teamID,
@@ -23,22 +21,15 @@ const UpdateTeamNameForm: React.FC<{ teamID: string; currentName: string }> = ({
   const t = useTranslations("teams");
   const tc = useTranslations("common");
   const tn = useTranslations("notifications");
-  const { showSnackbar } = useSnackbar();
   const [newName, setNewName] = useState(currentName);
   const isChanged = newName.trim() !== currentName;
   const isValid = newName.trim().length > 0 && isChanged;
   const router = useRouter();
 
-  const [state, formAction, isPending] = useActionState(
-    async (_prev: FormState, formData: FormData): Promise<FormState> => {
-      const result = await updateTeamName(formData);
-      if (result?.error) return { error: result.error };
-      showSnackbar(tn("teamRenamed"));
-      router.push("/manageTeams");
-      return { error: null };
-    },
-    { error: null },
-  );
+  const [state, formAction, isPending] = useFormAction(updateTeamName, {
+    successMessage: tn("teamRenamed"),
+    onSuccess: () => router.push("/manageTeams"),
+  });
 
   return (
     <Box component="form" action={formAction} sx={formStyles}>

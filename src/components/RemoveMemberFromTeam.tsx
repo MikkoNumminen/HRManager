@@ -6,17 +6,16 @@ import {
   formButtonContainerStyles,
   formStyles,
   headerStyles,
+  personSelectGridSx,
   smallButtonStyles,
 } from "@/muiStyles";
 import { Box, Button, Typography } from "@mui/material";
-import { useActionState, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { useSnackbar } from "./SnackbarProvider";
+import { useFormAction } from "@/hooks/useFormAction";
 import { PersonSelectCard } from "./PersonSelectCard";
 import { Person } from "@/schemas";
 import ConfirmDialog from "./ConfirmDialog";
-
-type FormState = { error: string | null };
 
 const RemoveMemberForm: React.FC<{
   teamID: string;
@@ -26,20 +25,13 @@ const RemoveMemberForm: React.FC<{
   const t = useTranslations("teams");
   const tc = useTranslations("common");
   const tn = useTranslations("notifications");
-  const { showSnackbar } = useSnackbar();
   const [selectedMember, setSelectedMember] = useState<string>("");
   const formRef = useRef<HTMLFormElement>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  const [state, formAction, isPending] = useActionState(
-    async (_prev: FormState, formData: FormData): Promise<FormState> => {
-      const result = await removeMember(formData);
-      if (result?.error) return { error: result.error };
-      showSnackbar(tn("memberRemoved"));
-      return { error: null };
-    },
-    { error: null },
-  );
+  const [state, formAction, isPending] = useFormAction(removeMember, {
+    successMessage: tn("memberRemoved"),
+  });
 
   const filteredPersons = persons.filter((p) => !includeOnlyIds || includeOnlyIds.includes(p.id));
   const selectedName = filteredPersons.find((p) => p.id === selectedMember)?.name;
@@ -58,14 +50,7 @@ const RemoveMemberForm: React.FC<{
       <input type="hidden" name="teamID" value={teamID} />
       <input type="hidden" name="personID" value={selectedMember} />
 
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))",
-          gap: 1,
-          mb: 1,
-        }}
-      >
+      <Box sx={personSelectGridSx}>
         {filteredPersons.map((p) => (
           <PersonSelectCard
             key={p.id}

@@ -9,12 +9,10 @@ import {
   textFieldStyles,
 } from "@/muiStyles";
 import { Box, Button, MenuItem, TextField, Typography } from "@mui/material";
-import { useActionState, useState } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { useSnackbar } from "./SnackbarProvider";
+import { useFormAction } from "@/hooks/useFormAction";
 import { CombinedTeam } from "@/schemas";
-
-type FormState = { error: string | null };
 
 const RemoveTeamFromDepartmentForm: React.FC<{
   currentTeams: CombinedTeam[];
@@ -22,18 +20,11 @@ const RemoveTeamFromDepartmentForm: React.FC<{
   const t = useTranslations("departments");
   const tc = useTranslations("common");
   const tn = useTranslations("notifications");
-  const { showSnackbar } = useSnackbar();
   const [selectedTeam, setSelectedTeam] = useState<string>("");
 
-  const [state, formAction, isPending] = useActionState(
-    async (_prev: FormState, formData: FormData): Promise<FormState> => {
-      const result = await removeTeamFromDepartment(formData);
-      if (result?.error) return { error: result.error };
-      showSnackbar(tn("teamRemovedFromDepartment"));
-      return { error: null };
-    },
-    { error: null },
-  );
+  const [state, formAction, isPending] = useFormAction(removeTeamFromDepartment, {
+    successMessage: tn("teamRemovedFromDepartment"),
+  });
 
   return (
     <Box component="form" action={formAction} sx={formStyles}>

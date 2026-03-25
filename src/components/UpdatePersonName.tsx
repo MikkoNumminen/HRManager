@@ -10,11 +10,9 @@ import {
 import { updatePersonName } from "@/serverActions";
 import { Box, Button, TextField, Tooltip, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
-import { useActionState, useState } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { useSnackbar } from "./SnackbarProvider";
-
-type FormState = { error: string | null };
+import { useFormAction } from "@/hooks/useFormAction";
 
 const UpdatePersonNameForm: React.FC<{ personID: string; currentName: string }> = ({
   personID,
@@ -23,22 +21,15 @@ const UpdatePersonNameForm: React.FC<{ personID: string; currentName: string }> 
   const t = useTranslations("persons");
   const tc = useTranslations("common");
   const tn = useTranslations("notifications");
-  const { showSnackbar } = useSnackbar();
   const [newName, setNewName] = useState(currentName);
   const isChanged = newName.trim() !== currentName;
   const isValid = newName.trim().length > 0 && isChanged;
   const router = useRouter();
 
-  const [state, formAction, isPending] = useActionState(
-    async (_prev: FormState, formData: FormData): Promise<FormState> => {
-      const result = await updatePersonName(formData);
-      if (result?.error) return { error: result.error };
-      showSnackbar(tn("nameUpdated"));
-      router.push("/managePersons");
-      return { error: null };
-    },
-    { error: null },
-  );
+  const [state, formAction, isPending] = useFormAction(updatePersonName, {
+    successMessage: tn("nameUpdated"),
+    onSuccess: () => router.push("/managePersons"),
+  });
 
   return (
     <Box component="form" action={formAction} sx={formStyles}>

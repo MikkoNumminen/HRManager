@@ -4,14 +4,12 @@ import { formButtonContainerStyles, formStyles, smallButtonStyles } from "@/muiS
 import { removePerson } from "@/serverActions";
 import { Box, Button, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
-import { useActionState, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import ConfirmDialog from "./ConfirmDialog";
 import DeleteImpactList from "./DeleteImpactList";
-import { useSnackbar } from "./SnackbarProvider";
+import { useFormAction } from "@/hooks/useFormAction";
 import type { PersonDeleteImpact } from "@/constants";
-
-type FormState = { error: string | null };
 
 const RemovePersonForm: React.FC<{
   personID: string;
@@ -21,21 +19,14 @@ const RemovePersonForm: React.FC<{
   const tc = useTranslations("common");
   const tn = useTranslations("notifications");
   const ti = useTranslations("deleteImpact");
-  const { showSnackbar } = useSnackbar();
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  const [state, formAction, isPending] = useActionState(
-    async (_prev: FormState, formData: FormData): Promise<FormState> => {
-      const result = await removePerson(formData);
-      if (result?.error) return { error: result.error };
-      showSnackbar(tn("personRemoved"));
-      router.push("/managePersons");
-      return { error: null };
-    },
-    { error: null },
-  );
+  const [state, formAction, isPending] = useFormAction(removePerson, {
+    successMessage: tn("personRemoved"),
+    onSuccess: () => router.push("/managePersons"),
+  });
 
   const impacts = impact
     ? [

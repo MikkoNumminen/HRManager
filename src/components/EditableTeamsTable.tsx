@@ -17,6 +17,8 @@ import { GroupsOutlined } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 import { colors, mobileCardClickableStyles } from "@/muiStyles";
 import { CombinedTeam } from "@/schemas";
+import { formatDate } from "@/utils/formatDate";
+import { onActivateKeyDown } from "@/utils/keyboardHandlers";
 import { useTranslations } from "next-intl";
 import EmptyState from "./EmptyState";
 
@@ -74,12 +76,7 @@ const EditableTeamsTable: React.FC<CombinedTeamProps> = ({ combinedTeams, canCre
                       hover
                       tabIndex={0}
                       onClick={() => handleRowClick(team.teamId)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          e.preventDefault();
-                          handleRowClick(team.teamId);
-                        }
-                      }}
+                      onKeyDown={onActivateKeyDown(() => handleRowClick(team.teamId))}
                       sx={{
                         "&:hover, &:focus-visible": {
                           cursor: "pointer",
@@ -100,8 +97,8 @@ const EditableTeamsTable: React.FC<CombinedTeamProps> = ({ combinedTeams, canCre
                             : null}
                         </Box>
                       </TableCell>
-                      <TableCell>{new Date(team.createdAt).toLocaleString()}</TableCell>
-                      <TableCell>{new Date(team.updatedAt).toLocaleString()}</TableCell>
+                      <TableCell>{formatDate(team.createdAt)}</TableCell>
+                      <TableCell>{formatDate(team.updatedAt)}</TableCell>
                     </TableRow>
                   </Tooltip>
                 ))
@@ -122,12 +119,7 @@ const EditableTeamsTable: React.FC<CombinedTeamProps> = ({ combinedTeams, canCre
                 role="button"
                 aria-label={t("clickToManage", { name: team.teamName })}
                 onClick={() => handleRowClick(team.teamId)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    handleRowClick(team.teamId);
-                  }
-                }}
+                onKeyDown={onActivateKeyDown(() => handleRowClick(team.teamId))}
                 sx={mobileCardClickableStyles}
               >
                 <Typography variant="subtitle1" sx={{ color: colors.slate100, fontWeight: 600 }}>
@@ -156,7 +148,7 @@ const EditableTeamsTable: React.FC<CombinedTeamProps> = ({ combinedTeams, canCre
                   variant="caption"
                   sx={{ color: colors.slate400, mt: 0.5, display: "block" }}
                 >
-                  {tc("createdAt")}: {new Date(team.createdAt).toLocaleString()}
+                  {tc("createdAt")}: {formatDate(team.createdAt)}
                 </Typography>
               </Box>
             ))}

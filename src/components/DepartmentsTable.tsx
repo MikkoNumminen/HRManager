@@ -17,6 +17,7 @@ import {
 } from "@mui/material";
 import { Department } from "@/schemas";
 import { colors, mobileCardStyles } from "@/muiStyles";
+import { formatDate } from "@/utils/formatDate";
 import { useTranslations } from "next-intl";
 
 interface DepartmentsTableProps {
@@ -125,8 +126,8 @@ const DepartmentsTable: React.FC<DepartmentsTableProps> = ({ departments, minima
                           : tc("dash")}
                       </Box>
                     </TableCell>
-                    <TableCell>{new Date(dept.createdAt).toLocaleString()}</TableCell>
-                    <TableCell>{new Date(dept.updatedAt).toLocaleString()}</TableCell>
+                    <TableCell>{formatDate(dept.createdAt)}</TableCell>
+                    <TableCell>{formatDate(dept.updatedAt)}</TableCell>
                   </TableRow>
                 ))
               )}
@@ -172,7 +173,7 @@ const DepartmentsTable: React.FC<DepartmentsTableProps> = ({ departments, minima
                   variant="caption"
                   sx={{ color: colors.slate400, mt: 0.5, display: "block" }}
                 >
-                  {tc("createdAt")}: {new Date(dept.createdAt).toLocaleString()}
+                  {tc("createdAt")}: {formatDate(dept.createdAt)}
                 </Typography>
               </Box>
             ))}

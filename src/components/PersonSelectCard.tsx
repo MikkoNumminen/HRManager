@@ -3,6 +3,7 @@
 import { Person } from "@/schemas";
 import { Avatar, Box, Tooltip, Typography } from "@mui/material";
 import { colors } from "@/muiStyles";
+import { onActivateKeyDown } from "@/utils/keyboardHandlers";
 
 type Props = {
   person: Person;
@@ -33,9 +34,7 @@ export function PersonSelectCard({ person, selected, onSelect, variant = "add" }
         aria-pressed={selected}
         aria-label={name}
         onClick={() => onSelect(selected ? "" : id)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") onSelect(selected ? "" : id);
-        }}
+        onKeyDown={onActivateKeyDown(() => onSelect(selected ? "" : id))}
         sx={{
           display: "flex",
           flexDirection: "column",

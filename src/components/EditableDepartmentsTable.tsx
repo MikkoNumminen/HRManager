@@ -17,6 +17,8 @@ import { ApartmentOutlined } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 import { colors, mobileCardClickableStyles } from "@/muiStyles";
 import { Department } from "@/schemas";
+import { formatDate } from "@/utils/formatDate";
+import { onActivateKeyDown } from "@/utils/keyboardHandlers";
 import { useTranslations } from "next-intl";
 import EmptyState from "./EmptyState";
 
@@ -78,12 +80,7 @@ const EditableDepartmentsTable: React.FC<EditableDepartmentsTableProps> = ({
                       hover
                       tabIndex={0}
                       onClick={() => handleRowClick(dept.id)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          e.preventDefault();
-                          handleRowClick(dept.id);
-                        }
-                      }}
+                      onKeyDown={onActivateKeyDown(() => handleRowClick(dept.id))}
                       sx={{
                         "&:hover, &:focus-visible": {
                           cursor: "pointer",
@@ -105,8 +102,8 @@ const EditableDepartmentsTable: React.FC<EditableDepartmentsTableProps> = ({
                             : null}
                         </Box>
                       </TableCell>
-                      <TableCell>{new Date(dept.createdAt).toLocaleString()}</TableCell>
-                      <TableCell>{new Date(dept.updatedAt).toLocaleString()}</TableCell>
+                      <TableCell>{formatDate(dept.createdAt)}</TableCell>
+                      <TableCell>{formatDate(dept.updatedAt)}</TableCell>
                     </TableRow>
                   </Tooltip>
                 ))
@@ -127,12 +124,7 @@ const EditableDepartmentsTable: React.FC<EditableDepartmentsTableProps> = ({
                 role="button"
                 aria-label={t("clickToManage", { name: dept.name })}
                 onClick={() => handleRowClick(dept.id)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    handleRowClick(dept.id);
-                  }
-                }}
+                onKeyDown={onActivateKeyDown(() => handleRowClick(dept.id))}
                 sx={mobileCardClickableStyles}
               >
                 <Typography variant="subtitle1" sx={{ color: colors.slate100, fontWeight: 600 }}>
@@ -166,7 +158,7 @@ const EditableDepartmentsTable: React.FC<EditableDepartmentsTableProps> = ({
                   variant="caption"
                   sx={{ color: colors.slate400, mt: 0.5, display: "block" }}
                 >
-                  {tc("createdAt")}: {new Date(dept.createdAt).toLocaleString()}
+                  {tc("createdAt")}: {formatDate(dept.createdAt)}
                 </Typography>
               </Box>
             ))}

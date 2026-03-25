@@ -6,16 +6,15 @@ import {
   formButtonContainerStyles,
   formStyles,
   headerStyles,
+  personSelectGridSx,
   smallButtonStyles,
 } from "@/muiStyles";
 import { Box, Button, Typography } from "@mui/material";
-import { useActionState, useState } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { useSnackbar } from "./SnackbarProvider";
+import { useFormAction } from "@/hooks/useFormAction";
 import { PersonSelectCard } from "./PersonSelectCard";
 import { Person } from "@/schemas";
-
-type FormState = { error: string | null };
 
 const UpdateManagerForm: React.FC<{ teamID: string; persons: Person[]; excludeIds?: string[] }> = ({
   teamID,
@@ -25,18 +24,11 @@ const UpdateManagerForm: React.FC<{ teamID: string; persons: Person[]; excludeId
   const t = useTranslations("teams");
 
   const tn = useTranslations("notifications");
-  const { showSnackbar } = useSnackbar();
   const [newManager, setNewManager] = useState<string>("");
 
-  const [state, formAction, isPending] = useActionState(
-    async (_prev: FormState, formData: FormData): Promise<FormState> => {
-      const result = await addManager(formData);
-      if (result?.error) return { error: result.error };
-      showSnackbar(tn("managerUpdated"));
-      return { error: null };
-    },
-    { error: null },
-  );
+  const [state, formAction, isPending] = useFormAction(addManager, {
+    successMessage: tn("managerUpdated"),
+  });
 
   const filteredPersons = persons.filter((p) => !excludeIds.includes(p.id));
 
@@ -54,14 +46,7 @@ const UpdateManagerForm: React.FC<{ teamID: string; persons: Person[]; excludeId
       <input type="hidden" name="teamID" value={teamID} />
       <input type="hidden" name="personID" value={newManager} />
 
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))",
-          gap: 1,
-          mb: 1,
-        }}
-      >
+      <Box sx={personSelectGridSx}>
         {filteredPersons.map((p) => (
           <PersonSelectCard
             key={p.id}

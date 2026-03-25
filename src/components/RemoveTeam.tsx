@@ -3,14 +3,12 @@
 import { formButtonContainerStyles, formStyles, smallButtonStyles } from "@/muiStyles";
 import { removeTeam } from "@/serverActions";
 import { Box, Button, Typography } from "@mui/material";
-import { useActionState, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import ConfirmDialog from "./ConfirmDialog";
 import DeleteImpactList from "./DeleteImpactList";
-import { useSnackbar } from "./SnackbarProvider";
+import { useFormAction } from "@/hooks/useFormAction";
 import type { TeamDeleteImpact } from "@/constants";
-
-type FormState = { error: string | null };
 
 const RemoveTeamForm: React.FC<{
   teamID: string;
@@ -20,19 +18,12 @@ const RemoveTeamForm: React.FC<{
   const tc = useTranslations("common");
   const tn = useTranslations("notifications");
   const ti = useTranslations("deleteImpact");
-  const { showSnackbar } = useSnackbar();
   const formRef = useRef<HTMLFormElement>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  const [state, formAction, isPending] = useActionState(
-    async (_prev: FormState, formData: FormData): Promise<FormState> => {
-      const result = await removeTeam(formData);
-      if (result?.error) return { error: result.error };
-      showSnackbar(tn("teamRemoved"));
-      return { error: null };
-    },
-    { error: null },
-  );
+  const [state, formAction, isPending] = useFormAction(removeTeam, {
+    successMessage: tn("teamRemoved"),
+  });
 
   const impacts = impact
     ? [

@@ -20,7 +20,7 @@ import {
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useActionState, useCallback, useState } from "react";
-import { colors } from "@/muiStyles";
+import { colors, dialogPaperSx } from "@/muiStyles";
 import { parseCSV, validatePersonImportRows } from "@/csvUtils";
 import { importPersonsCsv, ImportResult } from "@/serverActions";
 import { MAX_IMPORT_FILE_SIZE, MAX_IMPORT_ROWS } from "@/schemas";
@@ -130,11 +130,7 @@ export default function CsvImportDialog({ open, onClose }: CsvImportDialogProps)
       aria-labelledby="import-dialog-title"
       slotProps={{
         paper: {
-          sx: {
-            backgroundColor: colors.slate700,
-            border: `1px solid ${colors.slate300}`,
-            borderRadius: "8px",
-          },
+          sx: dialogPaperSx,
         },
       }}
     >

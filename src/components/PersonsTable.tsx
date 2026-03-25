@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import { Person } from "@/schemas";
 import { colors, mobileCardStyles } from "@/muiStyles";
+import { formatDate } from "@/utils/formatDate";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 
@@ -149,8 +150,8 @@ const PersonTable: React.FC<PersonTableProps> = ({
                     </TableCell>
                     <TableCell>{person.position ?? ""}</TableCell>
                     <TableCell>{person.email ?? ""}</TableCell>
-                    <TableCell>{new Date(person.createdAt).toLocaleString()}</TableCell>
-                    <TableCell>{new Date(person.updatedAt).toLocaleString()}</TableCell>
+                    <TableCell>{formatDate(person.createdAt)}</TableCell>
+                    <TableCell>{formatDate(person.updatedAt)}</TableCell>
                   </TableRow>
                 ))
               )}
@@ -199,7 +200,7 @@ const PersonTable: React.FC<PersonTableProps> = ({
                   variant="caption"
                   sx={{ color: colors.slate400, mt: 0.5, display: "block" }}
                 >
-                  {tc("createdAt")}: {new Date(person.createdAt).toLocaleString()}
+                  {tc("createdAt")}: {formatDate(person.createdAt)}
                 </Typography>
               </Box>
             ))}

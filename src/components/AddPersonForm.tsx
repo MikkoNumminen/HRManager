@@ -9,12 +9,10 @@ import {
 } from "@/muiStyles";
 import { createPerson } from "@/serverActions";
 import { Box, Button, TextField, Tooltip, Typography } from "@mui/material";
-import { useActionState, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { completeTutorialStep } from "@/tutorialConfig";
-import { useSnackbar } from "./SnackbarProvider";
-
-type FormState = { error: string | null; success: boolean };
+import { useFormAction } from "@/hooks/useFormAction";
 
 interface AddPersonFormProps {
   onOptimisticAdd?: (name: string, email: string) => void;
@@ -24,22 +22,18 @@ const AddPersonForm: React.FC<AddPersonFormProps> = ({ onOptimisticAdd }) => {
   const t = useTranslations("persons");
   const tc = useTranslations("common");
   const tn = useTranslations("notifications");
-  const { showSnackbar } = useSnackbar();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const isValid = name.trim().length > 0 && EMAIL_REGEX.test(email.trim());
 
-  const [state, formAction, isPending] = useActionState(
-    async (_prev: FormState, formData: FormData): Promise<FormState> => {
+  const [state, formAction, isPending] = useFormAction(
+    async (formData) => {
       onOptimisticAdd?.(formData.get("name") as string, formData.get("email") as string);
-      const result = await createPerson(formData);
-      if (result?.error) return { error: result.error, success: false };
       completeTutorialStep("add_person");
-      showSnackbar(tn("personCreated"));
-      return { error: null, success: true };
+      return createPerson(formData);
     },
-    { error: null, success: false },
+    { successMessage: tn("personCreated") },
   );
 
   useEffect(() => {
