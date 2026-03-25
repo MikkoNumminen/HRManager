@@ -1,22 +1,18 @@
 "use server";
-import { prisma } from "@/db";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { requirePermission } from "@/permissions";
-import { captureAuditContext, deferAudit, DeferredAuditEntry } from "@/auditLog";
-import { rateLimit } from "@/rateLimit";
 import { ActionError } from "@/actionErrors";
 import { getDemoSessionId } from "@/demoSession";
 import { MAX_NAME_LENGTH, MAX_DESCRIPTION_LENGTH } from "@/schemas";
-import { getTranslations } from "next-intl/server";
-import { safe, validateUUID, type ActionResult } from "@/lib/actionUtils";
+import { validateUUID, type ActionResult } from "@/lib/actionUtils";
+import { guardedAction } from "@/lib/guardedAction";
+import { withAuditedTransaction } from "@/lib/auditedTransaction";
 import { invalidateDashboardCache } from "@/lib/cacheInvalidation";
 
-export async function createDepartment(data: FormData): Promise<ActionResult> {
-  return safe(async () => {
-    const t = await getTranslations("errors");
-    await requirePermission("department:create");
-    await rateLimit("createDepartment");
+export const createDepartment: (data: FormData) => Promise<ActionResult> = guardedAction(
+  "department:create",
+  "createDepartment",
+  async (t, data: FormData) => {
     const name = data.get("name")?.valueOf();
     if (typeof name !== "string" || name.trim().length === 0) {
       throw new ActionError("invalidName", t("invalidName"));
@@ -34,9 +30,7 @@ export async function createDepartment(data: FormData): Promise<ActionResult> {
     }
 
     const sessionId = await getDemoSessionId();
-    const ctx = await captureAuditContext();
-    const auditEntries: DeferredAuditEntry[] = [];
-    await prisma.$transaction(async (tx) => {
+    await withAuditedTransaction(async (tx, addAudit) => {
       const department = await tx.department.create({
         data: {
           name: name.trim(),
@@ -44,26 +38,23 @@ export async function createDepartment(data: FormData): Promise<ActionResult> {
           sessionId,
         },
       });
-      auditEntries.push({
-        ...ctx,
+      addAudit({
         action: "create",
         entityType: "department",
         entityId: department.id,
         after: { name: department.name, description: department.description },
       });
     });
-    deferAudit(auditEntries);
     revalidatePath("/manageDepartments");
     revalidatePath("/");
     invalidateDashboardCache();
-  });
-}
+  },
+);
 
-export async function removeDepartment(data: FormData): Promise<ActionResult> {
-  return safe(async () => {
-    const t = await getTranslations("errors");
-    await requirePermission("department:delete");
-    await rateLimit("removeDepartment");
+export const removeDepartment: (data: FormData) => Promise<ActionResult> = guardedAction(
+  "department:delete",
+  "removeDepartment",
+  async (t, data: FormData) => {
     const departmentIDs = data
       .getAll("departmentID")
       .filter((v): v is string => typeof v === "string");
@@ -73,10 +64,8 @@ export async function removeDepartment(data: FormData): Promise<ActionResult> {
     departmentIDs.forEach((id) => validateUUID(id, "departmentID"));
 
     const sessionId = await getDemoSessionId();
-    const ctx = await captureAuditContext();
-    const auditEntries: DeferredAuditEntry[] = [];
     const now = new Date();
-    await prisma.$transaction(async (tx) => {
+    await withAuditedTransaction(async (tx, addAudit) => {
       const departmentsToDelete = await tx.department.findMany({
         where: { id: { in: departmentIDs }, deletedAt: null, sessionId },
       });
@@ -94,8 +83,7 @@ export async function removeDepartment(data: FormData): Promise<ActionResult> {
       });
 
       for (const dept of departmentsToDelete) {
-        auditEntries.push({
-          ...ctx,
+        addAudit({
           action: "delete",
           entityType: "department",
           entityId: dept.id,
@@ -103,20 +91,18 @@ export async function removeDepartment(data: FormData): Promise<ActionResult> {
         });
       }
     });
-    deferAudit(auditEntries);
     revalidatePath("/manageDepartments");
     revalidatePath("/manageTeams");
     revalidatePath("/");
     invalidateDashboardCache();
     redirect("/manageDepartments");
-  });
-}
+  },
+);
 
-export async function updateDepartment(data: FormData): Promise<ActionResult> {
-  return safe(async () => {
-    const t = await getTranslations("errors");
-    await requirePermission("department:update");
-    await rateLimit("updateDepartment");
+export const updateDepartment: (data: FormData) => Promise<ActionResult> = guardedAction(
+  "department:update",
+  "updateDepartment",
+  async (t, data: FormData) => {
     const departmentID = data.get("departmentID")?.toString();
     if (!departmentID) {
       throw new ActionError("noDepartmentProvided", t("noDepartmentProvided"));
@@ -140,9 +126,7 @@ export async function updateDepartment(data: FormData): Promise<ActionResult> {
     }
 
     const sessionId = await getDemoSessionId();
-    const ctx = await captureAuditContext();
-    const auditEntries: DeferredAuditEntry[] = [];
-    await prisma.$transaction(async (tx) => {
+    await withAuditedTransaction(async (tx, addAudit) => {
       const deptBefore = await tx.department.findFirst({ where: { id: departmentID, sessionId } });
       if (!deptBefore) {
         throw new ActionError("departmentNotFound", t("departmentNotFound"));
@@ -151,8 +135,7 @@ export async function updateDepartment(data: FormData): Promise<ActionResult> {
         where: { id: departmentID, sessionId },
         data: { name, description },
       });
-      auditEntries.push({
-        ...ctx,
+      addAudit({
         action: "update",
         entityType: "department",
         entityId: departmentID,
@@ -160,18 +143,16 @@ export async function updateDepartment(data: FormData): Promise<ActionResult> {
         after: { name, description },
       });
     });
-    deferAudit(auditEntries);
     revalidatePath("/manageDepartments");
     revalidatePath("/");
     invalidateDashboardCache();
-  });
-}
+  },
+);
 
-export async function updateDepartmentHead(data: FormData): Promise<ActionResult> {
-  return safe(async () => {
-    const t = await getTranslations("errors");
-    await requirePermission("department:update");
-    await rateLimit("updateDepartmentHead");
+export const updateDepartmentHead: (data: FormData) => Promise<ActionResult> = guardedAction(
+  "department:update",
+  "updateDepartmentHead",
+  async (t, data: FormData) => {
     const departmentID = data.get("departmentID")?.toString();
     const personID = data.get("personID")?.toString() || null;
 
@@ -182,9 +163,7 @@ export async function updateDepartmentHead(data: FormData): Promise<ActionResult
     if (personID) validateUUID(personID, "personID");
 
     const sessionId = await getDemoSessionId();
-    const ctx = await captureAuditContext();
-    const auditEntries: DeferredAuditEntry[] = [];
-    await prisma.$transaction(async (tx) => {
+    await withAuditedTransaction(async (tx, addAudit) => {
       if (personID) {
         const person = await tx.person.findFirst({
           where: { id: personID, deletedAt: null, sessionId },
@@ -201,8 +180,7 @@ export async function updateDepartmentHead(data: FormData): Promise<ActionResult
         where: { id: departmentID, sessionId },
         data: { headId: personID },
       });
-      auditEntries.push({
-        ...ctx,
+      addAudit({
         action: "update",
         entityType: "department",
         entityId: departmentID,
@@ -210,19 +188,17 @@ export async function updateDepartmentHead(data: FormData): Promise<ActionResult
         after: { headId: personID },
       });
     });
-    deferAudit(auditEntries);
     revalidatePath("/manageDepartments");
     revalidatePath("/");
     invalidateDashboardCache();
     redirect("/manageDepartments");
-  });
-}
+  },
+);
 
-export async function assignTeamToDepartment(data: FormData): Promise<ActionResult> {
-  return safe(async () => {
-    const t = await getTranslations("errors");
-    await requirePermission("department:assign_team");
-    await rateLimit("assignTeamToDepartment");
+export const assignTeamToDepartment: (data: FormData) => Promise<ActionResult> = guardedAction(
+  "department:assign_team",
+  "assignTeamToDepartment",
+  async (t, data: FormData) => {
     const departmentID = data.get("departmentID")?.toString();
     const teamID = data.get("teamID")?.toString();
 
@@ -232,9 +208,7 @@ export async function assignTeamToDepartment(data: FormData): Promise<ActionResu
     validateUUID(teamID, "teamID");
 
     const sessionId = await getDemoSessionId();
-    const ctx = await captureAuditContext();
-    const auditEntries: DeferredAuditEntry[] = [];
-    await prisma.$transaction(async (tx) => {
+    await withAuditedTransaction(async (tx, addAudit) => {
       const department = await tx.department.findFirst({ where: { id: departmentID, sessionId } });
       if (!department) {
         throw new ActionError("departmentNotFound", t("departmentNotFound"));
@@ -247,8 +221,7 @@ export async function assignTeamToDepartment(data: FormData): Promise<ActionResu
         where: { teamId: teamID, sessionId },
         data: { departmentId: departmentID },
       });
-      auditEntries.push({
-        ...ctx,
+      addAudit({
         action: "update",
         entityType: "team",
         entityId: teamID,
@@ -256,29 +229,25 @@ export async function assignTeamToDepartment(data: FormData): Promise<ActionResu
         after: { departmentId: departmentID },
       });
     });
-    deferAudit(auditEntries);
     revalidatePath("/manageDepartments");
     revalidatePath("/manageTeams");
     revalidatePath("/");
     invalidateDashboardCache();
     redirect("/manageDepartments");
-  });
-}
+  },
+);
 
-export async function removeTeamFromDepartment(data: FormData): Promise<ActionResult> {
-  return safe(async () => {
-    const t = await getTranslations("errors");
-    await requirePermission("department:assign_team");
-    await rateLimit("removeTeamFromDepartment");
+export const removeTeamFromDepartment: (data: FormData) => Promise<ActionResult> = guardedAction(
+  "department:assign_team",
+  "removeTeamFromDepartment",
+  async (t, data: FormData) => {
     const teamID = data.get("teamID")?.toString();
 
     if (!teamID) throw new ActionError("noTeamProvided", t("noTeamProvided"));
     validateUUID(teamID, "teamID");
 
     const sessionId = await getDemoSessionId();
-    const ctx = await captureAuditContext();
-    const auditEntries: DeferredAuditEntry[] = [];
-    await prisma.$transaction(async (tx) => {
+    await withAuditedTransaction(async (tx, addAudit) => {
       const teamBefore = await tx.team.findFirst({ where: { teamId: teamID, sessionId } });
       if (!teamBefore) {
         throw new ActionError("teamNotFound", t("teamNotFound"));
@@ -287,8 +256,7 @@ export async function removeTeamFromDepartment(data: FormData): Promise<ActionRe
         where: { teamId: teamID, sessionId },
         data: { departmentId: null },
       });
-      auditEntries.push({
-        ...ctx,
+      addAudit({
         action: "update",
         entityType: "team",
         entityId: teamID,
@@ -296,11 +264,10 @@ export async function removeTeamFromDepartment(data: FormData): Promise<ActionRe
         after: { departmentId: null },
       });
     });
-    deferAudit(auditEntries);
     revalidatePath("/manageDepartments");
     revalidatePath("/manageTeams");
     revalidatePath("/");
     invalidateDashboardCache();
     redirect("/manageDepartments");
-  });
-}
+  },
+);
