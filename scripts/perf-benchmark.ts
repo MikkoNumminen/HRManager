@@ -100,7 +100,7 @@ async function main() {
 
   const samplePerson = await prisma.person.findFirst({ select: { id: true } });
   const sampleTeam = await prisma.team.findFirst({ select: { teamId: true, teamManagerId: true } });
-  const sampleDept = await prisma.department.findFirst({ select: { id: true } });
+  const _sampleDept = await prisma.department.findFirst({ select: { id: true } });
 
   const results: BenchmarkResult[] = [];
 
