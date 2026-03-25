@@ -16,7 +16,7 @@ const config: Config = {
     "^next-intl/server$": "<rootDir>/src/tests/mocks/next-intl-server.ts",
   },
   // Prisma 7 ships ESM — transform its .mjs files so Jest (CJS) can parse them
-  transformIgnorePatterns: ["node_modules/(?!(@prisma/client)/)"],
+  transformIgnorePatterns: ["node_modules/(?!(@prisma/client|pg-boss)/)"],
 };
 
 export default createJestConfig(config);
