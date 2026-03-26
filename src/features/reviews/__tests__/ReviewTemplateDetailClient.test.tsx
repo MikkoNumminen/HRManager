@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, act, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import ReviewTemplateDetailClient from "@/features/reviews/components/ReviewTemplateDetailClient";
 import { addReviewQuestion, removeReviewQuestion } from "@/features/reviews/actions";
 import type { ReviewTemplate } from "@/schemas";
@@ -148,10 +148,7 @@ describe("ReviewTemplateDetailClient", () => {
 
     // eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
     const form = container.querySelector("form") as HTMLFormElement;
-    await act(async () => {
-      fireEvent.submit(form);
-    });
-    await act(async () => {});
+    fireEvent.submit(form);
 
     await waitFor(() => {
       expect(addReviewQuestion as jest.Mock).toHaveBeenCalled();
@@ -167,10 +164,7 @@ describe("ReviewTemplateDetailClient", () => {
 
     // eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
     const form = container.querySelector("form") as HTMLFormElement;
-    await act(async () => {
-      fireEvent.submit(form);
-    });
-    await act(async () => {});
+    fireEvent.submit(form);
 
     await waitFor(() => {
       expect(screen.getByRole("alert")).toBeInTheDocument();
@@ -188,9 +182,7 @@ describe("ReviewTemplateDetailClient", () => {
     const deleteIcons = screen.getAllByTestId("DeleteIcon");
     // eslint-disable-next-line testing-library/no-node-access
     fireEvent.click(deleteIcons[0].closest("button")!);
-    await act(async () => {
-      fireEvent.click(screen.getByText("Remove"));
-    });
+    fireEvent.click(screen.getByText("Remove"));
 
     await waitFor(() => {
       expect(removeReviewQuestion as jest.Mock).toHaveBeenCalled();
@@ -209,9 +201,7 @@ describe("ReviewTemplateDetailClient", () => {
     const deleteIcons = screen.getAllByTestId("DeleteIcon");
     // eslint-disable-next-line testing-library/no-node-access
     fireEvent.click(deleteIcons[0].closest("button")!);
-    await act(async () => {
-      fireEvent.click(screen.getByText("Remove"));
-    });
+    fireEvent.click(screen.getByText("Remove"));
 
     await waitFor(() => {
       expect(removeReviewQuestion as jest.Mock).toHaveBeenCalled();
@@ -358,9 +348,7 @@ describe("ReviewTemplateDetailClient", () => {
     const deleteIcons = screen.getAllByTestId("DeleteIcon");
     // eslint-disable-next-line testing-library/no-node-access
     fireEvent.click(deleteIcons[0].closest("button")!);
-    await act(async () => {
-      fireEvent.click(screen.getByText("Remove"));
-    });
+    fireEvent.click(screen.getByText("Remove"));
 
     await waitFor(() => {
       expect(removeReviewQuestion as jest.Mock).toHaveBeenCalled();
@@ -379,9 +367,7 @@ describe("ReviewTemplateDetailClient", () => {
     const deleteIcons = screen.getAllByTestId("DeleteIcon");
     // eslint-disable-next-line testing-library/no-node-access
     fireEvent.click(deleteIcons[1].closest("button")!);
-    await act(async () => {
-      fireEvent.click(screen.getByText("Remove"));
-    });
+    fireEvent.click(screen.getByText("Remove"));
 
     await waitFor(() => {
       expect(removeReviewQuestion as jest.Mock).toHaveBeenCalled();
