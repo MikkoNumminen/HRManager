@@ -266,6 +266,10 @@ src/features/
 └── jobs/             # background job queue
 ```
 
+### 🧩 Platform integration
+
+HRManager is designed as a standalone, independently deployable application — but its modular architecture makes it equally suited for embedding into larger ecosystems. It is integrated into a [Turborepo monorepo](https://github.com/MikkoNumminen/Platform) via git submodule, where it runs alongside other apps (e.g. a community web app) with zero code duplication. The feature-based module structure, server action isolation, granular RBAC, and audit logging carry over unchanged — no adapter layer needed.
+
 ---
 
 ## RBAC
