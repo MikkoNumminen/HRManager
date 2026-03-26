@@ -941,10 +941,10 @@
     "error": "ข้อผิดพลาด"
   },
   "realtime": {
-    "connected": "Live updates active",
-    "disconnected": "Live updates paused",
-    "reconnecting": "Reconnecting...",
-    "activityFeed": "Live Activity",
-    "noActivity": "No recent activity"
+    "connected": "การอัปเดตแบบเรียลไทม์ทำงานอยู่",
+    "disconnected": "การอัปเดตแบบเรียลไทม์หยุดชั่วคราว",
+    "reconnecting": "กำลังเชื่อมต่อใหม่...",
+    "activityFeed": "กิจกรรมแบบเรียลไทม์",
+    "noActivity": "ไม่มีกิจกรรมล่าสุด"
   }
 }

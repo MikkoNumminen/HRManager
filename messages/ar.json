@@ -941,10 +941,10 @@
     "error": "تفاصيل الخطأ"
   },
   "realtime": {
-    "connected": "Live updates active",
-    "disconnected": "Live updates paused",
-    "reconnecting": "Reconnecting...",
-    "activityFeed": "Live Activity",
-    "noActivity": "No recent activity"
+    "connected": "التحديثات المباشرة نشطة",
+    "disconnected": "التحديثات المباشرة متوقفة",
+    "reconnecting": "جارٍ إعادة الاتصال...",
+    "activityFeed": "النشاط المباشر",
+    "noActivity": "لا يوجد نشاط حديث"
   }
 }

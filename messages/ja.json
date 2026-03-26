@@ -941,10 +941,10 @@
     "error": "エラー内容"
   },
   "realtime": {
-    "connected": "Live updates active",
-    "disconnected": "Live updates paused",
-    "reconnecting": "Reconnecting...",
-    "activityFeed": "Live Activity",
-    "noActivity": "No recent activity"
+    "connected": "リアルタイム更新が有効",
+    "disconnected": "リアルタイム更新が一時停止",
+    "reconnecting": "再接続中...",
+    "activityFeed": "ライブアクティビティ",
+    "noActivity": "最近のアクティビティなし"
   }
 }

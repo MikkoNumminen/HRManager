@@ -941,10 +941,10 @@
     "error": "错误信息"
   },
   "realtime": {
-    "connected": "Live updates active",
-    "disconnected": "Live updates paused",
-    "reconnecting": "Reconnecting...",
-    "activityFeed": "Live Activity",
-    "noActivity": "No recent activity"
+    "connected": "实时更新已启用",
+    "disconnected": "实时更新已暂停",
+    "reconnecting": "正在重新连接...",
+    "activityFeed": "实时活动",
+    "noActivity": "暂无最近活动"
   }
 }

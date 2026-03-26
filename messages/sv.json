@@ -941,10 +941,10 @@
     "error": "Fel"
   },
   "realtime": {
-    "connected": "Live updates active",
-    "disconnected": "Live updates paused",
-    "reconnecting": "Reconnecting...",
-    "activityFeed": "Live Activity",
-    "noActivity": "No recent activity"
+    "connected": "Liveuppdateringar aktiva",
+    "disconnected": "Liveuppdateringar pausade",
+    "reconnecting": "Återansluter...",
+    "activityFeed": "Liveaktivitet",
+    "noActivity": "Ingen senaste aktivitet"
   }
 }

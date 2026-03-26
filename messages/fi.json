@@ -941,10 +941,10 @@
     "error": "Virhe"
   },
   "realtime": {
-    "connected": "Live updates active",
-    "disconnected": "Live updates paused",
-    "reconnecting": "Reconnecting...",
-    "activityFeed": "Live Activity",
-    "noActivity": "No recent activity"
+    "connected": "Reaaliaikaiset päivitykset aktiiviset",
+    "disconnected": "Reaaliaikaiset päivitykset tauolla",
+    "reconnecting": "Yhdistetään uudelleen...",
+    "activityFeed": "Reaaliaikainen toiminta",
+    "noActivity": "Ei viimeaikaista toimintaa"
   }
 }

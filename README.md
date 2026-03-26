@@ -112,6 +112,8 @@ graph LR
 
 - **Gamified demo tour** — 8-step interactive tutorial with spotlight overlays, confetti, and auto-detection of task completion. Navigation hints are DOM-aware — they find the right element dynamically, so UI refactors don't break the tour.
 
+- **Real-time updates (SSE / polling)** — Every mutation automatically broadcasts a real-time event to all connected clients via Server-Sent Events. Other users see live notifications when someone creates a person, approves leave, or modifies a team — without refreshing. Hybrid transport: SSE for persistent connections (self-hosted, dev), automatic fallback to 5-second polling on Vercel's free tier (10-second serverless timeout). In-process EventEmitter with per-session ring buffer (100 events) — zero external dependencies, swappable to Redis pub-sub in one file. Self-notification filtering: you don't get notified about your own actions. Activity feed component shows recent events with action-specific icons and relative timestamps. Session-scoped: demo users only see events from their sandbox. _Why SSE over WebSocket? Next.js App Router doesn't support WebSocket upgrade in route handlers. SSE works natively with `ReadableStream` and degrades gracefully._
+
 - **Snackbar notifications** — Global success/error toasts via React context across all 17 form actions. No silent failures, no mystery about what happened.
 
 - **Keyboard shortcuts** — Press `?` to see all shortcuts. `/` focuses search, `g` then `d/p/t/e/l/r/o/a` navigates to any page (chord-based with 1s timeout). Suppressed inside inputs. _Why chords? Single-key shortcuts conflict with typing; a `g` prefix gives 8+ navigation targets without stealing keystrokes from forms._
@@ -168,7 +170,7 @@ graph LR
 
 - **Sentry error tracking** — `@sentry/nextjs` captures unhandled exceptions, server action failures, and client-side errors. Separate `sentry.client/server/edge.config.ts` files initialize Sentry per runtime. A reusable `SentryErrorBoundary` component wraps MUI fallback UI; `global-error.tsx` catches render-level crashes; `captureServerActionError()` helper instruments server actions. Sentry is opt-in — the app runs normally without a DSN configured. _Why opt-in? This is a portfolio project — developers shouldn't need a Sentry account to run it locally._
 
-- **1785+ tests, 91.9% line coverage** — Unit tests, integration tests against real PostgreSQL + in-memory MongoDB (no database mocks), and 75 Playwright E2E tests covering full user flows. _Why real databases in tests? Mocked tests can pass while production breaks. If your test doesn't hit a real database, it's not testing what you think it's testing._
+- **1828+ tests, 91.9% line coverage** — Unit tests, integration tests against real PostgreSQL + in-memory MongoDB (no database mocks), and 75 Playwright E2E tests covering full user flows. _Why real databases in tests? Mocked tests can pass while production breaks. If your test doesn't hit a real database, it's not testing what you think it's testing._
 
 - **Structured logging (Pino) with trace correlation** — JSON logs in production, human-readable in development. Every log line automatically includes OpenTelemetry `traceId` and `spanId` via Pino's mixin — search a trace ID in your log aggregator to see every log from that request. `createRequestLogger()` adds userId context on top. _Why Pino? It's the fastest Node.js logger, and structured JSON logs are parseable by Datadog, Grafana Loki, and CloudWatch without custom parsing rules._
 
@@ -230,6 +232,7 @@ graph LR
 | Reads          | `features/*/queries.ts` | Zod-validated, no `"use server"`. Dashboard uses raw SQL with CTEs for complex aggregations                |
 | Mutations      | `features/*/actions.ts` | Always inside `$transaction` — even single operations, because consistency beats micro-optimization        |
 | Audit logging  | `auditLog.ts` → MongoDB | Deferred via `after()` so it never slows down the user's response                                          |
+| Real-time      | `eventBus.ts` → SSE     | Every `deferAudit()` call also emits to in-process EventEmitter; SSE streams to clients, poll fallback     |
 | Types          | `features/*/schemas.ts` | Zod schemas → `z.infer` → TypeScript types. Feature-local schemas, barrel re-exported via `schemas/`       |
 | Auth           | `auth.ts`               | JWT with permission-enriched tokens. `permissionsVersion` detects stale permissions without extra DB calls |
 | RBAC           | `permissions.ts`        | Resolution order: superuser (all) → user override → role default                                           |
@@ -259,6 +262,7 @@ src/features/
 ├── reports/          # org chart, analytics
 ├── positions/
 ├── profile/
+├── realtime/         # SSE/polling event bus, activity feed, connection indicator
 ├── sessions/
 ├── twoFactor/
 ├── data/             # CSV import/export
@@ -313,11 +317,12 @@ HRManager is designed as a standalone, independently deployable application — 
 | OpenTelemetry      | 22       | SDK init gating, span creation/error/status, metrics caching, middleware tracing, instrumentation hook    |
 | iCal calendar      | 7        | RFC 5545 generation, DTEND exclusivity, text escaping, CRLF, multiple events                              |
 | Keyboard shortcuts | 8        | Chord navigation, help dialog, input suppression, search focus                                            |
+| Real-time (SSE)    | 43       | Event bus emit/subscribe/evict, ring buffer, emit helpers, schema validation, provider, hook, UI          |
 | Auth route         | 5        | Rate limiting on auth endpoints, CSRF, GET passthrough                                                    |
 | Reviews UI         | 86       | Cycle management, request table, submit form, templates, question CRUD, confirm dialogs                   |
 | Accessibility      | 25       | axe-core WCAG AA checks on 22 components — forms, tables, dialogs, skeletons, navigation                  |
 | E2E (Playwright)   | 75       | Auth, CRUD, detail editing, dashboard, profile, data I/O, form validation, full workflow                  |
-| **Total**          | **1785** | **91.9% line coverage · 83.5% function coverage**                                                         |
+| **Total**          | **1828** | **91.9% line coverage · 83.5% function coverage**                                                         |
 
 ```
 Statements : 90.83%    Branches : 82.47%
@@ -391,6 +396,7 @@ npm run dev                   # start dev server at localhost:3000
 | `ANTHROPIC_API_KEY`                  | No       | Claude API key (for i18n translation agent)                           |
 | `OTEL_ENABLED`                       | No       | Set `true` to enable OpenTelemetry tracing + metrics                  |
 | `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` | No       | OTLP trace collector URL (default: `http://localhost:4318/v1/traces`) |
+| `NEXT_PUBLIC_REALTIME_TRANSPORT`     | No       | `sse` or `poll` (auto-detected: SSE local, poll on Vercel)            |
 
 ---
 
@@ -436,7 +442,7 @@ _Last updated: March 2026_
 ### Architecture & Observability
 
 - [x] OpenTelemetry tracing — instrument full request lifecycle; export to Jaeger/Datadog; P95/P99 dashboards
-- [ ] WebSocket real-time updates — live notifications for person create, leave requests, activity feed
+- [x] Real-time updates (SSE) — live notifications via Server-Sent Events with polling fallback for Vercel
 - [x] Performance at scale — N+1 query fixes, 14 database indexes, load testing tools, scaling analysis
 
 ### Security & Compliance

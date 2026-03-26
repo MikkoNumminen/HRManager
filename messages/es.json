@@ -941,10 +941,10 @@
     "error": "Fallo"
   },
   "realtime": {
-    "connected": "Live updates active",
-    "disconnected": "Live updates paused",
-    "reconnecting": "Reconnecting...",
-    "activityFeed": "Live Activity",
-    "noActivity": "No recent activity"
+    "connected": "Actualizaciones en vivo activas",
+    "disconnected": "Actualizaciones en vivo en pausa",
+    "reconnecting": "Reconectando...",
+    "activityFeed": "Actividad en vivo",
+    "noActivity": "Sin actividad reciente"
   }
 }

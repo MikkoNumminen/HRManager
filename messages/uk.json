@@ -941,10 +941,10 @@
     "error": "Помилка"
   },
   "realtime": {
-    "connected": "Live updates active",
-    "disconnected": "Live updates paused",
-    "reconnecting": "Reconnecting...",
-    "activityFeed": "Live Activity",
-    "noActivity": "No recent activity"
+    "connected": "Оновлення в реальному часі активні",
+    "disconnected": "Оновлення в реальному часі призупинені",
+    "reconnecting": "Перепідключення...",
+    "activityFeed": "Активність у реальному часі",
+    "noActivity": "Немає нещодавньої активності"
   }
 }

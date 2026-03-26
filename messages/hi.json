@@ -941,10 +941,10 @@
     "error": "त्रुटि विवरण"
   },
   "realtime": {
-    "connected": "Live updates active",
-    "disconnected": "Live updates paused",
-    "reconnecting": "Reconnecting...",
-    "activityFeed": "Live Activity",
-    "noActivity": "No recent activity"
+    "connected": "लाइव अपडेट सक्रिय",
+    "disconnected": "लाइव अपडेट रुके हुए",
+    "reconnecting": "पुनः कनेक्ट हो रहा है...",
+    "activityFeed": "लाइव गतिविधि",
+    "noActivity": "कोई हालिया गतिविधि नहीं"
   }
 }

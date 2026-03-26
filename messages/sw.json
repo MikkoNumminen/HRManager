@@ -941,10 +941,10 @@
     "error": "Hitilafu"
   },
   "realtime": {
-    "connected": "Live updates active",
-    "disconnected": "Live updates paused",
-    "reconnecting": "Reconnecting...",
-    "activityFeed": "Live Activity",
-    "noActivity": "No recent activity"
+    "connected": "Masasisho ya moja kwa moja yanafanya kazi",
+    "disconnected": "Masasisho ya moja kwa moja yamesimamishwa",
+    "reconnecting": "Inaunganisha tena...",
+    "activityFeed": "Shughuli za moja kwa moja",
+    "noActivity": "Hakuna shughuli za hivi karibuni"
   }
 }

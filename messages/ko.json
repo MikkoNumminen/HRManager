@@ -941,10 +941,10 @@
     "error": "오류 내용"
   },
   "realtime": {
-    "connected": "Live updates active",
-    "disconnected": "Live updates paused",
-    "reconnecting": "Reconnecting...",
-    "activityFeed": "Live Activity",
-    "noActivity": "No recent activity"
+    "connected": "실시간 업데이트 활성",
+    "disconnected": "실시간 업데이트 일시 중지",
+    "reconnecting": "재연결 중...",
+    "activityFeed": "실시간 활동",
+    "noActivity": "최근 활동 없음"
   }
 }

@@ -941,10 +941,10 @@
     "error": "Erreur"
   },
   "realtime": {
-    "connected": "Live updates active",
-    "disconnected": "Live updates paused",
-    "reconnecting": "Reconnecting...",
-    "activityFeed": "Live Activity",
-    "noActivity": "No recent activity"
+    "connected": "Mises à jour en direct actives",
+    "disconnected": "Mises à jour en direct en pause",
+    "reconnecting": "Reconnexion...",
+    "activityFeed": "Activité en direct",
+    "noActivity": "Aucune activité récente"
   }
 }
