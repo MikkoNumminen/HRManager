@@ -24,9 +24,6 @@ jest.mock(
   { virtual: true },
 );
 
-// Expose the global mockShowSnackbar for assertions (set up in jest.setup.ts).
-declare const mockShowSnackbar: jest.Mock;
-
 const mockSetupData = {
   uri: "otpauth://totp/HRManager:test%40example.com?secret=TESTSECRET&issuer=HRManager",
   secret: "TESTSECRET",
@@ -73,9 +70,7 @@ describe("TwoFactorSetup", () => {
   test("clicking Enable opens setup dialog with QR code step", async () => {
     (beginTwoFactorSetup as jest.Mock).mockResolvedValue(mockSetupData);
     render(<TwoFactorSetup enabled={false} />);
-    await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: /Enable 2FA/i }));
-    });
+    fireEvent.click(screen.getByRole("button", { name: /Enable 2FA/i }));
     await waitFor(() => {
       expect(screen.getByText("Set Up Two-Factor Authentication")).toBeInTheDocument();
     });
@@ -86,9 +81,7 @@ describe("TwoFactorSetup", () => {
   test("shows snackbar error when beginTwoFactorSetup throws Error", async () => {
     (beginTwoFactorSetup as jest.Mock).mockRejectedValue(new Error("Network error"));
     render(<TwoFactorSetup enabled={false} />);
-    await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: /Enable 2FA/i }));
-    });
+    fireEvent.click(screen.getByRole("button", { name: /Enable 2FA/i }));
     await waitFor(() => {
       expect((globalThis as Record<string, unknown>).mockShowSnackbar).toHaveBeenCalledWith(
         "Network error",
@@ -101,9 +94,7 @@ describe("TwoFactorSetup", () => {
   test("shows generic error when beginTwoFactorSetup throws non-Error", async () => {
     (beginTwoFactorSetup as jest.Mock).mockRejectedValue("something bad");
     render(<TwoFactorSetup enabled={false} />);
-    await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: /Enable 2FA/i }));
-    });
+    fireEvent.click(screen.getByRole("button", { name: /Enable 2FA/i }));
     await waitFor(() => {
       expect((globalThis as Record<string, unknown>).mockShowSnackbar).toHaveBeenCalledWith(
         "Failed to initialize 2FA setup",
@@ -116,28 +107,20 @@ describe("TwoFactorSetup", () => {
   test("Next button in setup dialog advances to verify step", async () => {
     (beginTwoFactorSetup as jest.Mock).mockResolvedValue(mockSetupData);
     render(<TwoFactorSetup enabled={false} />);
-    await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: /Enable 2FA/i }));
-    });
-    await waitFor(() => {
-      expect(screen.getByRole("button", { name: /Next/i })).toBeInTheDocument();
-    });
+    fireEvent.click(screen.getByRole("button", { name: /Enable 2FA/i }));
+    await screen.findByRole("button", { name: /Next/i });
     fireEvent.click(screen.getByRole("button", { name: /Next/i }));
-    await waitFor(() => {
-      expect(screen.getByLabelText("Verification Code")).toBeInTheDocument();
-    });
+    await screen.findByLabelText("Verification Code");
   });
 
   // Setup dialog step 1: Back button returns to QR step.
   test("Back button in verify step returns to QR step", async () => {
     (beginTwoFactorSetup as jest.Mock).mockResolvedValue(mockSetupData);
     render(<TwoFactorSetup enabled={false} />);
-    await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: /Enable 2FA/i }));
-    });
-    await waitFor(() => screen.getByRole("button", { name: /Next/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Enable 2FA/i }));
+    await screen.findByRole("button", { name: /Next/i });
     fireEvent.click(screen.getByRole("button", { name: /Next/i }));
-    await waitFor(() => screen.getByRole("button", { name: /Back/i }));
+    await screen.findByRole("button", { name: /Back/i });
     fireEvent.click(screen.getByRole("button", { name: /Back/i }));
     await waitFor(() => {
       expect(screen.getByText("TESTSECRET")).toBeInTheDocument();
@@ -149,16 +132,12 @@ describe("TwoFactorSetup", () => {
     (beginTwoFactorSetup as jest.Mock).mockResolvedValue(mockSetupData);
     (confirmTwoFactorSetup as jest.Mock).mockResolvedValue(undefined);
     render(<TwoFactorSetup enabled={false} />);
-    await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: /Enable 2FA/i }));
-    });
-    await waitFor(() => screen.getByRole("button", { name: /Next/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Enable 2FA/i }));
+    await screen.findByRole("button", { name: /Next/i });
     fireEvent.click(screen.getByRole("button", { name: /Next/i }));
-    await waitFor(() => screen.getByLabelText("Verification Code"));
-    const form = screen.getByLabelText("Verification Code").closest("form")!;
-    await act(async () => {
-      fireEvent.submit(form);
-    });
+    const codeInput = await screen.findByLabelText("Verification Code");
+    // eslint-disable-next-line testing-library/no-node-access
+    fireEvent.submit(codeInput.closest("form")!);
     await waitFor(() => {
       expect(
         screen.getByText(/Save these recovery codes in a secure location/),
@@ -171,16 +150,12 @@ describe("TwoFactorSetup", () => {
     (beginTwoFactorSetup as jest.Mock).mockResolvedValue(mockSetupData);
     (confirmTwoFactorSetup as jest.Mock).mockResolvedValue({ error: "Invalid code" });
     render(<TwoFactorSetup enabled={false} />);
-    await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: /Enable 2FA/i }));
-    });
-    await waitFor(() => screen.getByRole("button", { name: /Next/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Enable 2FA/i }));
+    await screen.findByRole("button", { name: /Next/i });
     fireEvent.click(screen.getByRole("button", { name: /Next/i }));
-    await waitFor(() => screen.getByLabelText("Verification Code"));
-    const form = screen.getByLabelText("Verification Code").closest("form")!;
-    await act(async () => {
-      fireEvent.submit(form);
-    });
+    const codeInput = await screen.findByLabelText("Verification Code");
+    // eslint-disable-next-line testing-library/no-node-access
+    fireEvent.submit(codeInput.closest("form")!);
     await waitFor(() => {
       expect(screen.getByText("Invalid code")).toBeInTheDocument();
     });
@@ -191,16 +166,13 @@ describe("TwoFactorSetup", () => {
     (beginTwoFactorSetup as jest.Mock).mockResolvedValue(mockSetupData);
     (confirmTwoFactorSetup as jest.Mock).mockResolvedValue(undefined);
     render(<TwoFactorSetup enabled={false} />);
-    await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: /Enable 2FA/i }));
-    });
-    await waitFor(() => screen.getByRole("button", { name: /Next/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Enable 2FA/i }));
+    await screen.findByRole("button", { name: /Next/i });
     fireEvent.click(screen.getByRole("button", { name: /Next/i }));
-    await waitFor(() => screen.getByLabelText("Verification Code"));
-    await act(async () => {
-      fireEvent.submit(screen.getByLabelText("Verification Code").closest("form")!);
-    });
-    await waitFor(() => screen.getByRole("button", { name: /Done/i }));
+    const codeInput = await screen.findByLabelText("Verification Code");
+    // eslint-disable-next-line testing-library/no-node-access
+    fireEvent.submit(codeInput.closest("form")!);
+    await screen.findByRole("button", { name: /Done/i });
     fireEvent.click(screen.getByRole("button", { name: /Done/i }));
     await waitFor(() => {
       expect(screen.queryByText("Set Up Two-Factor Authentication")).not.toBeInTheDocument();
@@ -257,11 +229,9 @@ describe("TwoFactorSetup", () => {
     (regenerateRecoveryCodes as jest.Mock).mockResolvedValue({ recoveryCodes: newCodes });
     render(<TwoFactorSetup enabled={true} />);
     fireEvent.click(screen.getByRole("button", { name: /Regenerate Recovery Codes/i }));
-    await waitFor(() => screen.getByLabelText("Verification Code"));
-    const form = screen.getByLabelText("Verification Code").closest("form")!;
-    await act(async () => {
-      fireEvent.submit(form);
-    });
+    const codeInput = await screen.findByLabelText("Verification Code");
+    // eslint-disable-next-line testing-library/no-node-access
+    fireEvent.submit(codeInput.closest("form")!);
     await waitFor(() => {
       expect(screen.getByText("NEW1-AAAA")).toBeInTheDocument();
     });
@@ -275,11 +245,9 @@ describe("TwoFactorSetup", () => {
     (regenerateRecoveryCodes as jest.Mock).mockResolvedValue({ error: "Invalid code" });
     render(<TwoFactorSetup enabled={true} />);
     fireEvent.click(screen.getByRole("button", { name: /Regenerate Recovery Codes/i }));
-    await waitFor(() => screen.getByLabelText("Verification Code"));
-    const form = screen.getByLabelText("Verification Code").closest("form")!;
-    await act(async () => {
-      fireEvent.submit(form);
-    });
+    const codeInput = await screen.findByLabelText("Verification Code");
+    // eslint-disable-next-line testing-library/no-node-access
+    fireEvent.submit(codeInput.closest("form")!);
     await waitFor(() => {
       expect((globalThis as Record<string, unknown>).mockShowSnackbar).toHaveBeenCalledWith(
         "Invalid code",
@@ -293,11 +261,9 @@ describe("TwoFactorSetup", () => {
     (regenerateRecoveryCodes as jest.Mock).mockResolvedValue(null);
     render(<TwoFactorSetup enabled={true} />);
     fireEvent.click(screen.getByRole("button", { name: /Regenerate Recovery Codes/i }));
-    await waitFor(() => screen.getByLabelText("Verification Code"));
-    const form = screen.getByLabelText("Verification Code").closest("form")!;
-    await act(async () => {
-      fireEvent.submit(form);
-    });
+    const codeInput = await screen.findByLabelText("Verification Code");
+    // eslint-disable-next-line testing-library/no-node-access
+    fireEvent.submit(codeInput.closest("form")!);
     // No error thrown — dialog still open, verify the title is present
     await waitFor(() => {
       expect(screen.getByText("Regenerate Recovery Codes", { selector: "h2" })).toBeInTheDocument();
@@ -309,11 +275,9 @@ describe("TwoFactorSetup", () => {
     (regenerateRecoveryCodes as jest.Mock).mockResolvedValue({ error: null });
     render(<TwoFactorSetup enabled={true} />);
     fireEvent.click(screen.getByRole("button", { name: /Regenerate Recovery Codes/i }));
-    await waitFor(() => screen.getByLabelText("Verification Code"));
-    const form = screen.getByLabelText("Verification Code").closest("form")!;
-    await act(async () => {
-      fireEvent.submit(form);
-    });
+    const codeInput = await screen.findByLabelText("Verification Code");
+    // eslint-disable-next-line testing-library/no-node-access
+    fireEvent.submit(codeInput.closest("form")!);
     await waitFor(() => {
       // No snackbar for error:null case — snackbar was not called with "error" severity
       const calls = ((globalThis as Record<string, unknown>).mockShowSnackbar as jest.Mock).mock
@@ -328,19 +292,14 @@ describe("TwoFactorSetup", () => {
     (beginTwoFactorSetup as jest.Mock).mockResolvedValue(mockSetupData);
     (confirmTwoFactorSetup as jest.Mock).mockResolvedValue(undefined);
     render(<TwoFactorSetup enabled={false} />);
-    await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: /Enable 2FA/i }));
-    });
-    await waitFor(() => screen.getByRole("button", { name: /Next/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Enable 2FA/i }));
+    await screen.findByRole("button", { name: /Next/i });
     fireEvent.click(screen.getByRole("button", { name: /Next/i }));
-    await waitFor(() => screen.getByLabelText("Verification Code"));
-    await act(async () => {
-      fireEvent.submit(screen.getByLabelText("Verification Code").closest("form")!);
-    });
-    await waitFor(() => screen.getByRole("button", { name: /Copy All Codes/i }));
-    await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: /Copy All Codes/i }));
-    });
+    const codeInput = await screen.findByLabelText("Verification Code");
+    // eslint-disable-next-line testing-library/no-node-access
+    fireEvent.submit(codeInput.closest("form")!);
+    await screen.findByRole("button", { name: /Copy All Codes/i });
+    fireEvent.click(screen.getByRole("button", { name: /Copy All Codes/i }));
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
       mockSetupData.recoveryCodes.join("\n"),
     );
@@ -352,19 +311,14 @@ describe("TwoFactorSetup", () => {
     (beginTwoFactorSetup as jest.Mock).mockResolvedValue(mockSetupData);
     (confirmTwoFactorSetup as jest.Mock).mockResolvedValue(undefined);
     render(<TwoFactorSetup enabled={false} />);
-    await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: /Enable 2FA/i }));
-    });
-    await waitFor(() => screen.getByRole("button", { name: /Next/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Enable 2FA/i }));
+    await screen.findByRole("button", { name: /Next/i });
     fireEvent.click(screen.getByRole("button", { name: /Next/i }));
-    await waitFor(() => screen.getByLabelText("Verification Code"));
-    await act(async () => {
-      fireEvent.submit(screen.getByLabelText("Verification Code").closest("form")!);
-    });
-    await waitFor(() => screen.getByRole("button", { name: /Copy All Codes/i }));
-    await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: /Copy All Codes/i }));
-    });
+    const codeInput = await screen.findByLabelText("Verification Code");
+    // eslint-disable-next-line testing-library/no-node-access
+    fireEvent.submit(codeInput.closest("form")!);
+    await screen.findByRole("button", { name: /Copy All Codes/i });
+    fireEvent.click(screen.getByRole("button", { name: /Copy All Codes/i }));
     expect(screen.getByText("Recovery codes copied to clipboard")).toBeInTheDocument();
     act(() => jest.advanceTimersByTime(2001));
     await waitFor(() => {
@@ -377,11 +331,9 @@ describe("TwoFactorSetup", () => {
     (disableTwoFactor as jest.Mock).mockResolvedValue(undefined);
     render(<TwoFactorSetup enabled={true} />);
     fireEvent.click(screen.getByRole("button", { name: /Disable 2FA/i }));
-    await waitFor(() => screen.getByLabelText("Verification Code"));
-    const form = screen.getByLabelText("Verification Code").closest("form")!;
-    await act(async () => {
-      fireEvent.submit(form);
-    });
+    const codeInput = await screen.findByLabelText("Verification Code");
+    // eslint-disable-next-line testing-library/no-node-access
+    fireEvent.submit(codeInput.closest("form")!);
     await waitFor(() => {
       expect((globalThis as Record<string, unknown>).mockShowSnackbar).toHaveBeenCalledWith(
         "Two-factor authentication disabled",
@@ -396,11 +348,9 @@ describe("TwoFactorSetup", () => {
     (disableTwoFactor as jest.Mock).mockResolvedValue({ error: "Wrong code" });
     render(<TwoFactorSetup enabled={true} />);
     fireEvent.click(screen.getByRole("button", { name: /Disable 2FA/i }));
-    await waitFor(() => screen.getByLabelText("Verification Code"));
-    const form = screen.getByLabelText("Verification Code").closest("form")!;
-    await act(async () => {
-      fireEvent.submit(form);
-    });
+    const codeInput = await screen.findByLabelText("Verification Code");
+    // eslint-disable-next-line testing-library/no-node-access
+    fireEvent.submit(codeInput.closest("form")!);
     await waitFor(() => {
       expect(screen.getByText("Wrong code")).toBeInTheDocument();
     });
@@ -410,19 +360,15 @@ describe("TwoFactorSetup", () => {
   test("copy secret icon in setup dialog writes secret to clipboard", async () => {
     (beginTwoFactorSetup as jest.Mock).mockResolvedValue(mockSetupData);
     render(<TwoFactorSetup enabled={false} />);
-    await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: /Enable 2FA/i }));
-    });
-    await waitFor(() => screen.getByText("TESTSECRET"));
+    fireEvent.click(screen.getByRole("button", { name: /Enable 2FA/i }));
+    await screen.findByText("TESTSECRET");
     // The copy icon button is alongside the secret text
     const allButtons = screen.getAllByRole("button");
     const copySecretBtn = allButtons.find(
       (btn) => !btn.textContent?.includes("Next") && !btn.textContent?.match(/\w/),
     );
     if (copySecretBtn) {
-      await act(async () => {
-        fireEvent.click(copySecretBtn);
-      });
+      fireEvent.click(copySecretBtn);
       expect(navigator.clipboard.writeText).toHaveBeenCalledWith("TESTSECRET");
       expect((globalThis as Record<string, unknown>).mockShowSnackbar).toHaveBeenCalledWith(
         "Secret copied to clipboard",
@@ -444,17 +390,17 @@ describe("TwoFactorSetup", () => {
   test("setup dialog Escape key closes the dialog via onClose prop", async () => {
     (beginTwoFactorSetup as jest.Mock).mockResolvedValue(mockSetupData);
     render(<TwoFactorSetup enabled={false} />);
-    await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: /Enable 2FA/i }));
-    });
-    await waitFor(() => screen.getByText("Set Up Two-Factor Authentication"));
+    fireEvent.click(screen.getByRole("button", { name: /Enable 2FA/i }));
+    await screen.findByText("Set Up Two-Factor Authentication");
     // Fire Escape on the dialog element to trigger MUI's onClose → setSetupOpen(false)
+    // eslint-disable-next-line testing-library/no-node-access
     const dialog = document.querySelector('[role="dialog"]');
     if (dialog) {
       fireEvent.keyDown(dialog, { key: "Escape", code: "Escape", keyCode: 27 });
     }
     // After closing, setupOpen is false — dialog should no longer be visible
     await waitFor(() => {
+      // eslint-disable-next-line testing-library/no-node-access
       const dialogEl = document.querySelector('[role="dialog"]');
       if (dialogEl) {
         expect(dialogEl).not.toBeVisible();

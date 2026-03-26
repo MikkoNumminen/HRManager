@@ -236,6 +236,7 @@ describe("FeatureFlagsAdminClient", () => {
   test("create form submission calls action", async () => {
     (createFeatureFlag as jest.Mock).mockResolvedValue(undefined);
     renderAdmin([], adminPerms);
+    // eslint-disable-next-line testing-library/no-node-access
     const form = document.querySelector("form")!;
     fireEvent.submit(form);
     await waitFor(() => {
@@ -250,6 +251,7 @@ describe("FeatureFlagsAdminClient", () => {
   test("create error shows error text", async () => {
     (createFeatureFlag as jest.Mock).mockResolvedValue({ error: "Name taken" });
     renderAdmin([], adminPerms);
+    // eslint-disable-next-line testing-library/no-node-access
     const form = document.querySelector("form")!;
     fireEvent.submit(form);
     await waitFor(() => {
@@ -261,6 +263,7 @@ describe("FeatureFlagsAdminClient", () => {
   test("flag name links to detail page", () => {
     renderAdmin([makeFlag({ id: "abc-123", name: "my-flag" })], adminPerms);
     const link = screen.getByText("my-flag");
+    // eslint-disable-next-line testing-library/no-node-access
     expect(link.closest("a")).toHaveAttribute("href", "/admin/feature-flags/abc-123");
   });
 });

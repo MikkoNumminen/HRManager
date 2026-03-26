@@ -822,9 +822,9 @@ describe("describeChanges — null/undefined fallbacks (branch coverage)", () =>
   test("catch block returns tc(dash) when before and after are null", () => {
     // Make tc("unknown") throw to force the catch block to execute
     // but tc("dash") must work to test the catch return path
-    let callCount = 0;
+    let _callCount = 0;
     const partiallyThrowingTc = (key: string) => {
-      callCount++;
+      _callCount++;
       if (key === "unknown") throw new Error("tc unknown crashed");
       return `c:${key}`;
     };

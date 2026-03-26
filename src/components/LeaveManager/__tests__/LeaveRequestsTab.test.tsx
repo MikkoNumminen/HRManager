@@ -332,6 +332,7 @@ describe("LeaveRequestsTab", () => {
     fireEvent.click(screen.getByText("Submit Leave Request"));
 
     // Submit via the form element directly to trigger useActionState action
+    // eslint-disable-next-line testing-library/no-node-access
     const form = document.querySelector("form") as HTMLFormElement;
     fireEvent.submit(form);
 
@@ -349,6 +350,7 @@ describe("LeaveRequestsTab", () => {
     render(<LeaveRequestsTab {...defaultProps} />);
     fireEvent.click(screen.getByText("Submit Leave Request"));
 
+    // eslint-disable-next-line testing-library/no-node-access
     const form = document.querySelector("form") as HTMLFormElement;
     fireEvent.submit(form);
 
@@ -363,6 +365,7 @@ describe("LeaveRequestsTab", () => {
     render(<LeaveRequestsTab {...defaultProps} />);
 
     fireEvent.click(screen.getByText("Submit Leave Request"));
+    // eslint-disable-next-line testing-library/no-node-access
     const form = document.querySelector("form") as HTMLFormElement;
     fireEvent.submit(form);
 

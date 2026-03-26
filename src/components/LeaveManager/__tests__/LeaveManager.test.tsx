@@ -180,46 +180,46 @@ describe("LeaveManager", () => {
   // Passes canRequest=true to LeaveRequestsTab when permission granted.
   test("passes canRequest=true when permission granted", () => {
     render(<LeaveManager {...defaultProps} permissions={{ ...allPermissions }} />);
-    expect(screen.getByTestId("can-request").textContent).toBe("true");
+    expect(screen.getByTestId("can-request")).toHaveTextContent("true");
   });
 
   // Passes canRequest=false to LeaveRequestsTab when permission not granted.
   test("passes canRequest=false when permission denied", () => {
     render(<LeaveManager {...defaultProps} permissions={noPermissions} />);
-    expect(screen.getByTestId("can-request").textContent).toBe("false");
+    expect(screen.getByTestId("can-request")).toHaveTextContent("false");
   });
 
   // Passes canApprove=true when permission granted.
   test("passes canApprove=true when permission granted", () => {
     render(<LeaveManager {...defaultProps} permissions={{ ...allPermissions }} />);
-    expect(screen.getByTestId("can-approve").textContent).toBe("true");
+    expect(screen.getByTestId("can-approve")).toHaveTextContent("true");
   });
 
   // Passes canApprove=false when permission denied.
   test("passes canApprove=false when permission denied", () => {
     render(<LeaveManager {...defaultProps} permissions={noPermissions} />);
-    expect(screen.getByTestId("can-approve").textContent).toBe("false");
+    expect(screen.getByTestId("can-approve")).toHaveTextContent("false");
   });
 
   // Passes canManageTypes=true to LeaveTypesTab when permission granted.
   test("passes canManageTypes=true to types tab", () => {
     render(<LeaveManager {...defaultProps} />);
     fireEvent.click(screen.getByText("Types"));
-    expect(screen.getByTestId("can-manage-types").textContent).toBe("true");
+    expect(screen.getByTestId("can-manage-types")).toHaveTextContent("true");
   });
 
   // Passes canManageTypes=false to LeaveTypesTab when permission denied.
   test("passes canManageTypes=false to types tab when denied", () => {
     render(<LeaveManager {...defaultProps} permissions={noPermissions} />);
     fireEvent.click(screen.getByText("Types"));
-    expect(screen.getByTestId("can-manage-types").textContent).toBe("false");
+    expect(screen.getByTestId("can-manage-types")).toHaveTextContent("false");
   });
 
   // Passes canManageTypes to LeaveBalancesTab.
   test("passes canManageTypes to balances tab", () => {
     render(<LeaveManager {...defaultProps} />);
     fireEvent.click(screen.getByText("Balances"));
-    expect(screen.getByTestId("can-manage-types-balances").textContent).toBe("true");
+    expect(screen.getByTestId("can-manage-types-balances")).toHaveTextContent("true");
   });
 
   // ─── Status Filter ───────────────────────────────────────────
@@ -227,7 +227,7 @@ describe("LeaveManager", () => {
   // Initial statusFilter passed to requests tab is "all".
   test("passes initial statusFilter=all to requests tab", () => {
     render(<LeaveManager {...defaultProps} />);
-    expect(screen.getByTestId("status-filter").textContent).toBe("all");
+    expect(screen.getByTestId("status-filter")).toHaveTextContent("all");
   });
 
   // Updating status filter propagates filtered requests to the tab.
@@ -236,12 +236,12 @@ describe("LeaveManager", () => {
     const approvedRequest = makeLeaveRequest({ id: "lr-2", status: "APPROVED" });
     render(<LeaveManager {...defaultProps} leaveRequests={[pendingRequest, approvedRequest]} />);
     // Initially all 2 requests shown
-    expect(screen.getByTestId("requests-count").textContent).toBe("2");
+    expect(screen.getByTestId("requests-count")).toHaveTextContent("2");
     // Click the filter-pending button inside the mock tab
     fireEvent.click(screen.getByText("filter-pending"));
     // Now only PENDING requests shown
-    expect(screen.getByTestId("requests-count").textContent).toBe("1");
-    expect(screen.getByTestId("status-filter").textContent).toBe("pending");
+    expect(screen.getByTestId("requests-count")).toHaveTextContent("1");
+    expect(screen.getByTestId("status-filter")).toHaveTextContent("pending");
   });
 
   // When filter is "all" all requests are shown regardless of status.
@@ -252,7 +252,7 @@ describe("LeaveManager", () => {
       makeLeaveRequest({ id: "lr-3", status: "REJECTED" }),
     ];
     render(<LeaveManager {...defaultProps} leaveRequests={requests} />);
-    expect(screen.getByTestId("requests-count").textContent).toBe("3");
+    expect(screen.getByTestId("requests-count")).toHaveTextContent("3");
   });
 
   // ─── Data Propagation ───────────────────────────────────────
@@ -262,7 +262,7 @@ describe("LeaveManager", () => {
     const types = [makeLeaveType({ id: "lt-1" }), makeLeaveType({ id: "lt-2" })];
     render(<LeaveManager {...defaultProps} leaveTypes={types} />);
     fireEvent.click(screen.getByText("Types"));
-    expect(screen.getByTestId("types-count").textContent).toBe("2");
+    expect(screen.getByTestId("types-count")).toHaveTextContent("2");
   });
 
   // LeaveBalancesTab receives the correct balances count.
@@ -274,7 +274,7 @@ describe("LeaveManager", () => {
     ];
     render(<LeaveManager {...defaultProps} leaveBalances={balances} />);
     fireEvent.click(screen.getByText("Balances"));
-    expect(screen.getByTestId("balances-count").textContent).toBe("3");
+    expect(screen.getByTestId("balances-count")).toHaveTextContent("3");
   });
 
   // ─── Empty States ────────────────────────────────────────────
@@ -282,21 +282,21 @@ describe("LeaveManager", () => {
   // Works correctly with empty leaveRequests array.
   test("handles empty leaveRequests", () => {
     render(<LeaveManager {...defaultProps} leaveRequests={[]} />);
-    expect(screen.getByTestId("requests-count").textContent).toBe("0");
+    expect(screen.getByTestId("requests-count")).toHaveTextContent("0");
   });
 
   // Works correctly with empty leaveTypes array.
   test("handles empty leaveTypes", () => {
     render(<LeaveManager {...defaultProps} leaveTypes={[]} />);
     fireEvent.click(screen.getByText("Types"));
-    expect(screen.getByTestId("types-count").textContent).toBe("0");
+    expect(screen.getByTestId("types-count")).toHaveTextContent("0");
   });
 
   // Works correctly with empty leaveBalances array.
   test("handles empty leaveBalances", () => {
     render(<LeaveManager {...defaultProps} leaveBalances={[]} />);
     fireEvent.click(screen.getByText("Balances"));
-    expect(screen.getByTestId("balances-count").textContent).toBe("0");
+    expect(screen.getByTestId("balances-count")).toHaveTextContent("0");
   });
 
   // ─── Filter case-insensitive matching ─────────────────────
@@ -311,6 +311,6 @@ describe("LeaveManager", () => {
     // Trigger "pending" filter
     fireEvent.click(screen.getByText("filter-pending"));
     // Only PENDING should match "pending" case-insensitively
-    expect(screen.getByTestId("requests-count").textContent).toBe("1");
+    expect(screen.getByTestId("requests-count")).toHaveTextContent("1");
   });
 });

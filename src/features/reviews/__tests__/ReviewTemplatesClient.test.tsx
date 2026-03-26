@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, act } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import ReviewTemplatesClient from "@/features/reviews/components/ReviewTemplatesClient";
 import type { ReviewTemplate } from "@/schemas";
 import { createReviewTemplate, deleteReviewTemplate } from "@/features/reviews/actions";
@@ -167,11 +167,11 @@ describe("ReviewTemplatesClient", () => {
     // eslint-disable-next-line testing-library/no-node-access
     fireEvent.click(deleteIcon.closest("button")!);
 
-    await act(async () => {
-      fireEvent.click(screen.getByText("Remove"));
-    });
+    fireEvent.click(screen.getByText("Remove"));
 
-    expect(deleteReviewTemplate).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(deleteReviewTemplate).toHaveBeenCalled();
+    });
   });
 
   // ─── Confirm Delete — Error ────────────────────────────────
@@ -185,11 +185,11 @@ describe("ReviewTemplatesClient", () => {
     // eslint-disable-next-line testing-library/no-node-access
     fireEvent.click(deleteIcon.closest("button")!);
 
-    await act(async () => {
-      fireEvent.click(screen.getByText("Remove"));
-    });
+    fireEvent.click(screen.getByText("Remove"));
 
-    expect(screen.getByText("Cannot delete template")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("Cannot delete template")).toBeInTheDocument();
+    });
   });
 
   // ─── Create Error ──────────────────────────────────────────
@@ -204,11 +204,11 @@ describe("ReviewTemplatesClient", () => {
 
     const submitButton = screen.getByRole("button", { name: /Create Template/i });
 
-    await act(async () => {
-      fireEvent.click(submitButton);
-    });
+    fireEvent.click(submitButton);
 
-    expect(screen.getByText("Name already taken")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("Name already taken")).toBeInTheDocument();
+    });
   });
 
   // ─── Template Navigation ───────────────────────────────────

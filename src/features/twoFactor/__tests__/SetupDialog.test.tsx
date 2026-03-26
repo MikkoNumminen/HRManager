@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import SetupDialog from "@/features/twoFactor/components/SetupDialog";
 import { type TwoFactorSetupResult } from "@/features/twoFactor/actions";
 
@@ -164,7 +164,7 @@ describe("SetupDialog", () => {
   // Step 1: Verify & Enable button is enabled when not pending.
   test("step 1 verify button is enabled when not pending", () => {
     render(<SetupDialog {...defaultProps} activeStep={1} confirmPending={false} />);
-    expect(screen.getByRole("button", { name: /Verify & Enable/i })).not.toBeDisabled();
+    expect(screen.getByRole("button", { name: /Verify & Enable/i })).toBeEnabled();
   });
 
   // Step 1: submitting the form calls confirmAction via the form action.
@@ -173,6 +173,7 @@ describe("SetupDialog", () => {
     render(<SetupDialog {...defaultProps} activeStep={1} confirmAction={confirmAction} />);
     const codeInput = screen.getByLabelText("Verification Code");
     fireEvent.change(codeInput, { target: { value: "123456" } });
+    // eslint-disable-next-line testing-library/no-node-access
     fireEvent.submit(codeInput.closest("form")!);
     expect(confirmAction).toHaveBeenCalled();
   });
@@ -238,6 +239,7 @@ describe("SetupDialog", () => {
     render(<SetupDialog {...defaultProps} activeStep={0} onClose={onClose} />);
     // MUI Dialog listens for Escape key on the dialog paper element.
     // Fire keyDown on the dialog element to trigger MUI's internal onClose.
+    // eslint-disable-next-line testing-library/no-node-access
     const dialog = document.querySelector('[role="dialog"]');
     if (dialog) {
       fireEvent.keyDown(dialog, { key: "Escape", code: "Escape", keyCode: 27 });

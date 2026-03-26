@@ -221,6 +221,6 @@ describe("OptimisticPersons", () => {
       <OptimisticPersons persons={mockPersons} canCreate={false} total={1} page={1} search="Bob" />,
     );
     const searchInput = screen.getByRole("textbox") as HTMLInputElement;
-    expect(searchInput.value).toBe("Bob");
+    expect(searchInput).toHaveValue("Bob");
   });
 });

@@ -270,6 +270,6 @@ describe("OptimisticDepartments", () => {
       />,
     );
     const searchInput = screen.getByRole("textbox") as HTMLInputElement;
-    expect(searchInput.value).toBe("Marketing");
+    expect(searchInput).toHaveValue("Marketing");
   });
 });

@@ -210,6 +210,6 @@ describe("OptimisticTeams", () => {
       <OptimisticTeams teams={mockTeams} canCreate={false} total={1} page={1} search="Design" />,
     );
     const searchInput = screen.getByRole("textbox") as HTMLInputElement;
-    expect(searchInput.value).toBe("Design");
+    expect(searchInput).toHaveValue("Design");
   });
 });

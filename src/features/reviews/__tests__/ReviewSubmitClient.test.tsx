@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, act } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import ReviewSubmitClient from "@/features/reviews/components/ReviewSubmitClient";
 import type { ReviewRequest, ReviewTemplate } from "@/schemas";
 import { submitReview } from "@/features/reviews/actions";
@@ -280,9 +280,7 @@ describe("ReviewSubmitClient", () => {
     const allSubmitButtons = screen.getAllByText("Submit Review");
     const confirmBtn = allSubmitButtons[allSubmitButtons.length - 1];
 
-    await act(async () => {
-      fireEvent.click(confirmBtn);
-    });
+    fireEvent.click(confirmBtn);
 
     expect(submitReview).toHaveBeenCalled();
   });
@@ -298,11 +296,11 @@ describe("ReviewSubmitClient", () => {
     const allSubmitButtons = screen.getAllByText("Submit Review");
     const confirmBtn = allSubmitButtons[allSubmitButtons.length - 1];
 
-    await act(async () => {
-      fireEvent.click(confirmBtn);
-    });
+    fireEvent.click(confirmBtn);
 
-    expect(screen.getByText("Submission failed")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("Submission failed")).toBeInTheDocument();
+    });
   });
 
   // ─── Null Fallbacks ────────────────────────────────────────

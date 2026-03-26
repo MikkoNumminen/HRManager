@@ -186,6 +186,7 @@ describe("LeaveBalancesTab", () => {
     fireEvent.click(screen.getByText("Allocate Balance"));
 
     // Submit via the form element directly to trigger useActionState action
+    // eslint-disable-next-line testing-library/no-node-access
     const form = document.querySelector("form") as HTMLFormElement;
     fireEvent.submit(form);
 
@@ -203,6 +204,7 @@ describe("LeaveBalancesTab", () => {
     render(<LeaveBalancesTab {...defaultProps} />);
     fireEvent.click(screen.getByText("Allocate Balance"));
 
+    // eslint-disable-next-line testing-library/no-node-access
     const form = document.querySelector("form") as HTMLFormElement;
     fireEvent.submit(form);
 
@@ -217,6 +219,7 @@ describe("LeaveBalancesTab", () => {
     render(<LeaveBalancesTab {...defaultProps} />);
 
     fireEvent.click(screen.getByText("Allocate Balance"));
+    // eslint-disable-next-line testing-library/no-node-access
     const form = document.querySelector("form") as HTMLFormElement;
     fireEvent.submit(form);
 

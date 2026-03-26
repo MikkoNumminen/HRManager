@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+
 import LeaveTypesTab from "@/components/LeaveManager/LeaveTypesTab";
 import type { LeaveType } from "@/schemas";
 import { createLeaveType, updateLeaveType, deleteLeaveType } from "@/serverActions";
@@ -135,6 +135,7 @@ describe("LeaveTypesTab", () => {
     fireEvent.click(screen.getByText("Create Leave Type"));
 
     // Submit via the form element directly to bypass MUI button/input quirks
+    // eslint-disable-next-line testing-library/no-node-access
     const form = document.querySelector("form") as HTMLFormElement;
     fireEvent.submit(form);
 
@@ -152,6 +153,7 @@ describe("LeaveTypesTab", () => {
     render(<LeaveTypesTab leaveTypes={[]} canManageTypes={true} />);
     fireEvent.click(screen.getByText("Create Leave Type"));
 
+    // eslint-disable-next-line testing-library/no-node-access
     const form = document.querySelector("form") as HTMLFormElement;
     fireEvent.submit(form);
 
@@ -167,6 +169,7 @@ describe("LeaveTypesTab", () => {
 
     fireEvent.click(screen.getByText("Create Leave Type"));
 
+    // eslint-disable-next-line testing-library/no-node-access
     const form = document.querySelector("form") as HTMLFormElement;
     fireEvent.submit(form);
 
@@ -279,6 +282,7 @@ describe("LeaveTypesTab", () => {
     fireEvent.click(screen.getByLabelText("Delete Leave Type"));
     // Dialog is open
     expect(screen.getByRole("dialog")).toBeInTheDocument();
+    // eslint-disable-next-line testing-library/no-node-access
     fireEvent.keyDown(document.activeElement || document.body, {
       key: "Escape",
       code: "Escape",

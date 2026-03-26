@@ -78,8 +78,10 @@ describe("RemoveTeam Component", () => {
   });
 });
 
+/* eslint-disable testing-library/prefer-screen-queries */
 describe("RemoveTeamForm – impact branches", () => {
   const getDialog = () => {
+    // eslint-disable-next-line testing-library/no-node-access
     const dialog = document.querySelector("[role='dialog']");
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { within } = require("@testing-library/react");
