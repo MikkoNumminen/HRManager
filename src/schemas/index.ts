@@ -120,3 +120,4 @@ export {
   UserSessionSchema,
   type UserSession,
 } from "@/features/sessions/schemas";
+export { RealtimeEventSchema, type RealtimeEvent } from "@/features/realtime/schemas";

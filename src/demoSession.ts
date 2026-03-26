@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import { prisma } from "@/db";
 import { getAuditLogCollection, isMongoAvailable } from "@/mongoDb";
+import { clearSessionEvents } from "@/lib/eventBus";
 import { PERSON_SEEDS, TEAM_SEEDS, MEMBERSHIP_SEEDS, DEPARTMENT_SEEDS } from "@/seeds";
 
 /**
@@ -74,6 +75,11 @@ export async function cleanupStaleDemoSessions(): Promise<number> {
 
   const sessionIds = staleSessions.map((s) => s.id);
   if (sessionIds.length === 0) return 0;
+
+  // Clean up real-time event buffers
+  for (const id of sessionIds) {
+    clearSessionEvents(id);
+  }
 
   // Clean up audit logs from MongoDB (separate from PG transaction)
   if (isMongoAvailable()) {

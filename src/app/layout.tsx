@@ -6,6 +6,7 @@ import { AppRouterCacheProvider } from "@mui/material-nextjs/v16-appRouter";
 import ThemeRegistry from "@/components/shared/ThemeRegistry";
 import SessionProvider from "@/components/shared/SessionProvider";
 import SnackbarProvider from "@/components/shared/SnackbarProvider";
+import RealtimeProvider from "@/components/shared/RealtimeProvider";
 import TutorialProvider from "@/components/shared/TutorialProvider";
 import KeyboardShortcutsProvider from "@/components/shared/KeyboardShortcutsProvider";
 import TutorialSpotlight from "@/components/shared/TutorialSpotlight";
@@ -59,26 +60,28 @@ export default async function RootLayout({
             <NextIntlClientProvider locale={locale} messages={messages}>
               <ThemeRegistry>
                 <SnackbarProvider>
-                  <KeyboardShortcutsProvider>
-                    <TutorialProvider>
-                      <Box
-                        component="main"
-                        id="main-content"
-                        sx={{
-                          maxWidth: "1280px",
-                          mx: "auto",
-                          px: { xs: 1.5, sm: 2, md: 3 },
-                          pt: 2,
-                          pb: 2,
-                        }}
-                      >
-                        {children}
-                      </Box>
-                      <TutorialSpotlight />
-                      <TutorialCelebration />
-                      <TutorialChecklist />
-                    </TutorialProvider>
-                  </KeyboardShortcutsProvider>
+                  <RealtimeProvider>
+                    <KeyboardShortcutsProvider>
+                      <TutorialProvider>
+                        <Box
+                          component="main"
+                          id="main-content"
+                          sx={{
+                            maxWidth: "1280px",
+                            mx: "auto",
+                            px: { xs: 1.5, sm: 2, md: 3 },
+                            pt: 2,
+                            pb: 2,
+                          }}
+                        >
+                          {children}
+                        </Box>
+                        <TutorialSpotlight />
+                        <TutorialCelebration />
+                        <TutorialChecklist />
+                      </TutorialProvider>
+                    </KeyboardShortcutsProvider>
+                  </RealtimeProvider>
                 </SnackbarProvider>
               </ThemeRegistry>
             </NextIntlClientProvider>

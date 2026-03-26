@@ -939,5 +939,12 @@
     "data": "数据内容",
     "output": "输出结果",
     "error": "错误信息"
+  },
+  "realtime": {
+    "connected": "Live updates active",
+    "disconnected": "Live updates paused",
+    "reconnecting": "Reconnecting...",
+    "activityFeed": "Live Activity",
+    "noActivity": "No recent activity"
   }
 }

@@ -939,5 +939,12 @@
     "data": "Uppgifter",
     "output": "Utdata",
     "error": "Fel"
+  },
+  "realtime": {
+    "connected": "Live updates active",
+    "disconnected": "Live updates paused",
+    "reconnecting": "Reconnecting...",
+    "activityFeed": "Live Activity",
+    "noActivity": "No recent activity"
   }
 }

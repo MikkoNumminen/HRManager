@@ -939,5 +939,12 @@
     "data": "データ内容",
     "output": "出力結果",
     "error": "エラー内容"
+  },
+  "realtime": {
+    "connected": "Live updates active",
+    "disconnected": "Live updates paused",
+    "reconnecting": "Reconnecting...",
+    "activityFeed": "Live Activity",
+    "noActivity": "No recent activity"
   }
 }

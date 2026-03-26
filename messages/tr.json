@@ -939,5 +939,12 @@
     "data": "Veri",
     "output": "Çıktı",
     "error": "Hata"
+  },
+  "realtime": {
+    "connected": "Live updates active",
+    "disconnected": "Live updates paused",
+    "reconnecting": "Reconnecting...",
+    "activityFeed": "Live Activity",
+    "noActivity": "No recent activity"
   }
 }

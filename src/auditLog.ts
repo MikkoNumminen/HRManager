@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { getDemoSessionId } from "@/demoSession";
 import { AuditActionSchema, AuditEntityTypeSchema } from "@/features/audit/schemas";
 import { computeHash, getLatestHash } from "@/lib/auditHashChain";
+import { emitMutationEvent } from "@/lib/eventEmitHelpers";
 import logger from "@/lib/logger";
 import { after } from "next/server";
 import { z } from "zod";
@@ -91,6 +92,18 @@ export async function captureAuditContext(): Promise<{
  */
 export function deferAudit(entries: DeferredAuditEntry[]): void {
   if (entries.length === 0) return;
+
+  // Emit real-time events synchronously (in-process, non-blocking)
+  for (const entry of entries) {
+    emitMutationEvent({
+      action: entry.action,
+      entityType: entry.entityType,
+      entityId: entry.entityId ?? null,
+      actorEmail: entry.userEmail,
+      sessionId: entry.sessionId,
+    });
+  }
+
   if (!isMongoAvailable()) return;
 
   after(async () => {

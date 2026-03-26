@@ -939,5 +939,12 @@
     "data": "ข้อมูลงาน",
     "output": "ผลลัพธ์",
     "error": "ข้อผิดพลาด"
+  },
+  "realtime": {
+    "connected": "Live updates active",
+    "disconnected": "Live updates paused",
+    "reconnecting": "Reconnecting...",
+    "activityFeed": "Live Activity",
+    "noActivity": "No recent activity"
   }
 }

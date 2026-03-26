@@ -939,5 +939,12 @@
     "data": "محتوى البيانات",
     "output": "نتيجة الإخراج",
     "error": "تفاصيل الخطأ"
+  },
+  "realtime": {
+    "connected": "Live updates active",
+    "disconnected": "Live updates paused",
+    "reconnecting": "Reconnecting...",
+    "activityFeed": "Live Activity",
+    "noActivity": "No recent activity"
   }
 }
