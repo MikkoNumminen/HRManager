@@ -88,3 +88,113 @@ describe("Remove People", () => {
     });
   });
 });
+
+describe("RemovePersonForm – impact branches", () => {
+  const getDialog = () => {
+    const dialog = document.querySelector("[role='dialog']");
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { within } = require("@testing-library/react");
+    return within(dialog as HTMLElement);
+  };
+
+  // No impact prop renders no impact list items in dialog.
+  test("no impact prop renders no impact items", async () => {
+    render(<RemovePersonForm personID="p1" />);
+    await userEvent.click(screen.getByRole("button", { name: /Remove/i }));
+    const dialog = getDialog();
+    expect(dialog.queryByText(/Affected references/)).not.toBeInTheDocument();
+  });
+
+  // Impact with managedTeams shows team names in dialog.
+  test("impact with managedTeams shows team names", async () => {
+    const impact = {
+      managedTeams: [{ teamName: "Alpha" }, { teamName: "Beta" }],
+      headedDepartments: [],
+      teamMemberships: [],
+      leaveRequests: 0,
+      reviewRequests: 0,
+    };
+    render(<RemovePersonForm personID="p1" impact={impact} />);
+    await userEvent.click(screen.getByRole("button", { name: /Remove/i }));
+    const dialog = getDialog();
+    expect(dialog.getByText(/Alpha, Beta/)).toBeInTheDocument();
+  });
+
+  // Impact with headedDepartments shows department names.
+  test("impact with headedDepartments shows dept names", async () => {
+    const impact = {
+      managedTeams: [],
+      headedDepartments: [{ name: "Engineering" }],
+      teamMemberships: [],
+      leaveRequests: 0,
+      reviewRequests: 0,
+    };
+    render(<RemovePersonForm personID="p1" impact={impact} />);
+    await userEvent.click(screen.getByRole("button", { name: /Remove/i }));
+    const dialog = getDialog();
+    expect(dialog.getByText("Engineering")).toBeInTheDocument();
+  });
+
+  // Impact with teamMemberships shows team names.
+  test("impact with teamMemberships shows team names", async () => {
+    const impact = {
+      managedTeams: [],
+      headedDepartments: [],
+      teamMemberships: [{ teamName: "Gamma" }],
+      leaveRequests: 0,
+      reviewRequests: 0,
+    };
+    render(<RemovePersonForm personID="p1" impact={impact} />);
+    await userEvent.click(screen.getByRole("button", { name: /Remove/i }));
+    const dialog = getDialog();
+    expect(dialog.getByText("Gamma")).toBeInTheDocument();
+  });
+
+  // Impact with leaveRequests > 0 shows affected references.
+  test("impact with leaveRequests shows affected references", async () => {
+    const impact = {
+      managedTeams: [],
+      headedDepartments: [],
+      teamMemberships: [],
+      leaveRequests: 3,
+      reviewRequests: 0,
+    };
+    render(<RemovePersonForm personID="p1" impact={impact} />);
+    await userEvent.click(screen.getByRole("button", { name: /Remove/i }));
+    const dialog = getDialog();
+    expect(dialog.getByText(/Affected references/)).toBeInTheDocument();
+    // ICU plural not resolved in test — match raw template substring
+    expect(dialog.getByText(/leave request/)).toBeInTheDocument();
+  });
+
+  // Impact with reviewRequests > 0 shows affected references.
+  test("impact with reviewRequests shows affected references", async () => {
+    const impact = {
+      managedTeams: [],
+      headedDepartments: [],
+      teamMemberships: [],
+      leaveRequests: 0,
+      reviewRequests: 2,
+    };
+    render(<RemovePersonForm personID="p1" impact={impact} />);
+    await userEvent.click(screen.getByRole("button", { name: /Remove/i }));
+    const dialog = getDialog();
+    expect(dialog.getByText(/Affected references/)).toBeInTheDocument();
+    expect(dialog.getByText(/review request/)).toBeInTheDocument();
+  });
+
+  // Impact with all zeros renders no "Affected references" header.
+  test("impact with all zeros has no affected references", async () => {
+    const impact = {
+      managedTeams: [],
+      headedDepartments: [],
+      teamMemberships: [],
+      leaveRequests: 0,
+      reviewRequests: 0,
+    };
+    render(<RemovePersonForm personID="p1" impact={impact} />);
+    await userEvent.click(screen.getByRole("button", { name: /Remove/i }));
+    const dialog = getDialog();
+    expect(dialog.queryByText(/Affected references/)).not.toBeInTheDocument();
+  });
+});

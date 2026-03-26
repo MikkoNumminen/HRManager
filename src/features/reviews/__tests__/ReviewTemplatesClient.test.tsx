@@ -1,6 +1,7 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import ReviewTemplatesClient from "@/features/reviews/components/ReviewTemplatesClient";
 import type { ReviewTemplate } from "@/schemas";
+import { createReviewTemplate, deleteReviewTemplate } from "@/features/reviews/actions";
 
 // Mock server actions — component tests verify UI behavior, not server logic.
 jest.mock("@/features/reviews/actions", () => ({
@@ -138,5 +139,85 @@ describe("ReviewTemplatesClient", () => {
   test("renders templates heading", () => {
     render(<ReviewTemplatesClient {...defaultProps} />);
     expect(screen.getByText("Templates")).toBeInTheDocument();
+  });
+
+  // ─── Cancel Delete ─────────────────────────────────────────
+
+  // Clicking Cancel in the delete dialog does not call deleteReviewTemplate.
+  test("clicking Cancel in delete dialog does not call deleteReviewTemplate", () => {
+    render(<ReviewTemplatesClient {...defaultProps} />);
+    const deleteIcon = screen.getByTestId("DeleteIcon");
+    // eslint-disable-next-line testing-library/no-node-access
+    fireEvent.click(deleteIcon.closest("button")!);
+    // Dialog is open.
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    fireEvent.click(screen.getByText("Cancel"));
+    // deleteReviewTemplate must never be called after cancel.
+    expect(deleteReviewTemplate).not.toHaveBeenCalled();
+  });
+
+  // ─── Confirm Delete — Success ──────────────────────────────
+
+  // Clicking Remove in the dialog calls deleteReviewTemplate on success.
+  test("clicking Remove invokes deleteReviewTemplate on success", async () => {
+    (deleteReviewTemplate as jest.Mock).mockResolvedValue(undefined);
+
+    render(<ReviewTemplatesClient {...defaultProps} />);
+    const deleteIcon = screen.getByTestId("DeleteIcon");
+    // eslint-disable-next-line testing-library/no-node-access
+    fireEvent.click(deleteIcon.closest("button")!);
+
+    await act(async () => {
+      fireEvent.click(screen.getByText("Remove"));
+    });
+
+    expect(deleteReviewTemplate).toHaveBeenCalled();
+  });
+
+  // ─── Confirm Delete — Error ────────────────────────────────
+
+  // When deleteReviewTemplate returns an error, the error message is rendered.
+  test("shows error message when deleteReviewTemplate returns error", async () => {
+    (deleteReviewTemplate as jest.Mock).mockResolvedValue({ error: "Cannot delete template" });
+
+    render(<ReviewTemplatesClient {...defaultProps} />);
+    const deleteIcon = screen.getByTestId("DeleteIcon");
+    // eslint-disable-next-line testing-library/no-node-access
+    fireEvent.click(deleteIcon.closest("button")!);
+
+    await act(async () => {
+      fireEvent.click(screen.getByText("Remove"));
+    });
+
+    expect(screen.getByText("Cannot delete template")).toBeInTheDocument();
+  });
+
+  // ─── Create Error ──────────────────────────────────────────
+
+  // When createReviewTemplate returns an error, the error message is shown.
+  test("shows error message when createReviewTemplate returns error", async () => {
+    (createReviewTemplate as jest.Mock).mockResolvedValue({ error: "Name already taken" });
+
+    render(<ReviewTemplatesClient {...defaultProps} />);
+    const nameField = screen.getByRole("textbox", { name: /Template Name/i });
+    fireEvent.change(nameField, { target: { value: "Duplicate" } });
+
+    const submitButton = screen.getByRole("button", { name: /Create Template/i });
+
+    await act(async () => {
+      fireEvent.click(submitButton);
+    });
+
+    expect(screen.getByText("Name already taken")).toBeInTheDocument();
+  });
+
+  // ─── Template Navigation ───────────────────────────────────
+
+  // Clicking a template list item triggers router.push to the template detail page.
+  test("clicking a template navigates to its detail page", () => {
+    render(<ReviewTemplatesClient {...defaultProps} />);
+    const templateItem = screen.getByText("Standard Review");
+    fireEvent.click(templateItem);
+    expect(mockPush).toHaveBeenCalledWith("/reviews/templates/tmpl-1");
   });
 });

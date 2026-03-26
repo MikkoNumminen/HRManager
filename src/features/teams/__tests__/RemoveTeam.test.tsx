@@ -77,3 +77,57 @@ describe("RemoveTeam Component", () => {
     });
   });
 });
+
+describe("RemoveTeamForm – impact branches", () => {
+  const getDialog = () => {
+    const dialog = document.querySelector("[role='dialog']");
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { within } = require("@testing-library/react");
+    return within(dialog as HTMLElement);
+  };
+
+  // No impact prop renders no affected references.
+  test("no impact prop renders no affected references", async () => {
+    render(<RemoveTeamForm teamID="t1" />);
+    await userEvent.click(screen.getByRole("button", { name: /Remove/i }));
+    const dialog = getDialog();
+    expect(dialog.queryByText(/Affected references/)).not.toBeInTheDocument();
+  });
+
+  // Impact with memberCount=0 and no department shows no sub-items.
+  test("impact with zero members and no department", async () => {
+    render(<RemoveTeamForm teamID="t1" impact={{ memberCount: 0, departmentName: null }} />);
+    await userEvent.click(screen.getByRole("button", { name: /Remove/i }));
+    const dialog = getDialog();
+    expect(dialog.queryByText(/Affected references/)).not.toBeInTheDocument();
+  });
+
+  // Impact with memberCount > 0 shows affected references.
+  test("impact with members shows affected references", async () => {
+    render(<RemoveTeamForm teamID="t1" impact={{ memberCount: 5, departmentName: null }} />);
+    await userEvent.click(screen.getByRole("button", { name: /Remove/i }));
+    const dialog = getDialog();
+    expect(dialog.getByText(/Affected references/)).toBeInTheDocument();
+    // ICU plural not resolved in test — label + items both contain "member"
+    expect(dialog.getAllByText(/member/i).length).toBeGreaterThanOrEqual(1);
+  });
+
+  // Impact with departmentName shows department.
+  test("impact with department shows name", async () => {
+    render(
+      <RemoveTeamForm teamID="t1" impact={{ memberCount: 0, departmentName: "Engineering" }} />,
+    );
+    await userEvent.click(screen.getByRole("button", { name: /Remove/i }));
+    const dialog = getDialog();
+    expect(dialog.getByText("Engineering")).toBeInTheDocument();
+  });
+
+  // Impact with both members and department.
+  test("impact with both members and department", async () => {
+    render(<RemoveTeamForm teamID="t1" impact={{ memberCount: 3, departmentName: "HR" }} />);
+    await userEvent.click(screen.getByRole("button", { name: /Remove/i }));
+    const dialog = getDialog();
+    expect(dialog.getByText(/Affected references/)).toBeInTheDocument();
+    expect(dialog.getByText("HR")).toBeInTheDocument();
+  });
+});

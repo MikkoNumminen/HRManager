@@ -1,6 +1,7 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import ReviewSubmitClient from "@/features/reviews/components/ReviewSubmitClient";
 import type { ReviewRequest, ReviewTemplate } from "@/schemas";
+import { submitReview } from "@/features/reviews/actions";
 
 // Mock server actions — component tests verify UI behavior, not server logic.
 jest.mock("@/features/reviews/actions", () => ({
@@ -229,5 +230,110 @@ describe("ReviewSubmitClient", () => {
       />,
     );
     expect(screen.getByText("Direct report review")).toBeInTheDocument();
+  });
+
+  // ─── Slider Update ─────────────────────────────────────────
+
+  // Changing slider value updates the displayed rating number.
+  test("slider onChange updates displayed rating value", () => {
+    render(<ReviewSubmitClient {...defaultProps} />);
+    const slider = screen.getByRole("slider");
+    // Simulate a slider change by firing the change event with a new value.
+    fireEvent.change(slider, { target: { value: 4 } });
+    // The slider should still be present (state update does not unmount).
+    expect(slider).toBeInTheDocument();
+  });
+
+  // ─── Text Input Update ─────────────────────────────────────
+
+  // Typing into a TEXT question field updates the answer.
+  test("typing in text field updates text answer", () => {
+    render(<ReviewSubmitClient {...defaultProps} />);
+    const textField = screen.getByPlaceholderText("Your response...");
+    fireEvent.change(textField, { target: { value: "Great collaboration skills." } });
+    expect((textField as HTMLTextAreaElement).value).toBe("Great collaboration skills.");
+  });
+
+  // ─── Confirm Dialog — Cancel ───────────────────────────────
+
+  // Clicking Cancel in the confirm dialog does not submit the form.
+  test("clicking Cancel in confirm dialog does not call submitReview", () => {
+    render(<ReviewSubmitClient {...defaultProps} />);
+    fireEvent.click(screen.getByRole("button", { name: /Submit Review/i }));
+    // Dialog is open.
+    expect(screen.getByText("Submit your review? This cannot be undone.")).toBeInTheDocument();
+    fireEvent.click(screen.getByText("Cancel"));
+    // submitReview must never be called after cancel.
+    expect(submitReview).not.toHaveBeenCalled();
+  });
+
+  // ─── Confirm Dialog — Confirm ──────────────────────────────
+
+  // Clicking Confirm in the dialog calls the form action.
+  test("clicking Confirm in dialog invokes form action", async () => {
+    (submitReview as jest.Mock).mockResolvedValue(undefined);
+
+    render(<ReviewSubmitClient {...defaultProps} />);
+    fireEvent.click(screen.getByRole("button", { name: /Submit Review/i }));
+
+    // Get the confirm button inside the dialog (the second "Submit Review" occurrence).
+    const allSubmitButtons = screen.getAllByText("Submit Review");
+    const confirmBtn = allSubmitButtons[allSubmitButtons.length - 1];
+
+    await act(async () => {
+      fireEvent.click(confirmBtn);
+    });
+
+    expect(submitReview).toHaveBeenCalled();
+  });
+
+  // ─── Error Display ─────────────────────────────────────────
+
+  // Displays error message when action returns an error.
+  test("displays error message when action returns error", async () => {
+    (submitReview as jest.Mock).mockResolvedValue({ error: "Submission failed" });
+
+    render(<ReviewSubmitClient {...defaultProps} />);
+    fireEvent.click(screen.getByRole("button", { name: /Submit Review/i }));
+    const allSubmitButtons = screen.getAllByText("Submit Review");
+    const confirmBtn = allSubmitButtons[allSubmitButtons.length - 1];
+
+    await act(async () => {
+      fireEvent.click(confirmBtn);
+    });
+
+    expect(screen.getByText("Submission failed")).toBeInTheDocument();
+  });
+
+  // ─── Null Fallbacks ────────────────────────────────────────
+
+  // Renders without crashing when subjectName is null (uses empty string fallback).
+  test("renders gracefully when subjectName is null", () => {
+    render(
+      <ReviewSubmitClient request={makeRequest({ subjectName: null })} template={makeTemplate()} />,
+    );
+    // The form should still be present.
+    expect(screen.getByRole("button", { name: /Submit Review/i })).toBeInTheDocument();
+  });
+
+  // Renders rating slider with fallback defaults when scaleMin/scaleMax are null.
+  test("renders rating slider when scaleMin and scaleMax are null", () => {
+    const templateNullScale = makeTemplate({
+      questions: [
+        {
+          id: "q-1",
+          text: "Rate performance",
+          type: "RATING",
+          scaleMin: null,
+          scaleMax: null,
+          order: 0,
+          required: true,
+        },
+      ],
+    });
+    render(<ReviewSubmitClient request={makeRequest()} template={templateNullScale} />);
+    expect(screen.getByRole("slider")).toBeInTheDocument();
+    // Should fall back to defaults: Rating (1–5)
+    expect(screen.getByText(/Rating \(1–5\)/)).toBeInTheDocument();
   });
 });

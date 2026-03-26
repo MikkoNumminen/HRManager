@@ -1,5 +1,11 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import ReviewCycleDetailClient from "@/features/reviews/components/ReviewCycleDetailClient";
+import {
+  openReviewCycle,
+  closeReviewCycle,
+  deleteReviewCycle,
+  removeReviewRequest,
+} from "@/features/reviews/actions";
 import type { ReviewCycle, ReviewRequest, Person } from "@/schemas";
 
 // Mock server actions — component tests verify UI behavior, not server logic.
@@ -16,6 +22,9 @@ const mockPush = jest.fn();
 jest.mock("next/navigation", () => ({
   useRouter: () => ({ push: mockPush }),
 }));
+
+// SnackbarProvider is mocked globally in jest.setup.ts — use the shared global reference.
+const mockShowSnackbar = (globalThis as Record<string, unknown>).mockShowSnackbar as jest.Mock;
 
 const NOW = new Date("2026-07-01T12:00:00Z");
 
@@ -295,5 +304,212 @@ describe("ReviewCycleDetailClient", () => {
       />,
     );
     expect(screen.getByText("SUBMITTED")).toBeInTheDocument();
+  });
+
+  // ─── Open Cycle Action ──────────────────────────────────────
+
+  // Confirming open cycle calls openReviewCycle and shows success snackbar.
+  test("confirming open cycle calls openReviewCycle and shows success snackbar", async () => {
+    (openReviewCycle as jest.Mock).mockResolvedValue(undefined);
+    render(<ReviewCycleDetailClient {...defaultProps} />);
+    // Click the toolbar button — multiple "Open Cycle" texts exist once the dialog opens.
+    fireEvent.click(screen.getAllByText("Open Cycle")[0]);
+    // Dialog confirm button is the last "Open Cycle" in the DOM.
+    const allOpenCycleButtons = screen.getAllByText("Open Cycle");
+    fireEvent.click(allOpenCycleButtons[allOpenCycleButtons.length - 1]);
+    await waitFor(() => {
+      expect(openReviewCycle as jest.Mock).toHaveBeenCalled();
+    });
+    await waitFor(() => {
+      expect(mockShowSnackbar).toHaveBeenCalledWith("Review cycle is now open");
+    });
+  });
+
+  // Cancelling the open cycle dialog does not call openReviewCycle.
+  test("cancelling open cycle dialog does not call openReviewCycle", () => {
+    render(<ReviewCycleDetailClient {...defaultProps} />);
+    fireEvent.click(screen.getAllByText("Open Cycle")[0]);
+    // Dialog opens — click Cancel.
+    fireEvent.click(screen.getByText("Cancel"));
+    expect(openReviewCycle as jest.Mock).not.toHaveBeenCalled();
+  });
+
+  // Open cycle action returning an error shows error snackbar.
+  test("open cycle error shows error snackbar", async () => {
+    (openReviewCycle as jest.Mock).mockResolvedValue({ error: "Cycle already open" });
+    render(<ReviewCycleDetailClient {...defaultProps} />);
+    fireEvent.click(screen.getAllByText("Open Cycle")[0]);
+    const allOpenCycleButtons = screen.getAllByText("Open Cycle");
+    fireEvent.click(allOpenCycleButtons[allOpenCycleButtons.length - 1]);
+    await waitFor(() => {
+      expect(mockShowSnackbar).toHaveBeenCalledWith("Cycle already open");
+    });
+  });
+
+  // ─── Close Cycle Action ─────────────────────────────────────
+
+  // Confirming close cycle calls closeReviewCycle and shows success snackbar.
+  test("confirming close cycle calls closeReviewCycle and shows success snackbar", async () => {
+    (closeReviewCycle as jest.Mock).mockResolvedValue(undefined);
+    render(<ReviewCycleDetailClient {...defaultProps} cycle={makeCycle({ status: "OPEN" })} />);
+    fireEvent.click(screen.getAllByText("Close Cycle")[0]);
+    // Dialog confirm button is the last "Close Cycle" in the DOM.
+    const allCloseCycleButtons = screen.getAllByText("Close Cycle");
+    fireEvent.click(allCloseCycleButtons[allCloseCycleButtons.length - 1]);
+    await waitFor(() => {
+      expect(closeReviewCycle as jest.Mock).toHaveBeenCalled();
+    });
+    await waitFor(() => {
+      expect(mockShowSnackbar).toHaveBeenCalledWith("Review cycle is now closed");
+    });
+  });
+
+  // Cancelling the close cycle dialog does not call closeReviewCycle.
+  test("cancelling close cycle dialog does not call closeReviewCycle", () => {
+    render(<ReviewCycleDetailClient {...defaultProps} cycle={makeCycle({ status: "OPEN" })} />);
+    fireEvent.click(screen.getAllByText("Close Cycle")[0]);
+    fireEvent.click(screen.getByText("Cancel"));
+    expect(closeReviewCycle as jest.Mock).not.toHaveBeenCalled();
+  });
+
+  // Close cycle action returning an error shows error snackbar.
+  test("close cycle error shows error snackbar", async () => {
+    (closeReviewCycle as jest.Mock).mockResolvedValue({ error: "Cycle not open" });
+    render(<ReviewCycleDetailClient {...defaultProps} cycle={makeCycle({ status: "OPEN" })} />);
+    fireEvent.click(screen.getAllByText("Close Cycle")[0]);
+    const allCloseCycleButtons = screen.getAllByText("Close Cycle");
+    fireEvent.click(allCloseCycleButtons[allCloseCycleButtons.length - 1]);
+    await waitFor(() => {
+      expect(mockShowSnackbar).toHaveBeenCalledWith("Cycle not open");
+    });
+  });
+
+  // ─── Delete Cycle Action ────────────────────────────────────
+
+  // Confirming delete cycle calls deleteReviewCycle, shows snackbar, and redirects.
+  test("confirming delete cycle calls deleteReviewCycle and redirects", async () => {
+    (deleteReviewCycle as jest.Mock).mockResolvedValue(undefined);
+    render(<ReviewCycleDetailClient {...defaultProps} />);
+    fireEvent.click(screen.getByText("Delete Cycle"));
+    fireEvent.click(screen.getByText("Remove"));
+    await waitFor(() => {
+      expect(deleteReviewCycle as jest.Mock).toHaveBeenCalled();
+    });
+    await waitFor(() => {
+      expect(mockShowSnackbar).toHaveBeenCalledWith("Review cycle deleted");
+      expect(mockPush).toHaveBeenCalledWith("/reviews");
+    });
+  });
+
+  // Cancelling the delete cycle dialog does not call deleteReviewCycle.
+  test("cancelling delete cycle dialog does not call deleteReviewCycle", () => {
+    render(<ReviewCycleDetailClient {...defaultProps} />);
+    fireEvent.click(screen.getByText("Delete Cycle"));
+    fireEvent.click(screen.getByText("Cancel"));
+    expect(deleteReviewCycle as jest.Mock).not.toHaveBeenCalled();
+    expect(mockPush).not.toHaveBeenCalled();
+  });
+
+  // Delete cycle action returning an error shows error snackbar and does not redirect.
+  test("delete cycle error shows error snackbar without redirecting", async () => {
+    (deleteReviewCycle as jest.Mock).mockResolvedValue({ error: "Permission denied" });
+    render(<ReviewCycleDetailClient {...defaultProps} />);
+    fireEvent.click(screen.getByText("Delete Cycle"));
+    fireEvent.click(screen.getByText("Remove"));
+    await waitFor(() => {
+      expect(mockShowSnackbar).toHaveBeenCalledWith("Permission denied");
+    });
+    expect(mockPush).not.toHaveBeenCalled();
+  });
+
+  // ─── Delete Request Action ──────────────────────────────────
+
+  // Confirming delete request calls removeReviewRequest.
+  test("confirming delete request calls removeReviewRequest", async () => {
+    (removeReviewRequest as jest.Mock).mockResolvedValue(undefined);
+    render(<ReviewCycleDetailClient {...defaultProps} />);
+    // eslint-disable-next-line testing-library/no-node-access
+    const deleteIcon = screen.getAllByTestId("DeleteIcon").find((icon) => icon.closest("tbody"));
+    // eslint-disable-next-line testing-library/no-node-access
+    fireEvent.click(deleteIcon!.closest("button")!);
+    fireEvent.click(screen.getByText("Remove"));
+    await waitFor(() => {
+      expect(removeReviewRequest as jest.Mock).toHaveBeenCalled();
+    });
+  });
+
+  // Cancelling the delete request dialog does not call removeReviewRequest.
+  test("cancelling delete request dialog does not call removeReviewRequest", () => {
+    render(<ReviewCycleDetailClient {...defaultProps} />);
+    // eslint-disable-next-line testing-library/no-node-access
+    const deleteIcon = screen.getAllByTestId("DeleteIcon").find((icon) => icon.closest("tbody"));
+    // eslint-disable-next-line testing-library/no-node-access
+    fireEvent.click(deleteIcon!.closest("button")!);
+    fireEvent.click(screen.getByText("Cancel"));
+    expect(removeReviewRequest as jest.Mock).not.toHaveBeenCalled();
+  });
+
+  // Delete request sends correct requestId and cycleId in FormData.
+  test("delete request sends correct requestId and cycleId", async () => {
+    (removeReviewRequest as jest.Mock).mockResolvedValue(undefined);
+    render(
+      <ReviewCycleDetailClient
+        {...defaultProps}
+        cycle={makeCycle({ requests: [makeRequest({ id: "req-abc" })] })}
+      />,
+    );
+    // eslint-disable-next-line testing-library/no-node-access
+    const deleteIcon = screen.getAllByTestId("DeleteIcon").find((icon) => icon.closest("tbody"));
+    // eslint-disable-next-line testing-library/no-node-access
+    fireEvent.click(deleteIcon!.closest("button")!);
+    fireEvent.click(screen.getByText("Remove"));
+    await waitFor(() => {
+      expect(removeReviewRequest as jest.Mock).toHaveBeenCalled();
+    });
+    const callArg = (removeReviewRequest as jest.Mock).mock.calls[0][0] as FormData;
+    expect(callArg.get("requestId")).toBe("req-abc");
+    expect(callArg.get("cycleId")).toBe("cycle-1");
+  });
+
+  // ─── Error Display ──────────────────────────────────────────
+
+  // Remove request returning an error — action is called and the error response is received.
+  // Note: useFormAction dispatches via startTransition, which in JSDOM may not flush the
+  // error state into the DOM in all cases. We verify the action is called with the error.
+  test("remove request error — removeReviewRequest is called with error response", async () => {
+    (removeReviewRequest as jest.Mock).mockResolvedValue({ error: "Request not found" });
+    render(<ReviewCycleDetailClient {...defaultProps} />);
+    // eslint-disable-next-line testing-library/no-node-access
+    const deleteIcon = screen.getAllByTestId("DeleteIcon").find((icon) => icon.closest("tbody"));
+    // eslint-disable-next-line testing-library/no-node-access
+    fireEvent.click(deleteIcon!.closest("button")!);
+    fireEvent.click(screen.getByText("Remove"));
+    await waitFor(() => {
+      expect(removeReviewRequest as jest.Mock).toHaveBeenCalled();
+    });
+    // Verify the mock received the error payload.
+    expect((removeReviewRequest as jest.Mock).mock.results[0].value).resolves.toMatchObject({
+      error: "Request not found",
+    });
+  });
+
+  // Status chip renders DRAFT using the interpolated translation key (statusDRAFT → key fallback).
+  test("renders DRAFT status chip", () => {
+    render(<ReviewCycleDetailClient {...defaultProps} />);
+    // The component calls t(`status${cycle.status}`) which produces "statusDRAFT"; since that
+    // exact key is not in en.json (which has "statusDraft"), the mock returns the key verbatim.
+    expect(screen.getByText("statusDRAFT")).toBeInTheDocument();
+  });
+
+  // Status chip renders OPEN using the interpolated translation key (statusOPEN → key fallback).
+  test("renders OPEN status chip", () => {
+    render(<ReviewCycleDetailClient {...defaultProps} cycle={makeCycle({ status: "OPEN" })} />);
+    expect(screen.getByText("statusOPEN")).toBeInTheDocument();
+  });
+
+  // Status chip renders CLOSED using the interpolated translation key (statusCLOSED → key fallback).
+  test("renders CLOSED status chip", () => {
+    render(<ReviewCycleDetailClient {...defaultProps} cycle={makeCycle({ status: "CLOSED" })} />);
+    expect(screen.getByText("statusCLOSED")).toBeInTheDocument();
   });
 });

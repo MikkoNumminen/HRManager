@@ -1,7 +1,8 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
 import OptimisticPersons from "@/features/persons/components/OptimisticPersons";
 import { Person } from "@/schemas";
 import { createPerson } from "@/features/persons/actions";
+import { useRouter } from "next/navigation";
 
 jest.mock("next/navigation", () => ({
   useRouter: jest.fn(() => ({ push: jest.fn(), replace: jest.fn() })),
@@ -113,5 +114,113 @@ describe("OptimisticPersons", () => {
       <OptimisticPersons persons={mockPersons} canCreate={false} total={50} page={1} search="" />,
     );
     expect(screen.getByRole("navigation")).toBeInTheDocument();
+  });
+
+  // ─── Search Debounce ────────────────────────────────────────
+
+  // Typing in the search bar debounces and calls router.replace after 400 ms.
+  test("search debounce calls router.replace after 400ms", async () => {
+    jest.useFakeTimers();
+    const mockReplace = jest.fn();
+    (useRouter as jest.Mock).mockReturnValue({ push: jest.fn(), replace: mockReplace });
+
+    render(<OptimisticPersons persons={mockPersons} canCreate={false} {...defaultProps} />);
+
+    const searchInput = screen.getByRole("textbox");
+    fireEvent.change(searchInput, { target: { value: "Ali" } });
+
+    // Not called yet — debounce pending.
+    expect(mockReplace).not.toHaveBeenCalled();
+
+    await act(async () => {
+      jest.advanceTimersByTime(400);
+    });
+
+    expect(mockReplace).toHaveBeenCalledWith(
+      expect.stringContaining("/managePersons?q=Ali&page=1"),
+    );
+
+    jest.useRealTimers();
+  });
+
+  // Searching with a non-empty term then clearing it omits q param and resets to page 1.
+  test("search debounce after clearing input omits q param", async () => {
+    jest.useFakeTimers();
+    const mockReplace = jest.fn();
+    (useRouter as jest.Mock).mockReturnValue({ push: jest.fn(), replace: mockReplace });
+
+    render(<OptimisticPersons persons={mockPersons} canCreate={false} {...defaultProps} />);
+
+    const searchInput = screen.getByRole("textbox");
+    // First type something so debounce fires.
+    fireEvent.change(searchInput, { target: { value: "Ali" } });
+    await act(async () => {
+      jest.advanceTimersByTime(400);
+    });
+    mockReplace.mockClear();
+
+    // Now clear the search.
+    fireEvent.change(searchInput, { target: { value: "" } });
+    await act(async () => {
+      jest.advanceTimersByTime(400);
+    });
+
+    expect(mockReplace).toHaveBeenCalledWith(expect.stringContaining("/managePersons?page=1"));
+    const lastCall = mockReplace.mock.calls[mockReplace.mock.calls.length - 1][0] as string;
+    expect(lastCall).not.toContain("q=");
+
+    jest.useRealTimers();
+  });
+
+  // ─── Page Change ────────────────────────────────────────────
+
+  // Clicking a page button calls router.push with the correct page param.
+  test("page change without search calls router.push with page param only", () => {
+    const mockPush = jest.fn();
+    (useRouter as jest.Mock).mockReturnValue({ push: mockPush, replace: jest.fn() });
+
+    render(
+      <OptimisticPersons persons={mockPersons} canCreate={false} total={50} page={1} search="" />,
+    );
+
+    const page2Button = screen.getByRole("button", { name: /page 2/i });
+    fireEvent.click(page2Button);
+
+    expect(mockPush).toHaveBeenCalledWith(expect.stringContaining("page=2"));
+    const call = mockPush.mock.calls[0][0] as string;
+    expect(call).not.toContain("q=");
+  });
+
+  // When a search term is active, page change includes it in the URL.
+  test("page change with active search preserves search param", () => {
+    const mockPush = jest.fn();
+    (useRouter as jest.Mock).mockReturnValue({ push: mockPush, replace: jest.fn() });
+
+    render(
+      <OptimisticPersons
+        persons={mockPersons}
+        canCreate={false}
+        total={50}
+        page={1}
+        search="Ali"
+      />,
+    );
+
+    const page2Button = screen.getByRole("button", { name: /page 2/i });
+    fireEvent.click(page2Button);
+
+    expect(mockPush).toHaveBeenCalledWith(expect.stringContaining("q=Ali"));
+    expect(mockPush).toHaveBeenCalledWith(expect.stringContaining("page=2"));
+  });
+
+  // ─── Initial Search Value ───────────────────────────────────
+
+  // When search prop is non-empty the search field is pre-populated.
+  test("renders search bar with initial search value from props", () => {
+    render(
+      <OptimisticPersons persons={mockPersons} canCreate={false} total={1} page={1} search="Bob" />,
+    );
+    const searchInput = screen.getByRole("textbox") as HTMLInputElement;
+    expect(searchInput.value).toBe("Bob");
   });
 });

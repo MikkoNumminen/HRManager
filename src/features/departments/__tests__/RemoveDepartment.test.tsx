@@ -90,3 +90,41 @@ describe("RemoveDepartment Component", () => {
     expect(screen.getByDisplayValue(departmentID)).toHaveAttribute("name", "departmentID");
   });
 });
+
+describe("RemoveDepartmentForm – impact branches", () => {
+  const getDialog = () => {
+    const dialog = document.querySelector("[role='dialog']");
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { within } = require("@testing-library/react");
+    return within(dialog as HTMLElement);
+  };
+
+  // No impact prop renders no affected references.
+  test("no impact prop renders no affected references", async () => {
+    render(<RemoveDepartmentForm departmentID="d1" />);
+    await userEvent.click(screen.getByRole("button", { name: /Remove/i }));
+    const dialog = getDialog();
+    expect(dialog.queryByText(/Affected references/)).not.toBeInTheDocument();
+  });
+
+  // Empty teams array renders no affected references.
+  test("impact with empty teams", async () => {
+    render(<RemoveDepartmentForm departmentID="d1" impact={{ teams: [] }} />);
+    await userEvent.click(screen.getByRole("button", { name: /Remove/i }));
+    const dialog = getDialog();
+    expect(dialog.queryByText(/Affected references/)).not.toBeInTheDocument();
+  });
+
+  // Teams with names shows team names in dialog.
+  test("impact with teams shows team names", async () => {
+    render(
+      <RemoveDepartmentForm
+        departmentID="d1"
+        impact={{ teams: [{ teamName: "Alpha" }, { teamName: "Beta" }] }}
+      />,
+    );
+    await userEvent.click(screen.getByRole("button", { name: /Remove/i }));
+    const dialog = getDialog();
+    expect(dialog.getByText(/Alpha, Beta/)).toBeInTheDocument();
+  });
+});

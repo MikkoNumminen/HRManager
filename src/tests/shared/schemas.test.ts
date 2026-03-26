@@ -19,6 +19,40 @@ import {
   MAX_URL_LENGTH,
   ImageUrlSchema,
   MAX_EXPORT_ROWS,
+  MAX_NAME_LENGTH,
+  MAX_EMAIL_LENGTH,
+  MAX_POSITION_LENGTH,
+  MAX_DESCRIPTION_LENGTH,
+  EmailSchema,
+  TwoFactorSetupSchema,
+  TwoFactorVerifySchema,
+  CsvPersonImportRowSchema,
+  MAX_IMPORT_ROWS,
+  MAX_IMPORT_FILE_SIZE,
+  ReviewQuestionSchema,
+  ReviewTemplateSchema,
+  ReviewCycleSchema,
+  ReviewRequestSchema,
+  ReviewAnswerSchema,
+  ReviewSubmissionSchema,
+  TeamReviewRequestSchema,
+  TeamReviewReportSchema,
+  TeamReviewCycleSchema,
+  MAX_LEAVE_NOTE_LENGTH,
+  LeaveRequestStatusSchema,
+  LeaveTypeSchema,
+  LeaveRequestSchema,
+  LeaveBalanceSchema,
+  PositionSchema,
+  EmployeeTeamSchema,
+  EmployeeDepartmentSchema,
+  EmployeeProfileSchema,
+  OrgChartMemberSchema,
+  OrgChartTeamSchema,
+  OrgChartDepartmentSchema,
+  OrgChartDataSchema,
+  MAX_CONCURRENT_SESSIONS,
+  UserSessionSchema,
 } from "@/schemas";
 
 const VALID_UUID = "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11";
@@ -861,5 +895,995 @@ describe("MAX_EXPORT_ROWS", () => {
   // The export row cap should be 10 000 — enough for any realistic HR dataset.
   test("is 10000", () => {
     expect(MAX_EXPORT_ROWS).toBe(10000);
+  });
+});
+
+// ── Shared constants ───────────────────────────────────────────────────────
+
+describe("shared constants", () => {
+  // These numeric caps are shared across all feature schemas — verify their values
+  // so any accidental change is immediately caught.
+  test("MAX_NAME_LENGTH is 255", () => {
+    expect(MAX_NAME_LENGTH).toBe(255);
+  });
+
+  test("MAX_EMAIL_LENGTH is 320", () => {
+    expect(MAX_EMAIL_LENGTH).toBe(320);
+  });
+
+  test("MAX_POSITION_LENGTH is 255", () => {
+    expect(MAX_POSITION_LENGTH).toBe(255);
+  });
+
+  test("MAX_DESCRIPTION_LENGTH is 1000", () => {
+    expect(MAX_DESCRIPTION_LENGTH).toBe(1000);
+  });
+});
+
+describe("EmailSchema", () => {
+  // A properly formatted email should parse without error.
+  test("accepts a valid email", () => {
+    expect(() => EmailSchema.parse("user@example.com")).not.toThrow();
+  });
+
+  // A string without @ is not a valid email.
+  test("rejects invalid email format", () => {
+    expect(() => EmailSchema.parse("not-an-email")).toThrow();
+  });
+
+  // Empty string should fail — an email requires at least local@domain.
+  test("rejects empty string", () => {
+    expect(() => EmailSchema.parse("")).toThrow();
+  });
+
+  // An email longer than MAX_EMAIL_LENGTH should be rejected.
+  test("rejects email exceeding MAX_EMAIL_LENGTH", () => {
+    const longEmail = "a".repeat(MAX_EMAIL_LENGTH) + "@example.com";
+    expect(() => EmailSchema.parse(longEmail)).toThrow();
+  });
+});
+
+// ── Two-Factor Authentication ──────────────────────────────────────────────
+
+describe("TwoFactorSetupSchema", () => {
+  const validSetup = {
+    uri: "otpauth://totp/HRManager:user@example.com?secret=ABC&issuer=HRManager",
+    secret: "JBSWY3DPEHPK3PXP",
+    recoveryCodes: ["AAAA-BBBB", "CCCC-DDDD"],
+  };
+
+  // A complete 2FA setup payload should parse fine.
+  test("accepts a valid 2FA setup payload", () => {
+    expect(() => TwoFactorSetupSchema.parse(validSetup)).not.toThrow();
+  });
+
+  // Recovery codes can be an empty array (e.g., before generation).
+  test("accepts empty recoveryCodes array", () => {
+    const result = TwoFactorSetupSchema.parse({ ...validSetup, recoveryCodes: [] });
+    expect(result.recoveryCodes).toEqual([]);
+  });
+
+  // Missing uri should fail.
+  test("rejects missing uri", () => {
+    const { uri: _, ...rest } = validSetup;
+    expect(() => TwoFactorSetupSchema.parse(rest)).toThrow();
+  });
+
+  // Missing secret should fail.
+  test("rejects missing secret", () => {
+    const { secret: _, ...rest } = validSetup;
+    expect(() => TwoFactorSetupSchema.parse(rest)).toThrow();
+  });
+
+  // recoveryCodes must be an array, not a string.
+  test("rejects non-array recoveryCodes", () => {
+    expect(() =>
+      TwoFactorSetupSchema.parse({ ...validSetup, recoveryCodes: "AAAA-BBBB" }),
+    ).toThrow();
+  });
+});
+
+describe("TwoFactorVerifySchema", () => {
+  // A 6-digit TOTP code is the standard format.
+  test("accepts a 6-character code", () => {
+    expect(() => TwoFactorVerifySchema.parse({ code: "123456" })).not.toThrow();
+  });
+
+  // Recovery codes have format XXXX-XXXX (9 chars including hyphen).
+  test("accepts a 9-character recovery code", () => {
+    expect(() => TwoFactorVerifySchema.parse({ code: "AAAA-BBBB" })).not.toThrow();
+  });
+
+  // A code shorter than 6 characters should be rejected.
+  test("rejects code shorter than 6 characters", () => {
+    expect(() => TwoFactorVerifySchema.parse({ code: "12345" })).toThrow();
+  });
+
+  // A code longer than 9 characters should be rejected.
+  test("rejects code longer than 9 characters", () => {
+    expect(() => TwoFactorVerifySchema.parse({ code: "1234567890" })).toThrow();
+  });
+
+  // Missing code field should fail.
+  test("rejects missing code", () => {
+    expect(() => TwoFactorVerifySchema.parse({})).toThrow();
+  });
+});
+
+// ── Data Import/Export ─────────────────────────────────────────────────────
+
+describe("MAX_IMPORT_ROWS", () => {
+  // The import row limit should be 1000 — prevents oversized CSV uploads.
+  test("is 1000", () => {
+    expect(MAX_IMPORT_ROWS).toBe(1000);
+  });
+});
+
+describe("MAX_IMPORT_FILE_SIZE", () => {
+  // The import file size cap should be 1 MB (1024 * 1024 bytes).
+  test("is 1 048 576 bytes (1 MB)", () => {
+    expect(MAX_IMPORT_FILE_SIZE).toBe(1024 * 1024);
+  });
+});
+
+describe("CsvPersonImportRowSchema", () => {
+  const validRow = { name: "Alice", email: "alice@example.com", position: "Developer" };
+
+  // A complete row with name, email, and position should parse fine.
+  test("accepts a valid import row", () => {
+    expect(() => CsvPersonImportRowSchema.parse(validRow)).not.toThrow();
+  });
+
+  // Position is optional — a row without it should still parse.
+  test("accepts a row without position", () => {
+    const { position: _, ...row } = validRow;
+    expect(() => CsvPersonImportRowSchema.parse(row)).not.toThrow();
+  });
+
+  // Name is required and must be non-empty.
+  test("rejects empty name", () => {
+    expect(() => CsvPersonImportRowSchema.parse({ ...validRow, name: "" })).toThrow();
+  });
+
+  // Missing name field should fail.
+  test("rejects missing name", () => {
+    const { name: _, ...row } = validRow;
+    expect(() => CsvPersonImportRowSchema.parse(row)).toThrow();
+  });
+
+  // Email must be a valid email format.
+  test("rejects invalid email format", () => {
+    expect(() => CsvPersonImportRowSchema.parse({ ...validRow, email: "not-email" })).toThrow();
+  });
+
+  // Missing email field should fail.
+  test("rejects missing email", () => {
+    const { email: _, ...row } = validRow;
+    expect(() => CsvPersonImportRowSchema.parse(row)).toThrow();
+  });
+});
+
+// ── Leave Management ───────────────────────────────────────────────────────
+
+describe("MAX_LEAVE_NOTE_LENGTH", () => {
+  // Leave notes are capped at 500 characters.
+  test("is 500", () => {
+    expect(MAX_LEAVE_NOTE_LENGTH).toBe(500);
+  });
+});
+
+describe("LeaveRequestStatusSchema", () => {
+  // All three valid statuses should be accepted.
+  test("accepts PENDING", () => {
+    expect(() => LeaveRequestStatusSchema.parse("PENDING")).not.toThrow();
+  });
+
+  test("accepts APPROVED", () => {
+    expect(() => LeaveRequestStatusSchema.parse("APPROVED")).not.toThrow();
+  });
+
+  test("accepts REJECTED", () => {
+    expect(() => LeaveRequestStatusSchema.parse("REJECTED")).not.toThrow();
+  });
+
+  // Made-up statuses should be rejected.
+  test("rejects invalid status", () => {
+    expect(() => LeaveRequestStatusSchema.parse("CANCELLED")).toThrow();
+  });
+});
+
+describe("LeaveTypeSchema", () => {
+  const validLeaveType = {
+    id: VALID_UUID,
+    name: "Annual Leave",
+    description: "Standard annual leave entitlement",
+    defaultDays: 20,
+    color: "#4CAF50",
+    createdAt: NOW,
+    updatedAt: NOW,
+  };
+
+  // A complete leave type should parse fine.
+  test("accepts a valid leave type", () => {
+    expect(() => LeaveTypeSchema.parse(validLeaveType)).not.toThrow();
+  });
+
+  // Description can be null (not all leave types have descriptions).
+  test("accepts null description", () => {
+    const result = LeaveTypeSchema.parse({ ...validLeaveType, description: null });
+    expect(result.description).toBeNull();
+  });
+
+  // defaultDays must be a non-negative integer.
+  test("rejects negative defaultDays", () => {
+    expect(() => LeaveTypeSchema.parse({ ...validLeaveType, defaultDays: -1 })).toThrow();
+  });
+
+  // defaultDays must be an integer, not a float.
+  test("rejects non-integer defaultDays", () => {
+    expect(() => LeaveTypeSchema.parse({ ...validLeaveType, defaultDays: 2.5 })).toThrow();
+  });
+
+  // id must be a valid UUID.
+  test("rejects invalid UUID for id", () => {
+    expect(() => LeaveTypeSchema.parse({ ...validLeaveType, id: "bad-id" })).toThrow();
+  });
+
+  // name is required and must be non-empty.
+  test("rejects empty name", () => {
+    expect(() => LeaveTypeSchema.parse({ ...validLeaveType, name: "" })).toThrow();
+  });
+});
+
+describe("LeaveRequestSchema", () => {
+  const validRequest = {
+    id: VALID_UUID,
+    personId: VALID_UUID,
+    personName: "Alice",
+    leaveTypeId: VALID_UUID_2,
+    leaveTypeName: "Annual Leave",
+    leaveTypeColor: "#4CAF50",
+    startDate: NOW,
+    endDate: NOW,
+    days: 5,
+    note: "Vacation",
+    status: "PENDING" as const,
+    reviewerId: null,
+    reviewerName: null,
+    reviewNote: null,
+    reviewedAt: null,
+    createdAt: NOW,
+  };
+
+  // A fully valid leave request should parse fine.
+  test("accepts a fully valid leave request", () => {
+    expect(() => LeaveRequestSchema.parse(validRequest)).not.toThrow();
+  });
+
+  // All nullable fields can be null.
+  test("accepts all nullable fields as null", () => {
+    const result = LeaveRequestSchema.parse({ ...validRequest, note: null });
+    expect(result.note).toBeNull();
+  });
+
+  // days must be at least 1 — zero-day leaves are not valid.
+  test("rejects days less than 1", () => {
+    expect(() => LeaveRequestSchema.parse({ ...validRequest, days: 0 })).toThrow();
+  });
+
+  // status must be one of the valid enum values.
+  test("rejects invalid status", () => {
+    expect(() => LeaveRequestSchema.parse({ ...validRequest, status: "CANCELLED" })).toThrow();
+  });
+
+  // personId must be a valid UUID.
+  test("rejects invalid UUID for personId", () => {
+    expect(() => LeaveRequestSchema.parse({ ...validRequest, personId: "bad" })).toThrow();
+  });
+});
+
+describe("LeaveBalanceSchema", () => {
+  const validBalance = {
+    id: VALID_UUID,
+    personId: VALID_UUID,
+    personName: "Bob",
+    leaveTypeId: VALID_UUID_2,
+    leaveTypeName: "Annual Leave",
+    leaveTypeColor: "#4CAF50",
+    year: 2026,
+    allocated: 20,
+    used: 5,
+    remaining: 15,
+  };
+
+  // A fully valid leave balance should parse fine.
+  test("accepts a valid leave balance", () => {
+    expect(() => LeaveBalanceSchema.parse(validBalance)).not.toThrow();
+  });
+
+  // allocated must be a non-negative integer.
+  test("rejects negative allocated", () => {
+    expect(() => LeaveBalanceSchema.parse({ ...validBalance, allocated: -1 })).toThrow();
+  });
+
+  // used must be a non-negative integer.
+  test("rejects negative used", () => {
+    expect(() => LeaveBalanceSchema.parse({ ...validBalance, used: -1 })).toThrow();
+  });
+
+  // year must be an integer.
+  test("rejects non-integer year", () => {
+    expect(() => LeaveBalanceSchema.parse({ ...validBalance, year: 2026.5 })).toThrow();
+  });
+
+  // id must be a valid UUID.
+  test("rejects invalid UUID for id", () => {
+    expect(() => LeaveBalanceSchema.parse({ ...validBalance, id: "not-uuid" })).toThrow();
+  });
+});
+
+// ── Positions ──────────────────────────────────────────────────────────────
+
+describe("PositionSchema", () => {
+  const validPosition = {
+    id: VALID_UUID,
+    name: "Senior Developer",
+    createdAt: NOW,
+    updatedAt: NOW,
+  };
+
+  // A fully valid position should parse fine.
+  test("accepts a valid position", () => {
+    expect(() => PositionSchema.parse(validPosition)).not.toThrow();
+  });
+
+  // name must be non-empty.
+  test("rejects empty name", () => {
+    expect(() => PositionSchema.parse({ ...validPosition, name: "" })).toThrow();
+  });
+
+  // id must be a valid UUID.
+  test("rejects invalid UUID for id", () => {
+    expect(() => PositionSchema.parse({ ...validPosition, id: "bad" })).toThrow();
+  });
+
+  // Timestamps must be Date objects.
+  test("rejects non-date createdAt", () => {
+    expect(() => PositionSchema.parse({ ...validPosition, createdAt: "2026-01-01" })).toThrow();
+  });
+
+  // All fields are preserved after parsing.
+  test("preserves all fields after parsing", () => {
+    const result = PositionSchema.parse(validPosition);
+    expect(result).toEqual(validPosition);
+  });
+});
+
+// ── Employee Profile ───────────────────────────────────────────────────────
+
+describe("EmployeeTeamSchema", () => {
+  // A valid employee team reference should parse fine.
+  test("accepts a valid employee team", () => {
+    expect(() =>
+      EmployeeTeamSchema.parse({ teamId: VALID_UUID, teamName: "Engineering" }),
+    ).not.toThrow();
+  });
+
+  // teamId must be a valid UUID.
+  test("rejects invalid UUID for teamId", () => {
+    expect(() => EmployeeTeamSchema.parse({ teamId: "bad", teamName: "Eng" })).toThrow();
+  });
+
+  // teamName is required.
+  test("rejects missing teamName", () => {
+    expect(() => EmployeeTeamSchema.parse({ teamId: VALID_UUID })).toThrow();
+  });
+});
+
+describe("EmployeeDepartmentSchema", () => {
+  // A valid employee department reference should parse fine.
+  test("accepts a valid employee department", () => {
+    expect(() => EmployeeDepartmentSchema.parse({ id: VALID_UUID, name: "Product" })).not.toThrow();
+  });
+
+  // id must be a valid UUID.
+  test("rejects invalid UUID for id", () => {
+    expect(() => EmployeeDepartmentSchema.parse({ id: "bad", name: "Product" })).toThrow();
+  });
+});
+
+describe("EmployeeProfileSchema", () => {
+  const validProfile = {
+    id: VALID_UUID,
+    name: "Alice",
+    position: "Engineer",
+    email: "alice@example.com",
+    createdAt: NOW,
+    updatedAt: NOW,
+    teams: [{ teamId: VALID_UUID, teamName: "Alpha" }],
+    managedTeams: [],
+    headOfDepartments: [],
+  };
+
+  // A complete employee profile should parse fine.
+  test("accepts a fully valid employee profile", () => {
+    expect(() => EmployeeProfileSchema.parse(validProfile)).not.toThrow();
+  });
+
+  // position and email can be null.
+  test("accepts null position and email", () => {
+    const result = EmployeeProfileSchema.parse({ ...validProfile, position: null, email: null });
+    expect(result.position).toBeNull();
+    expect(result.email).toBeNull();
+  });
+
+  // Teams, managedTeams, and headOfDepartments can all be empty arrays.
+  test("accepts all empty arrays for teams fields", () => {
+    const result = EmployeeProfileSchema.parse({
+      ...validProfile,
+      teams: [],
+      managedTeams: [],
+      headOfDepartments: [],
+    });
+    expect(result.teams).toEqual([]);
+    expect(result.managedTeams).toEqual([]);
+    expect(result.headOfDepartments).toEqual([]);
+  });
+
+  // name must be non-empty.
+  test("rejects empty name", () => {
+    expect(() => EmployeeProfileSchema.parse({ ...validProfile, name: "" })).toThrow();
+  });
+
+  // id must be a valid UUID.
+  test("rejects invalid UUID for id", () => {
+    expect(() => EmployeeProfileSchema.parse({ ...validProfile, id: "bad" })).toThrow();
+  });
+
+  // email must be a valid email format when non-null.
+  test("rejects invalid email format", () => {
+    expect(() => EmployeeProfileSchema.parse({ ...validProfile, email: "not-an-email" })).toThrow();
+  });
+});
+
+// ── Reviews ────────────────────────────────────────────────────────────────
+
+describe("ReviewQuestionSchema", () => {
+  const validQuestion = {
+    id: VALID_UUID,
+    text: "How would you rate your performance?",
+    type: "RATING" as const,
+    scaleMin: 1,
+    scaleMax: 5,
+    order: 0,
+    required: true,
+  };
+
+  // A complete rating question should parse fine.
+  test("accepts a valid RATING question", () => {
+    expect(() => ReviewQuestionSchema.parse(validQuestion)).not.toThrow();
+  });
+
+  // TEXT type questions should also be accepted.
+  test("accepts a valid TEXT question", () => {
+    const q = { ...validQuestion, type: "TEXT" as const, scaleMin: null, scaleMax: null };
+    expect(() => ReviewQuestionSchema.parse(q)).not.toThrow();
+  });
+
+  // scaleMin and scaleMax can be null for TEXT questions.
+  test("accepts null scaleMin and scaleMax", () => {
+    const result = ReviewQuestionSchema.parse({ ...validQuestion, scaleMin: null, scaleMax: null });
+    expect(result.scaleMin).toBeNull();
+    expect(result.scaleMax).toBeNull();
+  });
+
+  // type must be one of the valid enum values.
+  test("rejects invalid type", () => {
+    expect(() => ReviewQuestionSchema.parse({ ...validQuestion, type: "CHECKBOX" })).toThrow();
+  });
+
+  // text must be non-empty.
+  test("rejects empty text", () => {
+    expect(() => ReviewQuestionSchema.parse({ ...validQuestion, text: "" })).toThrow();
+  });
+
+  // order must be a non-negative integer.
+  test("rejects negative order", () => {
+    expect(() => ReviewQuestionSchema.parse({ ...validQuestion, order: -1 })).toThrow();
+  });
+
+  // scaleMin must be within 1–5 when non-null.
+  test("rejects scaleMin below 1", () => {
+    expect(() => ReviewQuestionSchema.parse({ ...validQuestion, scaleMin: 0 })).toThrow();
+  });
+
+  // scaleMax must be within 2–10 when non-null.
+  test("rejects scaleMax above 10", () => {
+    expect(() => ReviewQuestionSchema.parse({ ...validQuestion, scaleMax: 11 })).toThrow();
+  });
+});
+
+describe("ReviewTemplateSchema", () => {
+  const validTemplate = {
+    id: VALID_UUID,
+    name: "Annual Review",
+    description: "Used for annual performance reviews",
+    questions: [],
+    createdAt: NOW,
+    updatedAt: NOW,
+  };
+
+  // A complete template with no questions should parse fine.
+  test("accepts a valid review template with no questions", () => {
+    expect(() => ReviewTemplateSchema.parse(validTemplate)).not.toThrow();
+  });
+
+  // description can be null.
+  test("accepts null description", () => {
+    const result = ReviewTemplateSchema.parse({ ...validTemplate, description: null });
+    expect(result.description).toBeNull();
+  });
+
+  // name must be non-empty.
+  test("rejects empty name", () => {
+    expect(() => ReviewTemplateSchema.parse({ ...validTemplate, name: "" })).toThrow();
+  });
+
+  // questions must be an array (even if empty).
+  test("rejects missing questions array", () => {
+    const { questions: _, ...rest } = validTemplate;
+    expect(() => ReviewTemplateSchema.parse(rest)).toThrow();
+  });
+});
+
+describe("ReviewCycleSchema", () => {
+  const validCycle = {
+    id: VALID_UUID,
+    name: "Q1 2026",
+    templateId: VALID_UUID_2,
+    templateName: "Annual Review",
+    status: "DRAFT" as const,
+    startDate: NOW,
+    endDate: NOW,
+    requestCount: 10,
+    submittedCount: 3,
+    createdAt: NOW,
+    updatedAt: NOW,
+  };
+
+  // A complete review cycle should parse fine.
+  test("accepts a fully valid review cycle", () => {
+    expect(() => ReviewCycleSchema.parse(validCycle)).not.toThrow();
+  });
+
+  // templateId and templateName can be null (no template assigned yet).
+  test("accepts null templateId and templateName", () => {
+    const result = ReviewCycleSchema.parse({
+      ...validCycle,
+      templateId: null,
+      templateName: null,
+    });
+    expect(result.templateId).toBeNull();
+    expect(result.templateName).toBeNull();
+  });
+
+  // All three valid cycle statuses should be accepted.
+  test("accepts OPEN and CLOSED statuses", () => {
+    expect(() => ReviewCycleSchema.parse({ ...validCycle, status: "OPEN" })).not.toThrow();
+    expect(() => ReviewCycleSchema.parse({ ...validCycle, status: "CLOSED" })).not.toThrow();
+  });
+
+  // Invalid status should be rejected.
+  test("rejects invalid status", () => {
+    expect(() => ReviewCycleSchema.parse({ ...validCycle, status: "ARCHIVED" })).toThrow();
+  });
+
+  // name must be non-empty.
+  test("rejects empty name", () => {
+    expect(() => ReviewCycleSchema.parse({ ...validCycle, name: "" })).toThrow();
+  });
+});
+
+describe("ReviewRequestSchema", () => {
+  const validReviewRequest = {
+    id: VALID_UUID,
+    cycleId: VALID_UUID,
+    cycleName: "Q1 2026",
+    cycleStatus: "OPEN" as const,
+    subjectId: VALID_UUID_2,
+    subjectName: "Alice",
+    reviewerId: VALID_UUID,
+    reviewerName: "Bob",
+    type: "PEER" as const,
+    status: "PENDING" as const,
+    createdAt: NOW,
+  };
+
+  // A fully valid review request should parse fine.
+  test("accepts a fully valid review request", () => {
+    expect(() => ReviewRequestSchema.parse(validReviewRequest)).not.toThrow();
+  });
+
+  // subjectId, subjectName, reviewerId, reviewerName can all be null.
+  test("accepts null subject and reviewer fields", () => {
+    const result = ReviewRequestSchema.parse({
+      ...validReviewRequest,
+      subjectId: null,
+      subjectName: null,
+      reviewerId: null,
+      reviewerName: null,
+    });
+    expect(result.subjectId).toBeNull();
+    expect(result.reviewerId).toBeNull();
+  });
+
+  // All four review types should be accepted.
+  test("accepts all four type values", () => {
+    for (const type of ["SELF", "MANAGER", "PEER", "DIRECT_REPORT"]) {
+      expect(() => ReviewRequestSchema.parse({ ...validReviewRequest, type })).not.toThrow();
+    }
+  });
+
+  // Invalid type should be rejected.
+  test("rejects invalid type", () => {
+    expect(() => ReviewRequestSchema.parse({ ...validReviewRequest, type: "COLLEAGUE" })).toThrow();
+  });
+
+  // SUBMITTED status should also be accepted.
+  test("accepts SUBMITTED status", () => {
+    expect(() =>
+      ReviewRequestSchema.parse({ ...validReviewRequest, status: "SUBMITTED" }),
+    ).not.toThrow();
+  });
+});
+
+describe("ReviewAnswerSchema", () => {
+  // A rating answer with a valid ratingValue should parse fine.
+  test("accepts a valid rating answer", () => {
+    expect(() =>
+      ReviewAnswerSchema.parse({ questionId: VALID_UUID, ratingValue: 5, textValue: null }),
+    ).not.toThrow();
+  });
+
+  // A text answer with a textValue and null ratingValue should parse fine.
+  test("accepts a valid text answer", () => {
+    expect(() =>
+      ReviewAnswerSchema.parse({
+        questionId: VALID_UUID,
+        ratingValue: null,
+        textValue: "Great work",
+      }),
+    ).not.toThrow();
+  });
+
+  // Both ratingValue and textValue can be null.
+  test("accepts null ratingValue and textValue", () => {
+    const result = ReviewAnswerSchema.parse({
+      questionId: VALID_UUID,
+      ratingValue: null,
+      textValue: null,
+    });
+    expect(result.ratingValue).toBeNull();
+    expect(result.textValue).toBeNull();
+  });
+
+  // ratingValue must be between 1 and 10 when non-null.
+  test("rejects ratingValue below 1", () => {
+    expect(() =>
+      ReviewAnswerSchema.parse({ questionId: VALID_UUID, ratingValue: 0, textValue: null }),
+    ).toThrow();
+  });
+
+  test("rejects ratingValue above 10", () => {
+    expect(() =>
+      ReviewAnswerSchema.parse({ questionId: VALID_UUID, ratingValue: 11, textValue: null }),
+    ).toThrow();
+  });
+
+  // questionId must be a valid UUID.
+  test("rejects invalid UUID for questionId", () => {
+    expect(() =>
+      ReviewAnswerSchema.parse({ questionId: "bad", ratingValue: null, textValue: null }),
+    ).toThrow();
+  });
+});
+
+describe("ReviewSubmissionSchema", () => {
+  const validSubmission = {
+    id: VALID_UUID,
+    requestId: VALID_UUID_2,
+    answers: [{ questionId: VALID_UUID, ratingValue: 7, textValue: null }],
+    submittedAt: NOW,
+  };
+
+  // A fully valid submission should parse fine.
+  test("accepts a fully valid submission", () => {
+    expect(() => ReviewSubmissionSchema.parse(validSubmission)).not.toThrow();
+  });
+
+  // answers can be an empty array.
+  test("accepts empty answers array", () => {
+    const result = ReviewSubmissionSchema.parse({ ...validSubmission, answers: [] });
+    expect(result.answers).toEqual([]);
+  });
+
+  // submittedAt must be a Date.
+  test("rejects non-date submittedAt", () => {
+    expect(() =>
+      ReviewSubmissionSchema.parse({ ...validSubmission, submittedAt: "yesterday" }),
+    ).toThrow();
+  });
+});
+
+describe("TeamReviewRequestSchema", () => {
+  const validReq = {
+    id: VALID_UUID,
+    type: "PEER",
+    status: "PENDING",
+    reviewerId: VALID_UUID_2,
+    reviewerName: "Alice",
+  };
+
+  // A fully valid team review request should parse fine.
+  test("accepts a valid team review request", () => {
+    expect(() => TeamReviewRequestSchema.parse(validReq)).not.toThrow();
+  });
+
+  // reviewerId and reviewerName can be null.
+  test("accepts null reviewerId and reviewerName", () => {
+    const result = TeamReviewRequestSchema.parse({
+      ...validReq,
+      reviewerId: null,
+      reviewerName: null,
+    });
+    expect(result.reviewerId).toBeNull();
+    expect(result.reviewerName).toBeNull();
+  });
+
+  // id must be a valid UUID.
+  test("rejects invalid UUID for id", () => {
+    expect(() => TeamReviewRequestSchema.parse({ ...validReq, id: "bad" })).toThrow();
+  });
+});
+
+describe("TeamReviewReportSchema", () => {
+  const validReport = {
+    subjectId: VALID_UUID,
+    subjectName: "Bob",
+    requests: [
+      { id: VALID_UUID_2, type: "PEER", status: "PENDING", reviewerId: null, reviewerName: null },
+    ],
+  };
+
+  // A fully valid team review report should parse fine.
+  test("accepts a valid team review report", () => {
+    expect(() => TeamReviewReportSchema.parse(validReport)).not.toThrow();
+  });
+
+  // requests can be an empty array.
+  test("accepts empty requests array", () => {
+    const result = TeamReviewReportSchema.parse({ ...validReport, requests: [] });
+    expect(result.requests).toEqual([]);
+  });
+
+  // subjectId must be a valid UUID.
+  test("rejects invalid UUID for subjectId", () => {
+    expect(() => TeamReviewReportSchema.parse({ ...validReport, subjectId: "bad" })).toThrow();
+  });
+});
+
+describe("TeamReviewCycleSchema", () => {
+  const validCycle = {
+    cycleId: VALID_UUID,
+    cycleName: "Q1 2026",
+    cycleStatus: "OPEN" as const,
+    reports: [],
+  };
+
+  // A fully valid team review cycle should parse fine.
+  test("accepts a valid team review cycle", () => {
+    expect(() => TeamReviewCycleSchema.parse(validCycle)).not.toThrow();
+  });
+
+  // All three cycle statuses should be accepted.
+  test("accepts DRAFT and CLOSED statuses", () => {
+    expect(() =>
+      TeamReviewCycleSchema.parse({ ...validCycle, cycleStatus: "DRAFT" }),
+    ).not.toThrow();
+    expect(() =>
+      TeamReviewCycleSchema.parse({ ...validCycle, cycleStatus: "CLOSED" }),
+    ).not.toThrow();
+  });
+
+  // Invalid cycleStatus should be rejected.
+  test("rejects invalid cycleStatus", () => {
+    expect(() => TeamReviewCycleSchema.parse({ ...validCycle, cycleStatus: "ARCHIVED" })).toThrow();
+  });
+
+  // cycleId must be a valid UUID.
+  test("rejects invalid UUID for cycleId", () => {
+    expect(() => TeamReviewCycleSchema.parse({ ...validCycle, cycleId: "bad" })).toThrow();
+  });
+});
+
+// ── Org Chart ──────────────────────────────────────────────────────────────
+
+describe("OrgChartMemberSchema", () => {
+  const validMember = {
+    id: VALID_UUID,
+    name: "Alice",
+    position: "Engineer",
+    email: "alice@example.com",
+  };
+
+  // A complete org chart member should parse fine.
+  test("accepts a valid org chart member", () => {
+    expect(() => OrgChartMemberSchema.parse(validMember)).not.toThrow();
+  });
+
+  // position and email can be null.
+  test("accepts null position and email", () => {
+    const result = OrgChartMemberSchema.parse({ ...validMember, position: null, email: null });
+    expect(result.position).toBeNull();
+    expect(result.email).toBeNull();
+  });
+
+  // id must be a valid UUID.
+  test("rejects invalid UUID for id", () => {
+    expect(() => OrgChartMemberSchema.parse({ ...validMember, id: "bad" })).toThrow();
+  });
+});
+
+describe("OrgChartTeamSchema", () => {
+  const validTeam = {
+    teamId: VALID_UUID,
+    teamName: "Platform",
+    managerId: VALID_UUID_2,
+    managerName: "Bob",
+    members: [{ id: VALID_UUID, name: "Alice", position: null, email: null }],
+  };
+
+  // A complete org chart team should parse fine.
+  test("accepts a valid org chart team", () => {
+    expect(() => OrgChartTeamSchema.parse(validTeam)).not.toThrow();
+  });
+
+  // managerId and managerName can be null (no manager assigned).
+  test("accepts null managerId and managerName", () => {
+    const result = OrgChartTeamSchema.parse({ ...validTeam, managerId: null, managerName: null });
+    expect(result.managerId).toBeNull();
+    expect(result.managerName).toBeNull();
+  });
+
+  // members can be an empty array.
+  test("accepts empty members array", () => {
+    const result = OrgChartTeamSchema.parse({ ...validTeam, members: [] });
+    expect(result.members).toEqual([]);
+  });
+
+  // teamId must be a valid UUID.
+  test("rejects invalid UUID for teamId", () => {
+    expect(() => OrgChartTeamSchema.parse({ ...validTeam, teamId: "bad" })).toThrow();
+  });
+});
+
+describe("OrgChartDepartmentSchema", () => {
+  const validDept = {
+    id: VALID_UUID,
+    name: "Engineering",
+    headId: VALID_UUID_2,
+    headName: "Alice",
+    teams: [],
+  };
+
+  // A complete org chart department should parse fine.
+  test("accepts a valid org chart department", () => {
+    expect(() => OrgChartDepartmentSchema.parse(validDept)).not.toThrow();
+  });
+
+  // headId and headName can be null.
+  test("accepts null headId and headName", () => {
+    const result = OrgChartDepartmentSchema.parse({ ...validDept, headId: null, headName: null });
+    expect(result.headId).toBeNull();
+    expect(result.headName).toBeNull();
+  });
+
+  // teams can be an empty array.
+  test("accepts empty teams array", () => {
+    const result = OrgChartDepartmentSchema.parse({ ...validDept, teams: [] });
+    expect(result.teams).toEqual([]);
+  });
+
+  // id must be a valid UUID.
+  test("rejects invalid UUID for id", () => {
+    expect(() => OrgChartDepartmentSchema.parse({ ...validDept, id: "bad" })).toThrow();
+  });
+});
+
+describe("OrgChartDataSchema", () => {
+  const validData = {
+    departments: [],
+    unassignedTeams: [],
+    unassignedPersons: [],
+  };
+
+  // An empty org chart (no departments or teams) should parse fine.
+  test("accepts empty org chart data", () => {
+    expect(() => OrgChartDataSchema.parse(validData)).not.toThrow();
+  });
+
+  // departments, unassignedTeams, and unassignedPersons are all required arrays.
+  test("rejects missing departments field", () => {
+    const { departments: _, ...rest } = validData;
+    expect(() => OrgChartDataSchema.parse(rest)).toThrow();
+  });
+
+  test("rejects missing unassignedTeams field", () => {
+    const { unassignedTeams: _, ...rest } = validData;
+    expect(() => OrgChartDataSchema.parse(rest)).toThrow();
+  });
+
+  test("rejects missing unassignedPersons field", () => {
+    const { unassignedPersons: _, ...rest } = validData;
+    expect(() => OrgChartDataSchema.parse(rest)).toThrow();
+  });
+});
+
+// ── Sessions ───────────────────────────────────────────────────────────────
+
+describe("MAX_CONCURRENT_SESSIONS", () => {
+  // The session concurrency limit should be 5.
+  test("is 5", () => {
+    expect(MAX_CONCURRENT_SESSIONS).toBe(5);
+  });
+});
+
+describe("UserSessionSchema", () => {
+  const validSession = {
+    id: VALID_UUID,
+    userId: VALID_UUID_2,
+    userAgent: "Mozilla/5.0",
+    ipAddress: "127.0.0.1",
+    active: true,
+    lastActiveAt: NOW,
+    createdAt: NOW,
+  };
+
+  // A fully valid session should parse fine.
+  test("accepts a fully valid session", () => {
+    expect(() => UserSessionSchema.parse(validSession)).not.toThrow();
+  });
+
+  // userAgent and ipAddress can be null.
+  test("accepts null userAgent and ipAddress", () => {
+    const result = UserSessionSchema.parse({ ...validSession, userAgent: null, ipAddress: null });
+    expect(result.userAgent).toBeNull();
+    expect(result.ipAddress).toBeNull();
+  });
+
+  // active must be a boolean.
+  test("rejects non-boolean active", () => {
+    expect(() => UserSessionSchema.parse({ ...validSession, active: "yes" })).toThrow();
+  });
+
+  // lastActiveAt must be a Date.
+  test("rejects non-date lastActiveAt", () => {
+    expect(() => UserSessionSchema.parse({ ...validSession, lastActiveAt: "yesterday" })).toThrow();
+  });
+
+  // id must be a valid UUID.
+  test("rejects invalid UUID for id", () => {
+    expect(() => UserSessionSchema.parse({ ...validSession, id: "bad" })).toThrow();
+  });
+
+  // userId must be a valid UUID.
+  test("rejects invalid UUID for userId", () => {
+    expect(() => UserSessionSchema.parse({ ...validSession, userId: "bad" })).toThrow();
+  });
+
+  // All fields are preserved after parsing.
+  test("preserves all fields after parsing", () => {
+    const result = UserSessionSchema.parse(validSession);
+    expect(result).toEqual(validSession);
   });
 });
