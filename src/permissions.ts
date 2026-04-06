@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { prisma } from "@/db";
 import { auth } from "@/auth";
 import { ActionError } from "@/actionErrors";
@@ -151,7 +152,11 @@ function formatPermissionDescription(key: PermissionKey): string {
   return descriptions[key];
 }
 
-export async function getCurrentUser() {
+// Per-request memoized — without React cache, every hasPermission() call inside
+// a single page render would issue an independent prisma.user.findUnique with a
+// permissions join. The home page calls hasPermission ~5x (one per query), so
+// this turns 5 round-trips per render into 1.
+export const getCurrentUser = cache(async () => {
   const session = await auth();
   if (!session?.user?.email) return null;
 
@@ -165,7 +170,7 @@ export async function getCurrentUser() {
   });
 
   return user;
-}
+});
 
 export async function resolvePermissions(
   role: string,
@@ -191,6 +196,21 @@ export async function resolvePermissions(
   return result;
 }
 
+// Per-request memoized for the no-arg call (current user). The userId variant
+// remains unmemoized because admin pages may legitimately look up multiple
+// users in one render, and React.cache only deduplicates by argument identity.
+const getCurrentUserPermissions = cache(
+  async (): Promise<Partial<Record<PermissionKey, boolean>>> => {
+    const user = await getCurrentUser();
+    if (!user) return resolvePermissions("guest", []);
+    const overrides = user.permissions.map((up) => ({
+      key: up.permission.key,
+      granted: up.granted,
+    }));
+    return resolvePermissions(user.role, overrides);
+  },
+);
+
 export async function getUserPermissions(
   userId?: string,
 ): Promise<Partial<Record<PermissionKey, boolean>>> {
@@ -211,14 +231,7 @@ export async function getUserPermissions(
     return resolvePermissions(user.role, overrides);
   }
 
-  const user = await getCurrentUser();
-  if (!user) return resolvePermissions("guest", []);
-
-  const overrides = user.permissions.map((up) => ({
-    key: up.permission.key,
-    granted: up.granted,
-  }));
-  return resolvePermissions(user.role, overrides);
+  return getCurrentUserPermissions();
 }
 
 export async function hasPermission(permissionKey: PermissionKey): Promise<boolean> {

@@ -98,11 +98,17 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Run proxy on all routes except static files and images.
-  // No prefetch header exclusion — all navigable routes must get security headers.
+  // Run proxy on all routes except static files, images, and high-frequency
+  // API endpoints that don't need CSP / security-header injection.
+  //
+  // /api/health, /api/ready, and /api/realtime/{poll,sse} are hit on every
+  // page load (or every 30 s for polling) and don't render HTML, so the CSP
+  // nonce + header bookkeeping is pure waste. Excluding them shaves a few ms
+  // of Active CPU off every poll on the Vercel Hobby tier.
   matcher: [
     {
-      source: "/((?!_next/static|_next/image|favicon\\.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+      source:
+        "/((?!_next/static|_next/image|favicon\\.ico|api/health|api/ready|api/realtime/poll|api/realtime/sse|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
     },
   ],
 };

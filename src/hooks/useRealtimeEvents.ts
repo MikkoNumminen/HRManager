@@ -6,7 +6,10 @@ import type { RealtimeEvent } from "@/features/realtime/schemas";
 type Transport = "sse" | "poll" | "none";
 
 const MAX_EVENTS = 50;
-const POLL_INTERVAL_MS = 5_000;
+// 30 s polling on Vercel — at 5 s, an idle demo tab burned 720 Lambda
+// invocations/hour against the Hobby tier Active CPU budget. 30 s keeps the
+// "live updates" experience usable while cutting realtime CPU 6×.
+const POLL_INTERVAL_MS = 30_000;
 const RECONNECT_DELAYS = [1_000, 2_000, 4_000, 8_000, 16_000];
 
 function detectTransport(): Transport {
