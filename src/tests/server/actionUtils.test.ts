@@ -8,10 +8,13 @@ jest.mock("next-intl/server", () => ({
   getTranslations: jest.fn().mockResolvedValue((key: string) => `translated:${key}`),
 }));
 
-// Mock next/cache so revalidateTag doesn't throw outside Next.js runtime.
+// Mock next/cache so cache functions don't throw outside Next.js runtime.
+// unstable_cache passthrough preserves test semantics for wrapped queries.
 jest.mock("next/cache", () => ({
   revalidateTag: jest.fn(),
   revalidatePath: jest.fn(),
+  updateTag: jest.fn(),
+  unstable_cache: <T extends (...args: unknown[]) => unknown>(fn: T) => fn,
 }));
 
 // Mock @/rateLimit — actionUtils imports it transitively; we don't need real rate limiting here.
@@ -41,20 +44,21 @@ describe("serverActions/_shared re-exports", () => {
 });
 
 describe("cacheInvalidation", () => {
-  const { revalidateTag } = require("next/cache");
+  const { updateTag } = require("next/cache");
 
   beforeEach(() => jest.clearAllMocks());
 
-  // invalidateDashboardCache calls revalidateTag with "dashboard".
-  test("invalidateDashboardCache calls revalidateTag with dashboard", () => {
+  // invalidateDashboardCache calls updateTag for both dashboard and org-data.
+  test("invalidateDashboardCache calls updateTag with dashboard and org-data", () => {
     invalidateDashboardCache();
-    expect(revalidateTag).toHaveBeenCalledWith("dashboard", "max");
+    expect(updateTag).toHaveBeenCalledWith("dashboard");
+    expect(updateTag).toHaveBeenCalledWith("org-data");
   });
 
-  // invalidateOrgChartCache calls revalidateTag with "org-chart".
-  test("invalidateOrgChartCache calls revalidateTag with org-chart", () => {
+  // invalidateOrgChartCache calls updateTag with "org-chart".
+  test("invalidateOrgChartCache calls updateTag with org-chart", () => {
     invalidateOrgChartCache();
-    expect(revalidateTag).toHaveBeenCalledWith("org-chart", "max");
+    expect(updateTag).toHaveBeenCalledWith("org-chart");
   });
 });
 

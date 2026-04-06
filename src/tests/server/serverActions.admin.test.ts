@@ -55,6 +55,7 @@ jest.mock("@/demoSession", () => ({
 jest.mock("next/cache", () => ({
   revalidatePath: jest.fn(),
   revalidateTag: jest.fn(),
+  updateTag: jest.fn(),
   unstable_cache: jest.fn((fn: (...args: unknown[]) => unknown) => fn),
 }));
 jest.mock("next/navigation", () => ({

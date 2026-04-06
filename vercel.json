@@ -1,0 +1,4 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "ignoreCommand": "git diff HEAD^ HEAD --quiet -- ':(exclude)*.md' ':(exclude)docs/**' ':(exclude)src/tests/**' ':(exclude)src/features/**/__tests__/**' ':(exclude)src/components/**/__tests__/**' ':(exclude)e2e/**' ':(exclude)playwright.config.ts' ':(exclude)stryker.config.mjs' ':(exclude)jest.config.*' ':(exclude)jest.polyfills.ts' ':(exclude)jest.setup.ts' ':(exclude).github/**' ':(exclude).husky/**' ':(exclude).gitignore' ':(exclude).prettierignore' ':(exclude).editorconfig'"
+}

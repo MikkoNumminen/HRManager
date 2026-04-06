@@ -4,45 +4,58 @@ import { TeamSchema, CombinedTeam } from "./schemas";
 import { getDemoSessionId } from "@/demoSession";
 import { hasPermission } from "@/permissions";
 import { PAGE_SIZE, TeamDeleteImpact } from "@/constants";
+import { cache } from "@/lib/cache";
+import { ORG_DATA_TAG } from "@/lib/cacheInvalidation";
+
+// Cache TTL: 5 minutes. Invalidated by updateTag(ORG_DATA_TAG) from mutations.
+const CACHE_TTL = 300;
 
 export async function getTeams(): Promise<CombinedTeam[]> {
   const allowed = await hasPermission("team:read");
   if (!allowed) throw new ActionError("permissionDenied", "Permission denied");
   const sessionId = await getDemoSessionId();
-  // Use select on relations to avoid fetching full records (performance at scale).
-  const teams = await prisma.team.findMany({
-    where: { deletedAt: null, sessionId },
-    include: {
-      manager: { select: { name: true } },
-      department: { select: { name: true } },
-      members: {
-        where: { deletedAt: null, sessionId },
-        include: {
-          person: { select: { name: true, email: true } },
+  return fetchTeamsCached(sessionId);
+}
+
+const fetchTeamsCached = cache(
+  async (sessionId: string | null): Promise<CombinedTeam[]> => {
+    // Use select on relations to avoid fetching full records (performance at scale).
+    const teams = await prisma.team.findMany({
+      where: { deletedAt: null, sessionId },
+      include: {
+        manager: { select: { name: true } },
+        department: { select: { name: true } },
+        members: {
+          where: { deletedAt: null, sessionId },
+          include: {
+            person: { select: { name: true, email: true } },
+          },
         },
       },
-    },
-  });
+    });
 
-  return teams.map((team) =>
-    TeamSchema.parse({
-      teamId: team.teamId,
-      teamName: team.teamName,
-      teamManagerId: team.teamManagerId ?? null,
-      managerName: team.manager?.name ?? null,
-      departmentId: team.departmentId ?? null,
-      departmentName: team.department?.name ?? null,
-      createdAt: team.createdAt,
-      updatedAt: team.updatedAt,
-      members:
-        team.members?.map((member) => ({
-          personId: member.personId,
-          name: member.person.name,
-          email: member.person.email ?? null,
-        })) ?? [],
-    }),
-  );
-}
+    return teams.map((team) =>
+      TeamSchema.parse({
+        teamId: team.teamId,
+        teamName: team.teamName,
+        teamManagerId: team.teamManagerId ?? null,
+        managerName: team.manager?.name ?? null,
+        departmentId: team.departmentId ?? null,
+        departmentName: team.department?.name ?? null,
+        createdAt: team.createdAt,
+        updatedAt: team.updatedAt,
+        members:
+          team.members?.map((member) => ({
+            personId: member.personId,
+            name: member.person.name,
+            email: member.person.email ?? null,
+          })) ?? [],
+      }),
+    );
+  },
+  ["teams-list"],
+  { revalidate: CACHE_TTL, tags: [ORG_DATA_TAG] },
+);
 
 export async function getPagedTeams(
   opts: { page?: number; pageSize?: number; search?: string } = {},

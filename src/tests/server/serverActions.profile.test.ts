@@ -45,6 +45,8 @@ jest.mock("@/rateLimit", () => ({
 jest.mock("next/cache", () => ({
   revalidatePath: jest.fn(),
   revalidateTag: jest.fn(),
+  updateTag: jest.fn(),
+  unstable_cache: <T extends (...args: unknown[]) => unknown>(fn: T) => fn,
 }));
 jest.mock("next/navigation", () => ({
   redirect: jest.fn(),

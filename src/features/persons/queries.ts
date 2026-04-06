@@ -5,18 +5,32 @@ import { EmployeeProfileSchema, EmployeeProfile } from "@/features/employee/sche
 import { getDemoSessionId } from "@/demoSession";
 import { hasPermission } from "@/permissions";
 import { PAGE_SIZE, PersonDeleteImpact } from "@/constants";
+import { cache } from "@/lib/cache";
+import { ORG_DATA_TAG } from "@/lib/cacheInvalidation";
+
+// Cache TTL: 5 minutes. Org-wide person list rarely changes between mutations
+// and is invalidated synchronously via updateTag(ORG_DATA_TAG) from any
+// mutating action (see lib/cacheInvalidation.ts).
+const CACHE_TTL = 300;
 
 export async function getPersons(): Promise<Person[]> {
   const allowed = await hasPermission("person:read");
   if (!allowed) throw new ActionError("permissionDenied", "Permission denied");
   const sessionId = await getDemoSessionId();
-  const persons = await prisma.person.findMany({
-    where: { deletedAt: null, sessionId },
-    omit: { sessionId: true, deletedAt: true },
-  });
-
-  return persons.map((person) => PersonSchema.parse(person));
+  return fetchPersonsCached(sessionId);
 }
+
+const fetchPersonsCached = cache(
+  async (sessionId: string | null): Promise<Person[]> => {
+    const persons = await prisma.person.findMany({
+      where: { deletedAt: null, sessionId },
+      omit: { sessionId: true, deletedAt: true },
+    });
+    return persons.map((person) => PersonSchema.parse(person));
+  },
+  ["persons-list"],
+  { revalidate: CACHE_TTL, tags: [ORG_DATA_TAG] },
+);
 
 export async function getPagedPersons(
   opts: { page?: number; pageSize?: number; search?: string } = {},

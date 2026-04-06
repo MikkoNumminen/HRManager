@@ -6,6 +6,7 @@ import { MAX_POSITION_LENGTH } from "@/schemas/shared";
 import { validateUUID, type ActionResult } from "@/lib/actionUtils";
 import { guardedAction } from "@/lib/guardedAction";
 import { withAuditedTransaction } from "@/lib/auditedTransaction";
+import { invalidateOrgCache } from "@/lib/cacheInvalidation";
 
 export const createPositionEntry: (data: FormData) => Promise<ActionResult> = guardedAction(
   "position:manage",
@@ -31,6 +32,7 @@ export const createPositionEntry: (data: FormData) => Promise<ActionResult> = gu
       });
     });
     revalidatePath("/positions");
+    invalidateOrgCache();
   },
 );
 
@@ -57,5 +59,6 @@ export const deletePositionEntry: (data: FormData) => Promise<ActionResult> = gu
       });
     });
     revalidatePath("/positions");
+    invalidateOrgCache();
   },
 );

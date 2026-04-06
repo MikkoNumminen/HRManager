@@ -1,7 +1,7 @@
 import { prisma } from "@/db";
 import { hasPermission } from "@/permissions";
 import { getDemoSessionId } from "@/demoSession";
-import { unstable_cache as nextCache } from "next/cache";
+import { cache } from "@/lib/cache";
 import {
   HeadcountTrendSchema,
   TurnoverRateSchema,
@@ -13,18 +13,6 @@ import {
   type LeaveUtilization,
   type ReviewCompletion,
 } from "./schemas";
-
-// In test environments, unstable_cache requires incrementalCache (Next.js runtime).
-// Fall back to a passthrough wrapper so tests call the function directly.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- must match Next.js Callback type
-function cache<T extends (...args: any[]) => Promise<any>>(
-  fn: T,
-  keyParts?: string[],
-  options?: { revalidate?: number; tags?: string[] },
-): T {
-  if (process.env.NODE_ENV === "test") return fn;
-  return nextCache(fn, keyParts, options) as unknown as T;
-}
 
 // Raw SQL result types (PgBouncer-compatible unnamed parameterized queries)
 interface HeadcountTrendRow {
