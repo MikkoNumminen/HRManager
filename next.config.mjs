@@ -1,13 +1,17 @@
+import { readFileSync } from "fs";
 import createNextIntlPlugin from "next-intl/plugin";
 import { withSentryConfig } from "@sentry/nextjs";
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
+const pkg = JSON.parse(readFileSync(new URL("./package.json", import.meta.url), "utf8"));
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: "standalone",
-  experimental: {
-    instrumentationHook: true,
+  // Surface the real package version to every runtime (incl. Edge), since
+  // npm_package_version is unset when the standalone server runs `node server.js`.
+  env: {
+    APP_VERSION: pkg.version,
   },
   headers: async () => [
     {

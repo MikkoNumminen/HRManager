@@ -7,6 +7,7 @@ import {
   hasPermission,
   requirePermission,
   seedPermissions,
+  type PermissionKey,
 } from "@/permissions";
 import { ActionError } from "@/actionErrors";
 
@@ -277,7 +278,7 @@ describe("hasPermission", () => {
       permissions: [],
     });
 
-    const result = await hasPermission("fake:permission");
+    const result = await hasPermission("fake:permission" as PermissionKey);
     expect(result).toBe(false);
   });
 });

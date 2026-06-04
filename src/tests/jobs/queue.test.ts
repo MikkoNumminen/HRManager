@@ -1,4 +1,5 @@
 // Mock pg-boss before importing queue module
+export {};
 const mockStart = jest.fn().mockResolvedValue(undefined);
 const mockStop = jest.fn().mockResolvedValue(undefined);
 const mockOn = jest.fn();

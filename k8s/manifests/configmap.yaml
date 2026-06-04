@@ -9,8 +9,9 @@ metadata:
     app.kubernetes.io/managed-by: kubectl
 data:
   NODE_ENV: "production"
-  NEXTAUTH_URL: "https://hrmanager.example.com"
-  # MongoDB connection (non-sensitive host/db part — put full URI in secret)
-  MONGO_DB_NAME: "hrmanager_audit"
+  # Auth.js v5 reads AUTH_URL (falls back to NEXTAUTH_URL).
+  AUTH_URL: "https://hrmanager.example.com"
+  # Run the pg-boss background workers in-process on this long-running deployment.
+  WORKERS_ENABLED: "true"
   # Next.js performance tuning
   NEXT_TELEMETRY_DISABLED: "1"

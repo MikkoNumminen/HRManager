@@ -22,8 +22,8 @@ const NOW = new Date("2026-01-01T00:00:00Z");
 const makePosition = (overrides: Partial<Position> = {}): Position => ({
   id: "00000000-0000-0000-0000-000000000001",
   name: "Software Engineer",
-  sessionId: null,
   createdAt: NOW,
+  updatedAt: NOW,
   ...overrides,
 });
 

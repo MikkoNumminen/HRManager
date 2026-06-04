@@ -57,10 +57,10 @@ spec:
             periodSeconds: 10
             timeoutSeconds: 5
             failureThreshold: 3
-          # Readiness probe — gates traffic until app is ready
+          # Readiness probe — deep check; gates traffic until Postgres/Mongo are reachable
           readinessProbe:
             httpGet:
-              path: /api/health
+              path: /api/ready
               port: http
             initialDelaySeconds: 10
             periodSeconds: 5

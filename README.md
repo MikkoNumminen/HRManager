@@ -59,7 +59,7 @@ sequenceDiagram
 
 ### 🔐 Security & access control
 
-- **34 permissions, not just 4 roles (granular RBAC)** — Instead of "admin = can do everything," each action has its own permission key (`person:create`, `team:delete`, `review:manage`, `leave:approve`, `position:manage`). Any permission can be overridden per-user: grant a regular user `person:create` without promoting them, or deny `team:delete` from an administrator who shouldn't have it. _Why? Simple role checks seem fine until you need exceptions — and every real organization has them._
+- **38 permissions, not just 4 roles (granular RBAC)** — Instead of "admin = can do everything," each action has its own permission key (`person:create`, `team:delete`, `review:manage`, `leave:approve`, `position:manage`). Any permission can be overridden per-user: grant a regular user `person:create` without promoting them, or deny `team:delete` from an administrator who shouldn't have it. _Why? Simple role checks seem fine until you need exceptions — and every real organization has them._
 
 ```mermaid
 graph TD
@@ -286,7 +286,7 @@ HRManager is designed as a standalone, independently deployable application — 
 
 | Role          | Access                           | Typical use case                                  |
 | ------------- | -------------------------------- | ------------------------------------------------- |
-| Superuser     | All 34 permissions (immutable)   | System admin — first OAuth user is auto-promoted  |
+| Superuser     | All 38 permissions (immutable)   | System admin — first OAuth user is auto-promoted  |
 | Administrator | All CRUD + dashboard + audit log | Day-to-day management (no admin UI or data reset) |
 | User          | Read-only                        | Regular employee viewing org data                 |
 | Guest         | Read-only (unauthenticated)      | Public visitors browsing without login            |

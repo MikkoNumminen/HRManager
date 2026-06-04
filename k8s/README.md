@@ -77,7 +77,7 @@ Paste the output into the corresponding field in `secret.yaml`.
 
 ### 2. Update the ConfigMap
 
-Edit `k8s/manifests/configmap.yaml` and set `NEXTAUTH_URL` to your actual domain.
+Edit `k8s/manifests/configmap.yaml` and set `AUTH_URL` to your actual domain.
 
 ### 3. Set your container image
 
@@ -142,15 +142,18 @@ Create a file **outside** your git repository (e.g., `~/hrmanager-secrets.yaml`)
 secrets:
   data:
     DATABASE_URL: "postgresql://user:pass@host:5432/hrmanager"
-    NEXTAUTH_SECRET: "your-nextauth-secret-min-32-chars"
-    GOOGLE_CLIENT_ID: "your-google-client-id"
-    GOOGLE_CLIENT_SECRET: "your-google-client-secret"
-    GITHUB_CLIENT_ID: "your-github-client-id"
-    GITHUB_CLIENT_SECRET: "your-github-client-secret"
-    MONGODB_URI: "mongodb://user:pass@host:27017/hrmanager_audit"
+    AUTH_SECRET: "your-auth-secret-min-32-chars"
+    AUTH_GOOGLE_ID: "your-google-client-id"
+    AUTH_GOOGLE_SECRET: "your-google-client-secret"
+    AUTH_GITHUB_ID: "your-github-client-id"
+    AUTH_GITHUB_SECRET: "your-github-client-secret"
+    MONGODB_URL: "mongodb://user:pass@host:27017/hrmanager_audit"
+    TOTP_ENCRYPTION_KEY: "your-totp-encryption-key"
+    AUDIT_HMAC_SECRET: "your-audit-hmac-secret"
+    CRON_SECRET: "your-cron-secret"
 
 config:
-  NEXTAUTH_URL: "https://your-domain.com"
+  AUTH_URL: "https://your-domain.com"
 
 ingress:
   host: your-domain.com

@@ -108,8 +108,10 @@ affinity: {}
 # -- Application environment variables (non-sensitive)
 config:
   NODE_ENV: "production"
-  NEXTAUTH_URL: "https://hrmanager.example.com"
-  MONGO_DB_NAME: "hrmanager_audit"
+  # Auth.js v5 reads AUTH_URL (falls back to NEXTAUTH_URL).
+  AUTH_URL: "https://hrmanager.example.com"
+  # Run the pg-boss background workers in-process on this long-running deployment.
+  WORKERS_ENABLED: "true"
   NEXT_TELEMETRY_DISABLED: "1"
 
 # -- Sensitive environment variables.
@@ -120,14 +122,18 @@ secrets:
   # If set, the 'data' block below is ignored.
   existingSecret: ""
   data:
-    # Replace all placeholder values with actual base64-encoded secrets before deploying.
+    # Plain strings (Helm base64-encodes them). Names match what the app reads:
+    # Auth.js v5 AUTH_* inference, MONGODB_URL, and the prod-required secrets.
     DATABASE_URL: ""
-    NEXTAUTH_SECRET: ""
-    GOOGLE_CLIENT_ID: ""
-    GOOGLE_CLIENT_SECRET: ""
-    GITHUB_CLIENT_ID: ""
-    GITHUB_CLIENT_SECRET: ""
-    MONGODB_URI: ""
+    AUTH_SECRET: ""
+    AUTH_GOOGLE_ID: ""
+    AUTH_GOOGLE_SECRET: ""
+    AUTH_GITHUB_ID: ""
+    AUTH_GITHUB_SECRET: ""
+    MONGODB_URL: ""
+    TOTP_ENCRYPTION_KEY: ""
+    AUDIT_HMAC_SECRET: ""
+    CRON_SECRET: ""
 
 # -- Liveness probe configuration
 livenessProbe:
@@ -139,10 +145,10 @@ livenessProbe:
   timeoutSeconds: 5
   failureThreshold: 3
 
-# -- Readiness probe configuration
+# -- Readiness probe configuration (deep check — gates traffic on Postgres/Mongo)
 readinessProbe:
   httpGet:
-    path: /api/health
+    path: /api/ready
     port: http
   initialDelaySeconds: 10
   periodSeconds: 5

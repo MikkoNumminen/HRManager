@@ -5,7 +5,9 @@
 **Scope:** Full codebase — UI layer, business logic layer, configuration & types layer
 **Method:** 3 parallel subagents reviewing 307 source files across all layers
 
-> **⚠️ Note (2026-03-26):** File paths in this report reference the **pre-modularization** flat structure (e.g. `src/components/X`, `src/serverActions.ts`, `src/queries.ts`). After the modularization on 2026-03-26, these files now live in `src/features/*/` modules. See `CLAUDE.md` Architecture rules for the current structure.
+> **⚠️ Note (2026-03-26):** File paths in this report reference the **pre-modularization** flat structure (e.g. `src/components/X`, `src/serverActions.ts`, `src/queries.ts`). After the modularization on 2026-03-26, these files now live in `src/features/*/` modules. See the [Architecture](README.md#architecture) section of the README for the current structure.
+>
+> **✅ Status (2026-06-05):** This report is **historical**. Most critical/important findings have since been resolved in code: DRY-01 (a generic `src/components/shared/DataTable.tsx` now backs the tables), DRY-03/DRY-04 (`guardedAction` + `withAuditedTransaction` helpers exist and are used), SEC-01 (`.env*` is git-ignored, not committed), CFG-01 (`LeaveRequest.status` is now the `LeaveRequestStatus` enum), ERR-05 (`/api/audit/verify` checks `admin:view_audit_log`). STRUCT-02/03 are stale — `src/queries.ts` and `src/serverActions/` are now thin barrel re-exports, not god files. Individual findings below are **not** annotated; read them as a 2026-03-25 snapshot.
 
 ---
 

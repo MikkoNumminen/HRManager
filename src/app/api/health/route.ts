@@ -15,7 +15,7 @@ const startedAt = Date.now();
 export function GET(): NextResponse {
   return NextResponse.json({
     status: "ok",
-    version: process.env.npm_package_version ?? "0.1.0",
+    version: process.env.APP_VERSION ?? process.env.npm_package_version ?? "0.1.0",
     uptime: Math.floor((Date.now() - startedAt) / 1000),
     timestamp: new Date().toISOString(),
   });

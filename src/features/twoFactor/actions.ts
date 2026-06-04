@@ -236,8 +236,23 @@ export async function regenerateRecoveryCodes(
 }
 
 /**
- * Verify a TOTP code during login. Called from the 2FA verification page.
- * Sets a token flag to indicate 2FA is verified.
+ * Stamp the current login session as having passed 2FA, server-side.
+ * This is the single source of truth the JWT callback reads — the client
+ * cannot set it. updateMany (not update) avoids throwing if the session row
+ * is absent (e.g. in tests with a synthetic session).
+ */
+async function markSessionTwoFactorVerified(sessionId: string | undefined): Promise<void> {
+  if (!sessionId) return;
+  await prisma.userSession.updateMany({
+    where: { id: sessionId },
+    data: { twoFactorVerifiedAt: new Date() },
+  });
+}
+
+/**
+ * Verify a TOTP or recovery code during login. Called from the 2FA verification
+ * page. On success, stamps UserSession.twoFactorVerifiedAt so the JWT callback
+ * marks the session 2FA-verified on its next refresh.
  */
 export async function verifyTwoFactorLogin(data: FormData): Promise<ActionResult> {
   return safe(async () => {
@@ -248,6 +263,7 @@ export async function verifyTwoFactorLogin(data: FormData): Promise<ActionResult
 
     const code = data.get("code")?.toString()?.trim();
     const userId = session.user.id;
+    const sessionId = session.user.sessionId;
 
     if (!code) {
       throw new ActionError("invalidTotpCode", t("invalidTotpCode"));
@@ -265,7 +281,8 @@ export async function verifyTwoFactorLogin(data: FormData): Promise<ActionResult
 
     // Try TOTP code first
     if (code.length === 6 && verifyTotpCode(secret, code)) {
-      // Success — verified via TOTP
+      // Success — stamp the session server-side so the JWT can trust it.
+      await markSessionTwoFactorVerified(sessionId);
       return;
     }
 
@@ -281,6 +298,12 @@ export async function verifyTwoFactorLogin(data: FormData): Promise<ActionResult
           where: { userId },
           data: { recoveryCodes: updatedCodes },
         });
+        if (sessionId) {
+          await tx.userSession.updateMany({
+            where: { id: sessionId },
+            data: { twoFactorVerifiedAt: new Date() },
+          });
+        }
         addAudit({
           action: "update",
           entityType: "user",

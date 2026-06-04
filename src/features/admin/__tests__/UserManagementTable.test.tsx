@@ -84,7 +84,7 @@ describe("UserManagementTable", () => {
       email: "dave@example.com",
       name: "Dave",
       image: null,
-      role: "custom_role",
+      role: "custom_role" as AppUser["role"],
       createdAt: new Date("2026-04-01"),
       updatedAt: new Date("2026-04-01"),
     };

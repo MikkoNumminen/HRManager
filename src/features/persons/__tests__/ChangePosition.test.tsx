@@ -72,6 +72,7 @@ describe("UpdatePosition Component", () => {
   test("shows generic error when updatePosition throws non-Error", async () => {
     (updatePosition as jest.MockedFunction<typeof updatePosition>).mockResolvedValue({
       error: "An unexpected error occurred",
+      code: "unexpectedError",
     });
     render(<UpdatePositionForm personID={personID} positions={mockPositions} />);
 
@@ -89,6 +90,7 @@ describe("UpdatePosition Component", () => {
   test("shows error message when updatePosition fails", async () => {
     (updatePosition as jest.MockedFunction<typeof updatePosition>).mockResolvedValue({
       error: "Update failed",
+      code: "unexpectedError",
     });
     render(<UpdatePositionForm personID={personID} positions={mockPositions} />);
 

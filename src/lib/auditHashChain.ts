@@ -4,9 +4,18 @@ import type { AuditLogDocument } from "@/mongoDb";
 import type { WithId } from "mongodb";
 
 // HMAC secret for audit log hash chain integrity.
-// Falls back to a development-only key so the feature works out of the box.
+// Required in production — the tamper-evidence guarantee is worthless if the
+// key is the publicly-known development fallback, so we refuse to use it there.
 function getHmacSecret(): string {
-  return process.env.AUDIT_HMAC_SECRET ?? "dev-audit-hmac-secret-change-in-production";
+  const secret = process.env.AUDIT_HMAC_SECRET;
+  if (secret) return secret;
+  if (process.env.NODE_ENV === "production") {
+    throw new Error(
+      "AUDIT_HMAC_SECRET must be set in production — the audit-log hash chain " +
+        "cannot fall back to the insecure development key.",
+    );
+  }
+  return "dev-audit-hmac-secret-change-in-production";
 }
 
 // Compute the canonical string representation of a log entry for hashing.

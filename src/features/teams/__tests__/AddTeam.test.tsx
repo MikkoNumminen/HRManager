@@ -71,6 +71,7 @@ describe("AddTeam Component", () => {
   test("shows generic error when createTeam throws non-Error", async () => {
     (createTeam as jest.MockedFunction<typeof createTeam>).mockResolvedValue({
       error: "An unexpected error occurred",
+      code: "unexpectedError",
     });
     render(<AddTeamForm />);
 
@@ -86,6 +87,7 @@ describe("AddTeam Component", () => {
   test("shows error message when createTeam fails", async () => {
     (createTeam as jest.MockedFunction<typeof createTeam>).mockResolvedValue({
       error: "Team already exists",
+      code: "invalidName",
     });
     render(<AddTeamForm />);
 

@@ -192,6 +192,6 @@ describe("proxy config", () => {
 
   // Matcher does not exclude prefetch requests — all routes get security headers
   it("matcher does not exclude prefetch requests", () => {
-    expect(config.matcher[0].missing).toBeUndefined();
+    expect((config.matcher[0] as { source: string; missing?: unknown }).missing).toBeUndefined();
   });
 });

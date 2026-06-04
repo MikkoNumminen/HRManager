@@ -20,7 +20,7 @@ export async function GET(): Promise<NextResponse> {
 
   const body = {
     status: allOk ? "ready" : "degraded",
-    version: process.env.npm_package_version ?? "0.1.0",
+    version: process.env.APP_VERSION ?? process.env.npm_package_version ?? "0.1.0",
     uptime: Math.floor(process.uptime()),
     timestamp: new Date().toISOString(),
     totalLatencyMs: Date.now() - start,

@@ -79,6 +79,7 @@ describe("AddPerson Component", () => {
   test("shows generic error when createPerson throws non-Error", async () => {
     (createPerson as jest.MockedFunction<typeof createPerson>).mockResolvedValue({
       error: "An unexpected error occurred",
+      code: "unexpectedError",
     });
     render(<AddPersonForm />);
 
@@ -114,6 +115,7 @@ describe("AddPerson Component", () => {
   test("shows error message when createPerson fails", async () => {
     (createPerson as jest.MockedFunction<typeof createPerson>).mockResolvedValue({
       error: "A person with this email already exists",
+      code: "emailAlreadyExists",
     });
     render(<AddPersonForm />);
 

@@ -1,0 +1,13 @@
+# Normalize line endings: store LF in the repo and check out LF on every
+# platform. Without this, Windows checkouts get CRLF (core.autocrlf) and
+# `prettier --check` reports the whole tree as unformatted.
+* text=auto eol=lf
+
+# Binary assets — never normalize or diff as text.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary

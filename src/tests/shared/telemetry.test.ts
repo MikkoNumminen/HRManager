@@ -1,6 +1,7 @@
 // Tests for @/lib/telemetry — verifies SDK initialization behavior and env var gating.
 
 // Mock the heavy OTEL SDK modules to avoid real connections
+export {};
 const mockStart = jest.fn();
 const mockShutdown = jest.fn().mockResolvedValue(undefined);
 const MockNodeSDK = jest.fn().mockImplementation(() => ({

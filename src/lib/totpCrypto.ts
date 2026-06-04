@@ -7,16 +7,29 @@ const AUTH_TAG_LENGTH = 16;
 const ISSUER = "HRManager";
 
 /**
- * Derives a 256-bit AES key from the TOTP_ENCRYPTION_KEY env var.
- * Falls back to a deterministic key derived from NEXTAUTH_SECRET for dev convenience.
+ * Derives a 256-bit AES key from a dedicated TOTP_ENCRYPTION_KEY.
+ * In production a dedicated key is REQUIRED — we refuse to reuse the session
+ * secret (NEXTAUTH_SECRET), so that rotating one secret cannot silently break
+ * the other and a single compromise does not expose both. In dev/test we fall
+ * back to NEXTAUTH_SECRET so 2FA works out of the box.
  */
 function getEncryptionKey(): Buffer {
-  const envKey = process.env.TOTP_ENCRYPTION_KEY ?? process.env.NEXTAUTH_SECRET;
-  if (!envKey) {
+  const dedicatedKey = process.env.TOTP_ENCRYPTION_KEY;
+  if (dedicatedKey) {
+    return createHash("sha256").update(dedicatedKey).digest();
+  }
+  if (process.env.NODE_ENV === "production") {
+    throw new Error(
+      "TOTP_ENCRYPTION_KEY must be set in production — refusing to derive the " +
+        "TOTP encryption key from the session secret.",
+    );
+  }
+  const fallback = process.env.NEXTAUTH_SECRET;
+  if (!fallback) {
     throw new Error("TOTP_ENCRYPTION_KEY or NEXTAUTH_SECRET must be set");
   }
   // Derive a 32-byte key via SHA-256 so any-length secret works
-  return createHash("sha256").update(envKey).digest();
+  return createHash("sha256").update(fallback).digest();
 }
 
 /** Encrypt a TOTP secret for storage. Returns base64(iv + authTag + ciphertext). */
