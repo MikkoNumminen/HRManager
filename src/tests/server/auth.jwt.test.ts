@@ -51,15 +51,18 @@ describe("auth jwt callback — 2FA verification is server-derived, not client-s
     const userSession = await testPrisma.userSession.create({
       data: { userId: user.id, twoFactorVerifiedAt: null },
     });
+    // Seed a STALE/forged `true` on the token: the server must force it back to
+    // false because the session row is not stamped — proving the flag is derived
+    // from the DB, not carried over from the token or the client update payload.
     const token = {
       email: user.email,
       sessionId: userSession.id,
       role: "user",
       permissionsVersion: 0,
-      twoFactorVerified: false,
+      twoFactorVerified: true,
     };
 
-    // The malicious client payload attempts to flip the flag directly.
+    // The malicious client payload also attempts to flip the flag directly.
     const result = await jwt({
       token,
       trigger: "update",
