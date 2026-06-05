@@ -2,7 +2,13 @@ import { auth } from "@/auth";
 import { prisma } from "@/db";
 import { getAuditLogCollection, isMongoAvailable } from "@/mongoDb";
 import { clearSessionEvents } from "@/lib/eventBus";
-import { PERSON_SEEDS, TEAM_SEEDS, MEMBERSHIP_SEEDS, DEPARTMENT_SEEDS } from "@/seeds";
+import {
+  PERSON_SEEDS,
+  TEAM_SEEDS,
+  MEMBERSHIP_SEEDS,
+  DEPARTMENT_SEEDS,
+  LEAVE_TYPE_SEEDS,
+} from "@/seeds";
 
 /**
  * Returns the demo session ID from the current JWT, or null for real users.
@@ -56,6 +62,79 @@ export async function seedDemoData(sessionId: string): Promise<void> {
         });
       }
     }
+
+    // Position catalog — the distinct job titles of the seeded people, so the
+    // Positions page isn't empty in the demo.
+    const positionNames = [...new Set(PERSON_SEEDS.map((p) => p.position))];
+    await tx.position.createMany({
+      data: positionNames.map((name) => ({ name, sessionId })),
+    });
+
+    // Leave types + a balance per person per type for the current year, plus a
+    // couple of sample requests, so the Leave pages are populated in the demo.
+    const leaveTypes = await tx.leaveType.createManyAndReturn({
+      data: LEAVE_TYPE_SEEDS.map((lt) => ({ ...lt, sessionId })),
+    });
+    const currentYear = new Date().getFullYear();
+    await tx.leaveBalance.createMany({
+      data: persons.flatMap((p) =>
+        leaveTypes.map((lt) => ({
+          personId: p.id,
+          leaveTypeId: lt.id,
+          year: currentYear,
+          allocated: lt.defaultDays,
+          used: 0,
+          sessionId,
+        })),
+      ),
+    });
+
+    const annualLeave = leaveTypes.find((lt) => lt.name === "Annual Leave");
+    const sickLeave = leaveTypes.find((lt) => lt.name === "Sick Leave");
+    if (annualLeave && sickLeave) {
+      const today = new Date();
+      const nextWeek = new Date(today.getTime() + 7 * 86400000);
+      const nextNextWeek = new Date(today.getTime() + 14 * 86400000);
+
+      // Alice (index 0): approved annual leave, reviewed by Frank (index 5).
+      await tx.leaveRequest.create({
+        data: {
+          personId: persons[0].id,
+          leaveTypeId: annualLeave.id,
+          startDate: nextWeek,
+          endDate: new Date(nextWeek.getTime() + 4 * 86400000),
+          days: 5,
+          note: "Family vacation",
+          status: "APPROVED",
+          reviewerId: persons[5].id,
+          reviewedAt: today,
+          sessionId,
+        },
+      });
+      // Bob (index 1): pending sick leave.
+      await tx.leaveRequest.create({
+        data: {
+          personId: persons[1].id,
+          leaveTypeId: sickLeave.id,
+          startDate: nextNextWeek,
+          endDate: new Date(nextNextWeek.getTime() + 1 * 86400000),
+          days: 2,
+          note: "Medical appointment",
+          status: "PENDING",
+          sessionId,
+        },
+      });
+      // Reflect Alice's approved leave in her annual balance.
+      await tx.leaveBalance.updateMany({
+        where: {
+          personId: persons[0].id,
+          leaveTypeId: annualLeave.id,
+          year: currentYear,
+          sessionId,
+        },
+        data: { used: 5 },
+      });
+    }
   });
 }
 
@@ -87,6 +166,12 @@ export async function cleanupStaleDemoSessions(): Promise<number> {
   }
 
   await prisma.$transaction(async (tx) => {
+    // Leave + position data references people, so remove it before persons
+    // (the FKs are RESTRICT, not cascade).
+    await tx.leaveRequest.deleteMany({ where: { sessionId: { in: sessionIds } } });
+    await tx.leaveBalance.deleteMany({ where: { sessionId: { in: sessionIds } } });
+    await tx.leaveType.deleteMany({ where: { sessionId: { in: sessionIds } } });
+    await tx.position.deleteMany({ where: { sessionId: { in: sessionIds } } });
     await tx.teamMember.deleteMany({ where: { sessionId: { in: sessionIds } } });
     await tx.team.deleteMany({ where: { sessionId: { in: sessionIds } } });
     await tx.department.deleteMany({ where: { sessionId: { in: sessionIds } } });

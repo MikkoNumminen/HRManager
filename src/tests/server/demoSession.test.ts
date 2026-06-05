@@ -141,6 +141,30 @@ describe("demoSession", () => {
       expect(engDept!.teams).toHaveLength(2);
       expect(engDept!.teams.map((t) => t.teamName).sort()).toEqual(["Engineering", "Platform"]);
     });
+
+    // The account-free demo also seeds leave + positions so those pages aren't empty.
+    test("seeds leave types, per-person balances, sample requests, and positions", async () => {
+      const sessionId = "test-leave-positions";
+      await seedDemoData(sessionId);
+
+      // 4 leave types, 9 distinct job titles → 9 positions, 9 people × 4 types = 36 balances.
+      expect(await testPrisma.leaveType.count({ where: { sessionId } })).toBe(4);
+      expect(await testPrisma.position.count({ where: { sessionId } })).toBe(9);
+      expect(await testPrisma.leaveBalance.count({ where: { sessionId } })).toBe(36);
+      expect(await testPrisma.leaveRequest.count({ where: { sessionId } })).toBe(2);
+
+      // Alice's approved 5-day leave is reflected in her annual balance.
+      const annual = await testPrisma.leaveType.findFirst({
+        where: { name: "Annual Leave", sessionId },
+      });
+      const alice = await testPrisma.person.findFirst({
+        where: { name: "Alice Johnson", sessionId },
+      });
+      const balance = await testPrisma.leaveBalance.findFirst({
+        where: { personId: alice!.id, leaveTypeId: annual!.id, sessionId },
+      });
+      expect(balance!.used).toBe(5);
+    });
   });
 
   describe("cleanupStaleDemoSessions", () => {

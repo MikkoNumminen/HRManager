@@ -5,6 +5,12 @@ on:
     branches:
       - main
 
+# The "Comment mutation score on PR" step posts a PR comment, which needs write
+# access. The default GITHUB_TOKEN is read-only here, which caused a 403.
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   mutation:
     name: Stryker Mutation Score
