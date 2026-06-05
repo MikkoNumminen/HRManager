@@ -14,16 +14,27 @@ export async function register() {
   // serverless (Vercel) leave it unset — scheduled cleanup runs via the
   // /api/cron/cleanup endpoint instead, since lambdas can't host a long poller.
   if (process.env.WORKERS_ENABLED === "true") {
-    const { getJobQueue, stopJobQueue } = await import("@/jobs/queue");
-    const { registerAllWorkers } = await import("@/jobs/workers");
+    // Isolated from boot: a transient DB hiccup here must not crash the server
+    // or take down telemetry — log and continue.
+    try {
+      const { getJobQueue, stopJobQueue } = await import("@/jobs/queue");
+      const { registerAllWorkers } = await import("@/jobs/workers");
 
-    const boss = await getJobQueue();
-    registerAllWorkers(boss);
+      const boss = await getJobQueue();
+      registerAllWorkers(boss);
 
-    const stop = () => {
-      void stopJobQueue();
-    };
-    process.on("SIGTERM", stop);
-    process.on("SIGINT", stop);
+      const stop = async () => {
+        try {
+          await stopJobQueue();
+        } catch {
+          // best-effort drain on shutdown
+        }
+      };
+      process.on("SIGTERM", stop);
+      process.on("SIGINT", stop);
+    } catch (err) {
+      const { default: logger } = await import("@/lib/logger");
+      logger.error({ err }, "Background job worker startup failed");
+    }
   }
 }

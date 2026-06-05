@@ -1,4 +1,4 @@
-import NextAuth from "next-auth";
+import NextAuth, { type NextAuthConfig } from "next-auth";
 import Google from "next-auth/providers/google";
 import GitHub from "next-auth/providers/github";
 import Credentials from "next-auth/providers/credentials";
@@ -74,7 +74,10 @@ const demoProvider =
       ]
     : [];
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
+// Exported so the callbacks (notably the security-critical jwt 2FA derivation)
+// can be unit-tested directly. `satisfies` keeps the literal types while giving
+// the callback params their contextual NextAuth types.
+export const authConfig = {
   providers: [Google, GitHub, ...demoProvider],
   pages: { signIn: "/auth/signin" },
   session: { strategy: "jwt" },
@@ -289,4 +292,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return session;
     },
   },
-});
+} satisfies NextAuthConfig;
+
+export const { handlers, auth, signIn, signOut } = NextAuth(authConfig);

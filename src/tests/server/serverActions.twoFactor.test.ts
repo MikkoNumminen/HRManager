@@ -465,6 +465,83 @@ describe("Two-Factor Authentication Server Actions", () => {
       expect(result).toBeDefined();
       expect(result?.code).toBe("invalidTotpCode");
     });
+
+    // --- Regression for the 2FA-bypass fix ---
+    // The session is marked verified ONLY by a valid code, and ONLY server-side
+    // (UserSession.twoFactorVerifiedAt). The client can no longer set the flag.
+
+    it("stamps UserSession.twoFactorVerifiedAt after a valid TOTP code", async () => {
+      const userSession = await testPrisma.userSession.create({ data: { userId: testUser.id } });
+      auth.mockResolvedValueOnce({
+        user: { id: testUser.id, email: testUser.email, sessionId: userSession.id },
+      });
+
+      const totp = generateTotpSecret(testUser.email);
+      const { encryptSecret } = require("@/lib/totpCrypto");
+      await testPrisma.twoFactorAuth.create({
+        data: {
+          userId: testUser.id,
+          encryptedSecret: encryptSecret(getTotpBase32(totp)),
+          enabled: true,
+          recoveryCodes: [],
+        },
+      });
+
+      const result = await verifyTwoFactorLogin(formData({ code: totp.generate() }));
+      expect(result).toBeUndefined();
+
+      const after = await testPrisma.userSession.findUnique({ where: { id: userSession.id } });
+      expect(after?.twoFactorVerifiedAt).not.toBeNull();
+    });
+
+    it("stamps UserSession.twoFactorVerifiedAt after a valid recovery code", async () => {
+      const userSession = await testPrisma.userSession.create({ data: { userId: testUser.id } });
+      auth.mockResolvedValueOnce({
+        user: { id: testUser.id, email: testUser.email, sessionId: userSession.id },
+      });
+
+      const totp = generateTotpSecret(testUser.email);
+      const codes = generateRecoveryCodes();
+      const { encryptSecret } = require("@/lib/totpCrypto");
+      await testPrisma.twoFactorAuth.create({
+        data: {
+          userId: testUser.id,
+          encryptedSecret: encryptSecret(getTotpBase32(totp)),
+          enabled: true,
+          recoveryCodes: codes.map(hashRecoveryCode),
+        },
+      });
+
+      const result = await verifyTwoFactorLogin(formData({ code: codes[0] }));
+      expect(result).toBeUndefined();
+
+      const after = await testPrisma.userSession.findUnique({ where: { id: userSession.id } });
+      expect(after?.twoFactorVerifiedAt).not.toBeNull();
+    });
+
+    it("does NOT stamp twoFactorVerifiedAt when the code is invalid", async () => {
+      const userSession = await testPrisma.userSession.create({ data: { userId: testUser.id } });
+      auth.mockResolvedValueOnce({
+        user: { id: testUser.id, email: testUser.email, sessionId: userSession.id },
+      });
+
+      const totp = generateTotpSecret(testUser.email);
+      const { encryptSecret } = require("@/lib/totpCrypto");
+      await testPrisma.twoFactorAuth.create({
+        data: {
+          userId: testUser.id,
+          encryptedSecret: encryptSecret(getTotpBase32(totp)),
+          enabled: true,
+          recoveryCodes: [],
+        },
+      });
+
+      const result = await verifyTwoFactorLogin(formData({ code: "000000" }));
+      expect(result?.code).toBe("invalidTotpCode");
+
+      const after = await testPrisma.userSession.findUnique({ where: { id: userSession.id } });
+      expect(after?.twoFactorVerifiedAt).toBeNull();
+    });
   });
 
   describe("regenerateRecoveryCodes", () => {

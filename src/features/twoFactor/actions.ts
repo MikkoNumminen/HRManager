@@ -298,6 +298,9 @@ export async function verifyTwoFactorLogin(data: FormData): Promise<ActionResult
           where: { userId },
           data: { recoveryCodes: updatedCodes },
         });
+        // Stamp inside the same transaction as the recovery-code removal so they
+        // commit atomically (the TOTP path has no surrounding tx, so it uses the
+        // standalone markSessionTwoFactorVerified helper instead).
         if (sessionId) {
           await tx.userSession.updateMany({
             where: { id: sessionId },
