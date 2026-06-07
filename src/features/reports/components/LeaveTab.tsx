@@ -86,8 +86,8 @@ export default function LeaveTab({ data, t }: LeaveTabProps) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {data.data.map((r, i) => (
-                <TableRow key={i}>
+              {data.data.map((r) => (
+                <TableRow key={`${r.departmentName}-${r.leaveTypeName}`}>
                   <TableCell sx={tableCellStyles}>{r.departmentName}</TableCell>
                   <TableCell sx={tableCellStyles}>{r.leaveTypeName}</TableCell>
                   <TableCell sx={tableCellStyles} align="right">

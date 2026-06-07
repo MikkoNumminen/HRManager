@@ -56,6 +56,7 @@ export function useRealtimeEvents(options: UseRealtimeEventsOptions = {}): UseRe
     let retryCount = 0;
     let es: EventSource | null = null;
     let disposed = false;
+    let retryTimer: ReturnType<typeof setTimeout> | null = null;
 
     function connect() {
       if (disposed) return;
@@ -90,7 +91,7 @@ export function useRealtimeEvents(options: UseRealtimeEventsOptions = {}): UseRe
         if (disposed) return;
         const delay = RECONNECT_DELAYS[Math.min(retryCount, RECONNECT_DELAYS.length - 1)];
         retryCount++;
-        setTimeout(connect, delay);
+        retryTimer = setTimeout(connect, delay);
       };
     }
 
@@ -98,6 +99,7 @@ export function useRealtimeEvents(options: UseRealtimeEventsOptions = {}): UseRe
 
     return () => {
       disposed = true;
+      if (retryTimer) clearTimeout(retryTimer);
       es?.close();
       setConnected(false);
     };

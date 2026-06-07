@@ -78,8 +78,8 @@ export default function HeadcountTab({ data, t }: HeadcountTabProps) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {data.data.map((r, i) => (
-                <TableRow key={i}>
+              {data.data.map((r) => (
+                <TableRow key={`${r.month}-${r.departmentName}`}>
                   <TableCell sx={tableCellStyles}>{r.month}</TableCell>
                   <TableCell sx={tableCellStyles}>{r.departmentName}</TableCell>
                   <TableCell sx={tableCellStyles} align="right">
