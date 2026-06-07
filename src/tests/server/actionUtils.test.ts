@@ -28,6 +28,12 @@ jest.mock("@/rateLimit", () => ({
   },
 }));
 
+// Mock the Sentry wrapper so safe() reports without a real Sentry runtime.
+const mockCaptureServerActionError = jest.fn();
+jest.mock("@/lib/sentryCapture", () => ({
+  captureServerActionError: (...args: unknown[]) => mockCaptureServerActionError(...args),
+}));
+
 import { safe, validateUUID } from "@/lib/actionUtils";
 // Import from _shared.ts to ensure the re-export barrel is covered.
 import { safe as safeShared } from "@/serverActions/_shared";
@@ -63,6 +69,8 @@ describe("cacheInvalidation", () => {
 });
 
 describe("actionUtils safe()", () => {
+  beforeEach(() => mockCaptureServerActionError.mockClear());
+
   // Returns undefined when the function succeeds.
   test("returns undefined on success", async () => {
     const result = await safe(async () => {});
@@ -77,12 +85,15 @@ describe("actionUtils safe()", () => {
     expect(result).toEqual({ error: "Person not found", code: "personNotFound" });
   });
 
-  // Returns an error result when a generic Error is thrown.
-  test("catches generic Error and returns error result", async () => {
+  // Unexpected errors are reported to Sentry and return a GENERIC message — the raw
+  // error.message (which can leak DB internals) must not reach the client.
+  test("catches generic Error, reports it, and returns a generic message", async () => {
+    const err = new Error('Prisma: column "secret" does not exist');
     const result = await safe(async () => {
-      throw new Error("Something went wrong");
+      throw err;
     });
-    expect(result).toEqual({ error: "Something went wrong", code: "unexpectedError" });
+    expect(result).toEqual({ error: "translated:unexpectedError", code: "unexpectedError" });
+    expect(mockCaptureServerActionError).toHaveBeenCalledWith(err, { source: "safe" });
   });
 
   // Returns a translated unexpectedError when a non-Error value is thrown.

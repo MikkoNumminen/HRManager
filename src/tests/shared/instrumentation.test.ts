@@ -45,4 +45,12 @@ describe("instrumentation register()", () => {
     const { initTelemetry } = await import("@/lib/telemetry");
     expect(initTelemetry).not.toHaveBeenCalled();
   });
+
+  // onRequestError must be exported and wired to Sentry so server-side errors
+  // (RSC, route handlers) are captured — previously the hook was missing entirely.
+  it("exports onRequestError wired to Sentry.captureRequestError", async () => {
+    const instrumentation = await import("@/instrumentation");
+    const Sentry = await import("@sentry/nextjs");
+    expect(instrumentation.onRequestError).toBe(Sentry.captureRequestError);
+  });
 });

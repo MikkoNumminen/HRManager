@@ -2,6 +2,7 @@ import { RateLimitError } from "@/rateLimit";
 import { ActionError, type ErrorCode } from "@/actionErrors";
 import { getTranslations } from "next-intl/server";
 import logger from "@/lib/logger";
+import { captureServerActionError } from "@/lib/sentryCapture";
 
 /**
  * Server actions return ActionResult so error messages survive Next.js production sanitization.
@@ -17,10 +18,11 @@ export async function safe(fn: () => Promise<void>): Promise<ActionResult> {
     if (error && typeof error === "object" && "digest" in error) throw error;
     if (error instanceof ActionError) return { error: error.message, code: error.code };
     if (error instanceof RateLimitError) return { error: error.message, code: "rateLimited" };
-    if (error instanceof Error) {
-      logger.error({ err: error, code: "unexpectedError" }, "Server action failed");
-      return { error: error.message, code: "unexpectedError" };
-    }
+    // Unexpected error: report to Sentry and log it, then return a GENERIC message.
+    // Returning error.message previously leaked Prisma/DB internals (table, column
+    // and constraint names) straight to the client; the real error stays server-side.
+    captureServerActionError(error, { source: "safe" });
+    logger.error({ err: error, code: "unexpectedError" }, "Server action failed");
     const tErr = await getTranslations("errors");
     return { error: tErr("unexpectedError"), code: "unexpectedError" };
   }
