@@ -29,7 +29,9 @@ export function registerAuditExportWorker(boss: PgBoss): void {
 
       // Scope to the tenant captured at enqueue time. Without this the query
       // started as {} and exported every tenant's audit logs (cross-tenant leak).
-      const query: Filter<AuditLogDocument> = { sessionId };
+      // Coerce undefined -> null so a job enqueued before this field existed scopes
+      // to org-wide logs rather than degrading to an unscoped { sessionId: undefined }.
+      const query: Filter<AuditLogDocument> = { sessionId: sessionId ?? null };
 
       if (filters.dateFrom || filters.dateTo) {
         query.createdAt = {};
