@@ -2,7 +2,7 @@
 import { prisma } from "@/db";
 import { auth } from "@/auth";
 import { captureAuditContext, deferAudit, DeferredAuditEntry } from "@/auditLog";
-import { rateLimit } from "@/rateLimit";
+import { rateLimit, TWO_FACTOR_VERIFY_MAX } from "@/rateLimit";
 import { ActionError } from "@/actionErrors";
 import { getTranslations } from "next-intl/server";
 import { safe, validateUUID, type ActionResult } from "@/lib/actionUtils";
@@ -257,7 +257,7 @@ export async function verifyTwoFactorLogin(data: FormData): Promise<ActionResult
     const t = await getTranslations("errors");
     const session = await auth();
     if (!session?.user?.id) throw new ActionError("notAuthenticated", t("notAuthenticated"));
-    await rateLimit("verifyTwoFactorLogin");
+    await rateLimit("verifyTwoFactorLogin", TWO_FACTOR_VERIFY_MAX);
 
     const code = data.get("code")?.toString()?.trim();
     const userId = session.user.id;

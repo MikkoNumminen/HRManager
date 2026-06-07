@@ -34,6 +34,7 @@ jest.mock("@/auditLog", () => ({
 // Mock rate limiting
 jest.mock("@/rateLimit", () => ({
   rateLimit: jest.fn(),
+  TWO_FACTOR_VERIFY_MAX: 5,
   RateLimitError: class RateLimitError extends Error {
     constructor() {
       super("Too many requests");
@@ -398,6 +399,13 @@ describe("Two-Factor Authentication Server Actions", () => {
       const result = await verifyTwoFactorLogin(formData({}));
       expect(result).toBeDefined();
       expect(result?.code).toBe("invalidTotpCode");
+    });
+
+    // Verification uses the strict rate limit (not the default 30/min) to slow brute force.
+    it("applies the strict 2FA verification rate limit", async () => {
+      const { rateLimit } = require("@/rateLimit");
+      await verifyTwoFactorLogin(formData({ code: "123456" }));
+      expect(rateLimit).toHaveBeenCalledWith("verifyTwoFactorLogin", 5);
     });
 
     // Should verify a valid TOTP code during login

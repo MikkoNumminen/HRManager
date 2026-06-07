@@ -6,6 +6,7 @@ import { logRateLimitHit } from "@/auditLog";
 export const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute
 export const MAX_REQUESTS_PER_WINDOW = 30; // 30 requests per window
 export const AUTH_MAX_REQUESTS = 10; // 10 requests per window for auth endpoints
+export const TWO_FACTOR_VERIFY_MAX = 5; // strict limit for 2FA code / recovery-code verification
 
 export class RateLimitError extends Error {
   constructor() {
@@ -76,9 +77,12 @@ async function checkRateLimit(
   }
 }
 
-export async function rateLimit(action: string): Promise<void> {
+export async function rateLimit(
+  action: string,
+  maxRequests: number = MAX_REQUESTS_PER_WINDOW,
+): Promise<void> {
   const identifier = await getIdentifier();
-  await checkRateLimit(identifier, action, MAX_REQUESTS_PER_WINDOW);
+  await checkRateLimit(identifier, action, maxRequests);
 }
 
 export async function rateLimitAuth(action: string): Promise<void> {

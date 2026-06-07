@@ -1,5 +1,5 @@
 import * as OTPAuth from "otpauth";
-import { createCipheriv, createDecipheriv, randomBytes, createHash } from "crypto";
+import { createCipheriv, createDecipheriv, randomBytes, createHash, timingSafeEqual } from "crypto";
 
 const ALGORITHM = "aes-256-gcm";
 const IV_LENGTH = 12;
@@ -111,6 +111,15 @@ export function hashRecoveryCode(code: string): string {
  * Returns the index of the matching code, or -1 if no match.
  */
 export function findMatchingRecoveryCode(code: string, hashedCodes: string[]): number {
-  const hash = hashRecoveryCode(code);
-  return hashedCodes.indexOf(hash);
+  const hash = Buffer.from(hashRecoveryCode(code), "hex");
+  let matchIndex = -1;
+  for (let i = 0; i < hashedCodes.length; i++) {
+    const stored = Buffer.from(hashedCodes[i], "hex");
+    // Constant-time compare each stored hash, and don't early-exit on a match, so
+    // verification time doesn't leak whether/which recovery code matched.
+    if (stored.length === hash.length && timingSafeEqual(stored, hash)) {
+      matchIndex = i;
+    }
+  }
+  return matchIndex;
 }
