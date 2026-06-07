@@ -526,7 +526,7 @@
     "invalidTotpSecret": "유효하지 않은 TOTP 비밀키",
     "twoFactorAlreadyEnabled": "이중 인증이 이미 활성화되어 있습니다",
     "twoFactorNotEnabled": "이중 인증이 활성화되어 있지 않습니다",
-    "resetRequiresDemoSession": "Resetting all data is only available within a demo session"
+    "resetRequiresDemoSession": "모든 데이터 초기화는 데모 세션에서만 사용할 수 있습니다"
   },
   "reviews": {
     "title": "성과 평가",

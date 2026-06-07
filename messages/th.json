@@ -526,7 +526,7 @@
     "invalidTotpSecret": "รหัสลับ TOTP ไม่ถูกต้อง",
     "twoFactorAlreadyEnabled": "การยืนยันตัวตนสองขั้นตอนเปิดใช้งานอยู่แล้ว",
     "twoFactorNotEnabled": "การยืนยันตัวตนสองขั้นตอนไม่ได้เปิดใช้งาน",
-    "resetRequiresDemoSession": "Resetting all data is only available within a demo session"
+    "resetRequiresDemoSession": "การรีเซ็ตข้อมูลทั้งหมดใช้ได้เฉพาะในเซสชันสาธิตเท่านั้น"
   },
   "reviews": {
     "title": "การประเมินผลการปฏิบัติงาน",

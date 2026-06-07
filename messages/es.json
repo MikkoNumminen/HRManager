@@ -526,7 +526,7 @@
     "invalidTotpSecret": "Secreto TOTP no válido",
     "twoFactorAlreadyEnabled": "La autenticación de dos factores ya está habilitada",
     "twoFactorNotEnabled": "La autenticación de dos factores no está habilitada",
-    "resetRequiresDemoSession": "Resetting all data is only available within a demo session"
+    "resetRequiresDemoSession": "El restablecimiento de todos los datos solo está disponible en una sesión de demostración"
   },
   "reviews": {
     "title": "Evaluaciones de desempeño",

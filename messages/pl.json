@@ -526,7 +526,7 @@
     "invalidTotpSecret": "Nieprawidłowy sekret TOTP",
     "twoFactorAlreadyEnabled": "Uwierzytelnianie dwuskładnikowe jest już włączone",
     "twoFactorNotEnabled": "Uwierzytelnianie dwuskładnikowe nie jest włączone",
-    "resetRequiresDemoSession": "Resetting all data is only available within a demo session"
+    "resetRequiresDemoSession": "Resetowanie wszystkich danych jest dostępne tylko w sesji demonstracyjnej"
   },
   "reviews": {
     "title": "Oceny pracownicze",
