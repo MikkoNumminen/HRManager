@@ -138,28 +138,32 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         });
         if (dbUser) {
           const { ipAddress, userAgent } = await getRequestMeta();
-          const newSession = await prisma.userSession.create({
-            data: {
-              userId: dbUser.id,
-              ipAddress,
-              userAgent,
-            },
-          });
-          token.sessionId = newSession.id;
+          // Create the session and enforce the concurrent-session limit atomically.
+          // Run as one Serializable transaction (matching the first-user race above)
+          // so two simultaneous sign-ins can't both pass the count check and quietly
+          // exceed MAX_CONCURRENT_SESSIONS.
+          token.sessionId = await prisma.$transaction(
+            async (tx) => {
+              const newSession = await tx.userSession.create({
+                data: { userId: dbUser.id, ipAddress, userAgent },
+              });
 
-          // Enforce concurrent session limit: deactivate oldest sessions beyond the limit
-          const activeSessions = await prisma.userSession.findMany({
-            where: { userId: dbUser.id, active: true },
-            orderBy: { lastActiveAt: "desc" },
-            select: { id: true },
-          });
-          if (activeSessions.length > MAX_CONCURRENT_SESSIONS) {
-            const toDeactivate = activeSessions.slice(MAX_CONCURRENT_SESSIONS).map((s) => s.id);
-            await prisma.userSession.updateMany({
-              where: { id: { in: toDeactivate } },
-              data: { active: false },
-            });
-          }
+              const activeSessions = await tx.userSession.findMany({
+                where: { userId: dbUser.id, active: true },
+                orderBy: { lastActiveAt: "desc" },
+                select: { id: true },
+              });
+              if (activeSessions.length > MAX_CONCURRENT_SESSIONS) {
+                const toDeactivate = activeSessions.slice(MAX_CONCURRENT_SESSIONS).map((s) => s.id);
+                await tx.userSession.updateMany({
+                  where: { id: { in: toDeactivate } },
+                  data: { active: false },
+                });
+              }
+              return newSession.id;
+            },
+            { isolationLevel: "Serializable" },
+          );
         }
       }
 
