@@ -526,7 +526,7 @@
     "invalidTotpSecret": "Geçersiz TOTP gizli anahtarı",
     "twoFactorAlreadyEnabled": "İki faktörlü kimlik doğrulama zaten etkin",
     "twoFactorNotEnabled": "İki faktörlü kimlik doğrulama etkin değil",
-    "resetRequiresDemoSession": "Resetting all data is only available within a demo session"
+    "resetRequiresDemoSession": "Tüm verileri sıfırlama yalnızca demo oturumunda kullanılabilir"
   },
   "reviews": {
     "title": "Performans Değerlendirmeleri",

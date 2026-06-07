@@ -526,7 +526,7 @@
     "invalidTotpSecret": "Virheellinen TOTP-salaisuus",
     "twoFactorAlreadyEnabled": "Kaksivaiheinen tunnistautuminen on jo käytössä",
     "twoFactorNotEnabled": "Kaksivaiheinen tunnistautuminen ei ole käytössä",
-    "resetRequiresDemoSession": "Resetting all data is only available within a demo session"
+    "resetRequiresDemoSession": "Kaikkien tietojen nollaus on käytettävissä vain demoistunnossa"
   },
   "reviews": {
     "title": "Kehityskeskustelut",

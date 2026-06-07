@@ -526,7 +526,7 @@
     "invalidTotpSecret": "Siri ya TOTP si sahihi",
     "twoFactorAlreadyEnabled": "Uthibitishaji wa hatua mbili umewashwa tayari",
     "twoFactorNotEnabled": "Uthibitishaji wa hatua mbili haujawashwa",
-    "resetRequiresDemoSession": "Resetting all data is only available within a demo session"
+    "resetRequiresDemoSession": "Kuweka upya data zote kunapatikana tu katika kipindi cha onyesho"
   },
   "reviews": {
     "title": "Tathmini za Utendaji",

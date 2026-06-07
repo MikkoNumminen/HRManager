@@ -526,7 +526,7 @@
     "invalidTotpSecret": "Ogiltigt TOTP-hemligt",
     "twoFactorAlreadyEnabled": "Tvåfaktorsautentisering är redan aktiverad",
     "twoFactorNotEnabled": "Tvåfaktorsautentisering är inte aktiverad",
-    "resetRequiresDemoSession": "Resetting all data is only available within a demo session"
+    "resetRequiresDemoSession": "Återställning av all data är endast tillgänglig i en demosession"
   },
   "reviews": {
     "title": "Prestationsbedömningar",

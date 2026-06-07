@@ -526,7 +526,7 @@
     "invalidTotpSecret": "TOTPシークレットが無効です",
     "twoFactorAlreadyEnabled": "二要素認証はすでに有効です",
     "twoFactorNotEnabled": "二要素認証が有効になっていません",
-    "resetRequiresDemoSession": "Resetting all data is only available within a demo session"
+    "resetRequiresDemoSession": "すべてのデータのリセットはデモセッションでのみ利用できます"
   },
   "reviews": {
     "title": "パフォーマンス評価",

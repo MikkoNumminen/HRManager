@@ -526,7 +526,7 @@
     "invalidTotpSecret": "مفتاح TOTP غير صالح",
     "twoFactorAlreadyEnabled": "المصادقة الثنائية مفعّلة بالفعل",
     "twoFactorNotEnabled": "المصادقة الثنائية غير مفعّلة",
-    "resetRequiresDemoSession": "Resetting all data is only available within a demo session"
+    "resetRequiresDemoSession": "إعادة تعيين جميع البيانات متاحة فقط في جلسة تجريبية"
   },
   "reviews": {
     "title": "تقييمات الأداء",

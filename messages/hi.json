@@ -526,7 +526,7 @@
     "invalidTotpSecret": "अमान्य TOTP सीक्रेट",
     "twoFactorAlreadyEnabled": "दो-कारक प्रमाणीकरण पहले से सक्षम है",
     "twoFactorNotEnabled": "दो-कारक प्रमाणीकरण सक्षम नहीं है",
-    "resetRequiresDemoSession": "Resetting all data is only available within a demo session"
+    "resetRequiresDemoSession": "सभी डेटा को रीसेट करना केवल डेमो सत्र में ही उपलब्ध है"
   },
   "reviews": {
     "title": "प्रदर्शन समीक्षाएँ",

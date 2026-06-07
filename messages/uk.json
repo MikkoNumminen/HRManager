@@ -526,7 +526,7 @@
     "invalidTotpSecret": "Невірний секрет TOTP",
     "twoFactorAlreadyEnabled": "Двофакторна автентифікація вже увімкнена",
     "twoFactorNotEnabled": "Двофакторна автентифікація не увімкнена",
-    "resetRequiresDemoSession": "Resetting all data is only available within a demo session"
+    "resetRequiresDemoSession": "Скидання всіх даних доступне лише в демонстраційному сеансі"
   },
   "reviews": {
     "title": "Оцінка ефективності",

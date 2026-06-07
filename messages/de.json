@@ -526,7 +526,7 @@
     "invalidTotpSecret": "Ungültiges TOTP-Geheimnis",
     "twoFactorAlreadyEnabled": "Die Zwei-Faktor-Authentifizierung ist bereits aktiviert",
     "twoFactorNotEnabled": "Die Zwei-Faktor-Authentifizierung ist nicht aktiviert",
-    "resetRequiresDemoSession": "Resetting all data is only available within a demo session"
+    "resetRequiresDemoSession": "Das Zurücksetzen aller Daten ist nur in einer Demositzung möglich"
   },
   "reviews": {
     "title": "Leistungsbeurteilungen",
