@@ -289,6 +289,22 @@ describe("Two-Factor Authentication Server Actions", () => {
       expect(tfa!.recoveryCodes).toHaveLength(10);
     });
 
+    // A malformed recovery-codes payload must fail loudly, not silently enable 2FA
+    // with zero recovery codes (the user would have no fallback).
+    it("rejects a malformed recovery-codes payload", async () => {
+      const totp = generateTotpSecret(testUser.email);
+      const secret = getTotpBase32(totp);
+      const code = totp.generate();
+
+      const result = await confirmTwoFactorSetup(
+        formData({ code, secret, recoveryCodes: "{not valid json" }),
+      );
+
+      expect(result).toHaveProperty("code", "unexpectedError");
+      const tfa = await testPrisma.twoFactorAuth.findUnique({ where: { userId: testUser.id } });
+      expect(tfa).toBeNull(); // 2FA must not have been enabled
+    });
+
     // Should reject an invalid code
     it("should reject an invalid TOTP code", async () => {
       const totp = generateTotpSecret(testUser.email);

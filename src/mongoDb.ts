@@ -100,9 +100,10 @@ export async function ensureAuditLogIndexes(): Promise<void> {
         validationLevel: "moderate",
         validationAction: "warn",
       });
-    } catch {
-      // Collection already exists but collMod failed for another reason — log and continue
-      logger.warn("Could not apply schema validation to auditLogs collection");
+    } catch (error) {
+      // Collection already exists but collMod failed for another reason — log with the
+      // error so operators can triage (audit-log validation is a security invariant).
+      logger.warn({ err: error }, "Could not apply schema validation to auditLogs collection");
     }
   }
 
