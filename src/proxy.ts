@@ -55,14 +55,20 @@ export async function proxy(request: NextRequest) {
   const start = Date.now();
   const { pathname } = request.nextUrl;
 
-  // Enforce 2FA verification: redirect users who have 2FA enabled but haven't verified
-  if (
-    !pathname.startsWith("/api") &&
-    !pathname.startsWith("/auth") &&
-    !pathname.startsWith("/_next")
-  ) {
+  // Enforce 2FA verification for users who have 2FA enabled but haven't verified.
+  // The auth flow itself must stay reachable: the /auth pages AND NextAuth's own
+  // /api/auth routes (the verify screen reads /api/auth/session and needs sign-out).
+  // Everything else is gated — page requests are redirected to the verification
+  // screen, while API requests get a 403 JSON (a redirect is meaningless to a fetch,
+  // and previously every /api/* route bypassed the gate entirely). /api/health,
+  // /api/ready and /api/realtime/* are excluded by the matcher, so they never reach here.
+  const isAuthFlow = pathname.startsWith("/auth") || pathname.startsWith("/api/auth");
+  if (!isAuthFlow && !pathname.startsWith("/_next")) {
     const session = await auth();
     if (session?.user?.twoFactorRequired && !session?.user?.twoFactorVerified) {
+      if (pathname.startsWith("/api")) {
+        return NextResponse.json({ error: "Two-factor authentication required" }, { status: 403 });
+      }
       return NextResponse.redirect(new URL("/auth/verify-2fa", request.nextUrl.origin));
     }
   }

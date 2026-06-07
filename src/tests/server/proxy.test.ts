@@ -174,6 +174,29 @@ describe("proxy", () => {
     const res = await proxy(makeRequest("http://localhost:3000/auth/signin"));
     expect(res.status).not.toBe(307);
   });
+
+  // API routes are gated too, but with a 403 JSON instead of a page redirect.
+  it("returns 403 for API routes when 2FA required but not verified", async () => {
+    const { auth } = require("@/auth");
+    auth.mockResolvedValueOnce({
+      user: { twoFactorRequired: true, twoFactorVerified: false },
+    });
+    const res = await proxy(makeRequest("http://localhost:3000/api/calendar"));
+    expect(res.status).toBe(403);
+    await expect(res.json()).resolves.toEqual({ error: "Two-factor authentication required" });
+  });
+
+  // NextAuth's own /api/auth routes must stay reachable so a 2FA-required user can
+  // still complete verification (session endpoint) and sign out.
+  it("skips 2FA check for /api/auth routes", async () => {
+    const { auth } = require("@/auth");
+    auth.mockResolvedValueOnce({
+      user: { twoFactorRequired: true, twoFactorVerified: false },
+    });
+    const res = await proxy(makeRequest("http://localhost:3000/api/auth/session"));
+    expect(res.status).not.toBe(403);
+    expect(res.status).not.toBe(307);
+  });
 });
 
 describe("proxy config", () => {
