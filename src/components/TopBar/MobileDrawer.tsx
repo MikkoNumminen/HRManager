@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import { avatarStyles, colors } from "@/muiStyles";
 import { signIn } from "next-auth/react";
-import { DEMO_EMAIL } from "@/constants";
+import { DEMO_EMAIL, isDemoLoginEnabled } from "@/constants";
 import { useTranslations } from "next-intl";
 import LanguageSwitcher from "../shared/LanguageSwitcher";
 import ThemeSwitcher from "../shared/ThemeSwitcher";
@@ -45,7 +45,7 @@ export default function MobileDrawer({
 }: MobileDrawerProps) {
   const t = useTranslations("topBar");
   const user = session?.user;
-  const demoEnabled = process.env.NEXT_PUBLIC_DEMO_LOGIN !== "false";
+  const demoEnabled = isDemoLoginEnabled();
 
   const initials = user?.name
     ? user.name
