@@ -87,14 +87,14 @@ model TeamMember {
 }
 
 model User {
-  id                 String           @id @default(uuid())
-  email              String           @unique
+  id                 String            @id @default(uuid())
+  email              String            @unique
   name               String?
   image              String?
-  role               String           @default("user")
-  permissionsVersion Int              @default(0)
-  createdAt          DateTime         @default(now())
-  updatedAt          DateTime         @updatedAt
+  role               String            @default("user")
+  permissionsVersion Int               @default(0)
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
   permissions        UserPermission[]
   demoSessions       DemoSession[]
   sessions           UserSession[]
@@ -148,15 +148,18 @@ model DemoSession {
 }
 
 model UserSession {
-  id           String   @id @default(uuid())
-  userId       String
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userAgent    String?
-  ipAddress    String?
-  active       Boolean  @default(true)
-  lastActiveAt DateTime @default(now())
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id                  String    @id @default(uuid())
+  userId              String
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userAgent           String?
+  ipAddress           String?
+  active              Boolean   @default(true)
+  // Server-side record that 2FA was verified for THIS session. The JWT reads this
+  // instead of trusting a client useSession().update({ twoFactorVerified }) payload.
+  twoFactorVerifiedAt DateTime?
+  lastActiveAt        DateTime  @default(now())
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
 
   @@index([userId, active])
   @@index([lastActiveAt])
@@ -359,23 +362,23 @@ enum FeatureFlagScope {
 }
 
 model FeatureFlag {
-  id          String           @id @default(uuid())
-  name        String           @unique
+  id          String            @id @default(uuid())
+  name        String            @unique
   description String?
-  enabled     Boolean          @default(false)
-  scope       FeatureFlagScope @default(GLOBAL)
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
+  enabled     Boolean           @default(false)
+  scope       FeatureFlagScope  @default(GLOBAL)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
   userFlags   UserFeatureFlag[]
 }
 
 model UserFeatureFlag {
-  id        String      @id @default(uuid())
+  id        String   @id @default(uuid())
   userId    String
   flagId    String
-  enabled   Boolean     @default(false)
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  enabled   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   user User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   flag FeatureFlag @relation(fields: [flagId], references: [id], onDelete: Cascade)

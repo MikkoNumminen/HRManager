@@ -22,8 +22,9 @@ export default function TwoFactorVerify() {
       const result = await verifyTwoFactorLogin(formData);
       if (result?.error) return { error: result.error };
 
-      // Update the session to mark 2FA as verified
-      await update({ twoFactorVerified: true });
+      // Refresh the session so the JWT picks up the server-side verification
+      // (verifyTwoFactorLogin recorded it); the flag is no longer client-supplied.
+      await update();
 
       // Redirect to home after successful verification
       router.push("/");

@@ -206,6 +206,49 @@ describe("auth.ts callbacks", () => {
       expect(cleared.permissions).toBeUndefined();
     });
 
+    // 2FA verification is derived from the server-side session row, not a client claim.
+    test("sets twoFactorVerified from the session's twoFactorVerifiedAt", async () => {
+      const user = await testPrisma.user.create({
+        data: { email: "tfa-verified@example.com", name: "V", role: "user" },
+      });
+      const sess = await testPrisma.userSession.create({
+        data: { userId: user.id, twoFactorVerifiedAt: new Date() },
+      });
+      const token = {
+        email: "tfa-verified@example.com",
+        role: "user",
+        permissionsVersion: user.permissionsVersion,
+        sessionId: sess.id,
+        twoFactorVerified: false,
+      };
+      const result = await callbacks.jwt({ token, trigger: "update" });
+      expect(result.twoFactorVerified).toBe(true);
+    });
+
+    // A client update() payload cannot force verification — the JWT ignores it and
+    // reads the (unverified) session row instead (CWE-602 fix).
+    test("ignores a client-claimed twoFactorVerified when the session is unverified", async () => {
+      const user = await testPrisma.user.create({
+        data: { email: "tfa-unverified@example.com", name: "U", role: "user" },
+      });
+      const sess = await testPrisma.userSession.create({
+        data: { userId: user.id, twoFactorVerifiedAt: null },
+      });
+      const token = {
+        email: "tfa-unverified@example.com",
+        role: "user",
+        permissionsVersion: user.permissionsVersion,
+        sessionId: sess.id,
+        twoFactorVerified: false,
+      };
+      const result = await callbacks.jwt({
+        token,
+        trigger: "update",
+        session: { twoFactorVerified: true },
+      });
+      expect(result.twoFactorVerified).toBe(false);
+    });
+
     // Does a full refresh when permissionsVersion changes in the database.
     test("refreshes permissions when permissionsVersion changes", async () => {
       const user = await testPrisma.user.create({

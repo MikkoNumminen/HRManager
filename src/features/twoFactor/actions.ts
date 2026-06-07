@@ -21,6 +21,19 @@ import {
   findMatchingRecoveryCode,
 } from "@/lib/totpCrypto";
 
+/**
+ * Record that 2FA was verified for the current login session. This server-side
+ * timestamp is the source of truth the JWT callback reads — a client cannot forge
+ * it via useSession().update(). No-op if the session id is missing (defensive).
+ */
+async function markSessionTwoFactorVerified(sessionId: string | undefined): Promise<void> {
+  if (!sessionId) return;
+  await prisma.userSession.updateMany({
+    where: { id: sessionId },
+    data: { twoFactorVerifiedAt: new Date() },
+  });
+}
+
 export interface TwoFactorSetupResult {
   uri: string;
   secret: string;
@@ -248,6 +261,7 @@ export async function verifyTwoFactorLogin(data: FormData): Promise<ActionResult
 
     const code = data.get("code")?.toString()?.trim();
     const userId = session.user.id;
+    const sessionId = session.user.sessionId;
 
     if (!code) {
       throw new ActionError("invalidTotpCode", t("invalidTotpCode"));
@@ -267,7 +281,8 @@ export async function verifyTwoFactorLogin(data: FormData): Promise<ActionResult
 
     // Try TOTP code first
     if (code.length === 6 && verifyTotpCode(secret, code)) {
-      // Success — verified via TOTP
+      // Record verification server-side — the JWT reads this, not a client claim.
+      await markSessionTwoFactorVerified(sessionId);
       return;
     }
 
@@ -291,6 +306,8 @@ export async function verifyTwoFactorLogin(data: FormData): Promise<ActionResult
         });
       });
 
+      // Record verification server-side — the JWT reads this, not a client claim.
+      await markSessionTwoFactorVerified(sessionId);
       return;
     }
 

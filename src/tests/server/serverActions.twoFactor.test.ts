@@ -420,6 +420,31 @@ describe("Two-Factor Authentication Server Actions", () => {
       expect(result).toBeUndefined();
     });
 
+    // Records server-side 2FA verification on the current session (the JWT reads this).
+    it("marks the current session twoFactorVerifiedAt on success", async () => {
+      const totp = generateTotpSecret(testUser.email);
+      const secret = getTotpBase32(totp);
+      const { encryptSecret } = require("@/lib/totpCrypto");
+      await testPrisma.twoFactorAuth.create({
+        data: {
+          userId: testUser.id,
+          encryptedSecret: encryptSecret(secret),
+          enabled: true,
+          recoveryCodes: [],
+        },
+      });
+      const sess = await testPrisma.userSession.create({ data: { userId: testUser.id } });
+      auth.mockResolvedValue({
+        user: { id: testUser.id, email: testUser.email, sessionId: sess.id },
+      });
+
+      const result = await verifyTwoFactorLogin(formData({ code: totp.generate() }));
+      expect(result).toBeUndefined();
+
+      const updated = await testPrisma.userSession.findUnique({ where: { id: sess.id } });
+      expect(updated!.twoFactorVerifiedAt).not.toBeNull();
+    });
+
     // Should accept a valid recovery code
     it("should accept a valid recovery code and remove it", async () => {
       const totp = generateTotpSecret(testUser.email);
