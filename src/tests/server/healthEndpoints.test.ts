@@ -12,6 +12,12 @@ jest.mock("@/mongoDb", () => ({
   getAuditLogCollection: () => ({ findOne: mockFindOne }),
 }));
 
+// Mock the logger so the readiness probe's error logging doesn't add noise.
+jest.mock("@/lib/logger", () => ({
+  __esModule: true,
+  default: { info: jest.fn(), warn: jest.fn(), error: jest.fn() },
+}));
+
 import { GET as healthGET } from "@/app/api/health/route";
 import { GET as readyGET } from "@/app/api/ready/route";
 
@@ -59,7 +65,9 @@ describe("/api/ready", () => {
     const body = await res.json();
     expect(body.status).toBe("degraded");
     expect(body.dependencies.postgres.status).toBe("error");
-    expect(body.dependencies.postgres.error).toBe("Connection refused");
+    // The raw DB error must not leak to the unauthenticated probe — generic only.
+    expect(body.dependencies.postgres.error).toBe("unreachable");
+    expect(JSON.stringify(body)).not.toContain("Connection refused");
   });
 
   // Returns 503 when MongoDB is down.
@@ -73,6 +81,8 @@ describe("/api/ready", () => {
     const body = await res.json();
     expect(body.status).toBe("degraded");
     expect(body.dependencies.mongodb.status).toBe("error");
+    expect(body.dependencies.mongodb.error).toBe("unreachable");
+    expect(JSON.stringify(body)).not.toContain("MongoNetworkError");
   });
 
   // Returns ok for MongoDB when MONGODB_URL is not configured (optional dependency).

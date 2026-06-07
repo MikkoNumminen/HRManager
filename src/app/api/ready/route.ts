@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/db";
 import { isMongoAvailable, getAuditLogCollection } from "@/mongoDb";
+import logger from "@/lib/logger";
 
 interface DependencyStatus {
   status: "ok" | "error";
@@ -39,11 +40,10 @@ async function checkPostgres(): Promise<DependencyStatus> {
     await prisma.$queryRaw`SELECT 1`;
     return { status: "ok", latencyMs: Date.now() - start };
   } catch (err) {
-    return {
-      status: "error",
-      latencyMs: Date.now() - start,
-      error: err instanceof Error ? err.message : "Unknown error",
-    };
+    // Log the real error server-side; the readiness probe is reachable unauthenticated,
+    // so don't leak raw DB internals (host, schema, driver details) in the response.
+    logger.error({ err }, "Readiness check: PostgreSQL unreachable");
+    return { status: "error", latencyMs: Date.now() - start, error: "unreachable" };
   }
 }
 
@@ -57,10 +57,7 @@ async function checkMongoDB(): Promise<DependencyStatus> {
     await col.findOne({}, { projection: { _id: 1 } });
     return { status: "ok", latencyMs: Date.now() - start };
   } catch (err) {
-    return {
-      status: "error",
-      latencyMs: Date.now() - start,
-      error: err instanceof Error ? err.message : "Unknown error",
-    };
+    logger.error({ err }, "Readiness check: MongoDB unreachable");
+    return { status: "error", latencyMs: Date.now() - start, error: "unreachable" };
   }
 }
