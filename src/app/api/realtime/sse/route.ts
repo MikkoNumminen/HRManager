@@ -11,6 +11,11 @@ export async function GET(request: Request): Promise<Response> {
   if (!session?.user) {
     return new Response("Unauthorized", { status: 401 });
   }
+  // This route is excluded from the proxy matcher, so the 2FA gate must live here:
+  // a 2FA-required user must not stream tenant events before verifying.
+  if (session.user.twoFactorRequired && !session.user.twoFactorVerified) {
+    return new Response("Two-factor authentication required", { status: 403 });
+  }
 
   const sessionId = await getDemoSessionId();
 
