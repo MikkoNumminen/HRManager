@@ -385,11 +385,12 @@ describe("Two-Factor Authentication Server Actions", () => {
   });
 
   describe("verifyTwoFactorLogin", () => {
-    // Should return early without error when 2FA is not enabled (line 270).
-    it("should return without error when 2FA is not enabled for user", async () => {
-      // No twoFactorAuth record exists — verifyTwoFactorLogin should just return undefined.
+    // Should fail loudly when 2FA is not enabled — silently returning success
+    // would let a stale "2FA required" JWT bypass verification after an admin reset.
+    it("should return twoFactorNotEnabled error when 2FA is not enabled for user", async () => {
+      // No twoFactorAuth record exists — verifyTwoFactorLogin must reject, not succeed.
       const result = await verifyTwoFactorLogin(formData({ code: "123456" }));
-      expect(result).toBeUndefined();
+      expect(result).toHaveProperty("code", "twoFactorNotEnabled");
     });
 
     // Should reject when code field is missing — invalidTotpCode (line 262).

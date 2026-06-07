@@ -257,8 +257,10 @@ export async function verifyTwoFactorLogin(data: FormData): Promise<ActionResult
       where: { userId },
     });
     if (!tfa?.enabled) {
-      // 2FA not enabled — nothing to verify
-      return;
+      // Fail loudly instead of silently returning success. A silent success here
+      // let a stale "2FA required" JWT mark itself verified after an admin reset
+      // (adminResetTwoFactor) deleted the 2FA row — i.e. an auth bypass.
+      throw new ActionError("twoFactorNotEnabled", t("twoFactorNotEnabled"));
     }
 
     const secret = decryptSecret(tfa.encryptedSecret);
