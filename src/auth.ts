@@ -114,7 +114,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return true;
     },
 
-    async jwt({ token, trigger, session: sessionUpdate, user }) {
+    async jwt({ token, trigger, user }) {
       if (!token.email) return token;
 
       // Persist demoSessionId from authorize() on sign-in
@@ -122,14 +122,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.demoSessionId = user.demoSessionId;
       }
 
-      // On sign-in, mark 2FA as not yet verified
+      // On sign-in, mark 2FA as not yet verified. From then on twoFactorVerified is
+      // derived from the server-side session record (see the session-validity check
+      // below) — never trusted from a client useSession().update() payload, which a
+      // user could call from the console to forge twoFactorVerified=true (CWE-602).
       if (trigger === "signIn") {
         token.twoFactorVerified = false;
-      }
-
-      // Handle session update from client (e.g., after 2FA verification)
-      if (trigger === "update" && sessionUpdate?.twoFactorVerified === true) {
-        token.twoFactorVerified = true;
       }
 
       // --- Session tracking: create a new UserSession on sign-in ---
@@ -169,13 +167,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (token.sessionId && trigger !== "signIn") {
         const sessionRecord = await prisma.userSession.findUnique({
           where: { id: token.sessionId as string },
-          select: { active: true },
+          select: { active: true, twoFactorVerifiedAt: true },
         });
         if (!sessionRecord || !sessionRecord.active) {
           // Session was deactivated (force logout or concurrent limit exceeded)
           // Clear the token to force re-authentication
           return {} as typeof token;
         }
+        // Derive 2FA verification from server-side state written by
+        // verifyTwoFactorLogin — the source of truth a client cannot forge.
+        token.twoFactorVerified = sessionRecord.twoFactorVerifiedAt !== null;
         // Update lastActiveAt (at most once per 60 seconds to avoid DB write storms)
         const now = Date.now();
         const lastUpdate = token.sessionLastUpdate as number | undefined;
