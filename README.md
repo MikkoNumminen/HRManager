@@ -389,20 +389,20 @@ npx prisma migrate dev        # apply schema migrations
 npm run dev                   # start dev server at localhost:3000
 ```
 
-| Variable                             | Required | Description                                                           |
-| ------------------------------------ | -------- | --------------------------------------------------------------------- |
-| `DATABASE_URL`                       | Yes      | PostgreSQL connection string                                          |
-| `MONGODB_URL`                        | Yes      | MongoDB connection string                                             |
-| `AUTH_SECRET`                        | Yes      | NextAuth secret (`npx auth secret` generates one)                     |
-| `AUTH_GOOGLE_ID`                     | No       | Google OAuth client ID                                                |
-| `AUTH_GOOGLE_SECRET`                 | No       | Google OAuth client secret                                            |
-| `AUTH_GITHUB_ID`                     | No       | GitHub OAuth client ID                                                |
-| `AUTH_GITHUB_SECRET`                 | No       | GitHub OAuth client secret                                            |
-| `AUDIT_HMAC_SECRET`                  | No       | HMAC key for audit log hash chain (auto-generated if missing)         |
-| `ANTHROPIC_API_KEY`                  | No       | Claude API key (for i18n translation agent)                           |
-| `OTEL_ENABLED`                       | No       | Set `true` to enable OpenTelemetry tracing + metrics                  |
-| `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` | No       | OTLP trace collector URL (default: `http://localhost:4318/v1/traces`) |
-| `NEXT_PUBLIC_REALTIME_TRANSPORT`     | No       | `sse` or `poll` (auto-detected: SSE local, poll on Vercel)            |
+| Variable                             | Required | Description                                                                                                                                |
+| ------------------------------------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `DATABASE_URL`                       | Yes      | PostgreSQL connection string                                                                                                               |
+| `MONGODB_URL`                        | Yes      | MongoDB connection string                                                                                                                  |
+| `AUTH_SECRET`                        | Yes      | NextAuth secret (`npx auth secret` generates one)                                                                                          |
+| `AUTH_GOOGLE_ID`                     | No       | Google OAuth client ID                                                                                                                     |
+| `AUTH_GOOGLE_SECRET`                 | No       | Google OAuth client secret                                                                                                                 |
+| `AUTH_GITHUB_ID`                     | No       | GitHub OAuth client ID                                                                                                                     |
+| `AUTH_GITHUB_SECRET`                 | No       | GitHub OAuth client secret                                                                                                                 |
+| `AUDIT_HMAC_SECRET`                  | Prod     | HMAC key for the audit-log hash chain. Required in production (the chain refuses to run with the built-in dev key); dev fallback otherwise |
+| `ANTHROPIC_API_KEY`                  | No       | Claude API key (for i18n translation agent)                                                                                                |
+| `OTEL_ENABLED`                       | No       | Set `true` to enable OpenTelemetry tracing + metrics                                                                                       |
+| `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` | No       | OTLP trace collector URL (default: `http://localhost:4318/v1/traces`)                                                                      |
+| `NEXT_PUBLIC_REALTIME_TRANSPORT`     | No       | `sse` or `poll` (auto-detected: SSE local, poll on Vercel)                                                                                 |
 
 ---
 
