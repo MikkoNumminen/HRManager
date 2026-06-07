@@ -55,6 +55,8 @@ export type ErrorCode =
   | "demoCannotManageUsers"
   | "cannotKickYourself"
   | "notAuthenticated"
+  // Data management
+  | "resetRequiresDemoSession"
   // CSV import
   | "csvNoFile"
   | "csvNotCsvFile"
