@@ -283,8 +283,11 @@ export async function reviewLeaveRequest(data: FormData): Promise<ActionResult> 
       });
       if (!request) throw new ActionError("leaveRequestNotFound", t("leaveRequestNotFound"));
 
-      await tx.leaveRequest.update({
-        where: { id },
+      // Atomic status transition. Guards against two reviewers (or a double-click)
+      // both seeing PENDING and both incrementing the balance: only the transition
+      // that actually flips PENDING -> action proceeds; the loser matches 0 rows.
+      const transition = await tx.leaveRequest.updateMany({
+        where: { id, deletedAt: null, sessionId, status: LeaveRequestStatus.PENDING },
         data: {
           status: action,
           reviewerId: reviewerIdStr,
@@ -292,10 +295,28 @@ export async function reviewLeaveRequest(data: FormData): Promise<ActionResult> 
           reviewedAt: new Date(),
         },
       });
+      if (transition.count === 0) {
+        throw new ActionError("leaveRequestNotFound", t("leaveRequestNotFound"));
+      }
 
-      // If approved, update the balance
+      // If approved, update the balance — re-checking capacity at approval time, since
+      // the create-time check can be stale once other requests have been approved.
       if (action === LeaveRequestStatus.APPROVED) {
         const year = request.startDate.getFullYear();
+        const existing = await tx.leaveBalance.findUnique({
+          where: {
+            personId_leaveTypeId_year: {
+              personId: request.personId,
+              leaveTypeId: request.leaveTypeId,
+              year,
+            },
+          },
+        });
+        // Mirror the create-time check: only an existing balance caps the request
+        // (no balance row means the type is uncapped, e.g. unpaid leave).
+        if (existing && existing.allocated - existing.used < request.days) {
+          throw new ActionError("insufficientLeaveBalance", t("insufficientLeaveBalance"));
+        }
         await tx.leaveBalance.upsert({
           where: {
             personId_leaveTypeId_year: {

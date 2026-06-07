@@ -707,6 +707,65 @@ describe("reviewLeaveRequest", () => {
     expect(balance!.allocated).toBe(0); // defaultDays is 0 for Unpaid
   });
 
+  // Reviewing an already-decided request must not increment the balance again
+  // (guards the concurrent-reviewer / double-click double-deduct race).
+  test("does not double-increment the balance when reviewed twice", async () => {
+    const person = await createTestPerson({ name: "Frank" });
+    const lt = await createTestLeaveType({ name: "Annual", defaultDays: 20 });
+    await createTestBalance(person.id, lt.id, { year: 2026, allocated: 20 });
+    const request = await testPrisma.leaveRequest.create({
+      data: {
+        personId: person.id,
+        leaveTypeId: lt.id,
+        startDate: new Date("2026-07-01"),
+        endDate: new Date("2026-07-03"),
+        days: 3,
+        status: "PENDING",
+        sessionId: null,
+      },
+    });
+
+    expect(
+      await reviewLeaveRequest(formData({ id: request.id, action: "APPROVED" })),
+    ).toBeUndefined();
+    const second = await reviewLeaveRequest(formData({ id: request.id, action: "APPROVED" }));
+    expect(second).toHaveProperty("code", "leaveRequestNotFound");
+
+    const balance = await testPrisma.leaveBalance.findUnique({
+      where: { personId_leaveTypeId_year: { personId: person.id, leaveTypeId: lt.id, year: 2026 } },
+    });
+    expect(balance!.used).toBe(3); // not 6
+  });
+
+  // Approval is rejected (and the request stays PENDING) when it would exceed an
+  // existing balance — capacity is re-checked at approval, not only at creation.
+  test("rejects approval that would exceed an existing balance", async () => {
+    const person = await createTestPerson({ name: "Grace" });
+    const lt = await createTestLeaveType({ name: "Annual", defaultDays: 20 });
+    await createTestBalance(person.id, lt.id, { year: 2026, allocated: 5, used: 4 });
+    const request = await testPrisma.leaveRequest.create({
+      data: {
+        personId: person.id,
+        leaveTypeId: lt.id,
+        startDate: new Date("2026-07-01"),
+        endDate: new Date("2026-07-05"),
+        days: 3,
+        status: "PENDING",
+        sessionId: null,
+      },
+    });
+
+    const result = await reviewLeaveRequest(formData({ id: request.id, action: "APPROVED" }));
+    expect(result).toHaveProperty("code", "insufficientLeaveBalance");
+
+    const after = await testPrisma.leaveRequest.findUnique({ where: { id: request.id } });
+    expect(after!.status).toBe("PENDING");
+    const balance = await testPrisma.leaveBalance.findUnique({
+      where: { personId_leaveTypeId_year: { personId: person.id, leaveTypeId: lt.id, year: 2026 } },
+    });
+    expect(balance!.used).toBe(4); // unchanged
+  });
+
   // Rejects invalid action value.
   test("rejects invalid action value", async () => {
     const person = await createTestPerson({ name: "Eve" });
