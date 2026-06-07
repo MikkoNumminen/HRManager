@@ -137,6 +137,7 @@ test("audit export worker returns JSON format", async () => {
       id: "job-4",
       data: {
         userId: "user-1",
+        sessionId: null,
         filters: { action: "create" },
         format: "json",
       },
@@ -148,6 +149,10 @@ test("audit export worker returns JSON format", async () => {
   expect(parsed).toHaveLength(1);
   expect(parsed[0].action).toBe("create");
   expect(parsed[0].entityType).toBe("person");
+  // Org-wide export is scoped to sessionId: null, not an unscoped {} query.
+  expect(mockFindFn).toHaveBeenCalledWith(
+    expect.objectContaining({ sessionId: null, action: "create" }),
+  );
 });
 
 // Audit export worker returns CSV format
@@ -177,6 +182,7 @@ test("audit export worker returns CSV format", async () => {
       id: "job-5",
       data: {
         userId: "user-1",
+        sessionId: "demo-session-1",
         filters: {},
         format: "csv",
       },
@@ -186,6 +192,8 @@ test("audit export worker returns CSV format", async () => {
   expect(result.count).toBe(1);
   expect(result.result).toContain("id,userId,userEmail,action,entityType");
   expect(result.result).toContain("create");
+  // A demo caller's export is scoped to their session only — no cross-tenant leak.
+  expect(mockFindFn).toHaveBeenCalledWith(expect.objectContaining({ sessionId: "demo-session-1" }));
 });
 
 // Audit export worker returns empty when MongoDB is unavailable
@@ -201,6 +209,7 @@ test("audit export worker returns empty when MongoDB unavailable", async () => {
       id: "job-6",
       data: {
         userId: "user-1",
+        sessionId: null,
         filters: {},
         format: "json",
       },

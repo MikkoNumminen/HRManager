@@ -17,7 +17,7 @@ export function registerAuditExportWorker(boss: PgBoss): void {
     async (jobs: Job<AuditExportJobData>[]) => {
       // pg-boss delivers jobs as an array; process the first one
       const job = jobs[0];
-      const { filters, format } = job.data;
+      const { filters, format, sessionId } = job.data;
       const log = logger.child({ jobId: job.id, queue: QUEUE_NAMES.AUDIT_EXPORT, format });
 
       log.info("Audit export job started");
@@ -27,7 +27,9 @@ export function registerAuditExportWorker(boss: PgBoss): void {
         return { result: format === "json" ? "[]" : "", count: 0 };
       }
 
-      const query: Filter<AuditLogDocument> = {};
+      // Scope to the tenant captured at enqueue time. Without this the query
+      // started as {} and exported every tenant's audit logs (cross-tenant leak).
+      const query: Filter<AuditLogDocument> = { sessionId };
 
       if (filters.dateFrom || filters.dateTo) {
         query.createdAt = {};
