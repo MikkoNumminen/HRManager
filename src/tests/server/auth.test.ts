@@ -171,6 +171,26 @@ describe("auth.ts callbacks", () => {
       expect(result.permissions).toEqual({ "person:read": true });
     });
 
+    // twoFactorRequired is refreshed on the lightweight path, so enabling 2FA takes
+    // effect on the next request without waiting for a full token refresh.
+    test("refreshes twoFactorRequired on the lightweight path", async () => {
+      const user = await testPrisma.user.create({
+        data: { email: "tfa-lightweight@example.com", name: "L", role: "user" },
+      });
+      await testPrisma.twoFactorAuth.create({
+        data: { userId: user.id, encryptedSecret: "x", enabled: true, recoveryCodes: [] },
+      });
+      // Token already has role + permissionsVersion → lightweight path runs.
+      const token = {
+        email: "tfa-lightweight@example.com",
+        role: "user",
+        permissionsVersion: user.permissionsVersion,
+        twoFactorRequired: false,
+      };
+      const result = await callbacks.jwt({ token, trigger: undefined });
+      expect(result.twoFactorRequired).toBe(true);
+    });
+
     // Clears token fields when user is not found (e.g. kicked out).
     test("clears token when user not found in database", async () => {
       const token = {

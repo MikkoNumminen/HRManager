@@ -237,10 +237,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }));
         token.permissions = await resolvePermissions(dbUser.role, overrides);
       } else {
-        // Lightweight check: only fetch version to detect permission changes
+        // Lightweight check: fetch version to detect permission changes, plus the
+        // 2FA-enabled flag so twoFactorRequired stays current without a full refresh.
         const dbUser = await prisma.user.findUnique({
           where: { email: token.email },
-          select: { id: true, role: true, permissionsVersion: true },
+          select: {
+            id: true,
+            role: true,
+            permissionsVersion: true,
+            twoFactorAuth: { select: { enabled: true } },
+          },
         });
 
         if (!dbUser) {
@@ -250,6 +256,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           delete token.permissionsVersion;
           return token;
         }
+
+        // Keep 2FA-required in sync on the lightweight path too, so enabling or
+        // disabling 2FA takes effect on the next request — not only a full refresh.
+        token.twoFactorRequired = dbUser.twoFactorAuth?.enabled ?? false;
 
         if (dbUser.permissionsVersion !== token.permissionsVersion || dbUser.role !== token.role) {
           // Permissions or role changed — full refresh
