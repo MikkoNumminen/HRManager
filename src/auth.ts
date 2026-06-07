@@ -186,8 +186,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               where: { id: token.sessionId as string },
               data: { lastActiveAt: new Date() },
             })
-            .catch(() => {
-              // Non-critical — don't fail the request if lastActiveAt update fails
+            .catch((err) => {
+              // Non-critical — don't fail the request, but surface it for debugging.
+              // console (not the pino logger) keeps this edge-runtime safe.
+              console.warn("[auth] failed to update session lastActiveAt:", err);
             });
           token.sessionLastUpdate = now;
         }

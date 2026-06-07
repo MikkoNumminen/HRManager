@@ -98,13 +98,16 @@ export async function confirmTwoFactorSetup(data: FormData): Promise<ActionResul
       throw new ActionError("invalidTotpCode", t("invalidTotpCode"));
     }
 
-    // Parse recovery codes
+    // Parse recovery codes. Fail loudly on a malformed payload instead of silently
+    // enabling 2FA with zero recovery codes (which would leave the user no fallback).
     let recoveryCodes: string[] = [];
     if (recoveryCodesJson) {
       try {
-        recoveryCodes = JSON.parse(recoveryCodesJson) as string[];
+        const parsed = JSON.parse(recoveryCodesJson);
+        if (!Array.isArray(parsed)) throw new Error("recovery codes must be an array");
+        recoveryCodes = parsed.filter((c): c is string => typeof c === "string");
       } catch {
-        // Ignore parse errors — codes were already shown to user
+        throw new ActionError("unexpectedError", t("unexpectedError"));
       }
     }
 
