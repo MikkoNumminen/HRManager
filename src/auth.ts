@@ -5,7 +5,7 @@ import Credentials from "next-auth/providers/credentials";
 import { prisma } from "@/db";
 import { resolvePermissions } from "@/permissions";
 import { seedDemoData, cleanupStaleDemoSessions } from "@/demoSession";
-import { DEMO_EMAIL } from "@/constants";
+import { DEMO_EMAIL, isDemoLoginEnabled } from "@/constants";
 import { MAX_CONCURRENT_SESSIONS } from "@/features/sessions/schemas";
 import { headers } from "next/headers";
 
@@ -28,51 +28,51 @@ async function getRequestMeta(): Promise<{ ipAddress: string | null; userAgent: 
   }
 }
 
-// Demo login is enabled by default so the demo works out of the box.
-// Set NEXT_PUBLIC_DEMO_LOGIN=false to disable the zero-credential demo provider.
-// Uses NEXT_PUBLIC_ prefix so the client can conditionally show the demo login button.
-const demoProvider =
-  process.env.NEXT_PUBLIC_DEMO_LOGIN !== "false"
-    ? [
-        Credentials({
-          id: "demo",
-          name: "Demo",
-          credentials: {},
-          async authorize() {
-            let user = await prisma.user.findUnique({ where: { email: DEMO_EMAIL } });
-            if (!user) {
-              // First demo login — create with superuser so the demo is fully functional.
-              // Subsequent logins respect whatever role admins have assigned.
-              user = await prisma.user.create({
-                data: {
-                  email: DEMO_EMAIL,
-                  name: "Demo User",
-                  role: "superuser",
-                },
-              });
-            }
-
-            const demoSession = await prisma.demoSession.create({
-              data: { userId: user.id },
+// Demo login is OFF by default. Set NEXT_PUBLIC_DEMO_LOGIN=true to enable the
+// zero-credential demo provider (e.g. on the public demo deployment). Defaulting
+// to off means a deployment that forgets the flag never ships a one-click
+// superuser login. The NEXT_PUBLIC_ prefix lets the client gate the button to match.
+const demoProvider = isDemoLoginEnabled()
+  ? [
+      Credentials({
+        id: "demo",
+        name: "Demo",
+        credentials: {},
+        async authorize() {
+          let user = await prisma.user.findUnique({ where: { email: DEMO_EMAIL } });
+          if (!user) {
+            // First demo login — create with superuser so the demo is fully functional.
+            // Subsequent logins respect whatever role admins have assigned.
+            user = await prisma.user.create({
+              data: {
+                email: DEMO_EMAIL,
+                name: "Demo User",
+                role: "superuser",
+              },
             });
+          }
 
-            await seedDemoData(demoSession.id);
+          const demoSession = await prisma.demoSession.create({
+            data: { userId: user.id },
+          });
 
-            // Clean up stale sessions in the background — don't block login
-            cleanupStaleDemoSessions().catch((err) => {
-              console.error("[demoSession] cleanupStaleDemoSessions failed:", err);
-            });
+          await seedDemoData(demoSession.id);
 
-            return {
-              id: user.id,
-              email: user.email,
-              name: user.name,
-              demoSessionId: demoSession.id,
-            };
-          },
-        }),
-      ]
-    : [];
+          // Clean up stale sessions in the background — don't block login
+          cleanupStaleDemoSessions().catch((err) => {
+            console.error("[demoSession] cleanupStaleDemoSessions failed:", err);
+          });
+
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            demoSessionId: demoSession.id,
+          };
+        },
+      }),
+    ]
+  : [];
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [Google, GitHub, ...demoProvider],

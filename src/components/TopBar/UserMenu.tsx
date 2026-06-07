@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import { avatarStyles, colors, userMenuItemStyles, userMenuStyles } from "@/muiStyles";
 import { signIn } from "next-auth/react";
-import { DEMO_EMAIL } from "@/constants";
+import { DEMO_EMAIL, isDemoLoginEnabled } from "@/constants";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import NavMenu from "./NavMenu";
@@ -40,7 +40,7 @@ export default function UserMenu({
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const menuOpen = Boolean(anchorEl);
   const user = session?.user;
-  const demoEnabled = process.env.NEXT_PUBLIC_DEMO_LOGIN !== "false";
+  const demoEnabled = isDemoLoginEnabled();
 
   const initials = user?.name
     ? user.name
