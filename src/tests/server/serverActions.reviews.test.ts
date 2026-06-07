@@ -836,7 +836,9 @@ describe("submitReview", () => {
       },
     });
 
-    const answers = JSON.stringify([{ questionId: "q1", ratingValue: 4, textValue: null }]);
+    const answers = JSON.stringify([
+      { questionId: crypto.randomUUID(), ratingValue: 4, textValue: null },
+    ]);
 
     await submitReview(formData({ requestId: request.id, answers }));
 
@@ -845,6 +847,62 @@ describe("submitReview", () => {
 
     const submissions = await testPrisma.reviewSubmission.findMany();
     expect(submissions).toHaveLength(1);
+  });
+
+  // Out-of-range ratings must be rejected before hitting the JSON column.
+  test("rejects answers with an out-of-range rating", async () => {
+    const cycle = await testPrisma.reviewCycle.create({
+      data: { name: "C", startDate: new Date(), endDate: new Date(), status: "OPEN" },
+    });
+    const request = await testPrisma.reviewRequest.create({
+      data: { cycleId: cycle.id, type: "SELF", status: "PENDING" },
+    });
+    const answers = JSON.stringify([
+      { questionId: crypto.randomUUID(), ratingValue: 99, textValue: null },
+    ]);
+
+    const result = await submitReview(formData({ requestId: request.id, answers }));
+
+    expect(result).toHaveProperty("code", "ratingOutOfRange");
+    const updated = await testPrisma.reviewRequest.findUnique({ where: { id: request.id } });
+    expect(updated!.status).toBe("PENDING");
+  });
+
+  // A required template question that is left unanswered must be rejected.
+  test("rejects submission missing a required question", async () => {
+    const qId = crypto.randomUUID();
+    const template = await testPrisma.reviewTemplate.create({
+      data: {
+        name: "T",
+        questions: [
+          {
+            id: qId,
+            text: "Q",
+            type: "TEXT",
+            scaleMin: null,
+            scaleMax: null,
+            order: 0,
+            required: true,
+          },
+        ],
+      },
+    });
+    const cycle = await testPrisma.reviewCycle.create({
+      data: {
+        name: "C",
+        templateId: template.id,
+        startDate: new Date(),
+        endDate: new Date(),
+        status: "OPEN",
+      },
+    });
+    const request = await testPrisma.reviewRequest.create({
+      data: { cycleId: cycle.id, type: "SELF", status: "PENDING" },
+    });
+
+    const result = await submitReview(formData({ requestId: request.id, answers: "[]" }));
+
+    expect(result).toHaveProperty("code", "answerRequired");
   });
 
   // A review that has already been submitted must not be submitted again.

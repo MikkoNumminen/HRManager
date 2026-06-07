@@ -1,10 +1,11 @@
 "use server";
+import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { ActionError } from "@/actionErrors";
 import { getDemoSessionId } from "@/demoSession";
 import { MAX_NAME_LENGTH } from "@/schemas/shared";
-import { type ReviewQuestion } from "./schemas";
-import { type ActionResult } from "@/lib/actionUtils";
+import { type ReviewQuestion, ReviewAnswerSchema, MAX_QUESTION_TEXT_LENGTH } from "./schemas";
+import { type ActionResult, validateUUID } from "@/lib/actionUtils";
 import { guardedAction } from "@/lib/guardedAction";
 import { withAuditedTransaction } from "@/lib/auditedTransaction";
 
@@ -98,6 +99,9 @@ export const addReviewQuestion: (data: FormData) => Promise<ActionResult> = guar
     if (typeof text !== "string" || text.trim().length === 0) {
       throw new ActionError("invalidName", t("invalidName"));
     }
+    if (text.trim().length > MAX_QUESTION_TEXT_LENGTH) {
+      throw new ActionError("nameTooLong", t("nameTooLong", { max: MAX_QUESTION_TEXT_LENGTH }));
+    }
     if (type !== "RATING" && type !== "TEXT") {
       throw new ActionError("invalidQuestionType", t("invalidQuestionType"));
     }
@@ -105,6 +109,14 @@ export const addReviewQuestion: (data: FormData) => Promise<ActionResult> = guar
     const scaleMin = scaleMinRaw ? parseInt(String(scaleMinRaw), 10) : null;
     const scaleMax = scaleMaxRaw ? parseInt(String(scaleMaxRaw), 10) : null;
     const required = requiredRaw !== "false";
+
+    if (type === "RATING") {
+      const min = scaleMin ?? 1;
+      const max = scaleMax ?? 5;
+      if (!Number.isInteger(min) || !Number.isInteger(max) || min < 1 || max > 10 || min >= max) {
+        throw new ActionError("ratingOutOfRange", t("ratingOutOfRange"));
+      }
+    }
 
     const sessionId = await getDemoSessionId();
     await withAuditedTransaction(async (tx, addAudit) => {
@@ -213,6 +225,7 @@ export const createReviewCycle: (data: FormData) => Promise<ActionResult> = guar
 
     const resolvedTemplateId =
       typeof templateId === "string" && templateId.trim() ? templateId.trim() : null;
+    if (resolvedTemplateId) validateUUID(resolvedTemplateId, "templateId");
 
     const sessionId = await getDemoSessionId();
     await withAuditedTransaction(async (tx, addAudit) => {
@@ -372,6 +385,9 @@ export const addReviewRequest: (data: FormData) => Promise<ActionResult> = guard
     if (!["SELF", "MANAGER", "PEER", "DIRECT_REPORT"].includes(String(type))) {
       throw new ActionError("unexpectedError", t("unexpectedError"));
     }
+    validateUUID(cycleId, "cycleId");
+    validateUUID(subjectId, "subjectId");
+    validateUUID(reviewerId, "reviewerId");
 
     const sessionId = await getDemoSessionId();
     await withAuditedTransaction(async (tx, addAudit) => {
@@ -431,6 +447,11 @@ export const removeReviewRequest: (data: FormData) => Promise<ActionResult> = gu
         where: { id: requestId, sessionId },
       });
       if (!req) throw new ActionError("reviewRequestNotFound", t("reviewRequestNotFound"));
+      // A submitted request owns a ReviewSubmission and the FK is onDelete: Cascade,
+      // so deleting it would silently destroy the submitted answers. Refuse instead.
+      if (req.status === "SUBMITTED") {
+        throw new ActionError("reviewAlreadySubmitted", t("reviewAlreadySubmitted"));
+      }
 
       await tx.reviewRequest.delete({ where: { id: requestId } });
 
@@ -458,18 +479,19 @@ export const submitReview: (data: FormData) => Promise<ActionResult> = guardedAc
       throw new ActionError("unexpectedError", t("unexpectedError"));
     }
 
-    let answers: Array<{
-      questionId: string;
-      ratingValue: number | null;
-      textValue: string | null;
-    }> = [];
+    let rawAnswers: unknown = [];
     if (typeof answersRaw === "string") {
       try {
-        answers = JSON.parse(answersRaw);
+        rawAnswers = JSON.parse(answersRaw);
       } catch {
         throw new ActionError("unexpectedError", t("unexpectedError"));
       }
     }
+    // Validate shape before persisting to the JSON column: UUID questionIds,
+    // ratings 1-10, text <= 2000 chars, unknown keys stripped, count capped.
+    const parsedAnswers = z.array(ReviewAnswerSchema).max(200).safeParse(rawAnswers);
+    if (!parsedAnswers.success) throw new ActionError("ratingOutOfRange", t("ratingOutOfRange"));
+    const answers = parsedAnswers.data;
 
     const sessionId = await getDemoSessionId();
     await withAuditedTransaction(async (tx, addAudit) => {
@@ -482,6 +504,30 @@ export const submitReview: (data: FormData) => Promise<ActionResult> = guardedAc
         throw new ActionError("reviewAlreadySubmitted", t("reviewAlreadySubmitted"));
       if (req.cycle.status !== "OPEN")
         throw new ActionError("reviewCycleNotOpen", t("reviewCycleNotOpen"));
+
+      // Cross-check answers against the cycle's template: each answer must target a
+      // real question, and every required question must be answered.
+      const template = req.cycle.templateId
+        ? await tx.reviewTemplate.findFirst({ where: { id: req.cycle.templateId, sessionId } })
+        : null;
+      const questions = Array.isArray(template?.questions)
+        ? (template!.questions as ReviewQuestion[])
+        : [];
+      const questionIds = new Set(questions.map((q) => q.id));
+      const answeredIds = new Set(answers.map((a) => a.questionId));
+      // Only cross-check membership when the cycle has a template defining questions.
+      if (questions.length > 0) {
+        for (const a of answers) {
+          if (!questionIds.has(a.questionId)) {
+            throw new ActionError("unexpectedError", t("unexpectedError"));
+          }
+        }
+      }
+      for (const q of questions) {
+        if (q.required && !answeredIds.has(q.id)) {
+          throw new ActionError("answerRequired", t("answerRequired"));
+        }
+      }
 
       const submission = await tx.reviewSubmission.create({
         data: {
