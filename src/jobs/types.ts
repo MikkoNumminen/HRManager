@@ -11,6 +11,10 @@ export type CleanupJobData = z.infer<typeof CleanupJobDataSchema>;
 /** Data payload for audit-export queue jobs. */
 export const AuditExportJobDataSchema = z.object({
   userId: z.string(),
+  // Tenant scope captured at enqueue time: the demo session id, or null for
+  // org-wide logs. The worker has no request context, so it must filter the
+  // MongoDB query by this value — otherwise the export spans every tenant.
+  sessionId: z.string().nullable(),
   filters: z.object({
     dateFrom: z.string().optional(),
     dateTo: z.string().optional(),

@@ -8,6 +8,7 @@ import type { CleanupJobData, AuditExportJobData } from "@/jobs/types";
 import { CleanupJobDataSchema, AuditExportJobDataSchema } from "@/jobs/types";
 import { safe, validateUUID, type ActionResult } from "@/lib/actionUtils";
 import { auth } from "@/auth";
+import { getDemoSessionId } from "@/demoSession";
 import { ActionError } from "@/actionErrors";
 
 /** Enqueue a cleanup job (rate-limits, demo-sessions, or all). */
@@ -47,6 +48,9 @@ export async function enqueueAuditExportJob(data: {
 
     const parsed = AuditExportJobDataSchema.parse({
       userId: session.user.id,
+      // Scope the export to the caller's tenant (demo session, or null org-wide)
+      // so the background worker can't read another tenant's audit logs.
+      sessionId: await getDemoSessionId(),
       ...data,
     });
 
