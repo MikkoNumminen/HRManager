@@ -525,7 +525,8 @@
     "invalidTotpCode": "유효하지 않은 인증 코드입니다. 다시 시도해 주세요.",
     "invalidTotpSecret": "유효하지 않은 TOTP 비밀키",
     "twoFactorAlreadyEnabled": "이중 인증이 이미 활성화되어 있습니다",
-    "twoFactorNotEnabled": "이중 인증이 활성화되어 있지 않습니다"
+    "twoFactorNotEnabled": "이중 인증이 활성화되어 있지 않습니다",
+    "resetRequiresDemoSession": "Resetting all data is only available within a demo session"
   },
   "reviews": {
     "title": "성과 평가",

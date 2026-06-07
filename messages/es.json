@@ -525,7 +525,8 @@
     "invalidTotpCode": "Código de verificación no válido. Por favor, inténtelo de nuevo.",
     "invalidTotpSecret": "Secreto TOTP no válido",
     "twoFactorAlreadyEnabled": "La autenticación de dos factores ya está habilitada",
-    "twoFactorNotEnabled": "La autenticación de dos factores no está habilitada"
+    "twoFactorNotEnabled": "La autenticación de dos factores no está habilitada",
+    "resetRequiresDemoSession": "Resetting all data is only available within a demo session"
   },
   "reviews": {
     "title": "Evaluaciones de desempeño",

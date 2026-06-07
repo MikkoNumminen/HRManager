@@ -525,7 +525,8 @@
     "invalidTotpCode": "Nambari ya uthibitishaji si sahihi. Tafadhali jaribu tena.",
     "invalidTotpSecret": "Siri ya TOTP si sahihi",
     "twoFactorAlreadyEnabled": "Uthibitishaji wa hatua mbili umewashwa tayari",
-    "twoFactorNotEnabled": "Uthibitishaji wa hatua mbili haujawashwa"
+    "twoFactorNotEnabled": "Uthibitishaji wa hatua mbili haujawashwa",
+    "resetRequiresDemoSession": "Resetting all data is only available within a demo session"
   },
   "reviews": {
     "title": "Tathmini za Utendaji",

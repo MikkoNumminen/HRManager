@@ -91,24 +91,49 @@ describe("resetAll", () => {
   beforeEach(() => cleanDb(), 30_000);
   afterAll(() => cleanDb(), 30_000);
 
-  // The nuclear option: wipe everything — all people, all teams, all memberships.
-  // Used for starting fresh. Verify every table is empty afterward.
-  test("deletes all persons, teams, and team members", async () => {
-    const person = await createTestPerson({ name: "Alice", email: "alice@test.com" });
-    const team = await createTestTeam({ teamName: "Team A" });
+  afterEach(() => mockGetDemoSessionId.mockResolvedValue(null));
+
+  // Demo sandbox reset: deletes only the caller's demo-session rows (including
+  // their team memberships), never org-wide data.
+  test("deletes only the demo session's records, preserving org-wide data", async () => {
+    mockGetDemoSessionId.mockResolvedValue("demo-session-1");
+    const orgPerson = await createTestPerson({ name: "Org", email: "org@test.com" });
+    const demoPerson = await createTestPerson({
+      name: "Demo",
+      email: "demo@test.com",
+      sessionId: "demo-session-1",
+    });
+    const demoTeam = await createTestTeam({ teamName: "Demo Team", sessionId: "demo-session-1" });
     await testPrisma.teamMember.create({
-      data: { personId: person.id, teamId: team.teamId },
+      data: { personId: demoPerson.id, teamId: demoTeam.teamId, sessionId: "demo-session-1" },
     });
 
-    await resetAll();
+    const result = await resetAll();
 
-    expect(await testPrisma.person.findMany()).toHaveLength(0);
-    expect(await testPrisma.team.findMany()).toHaveLength(0);
-    expect(await testPrisma.teamMember.findMany()).toHaveLength(0);
+    expect(result).toBeUndefined();
+    expect(await testPrisma.person.findUnique({ where: { id: demoPerson.id } })).toBeNull();
+    expect(await testPrisma.team.findUnique({ where: { teamId: demoTeam.teamId } })).toBeNull();
+    expect(await testPrisma.person.findUnique({ where: { id: orgPerson.id } })).not.toBeNull();
   });
 
-  // Resetting an already empty database should just work without complaining.
-  test("succeeds on empty database", async () => {
+  // Critical guard: outside a demo session getDemoSessionId() returns null, which
+  // would turn `where: { sessionId: null }` into an org-wide wipe. resetAll must
+  // refuse and leave production data untouched.
+  test("refuses outside a demo session and leaves org-wide data intact", async () => {
+    mockGetDemoSessionId.mockResolvedValue(null);
+    const orgPerson = await createTestPerson({ name: "Alice", email: "alice@test.com" });
+    const orgTeam = await createTestTeam({ teamName: "Team A" });
+
+    const result = await resetAll();
+
+    expect(result).toHaveProperty("code", "resetRequiresDemoSession");
+    expect(await testPrisma.person.findUnique({ where: { id: orgPerson.id } })).not.toBeNull();
+    expect(await testPrisma.team.findUnique({ where: { teamId: orgTeam.teamId } })).not.toBeNull();
+  });
+
+  // An empty demo session resets cleanly without complaining.
+  test("succeeds on an empty demo session", async () => {
+    mockGetDemoSessionId.mockResolvedValue("demo-session-1");
     expect(await resetAll()).toBeUndefined();
   });
 });

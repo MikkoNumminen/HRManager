@@ -525,7 +525,8 @@
     "invalidTotpCode": "Ogiltig verifieringskod. Försök igen.",
     "invalidTotpSecret": "Ogiltigt TOTP-hemligt",
     "twoFactorAlreadyEnabled": "Tvåfaktorsautentisering är redan aktiverad",
-    "twoFactorNotEnabled": "Tvåfaktorsautentisering är inte aktiverad"
+    "twoFactorNotEnabled": "Tvåfaktorsautentisering är inte aktiverad",
+    "resetRequiresDemoSession": "Resetting all data is only available within a demo session"
   },
   "reviews": {
     "title": "Prestationsbedömningar",

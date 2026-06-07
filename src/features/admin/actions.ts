@@ -26,8 +26,16 @@ import {
 export const resetAll: () => Promise<ActionResult> = guardedAction(
   "data:reset",
   "resetAll",
-  async () => {
+  async (t) => {
     const sessionId = await getDemoSessionId();
+    if (!sessionId) {
+      // resetAll deletes every row matching `where: { sessionId }`. For a non-demo
+      // caller getDemoSessionId() is null, which would hard-delete every org-wide
+      // row (sessionId IS NULL) while the audit log captures only row counts —
+      // unrecoverable. This destructive reset is the demo sandbox's "start fresh"
+      // action, so refuse it outside a demo session.
+      throw new ActionError("resetRequiresDemoSession", t("resetRequiresDemoSession"));
+    }
     await withAuditedTransaction(async (tx, addAudit) => {
       const sessionWhere = { sessionId };
       const counts = {

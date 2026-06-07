@@ -525,7 +525,8 @@
     "invalidTotpCode": "Geçersiz doğrulama kodu. Lütfen tekrar deneyin.",
     "invalidTotpSecret": "Geçersiz TOTP gizli anahtarı",
     "twoFactorAlreadyEnabled": "İki faktörlü kimlik doğrulama zaten etkin",
-    "twoFactorNotEnabled": "İki faktörlü kimlik doğrulama etkin değil"
+    "twoFactorNotEnabled": "İki faktörlü kimlik doğrulama etkin değil",
+    "resetRequiresDemoSession": "Resetting all data is only available within a demo session"
   },
   "reviews": {
     "title": "Performans Değerlendirmeleri",

@@ -525,7 +525,8 @@
     "invalidTotpCode": "Невірний код підтвердження. Будь ласка, спробуйте ще раз.",
     "invalidTotpSecret": "Невірний секрет TOTP",
     "twoFactorAlreadyEnabled": "Двофакторна автентифікація вже увімкнена",
-    "twoFactorNotEnabled": "Двофакторна автентифікація не увімкнена"
+    "twoFactorNotEnabled": "Двофакторна автентифікація не увімкнена",
+    "resetRequiresDemoSession": "Resetting all data is only available within a demo session"
   },
   "reviews": {
     "title": "Оцінка ефективності",

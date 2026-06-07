@@ -487,7 +487,8 @@
     "invalidTotpCode": "Invalid verification code. Please try again.",
     "invalidTotpSecret": "Invalid TOTP secret",
     "twoFactorAlreadyEnabled": "Two-factor authentication is already enabled",
-    "twoFactorNotEnabled": "Two-factor authentication is not enabled"
+    "twoFactorNotEnabled": "Two-factor authentication is not enabled",
+    "resetRequiresDemoSession": "Resetting all data is only available within a demo session"
   },
   "tutorial": {
     "checklistTitle": "Demo Tour",
