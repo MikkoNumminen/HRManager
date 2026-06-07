@@ -204,3 +204,52 @@ describe("verifyChain", () => {
     expect(result.verifiedEntries).toBe(1);
   });
 });
+
+describe("getHmacSecret production safety", () => {
+  const ORIGINAL_NODE_ENV = process.env.NODE_ENV;
+  const ORIGINAL_SECRET = process.env.AUDIT_HMAC_SECRET;
+
+  const sampleDoc = {
+    userId: null,
+    userEmail: null,
+    action: "create",
+    entityType: "person",
+    entityId: null,
+    before: null,
+    after: null,
+    sessionId: null,
+    createdAt: new Date("2026-01-01T00:00:00Z"),
+    prevHash: null,
+  };
+
+  afterEach(() => {
+    process.env.NODE_ENV = ORIGINAL_NODE_ENV;
+    if (ORIGINAL_SECRET === undefined) {
+      delete process.env.AUDIT_HMAC_SECRET;
+    } else {
+      process.env.AUDIT_HMAC_SECRET = ORIGINAL_SECRET;
+    }
+  });
+
+  // In production a missing secret must fail closed rather than silently using
+  // the world-readable dev key, which would make tamper detection meaningless.
+  test("computeHash throws in production when AUDIT_HMAC_SECRET is unset", () => {
+    process.env.NODE_ENV = "production";
+    delete process.env.AUDIT_HMAC_SECRET;
+    expect(() => computeHash(sampleDoc)).toThrow(/AUDIT_HMAC_SECRET/);
+  });
+
+  // With the secret provided, production hashing works normally.
+  test("computeHash works in production when AUDIT_HMAC_SECRET is set", () => {
+    process.env.NODE_ENV = "production";
+    process.env.AUDIT_HMAC_SECRET = "a-strong-production-secret";
+    expect(computeHash(sampleDoc)).toMatch(/^[0-9a-f]{64}$/);
+  });
+
+  // Outside production the dev fallback keeps local dev and tests working.
+  test("falls back to the dev key outside production", () => {
+    process.env.NODE_ENV = "test";
+    delete process.env.AUDIT_HMAC_SECRET;
+    expect(() => computeHash(sampleDoc)).not.toThrow();
+  });
+});
