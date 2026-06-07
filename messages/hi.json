@@ -525,7 +525,8 @@
     "invalidTotpCode": "अमान्य सत्यापन कोड। कृपया पुनः प्रयास करें।",
     "invalidTotpSecret": "अमान्य TOTP सीक्रेट",
     "twoFactorAlreadyEnabled": "दो-कारक प्रमाणीकरण पहले से सक्षम है",
-    "twoFactorNotEnabled": "दो-कारक प्रमाणीकरण सक्षम नहीं है"
+    "twoFactorNotEnabled": "दो-कारक प्रमाणीकरण सक्षम नहीं है",
+    "resetRequiresDemoSession": "Resetting all data is only available within a demo session"
   },
   "reviews": {
     "title": "प्रदर्शन समीक्षाएँ",

@@ -525,7 +525,8 @@
     "invalidTotpCode": "Ungültiger Bestätigungscode. Bitte versuchen Sie es erneut.",
     "invalidTotpSecret": "Ungültiges TOTP-Geheimnis",
     "twoFactorAlreadyEnabled": "Die Zwei-Faktor-Authentifizierung ist bereits aktiviert",
-    "twoFactorNotEnabled": "Die Zwei-Faktor-Authentifizierung ist nicht aktiviert"
+    "twoFactorNotEnabled": "Die Zwei-Faktor-Authentifizierung ist nicht aktiviert",
+    "resetRequiresDemoSession": "Resetting all data is only available within a demo session"
   },
   "reviews": {
     "title": "Leistungsbeurteilungen",

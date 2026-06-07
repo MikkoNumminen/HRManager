@@ -525,7 +525,8 @@
     "invalidTotpCode": "Virheellinen vahvistuskoodi. Yritä uudelleen.",
     "invalidTotpSecret": "Virheellinen TOTP-salaisuus",
     "twoFactorAlreadyEnabled": "Kaksivaiheinen tunnistautuminen on jo käytössä",
-    "twoFactorNotEnabled": "Kaksivaiheinen tunnistautuminen ei ole käytössä"
+    "twoFactorNotEnabled": "Kaksivaiheinen tunnistautuminen ei ole käytössä",
+    "resetRequiresDemoSession": "Resetting all data is only available within a demo session"
   },
   "reviews": {
     "title": "Kehityskeskustelut",

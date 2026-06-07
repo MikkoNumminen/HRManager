@@ -525,7 +525,8 @@
     "invalidTotpCode": "验证码无效。请重试。",
     "invalidTotpSecret": "TOTP 密钥无效",
     "twoFactorAlreadyEnabled": "双因素身份验证已启用",
-    "twoFactorNotEnabled": "双因素身份验证未启用"
+    "twoFactorNotEnabled": "双因素身份验证未启用",
+    "resetRequiresDemoSession": "Resetting all data is only available within a demo session"
   },
   "reviews": {
     "title": "绩效评估",

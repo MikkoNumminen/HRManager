@@ -525,7 +525,8 @@
     "invalidTotpCode": "Nieprawidłowy kod weryfikacyjny. Spróbuj ponownie.",
     "invalidTotpSecret": "Nieprawidłowy sekret TOTP",
     "twoFactorAlreadyEnabled": "Uwierzytelnianie dwuskładnikowe jest już włączone",
-    "twoFactorNotEnabled": "Uwierzytelnianie dwuskładnikowe nie jest włączone"
+    "twoFactorNotEnabled": "Uwierzytelnianie dwuskładnikowe nie jest włączone",
+    "resetRequiresDemoSession": "Resetting all data is only available within a demo session"
   },
   "reviews": {
     "title": "Oceny pracownicze",
