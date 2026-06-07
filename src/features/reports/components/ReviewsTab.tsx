@@ -80,8 +80,8 @@ export default function ReviewsTab({ data, t }: ReviewsTabProps) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {data.map((r, i) => (
-                <TableRow key={i}>
+              {data.map((r) => (
+                <TableRow key={`${r.cycleName}-${r.cycleStatus}`}>
                   <TableCell sx={tableCellStyles}>{r.cycleName}</TableCell>
                   <TableCell sx={tableCellStyles}>{r.cycleStatus}</TableCell>
                   <TableCell sx={tableCellStyles} align="right">
