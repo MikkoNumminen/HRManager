@@ -151,6 +151,19 @@ describe("createPerson", () => {
     });
   });
 
+  // Emails are normalized to lowercase and de-duplicated case-insensitively
+  // (consistent with the CSV importer), so a differing-case email can't slip through.
+  test("normalizes email to lowercase and rejects a case-variant duplicate", async () => {
+    await createPerson(formData({ name: "Alice", email: "Alice@Test.com" }));
+    const [person] = await testPrisma.person.findMany();
+    expect(person.email).toBe("alice@test.com");
+
+    expect(await createPerson(formData({ name: "Bob", email: "ALICE@test.COM" }))).toMatchObject({
+      error: expect.stringContaining("already exists"),
+    });
+    expect(await testPrisma.person.count()).toBe(1);
+  });
+
   // When you first create someone, they don't have a job title yet — position starts as null.
   test("sets position to null by default", async () => {
     await createPerson(formData({ name: "Alice", email: "alice@test.com" }));

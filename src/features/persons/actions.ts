@@ -36,11 +36,18 @@ export const createPerson: (data: FormData) => Promise<ActionResult> = guardedAc
     if (!EmailSchema.safeParse(email).success) {
       throw new ActionError("invalidEmailFormat", t("invalidEmailFormat"));
     }
+    // Store canonically (lowercase) and de-duplicate case-insensitively, matching
+    // the CSV importer — "John@x.com" and "john@x.com" must not both be created.
+    const normalizedEmail = email.trim().toLowerCase();
 
     const sessionId = await getDemoSessionId();
     await withAuditedTransaction(async (tx, addAudit) => {
       const existingPerson = await tx.person.findFirst({
-        where: { email, deletedAt: null, sessionId },
+        where: {
+          email: { equals: normalizedEmail, mode: "insensitive" },
+          deletedAt: null,
+          sessionId,
+        },
       });
       if (existingPerson) {
         throw new ActionError("emailAlreadyExists", t("emailAlreadyExists"));
@@ -50,7 +57,7 @@ export const createPerson: (data: FormData) => Promise<ActionResult> = guardedAc
         data: {
           name: name.trim(),
           position: null,
-          email: email.trim(),
+          email: normalizedEmail,
           sessionId,
         },
       });
@@ -231,7 +238,7 @@ export const updateEmail: (data: FormData) => Promise<ActionResult> = guardedAct
     }
     validateUUID(personID, "personID");
 
-    const newEmail = (data.get("email") ?? data.get("name"))?.toString().trim();
+    const newEmail = (data.get("email") ?? data.get("name"))?.toString().trim().toLowerCase();
     if (!newEmail) {
       throw new ActionError("newEmailRequired", t("newEmailRequired"));
     }
@@ -245,7 +252,11 @@ export const updateEmail: (data: FormData) => Promise<ActionResult> = guardedAct
     const sessionId = await getDemoSessionId();
     await withAuditedTransaction(async (tx, addAudit) => {
       const existingPerson = await tx.person.findFirst({
-        where: { email: newEmail, deletedAt: null, sessionId },
+        where: {
+          email: { equals: newEmail, mode: "insensitive" },
+          deletedAt: null,
+          sessionId,
+        },
       });
       if (existingPerson && existingPerson.id !== personID) {
         throw new ActionError("emailAlreadyExists", t("emailAlreadyExists"));
