@@ -408,7 +408,7 @@ npm run dev                   # start dev server at localhost:3000
 
 ## Deployment
 
-Deployed on **Vercel** with **Vercel Postgres** (Neon) and **MongoDB Atlas** (free tier). Build: `prisma generate && prisma migrate deploy && next build`. The first OAuth user is auto-promoted to superuser. Demo login available for visitors to explore without OAuth.
+Deployed on **Vercel** with **Vercel Postgres** (Neon) and **MongoDB Atlas** (free tier). Build runs `scripts/vercel-build.sh`, which applies `prisma migrate deploy` **only on production** (so an unreviewed feature-branch migration can't hit the shared database from a preview build), then `prisma generate && next build`. The first OAuth user is auto-promoted to superuser. Demo login is opt-in — set `NEXT_PUBLIC_DEMO_LOGIN=true` to expose it.
 
 ### Kubernetes / Helm
 
