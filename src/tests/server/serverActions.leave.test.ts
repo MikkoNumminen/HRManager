@@ -138,6 +138,16 @@ describe("createLeaveType", () => {
     expect(types[0].color).toBe("#4caf50");
   });
 
+  // A non-hex color (e.g. a CSS-injection payload) is rejected and falls back to the
+  // default, so it can't be injected into the rendered backgroundColor.
+  test("falls back to the default for a non-hex color", async () => {
+    await createLeaveType(
+      formData({ name: "Evil", defaultDays: "5", color: "red; } body { display: none } .x {" }),
+    );
+    const [lt] = await testPrisma.leaveType.findMany();
+    expect(lt.color).toBe("#1976d2");
+  });
+
   // Creates a leave type without description.
   test("creates a leave type without description", async () => {
     await createLeaveType(formData({ name: "Sick Leave", defaultDays: "10", color: "#f44336" }));
