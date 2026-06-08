@@ -36,6 +36,11 @@ export async function importPersonsCsv(
   }
 
   const text = await file.text();
+  // Reject binary content disguised with a .csv extension — a NUL byte never appears
+  // in real text/CSV, and the extension check alone is trivially bypassed.
+  if (text.includes("\u0000")) {
+    return { error: t("csvNotCsvFile"), code: "csvNotCsvFile" };
+  }
   const rows = parseCSV(text);
 
   if (rows.length <= 1) {

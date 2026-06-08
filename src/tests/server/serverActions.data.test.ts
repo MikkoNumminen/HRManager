@@ -408,6 +408,19 @@ describe("importPersonsCsv", () => {
     expect(result.error).toBe("File must be a .csv file");
   });
 
+  // Rejects binary content disguised with a .csv extension (NUL byte = not text/CSV).
+  test("rejects binary content disguised as .csv", async () => {
+    const fd = new FormData();
+    fd.append(
+      "file",
+      new File([new Uint8Array([110, 97, 109, 101, 0, 98, 105, 110])], "evil.csv", {
+        type: "text/csv",
+      }),
+    );
+    const result = await importPersonsCsv(null, fd);
+    expect(result.code).toBe("csvNotCsvFile");
+  });
+
   // Returns error for oversized files
   test("returns error for file exceeding size limit", async () => {
     const fd = new FormData();
