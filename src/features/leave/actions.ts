@@ -18,6 +18,17 @@ import { safe } from "@/lib/actionUtils";
 
 // ─── Leave Management ────────────────────────────────────────────
 
+const HEX_COLOR = /^#[0-9a-fA-F]{3}([0-9a-fA-F]{3})?$/;
+
+/**
+ * Only accept hex colors (the leave-type form uses a colour picker). Anything else
+ * falls back to the default, so an arbitrary string can't be injected into the
+ * backgroundColor that LeaveTypesTab renders via Emotion's sx (CSS injection).
+ */
+function safeColor(value: unknown): string {
+  return typeof value === "string" && HEX_COLOR.test(value) ? value : "#1976d2";
+}
+
 export const createLeaveType: (data: FormData) => Promise<ActionResult> = guardedAction(
   "leave:manage_types",
   "createLeaveType",
@@ -42,7 +53,7 @@ export const createLeaveType: (data: FormData) => Promise<ActionResult> = guarde
     if (isNaN(defaultDays) || defaultDays < 0)
       throw new ActionError("invalidDaysValue", t("invalidDaysValue"));
 
-    const color = (data.get("color")?.valueOf() as string) ?? "#1976d2";
+    const color = safeColor(data.get("color")?.valueOf());
 
     const sessionId = await getDemoSessionId();
     await withAuditedTransaction(async (tx, addAudit) => {
@@ -88,7 +99,7 @@ export const updateLeaveType: (data: FormData) => Promise<ActionResult> = guarde
     if (isNaN(defaultDays) || defaultDays < 0)
       throw new ActionError("invalidDaysValue", t("invalidDaysValue"));
 
-    const color = (data.get("color")?.valueOf() as string) ?? "#1976d2";
+    const color = safeColor(data.get("color")?.valueOf());
 
     const sessionId = await getDemoSessionId();
     await withAuditedTransaction(async (tx, addAudit) => {

@@ -18,6 +18,14 @@ export async function GET(request: Request): Promise<NextResponse> {
   const url = new URL(request.url);
   const personId = url.searchParams.get("personId");
 
+  // Reject a malformed personId rather than passing it straight into the query.
+  if (
+    personId &&
+    !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(personId)
+  ) {
+    return NextResponse.json({ error: "Invalid personId" }, { status: 400 });
+  }
+
   const where: Record<string, unknown> = {
     status: LeaveRequestStatus.APPROVED,
     deletedAt: null,
