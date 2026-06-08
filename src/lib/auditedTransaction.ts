@@ -5,8 +5,11 @@ import {
   emitAuditEvents,
   type DeferredAuditEntry,
 } from "@/auditLog";
-import { isFeatureEnabled } from "@/lib/featureFlag";
-import { auditEntriesToOutboxData, scheduleAuditDrain, AUDIT_OUTBOX_FLAG } from "@/lib/auditOutbox";
+import {
+  auditEntriesToOutboxData,
+  scheduleAuditDrain,
+  isAuditOutboxEnabled,
+} from "@/lib/auditOutbox";
 import { Prisma } from "@prisma/client";
 
 /** Context fields automatically filled by withAuditedTransaction. */
@@ -36,7 +39,7 @@ export async function withAuditedTransaction<T>(fn: AuditedTransactionFn<T>): Pr
   // auth() / headers() calls do not run inside the PostgreSQL transaction window.
   const ctx = await captureAuditContext();
   const entries: DeferredAuditEntry[] = [];
-  const useOutbox = await isFeatureEnabled(AUDIT_OUTBOX_FLAG);
+  const useOutbox = await isAuditOutboxEnabled();
 
   const result = await prisma.$transaction(async (tx) => {
     const value = await fn(tx, (entry: AuditEntryInput) => entries.push({ ...ctx, ...entry }));
