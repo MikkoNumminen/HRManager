@@ -15,19 +15,9 @@ import { captureAuditContext, deferAudit, DeferredAuditEntry } from "@/auditLog"
 import { rateLimit } from "@/rateLimit";
 import { getTranslations } from "next-intl/server";
 import { safe } from "@/lib/actionUtils";
+import { safeColor } from "@/utils/color";
 
 // ─── Leave Management ────────────────────────────────────────────
-
-const HEX_COLOR = /^#[0-9a-fA-F]{3}([0-9a-fA-F]{3})?$/;
-
-/**
- * Only accept hex colors (the leave-type form uses a colour picker). Anything else
- * falls back to the default, so an arbitrary string can't be injected into the
- * backgroundColor that LeaveTypesTab renders via Emotion's sx (CSS injection).
- */
-function safeColor(value: unknown): string {
-  return typeof value === "string" && HEX_COLOR.test(value) ? value : "#1976d2";
-}
 
 export const createLeaveType: (data: FormData) => Promise<ActionResult> = guardedAction(
   "leave:manage_types",
