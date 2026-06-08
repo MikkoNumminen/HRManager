@@ -1,6 +1,6 @@
 import { timingSafeEqual } from "crypto";
 import { NextResponse } from "next/server";
-import { drainAuditOutbox } from "@/lib/auditOutbox";
+import { drainAuditOutboxBacklog } from "@/lib/auditOutbox";
 
 // Drains the audit outbox into MongoDB — the durability backstop for the
 // opportunistic after() drain. Vercel Cron invokes this (GET, with an auto-added
@@ -19,7 +19,8 @@ async function handle(request: Request): Promise<NextResponse> {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const result = await drainAuditOutbox();
+  // Loop the whole backlog so a post-outage catch-up clears in one run.
+  const result = await drainAuditOutboxBacklog();
   return NextResponse.json(result);
 }
 

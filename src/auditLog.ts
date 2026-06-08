@@ -4,8 +4,11 @@ import { getDemoSessionId } from "@/demoSession";
 import { AuditActionSchema, AuditEntityTypeSchema } from "@/features/audit/schemas";
 import { computeHash, getLatestHash } from "@/lib/auditHashChain";
 import { emitMutationEvent } from "@/lib/eventEmitHelpers";
-import { isFeatureEnabled } from "@/lib/featureFlag";
-import { auditEntriesToOutboxData, drainAuditOutbox, AUDIT_OUTBOX_FLAG } from "@/lib/auditOutbox";
+import {
+  auditEntriesToOutboxData,
+  drainAuditOutbox,
+  isAuditOutboxEnabled,
+} from "@/lib/auditOutbox";
 import { prisma } from "@/db";
 import logger from "@/lib/logger";
 import { after } from "next/server";
@@ -76,7 +79,10 @@ export function emitAuditEvents(entries: DeferredAuditEntry[]): void {
 async function persistAuditEntries(entries: DeferredAuditEntry[]): Promise<void> {
   if (entries.length === 0) return;
 
-  if (await isFeatureEnabled(AUDIT_OUTBOX_FLAG)) {
+  if (await isAuditOutboxEnabled()) {
+    // Note: this path (deferAudit / log*) writes the outbox post-response, so it's
+    // durable against a Mongo outage and fork-free, but — unlike withAuditedTransaction —
+    // not atomic with the mutation. A function kill before this runs still drops it.
     await prisma.auditOutbox.createMany({ data: auditEntriesToOutboxData(entries) });
     await drainAuditOutbox();
     return;

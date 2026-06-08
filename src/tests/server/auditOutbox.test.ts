@@ -19,7 +19,7 @@ jest.mock("@/lib/logger", () => ({
   default: { info: jest.fn(), warn: jest.fn(), error: jest.fn(), child: jest.fn() },
 }));
 
-import { drainAuditOutbox } from "@/lib/auditOutbox";
+import { drainAuditOutbox, drainAuditOutboxBacklog } from "@/lib/auditOutbox";
 
 beforeAll(async () => {
   await setupTestMongo();
@@ -77,5 +77,18 @@ describe("drainAuditOutbox", () => {
     const result = await drainAuditOutbox();
     expect(result.drained).toBe(0);
     expect(await testPrisma.auditOutbox.count({ where: { drainedAt: null } })).toBe(1);
+  });
+
+  // The backlog loop clears more than one batch in a single run (cron catch-up).
+  test("drainAuditOutboxBacklog clears a multi-batch backlog in one run", async () => {
+    for (let i = 0; i < 5; i++) {
+      await testPrisma.auditOutbox.create({ data: row({ action: "create" }) });
+    }
+
+    const result = await drainAuditOutboxBacklog({ batchSize: 2 });
+    expect(result.drained).toBe(5);
+    expect(result.batches).toBe(3); // 2 + 2 + 1
+    expect(await getTestAuditLogCollection().find().toArray()).toHaveLength(5);
+    expect(await testPrisma.auditOutbox.count({ where: { drainedAt: null } })).toBe(0);
   });
 });
