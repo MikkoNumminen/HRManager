@@ -14,6 +14,9 @@ export interface AuditLogDocument {
   createdAt: Date;
   prevHash?: string | null;
   hash?: string;
+  // Idempotency key = the AuditOutbox row id (as a string). Present only on docs
+  // delivered by the outbox drainer; a partial-unique index dedupes re-drains.
+  outboxId?: string | null;
 }
 
 const globalForMongo = globalThis as unknown as {
@@ -114,6 +117,12 @@ export async function ensureAuditLogIndexes(): Promise<void> {
     col.createIndex({ entityType: 1 }),
     col.createIndex({ createdAt: -1 }),
     col.createIndex({ sessionId: 1 }),
+    // Idempotency for the outbox drainer: re-draining the same row can't duplicate.
+    // Partial so legacy docs without an outboxId don't collide on the missing field.
+    col.createIndex(
+      { outboxId: 1 },
+      { unique: true, partialFilterExpression: { outboxId: { $type: "string" } } },
+    ),
     // TTL index: MongoDB automatically deletes documents older than 90 days
     col.createIndex({ createdAt: 1 }, { expireAfterSeconds: AUDIT_LOG_TTL_SECONDS }),
   ]);

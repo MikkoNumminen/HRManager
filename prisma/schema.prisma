@@ -133,6 +133,29 @@ model RateLimit {
   @@index([windowStart])
 }
 
+// Transactional outbox for audit logs. Entries are written here in the SAME
+// Postgres transaction as the mutation (durable even if MongoDB is down), then a
+// single advisory-locked drainer moves them to the MongoDB auditLogs collection
+// and assigns the hash chain — so no audit is lost and the chain can't fork.
+// prevHash/hash are intentionally NOT stored here: they're computed once, by the
+// drainer, in id order. `id` is the monotonic capture sequence = drain order.
+model AuditOutbox {
+  id         BigInt    @id @default(autoincrement())
+  userId     String?
+  userEmail  String?
+  action     String
+  entityType String
+  entityId   String?
+  before     String?
+  after      String?
+  sessionId  String?
+  createdAt  DateTime  @default(now())
+  drainedAt  DateTime?
+
+  @@index([drainedAt, id])
+  @@index([sessionId])
+}
+
 // AuditLog has been moved to MongoDB (polyglot persistence).
 // See src/mongoDb.ts for the MongoDB client and AuditLogDocument interface.
 
