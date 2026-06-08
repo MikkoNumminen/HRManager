@@ -181,6 +181,21 @@ describe("verifyChain", () => {
     expect(result.firstBrokenAt!.index).toBe(1);
   });
 
+  // Deleting a middle entry breaks the chain LINKAGE — the per-entry hash check
+  // alone can't catch this (each surviving doc is still internally consistent).
+  test("detects a deleted middle entry via linkage", async () => {
+    await insertHashedEntry({ action: "create" });
+    const id = await insertHashedEntry({ action: "update" });
+    await insertHashedEntry({ action: "delete" });
+
+    const { ObjectId } = require("mongodb");
+    await col.deleteOne({ _id: new ObjectId(id) });
+
+    const result = await verifyChain(null);
+    expect(result.valid).toBe(false);
+    expect(result.firstBrokenAt).toBeDefined();
+  });
+
   // Skips legacy entries without hash field.
   test("skips legacy entries without hash field", async () => {
     // Insert a legacy entry without hash
