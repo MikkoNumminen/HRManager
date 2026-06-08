@@ -242,6 +242,16 @@ describe("updateLeaveType", () => {
     expect(updated!.color).toBe("#ff0000");
   });
 
+  // A non-hex color on update also falls back to the default (CSS-injection guard).
+  test("falls back to the default for a non-hex color on update", async () => {
+    const lt = await createTestLeaveType({ name: "T", defaultDays: 5 });
+    await updateLeaveType(
+      formData({ id: lt.id, name: "T", defaultDays: "5", color: "url(http://evil)" }),
+    );
+    const updated = await testPrisma.leaveType.findUnique({ where: { id: lt.id } });
+    expect(updated!.color).toBe("#1976d2");
+  });
+
   // Rejects update to non-existent leave type.
   test("rejects update to non-existent leave type", async () => {
     const result = await updateLeaveType(

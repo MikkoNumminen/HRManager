@@ -26,6 +26,7 @@ import { useSnackbar } from "../shared/SnackbarProvider";
 import { useTranslations } from "next-intl";
 import type { LeaveType } from "@/schemas";
 import { createLeaveType, updateLeaveType, deleteLeaveType } from "@/serverActions";
+import { safeColor } from "@/utils/color";
 
 interface LeaveTypesTabProps {
   leaveTypes: LeaveType[];
@@ -243,7 +244,7 @@ export default function LeaveTypesTab({ leaveTypes, canManageTypes }: LeaveTypes
                           width: 24,
                           height: 24,
                           borderRadius: "4px",
-                          backgroundColor: lt.color,
+                          backgroundColor: safeColor(lt.color),
                         }}
                       />
                     </TableCell>
