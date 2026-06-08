@@ -218,7 +218,7 @@ describe("logPermissionDenial", () => {
     mockLoggerError.mockClear();
     const col = getTestAuditLogCollection();
     const insertSpy = jest
-      .spyOn(col, "insertOne")
+      .spyOn(col, "insertMany")
       .mockRejectedValueOnce(new Error("DB write failed"));
 
     mockAuth.mockResolvedValue({
@@ -273,7 +273,7 @@ describe("logRateLimitHit", () => {
     mockLoggerError.mockClear();
     const col = getTestAuditLogCollection();
     const insertSpy = jest
-      .spyOn(col, "insertOne")
+      .spyOn(col, "insertMany")
       .mockRejectedValueOnce(new Error("DB write failed"));
 
     await logRateLimitHit("createPerson", "ip:10.0.0.1");
@@ -436,8 +436,8 @@ describe("MongoDB unavailable — all functions must return early without writin
     expect(logs).toHaveLength(0);
   });
 
-  // deferAudit skips registration of after() callback when MongoDB is unavailable.
-  test("deferAudit registers no after() callback when MongoDB unavailable", () => {
+  // deferAudit writes nothing when MongoDB is unavailable (legacy path).
+  test("deferAudit writes nothing when MongoDB unavailable", async () => {
     mockMongoUnavailable();
     deferAudit([
       {
@@ -448,36 +448,40 @@ describe("MongoDB unavailable — all functions must return early without writin
         sessionId: null,
       },
     ]);
-    expect(afterCallbacks).toHaveLength(0);
+    await flushAfterCallbacks();
+    expect(await getTestAuditLogCollection().find().toArray()).toHaveLength(0);
   });
 
-  // logPermissionDenial returns early and registers no after() callback.
-  test("logPermissionDenial registers no after() callback when MongoDB unavailable", async () => {
+  // logPermissionDenial writes nothing when MongoDB is unavailable.
+  test("logPermissionDenial writes nothing when MongoDB unavailable", async () => {
     mockAuth.mockResolvedValue({ user: { id: "u1", email: "u@test.com" } });
     mockMongoUnavailable();
 
     await logPermissionDenial("person:delete");
+    await flushAfterCallbacks();
 
-    expect(afterCallbacks).toHaveLength(0);
+    expect(await getTestAuditLogCollection().find().toArray()).toHaveLength(0);
   });
 
-  // logRateLimitHit returns early and registers no after() callback.
-  test("logRateLimitHit registers no after() callback when MongoDB unavailable", async () => {
+  // logRateLimitHit writes nothing when MongoDB is unavailable.
+  test("logRateLimitHit writes nothing when MongoDB unavailable", async () => {
     mockMongoUnavailable();
 
     await logRateLimitHit("createPerson", "ip:10.0.0.1");
+    await flushAfterCallbacks();
 
-    expect(afterCallbacks).toHaveLength(0);
+    expect(await getTestAuditLogCollection().find().toArray()).toHaveLength(0);
   });
 
-  // deferAuditLog wraps deferAudit — also skips when MongoDB unavailable.
-  test("deferAuditLog registers no after() callback when MongoDB unavailable", async () => {
+  // deferAuditLog wraps deferAudit — also writes nothing when MongoDB unavailable.
+  test("deferAuditLog writes nothing when MongoDB unavailable", async () => {
     mockAuth.mockResolvedValue({ user: { id: "u1", email: "u@test.com" } });
     mockMongoUnavailable();
 
     await deferAuditLog({ action: "create", entityType: "person" });
+    await flushAfterCallbacks();
 
-    expect(afterCallbacks).toHaveLength(0);
+    expect(await getTestAuditLogCollection().find().toArray()).toHaveLength(0);
   });
 });
 
