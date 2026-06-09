@@ -32,6 +32,11 @@ export async function isAuditOutboxEnabled(): Promise<boolean> {
   return value;
 }
 
+/** Test-only: clear the cached flag so each test starts from a known state. */
+export function __resetAuditOutboxFlagCache(): void {
+  flagCache = null;
+}
+
 /** Map captured audit entries to AuditOutbox rows (before/after stored as JSON, as in Mongo). */
 export function auditEntriesToOutboxData(
   entries: DeferredAuditEntry[],
@@ -56,21 +61,25 @@ export function auditEntriesToOutboxData(
  */
 export async function drainAuditOutbox(
   batchSize = DRAIN_BATCH,
-): Promise<{ drained: number; processed: number; skipped?: boolean }> {
-  if (!isMongoAvailable()) return { drained: 0, processed: 0 };
+): Promise<{ drained: number; processed: number; hasMore: boolean; skipped?: boolean }> {
+  if (!isMongoAvailable()) return { drained: 0, processed: 0, hasMore: false };
 
   return prisma.$transaction(
     async (tx) => {
       const lock = await tx.$queryRaw<{ locked: boolean }[]>`
         SELECT pg_try_advisory_xact_lock(${DRAIN_LOCK_KEY}::bigint) AS locked`;
-      if (!lock[0]?.locked) return { drained: 0, processed: 0, skipped: true };
+      if (!lock[0]?.locked) return { drained: 0, processed: 0, hasMore: false, skipped: true };
 
-      const rows = await tx.auditOutbox.findMany({
+      // Fetch one extra row to learn whether more remain — so the backlog loop can
+      // stop without a trailing empty drain when the queue is an exact multiple.
+      const fetched = await tx.auditOutbox.findMany({
         where: { drainedAt: null },
         orderBy: { id: "asc" },
-        take: batchSize,
+        take: batchSize + 1,
       });
-      if (rows.length === 0) return { drained: 0, processed: 0 };
+      const hasMore = fetched.length > batchSize;
+      const rows = hasMore ? fetched.slice(0, batchSize) : fetched;
+      if (rows.length === 0) return { drained: 0, processed: 0, hasMore: false };
 
       const col = getAuditLogCollection();
 
@@ -135,7 +144,7 @@ export async function drainAuditOutbox(
         data: { drainedAt: new Date() },
       });
 
-      return { drained: inserted, processed: rows.length };
+      return { drained: inserted, processed: rows.length, hasMore };
     },
     { timeout: 20_000 },
   );
@@ -158,7 +167,7 @@ export async function drainAuditOutboxBacklog(
     const res = await drainAuditOutbox(batchSize);
     batches++;
     drained += res.drained;
-    if (res.skipped || res.processed < batchSize) break;
+    if (res.skipped || !res.hasMore) break;
   }
   return { drained, batches };
 }

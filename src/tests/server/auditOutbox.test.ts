@@ -18,8 +18,17 @@ jest.mock("@/lib/logger", () => ({
   __esModule: true,
   default: { info: jest.fn(), warn: jest.fn(), error: jest.fn(), child: jest.fn() },
 }));
+const mockIsFeatureEnabled = jest.fn();
+jest.mock("@/lib/featureFlag", () => ({
+  isFeatureEnabled: (...args: unknown[]) => mockIsFeatureEnabled(...args),
+}));
 
-import { drainAuditOutbox, drainAuditOutboxBacklog } from "@/lib/auditOutbox";
+import {
+  drainAuditOutbox,
+  drainAuditOutboxBacklog,
+  isAuditOutboxEnabled,
+  __resetAuditOutboxFlagCache,
+} from "@/lib/auditOutbox";
 
 beforeAll(async () => {
   await setupTestMongo();
@@ -90,5 +99,34 @@ describe("drainAuditOutbox", () => {
     expect(result.batches).toBe(3); // 2 + 2 + 1
     expect(await getTestAuditLogCollection().find().toArray()).toHaveLength(5);
     expect(await testPrisma.auditOutbox.count({ where: { drainedAt: null } })).toBe(0);
+  });
+});
+
+describe("isAuditOutboxEnabled", () => {
+  beforeEach(() => {
+    __resetAuditOutboxFlagCache();
+    mockIsFeatureEnabled.mockReset();
+  });
+
+  // Repeated checks within the TTL reuse the cached value instead of re-querying.
+  test("caches the flag so repeated checks don't re-query", async () => {
+    mockIsFeatureEnabled.mockResolvedValue(true);
+
+    expect(await isAuditOutboxEnabled()).toBe(true);
+    expect(await isAuditOutboxEnabled()).toBe(true);
+
+    expect(mockIsFeatureEnabled).toHaveBeenCalledTimes(1);
+  });
+
+  // Resetting the cache forces a fresh lookup (also proves test isolation works).
+  test("re-queries after the cache is reset", async () => {
+    mockIsFeatureEnabled.mockResolvedValue(false);
+    expect(await isAuditOutboxEnabled()).toBe(false);
+
+    __resetAuditOutboxFlagCache();
+    mockIsFeatureEnabled.mockResolvedValue(true);
+    expect(await isAuditOutboxEnabled()).toBe(true);
+
+    expect(mockIsFeatureEnabled).toHaveBeenCalledTimes(2);
   });
 });
