@@ -24,6 +24,9 @@ const customConfig = {
   testPathIgnorePatterns: ["<rootDir>/.claude/", "<rootDir>/.stryker-tmp/"],
   modulePathIgnorePatterns: ["<rootDir>/.claude/", "<rootDir>/.stryker-tmp/"],
   setupFiles: ["<rootDir>/src/tests/server/loadEnv.ts"],
+  // ⚠️ KEEP moduleNameMapper + transformIgnorePatterns IN SYNC with jest.config.server.ts.
+  // Any module mocked there (ESM-only deps in particular) must be mirrored here, or
+  // Stryker's initial dry run fails with "Cannot use import statement outside a module".
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
     "^next-intl/server$": "<rootDir>/src/tests/mocks/next-intl-server.ts",
