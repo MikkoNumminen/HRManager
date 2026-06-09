@@ -27,6 +27,9 @@ const customConfig = {
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
     "^next-intl/server$": "<rootDir>/src/tests/mocks/next-intl-server.ts",
+    // pg-boss is ESM-only; mock it (as jest.config.server.ts does) so the dry run
+    // doesn't load it untransformed → "Cannot use import statement outside a module".
+    "^pg-boss$": "<rootDir>/src/tests/mocks/pg-boss.ts",
   },
   // Prisma 7 ships ESM — transform its .mjs files so Jest (CJS) can parse them
   transformIgnorePatterns: ["node_modules/(?!(@prisma/client)/)"],
