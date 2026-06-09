@@ -5,10 +5,23 @@ on:
     branches:
       - main
 
+# The score-comment step posts to the PR; without this the default token is read-only.
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
 jobs:
   mutation:
     name: Stryker Mutation Score
     runs-on: ubuntu-latest
+
+    # Job-level so `npm ci`'s postinstall (`prisma generate`, which loads the Prisma 7
+    # config that reads DATABASE_URL + DIRECT_URL) can resolve them — without this the
+    # install fails. Mirrors ci.yml.
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/hrmanager_test
+      DIRECT_URL: postgresql://postgres:postgres@localhost:5432/hrmanager_test
 
     services:
       postgres:
