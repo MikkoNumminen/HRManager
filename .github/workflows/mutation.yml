@@ -66,14 +66,12 @@ jobs:
 
       - name: Push test schema
         run: npx prisma db push --accept-data-loss
-        env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/hrmanager_test
 
       - name: Run Stryker mutation tests
         id: stryker
         run: npx stryker run
         env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/hrmanager_test
+          # DATABASE_URL + DIRECT_URL come from the job-level env.
           MONGODB_URI: mongodb://localhost:27017/hrmanager_audit_test
           NEXTAUTH_SECRET: test-secret-for-ci
           NEXTAUTH_URL: http://localhost:3000
