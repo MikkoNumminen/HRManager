@@ -277,6 +277,7 @@ describe("hasPermission", () => {
       permissions: [],
     });
 
+    // @ts-expect-error — deliberately passing a key outside the PermissionKey union
     const result = await hasPermission("fake:permission");
     expect(result).toBe(false);
   });

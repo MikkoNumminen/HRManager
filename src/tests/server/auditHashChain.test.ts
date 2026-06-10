@@ -238,7 +238,8 @@ describe("getHmacSecret production safety", () => {
   };
 
   afterEach(() => {
-    process.env.NODE_ENV = ORIGINAL_NODE_ENV;
+    // NODE_ENV is typed read-only by Next.js, so write through a cast
+    (process.env as Record<string, string | undefined>).NODE_ENV = ORIGINAL_NODE_ENV;
     if (ORIGINAL_SECRET === undefined) {
       delete process.env.AUDIT_HMAC_SECRET;
     } else {
@@ -249,21 +250,21 @@ describe("getHmacSecret production safety", () => {
   // In production a missing secret must fail closed rather than silently using
   // the world-readable dev key, which would make tamper detection meaningless.
   test("computeHash throws in production when AUDIT_HMAC_SECRET is unset", () => {
-    process.env.NODE_ENV = "production";
+    (process.env as Record<string, string | undefined>).NODE_ENV = "production";
     delete process.env.AUDIT_HMAC_SECRET;
     expect(() => computeHash(sampleDoc)).toThrow(/AUDIT_HMAC_SECRET/);
   });
 
   // With the secret provided, production hashing works normally.
   test("computeHash works in production when AUDIT_HMAC_SECRET is set", () => {
-    process.env.NODE_ENV = "production";
+    (process.env as Record<string, string | undefined>).NODE_ENV = "production";
     process.env.AUDIT_HMAC_SECRET = "a-strong-production-secret";
     expect(computeHash(sampleDoc)).toMatch(/^[0-9a-f]{64}$/);
   });
 
   // Outside production the dev fallback keeps local dev and tests working.
   test("falls back to the dev key outside production", () => {
-    process.env.NODE_ENV = "test";
+    (process.env as Record<string, string | undefined>).NODE_ENV = "test";
     delete process.env.AUDIT_HMAC_SECRET;
     expect(() => computeHash(sampleDoc)).not.toThrow();
   });

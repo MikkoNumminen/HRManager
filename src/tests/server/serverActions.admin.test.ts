@@ -579,7 +579,8 @@ describe("seedMockData", () => {
   // Production environment skips mock user seeding to prevent test accounts in prod DB.
   test("skips mock user seeding in production environment", async () => {
     const originalEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = "production";
+    // NODE_ENV is typed read-only by Next.js, so write through a cast
+    (process.env as Record<string, string | undefined>).NODE_ENV = "production";
     try {
       await seedMockData();
 
@@ -590,7 +591,7 @@ describe("seedMockData", () => {
       const users = await testPrisma.user.findMany();
       expect(users).toHaveLength(0);
     } finally {
-      process.env.NODE_ENV = originalEnv;
+      (process.env as Record<string, string | undefined>).NODE_ENV = originalEnv;
     }
   });
 

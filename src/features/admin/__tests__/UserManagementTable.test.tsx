@@ -84,6 +84,7 @@ describe("UserManagementTable", () => {
       email: "dave@example.com",
       name: "Dave",
       image: null,
+      // @ts-expect-error deliberately outside the role union to exercise the fallback chip color
       role: "custom_role",
       createdAt: new Date("2026-04-01"),
       updatedAt: new Date("2026-04-01"),

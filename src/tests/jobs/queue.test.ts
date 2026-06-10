@@ -1,3 +1,6 @@
+// Make this file a module so top-level mock declarations don't collide with other test files
+export {};
+
 // Mock pg-boss before importing queue module
 const mockStart = jest.fn().mockResolvedValue(undefined);
 const mockStop = jest.fn().mockResolvedValue(undefined);

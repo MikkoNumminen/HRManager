@@ -2,6 +2,7 @@ import React from "react";
 import { render, screen, fireEvent, within } from "@testing-library/react";
 import { EditableTeamsTable } from "@/features/teams/components/TeamsTable";
 import { useRouter } from "next/navigation";
+import type { CombinedTeam } from "@/schemas";
 
 jest.mock("next/navigation", () => ({
   useRouter: jest.fn(),
@@ -127,9 +128,10 @@ describe("EditableTeamsTable Component", () => {
 
   // Shows "Unknown" fallback when a team member has no name
   test("should show unknown fallback for member without name", () => {
-    const teamsWithNullMember = [
+    const teamsWithNullMember: CombinedTeam[] = [
       {
         ...mockCombinedTeams[0],
+        // @ts-expect-error name is deliberately null to exercise the unknown-name fallback
         members: [{ personId: "person-x", name: null, email: "x@example.com" }],
       },
     ];

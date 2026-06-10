@@ -48,10 +48,6 @@ const makePerson = (overrides: Partial<Person> = {}): Person => ({
   name: "Alice Johnson",
   email: "alice@example.com",
   position: "Engineer",
-  managerId: null,
-  managerName: null,
-  teamId: null,
-  teamName: null,
   createdAt: NOW,
   updatedAt: NOW,
   ...overrides,
@@ -108,7 +104,10 @@ describe("LeaveRequestsTab", () => {
     render(
       <LeaveRequestsTab
         {...defaultProps}
-        requests={[makeLeaveRequest({ status: "UNKNOWN_STATUS" })]}
+        requests={[
+          // @ts-expect-error deliberately invalid status to exercise the colorMap fallback
+          makeLeaveRequest({ status: "UNKNOWN_STATUS" }),
+        ]}
       />,
     );
     expect(screen.getByText("UNKNOWN_STATUS")).toBeInTheDocument();
