@@ -4,6 +4,7 @@ import { requirePermission } from "@/permissions";
 import { rateLimit } from "@/rateLimit";
 import { deferAuditLog } from "@/auditLog";
 import { getJobQueue, QUEUE_NAMES, type QueueName } from "@/jobs/queue";
+import { scheduleJobDrain } from "@/jobs/drain";
 import type { CleanupJobData, AuditExportJobData } from "@/jobs/types";
 import { CleanupJobDataSchema, AuditExportJobDataSchema } from "@/jobs/types";
 import { safe, validateUUID, type ActionResult } from "@/lib/actionUtils";
@@ -22,6 +23,8 @@ export async function enqueueCleanupJob(
     const parsed = CleanupJobDataSchema.parse({ type });
     const boss = await getJobQueue();
     const jobId = await boss.send(QUEUE_NAMES.CLEANUP, parsed);
+    // No worker process runs on Vercel — execute the job post-response.
+    scheduleJobDrain();
 
     await deferAuditLog({
       action: "create",
@@ -56,6 +59,8 @@ export async function enqueueAuditExportJob(data: {
 
     const boss = await getJobQueue();
     const jobId = await boss.send(QUEUE_NAMES.AUDIT_EXPORT, parsed);
+    // No worker process runs on Vercel — execute the job post-response.
+    scheduleJobDrain();
 
     await deferAuditLog({
       action: "export",
@@ -75,6 +80,8 @@ export async function retryFailedJob(queueName: QueueName, jobId: string): Promi
 
     const boss = await getJobQueue();
     await boss.resume(queueName, jobId);
+    // A resumed job is pending again — process it without waiting for the cron.
+    scheduleJobDrain();
 
     await deferAuditLog({
       action: "update",
