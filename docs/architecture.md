@@ -112,7 +112,7 @@ flowchart TD
     A[Incoming request] --> B{Authenticated?}
     B -->|No| C[Guest permissions<br/>read-only]
     B -->|Yes| D{Role?}
-    D -->|superuser| E[All 24 permissions<br/>immutable]
+    D -->|superuser| E[All 38 permissions<br/>immutable]
     D -->|administrator / user| F[Load role defaults]
     F --> G{User overrides?}
     G -->|Yes| H[Apply grant/deny<br/>overrides per key]
