@@ -63,6 +63,7 @@ describe("Update Email", () => {
   test("shows generic error when updateEmail throws non-Error", async () => {
     (updateEmail as jest.MockedFunction<typeof updateEmail>).mockResolvedValue({
       error: "An unexpected error occurred",
+      code: "unexpectedError",
     });
     render(<UpdateEmailForm personID={personID} />);
 
@@ -79,6 +80,7 @@ describe("Update Email", () => {
   test("shows error message when updateEmail fails", async () => {
     (updateEmail as jest.MockedFunction<typeof updateEmail>).mockResolvedValue({
       error: "A person with this email already exists",
+      code: "emailAlreadyExists",
     });
     render(<UpdateEmailForm personID={personID} />);
 

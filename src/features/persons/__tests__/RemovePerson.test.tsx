@@ -63,6 +63,7 @@ describe("Remove People", () => {
   test("shows generic error when removePerson throws non-Error", async () => {
     (removePerson as jest.MockedFunction<typeof removePerson>).mockResolvedValue({
       error: "An unexpected error occurred",
+      code: "unexpectedError",
     });
     render(<RemovePersonForm personID={personID} />);
 
@@ -77,6 +78,7 @@ describe("Remove People", () => {
   test("shows error message when removePerson fails", async () => {
     (removePerson as jest.MockedFunction<typeof removePerson>).mockResolvedValue({
       error: "Removal failed",
+      code: "unexpectedError",
     });
     render(<RemovePersonForm personID={personID} />);
 
@@ -110,7 +112,10 @@ describe("RemovePersonForm – impact branches", () => {
   // Impact with managedTeams shows team names in dialog.
   test("impact with managedTeams shows team names", async () => {
     const impact = {
-      managedTeams: [{ teamName: "Alpha" }, { teamName: "Beta" }],
+      managedTeams: [
+        { teamId: "t1", teamName: "Alpha" },
+        { teamId: "t2", teamName: "Beta" },
+      ],
       headedDepartments: [],
       teamMemberships: [],
       leaveRequests: 0,
@@ -126,7 +131,7 @@ describe("RemovePersonForm – impact branches", () => {
   test("impact with headedDepartments shows dept names", async () => {
     const impact = {
       managedTeams: [],
-      headedDepartments: [{ name: "Engineering" }],
+      headedDepartments: [{ id: "d1", name: "Engineering" }],
       teamMemberships: [],
       leaveRequests: 0,
       reviewRequests: 0,
@@ -142,7 +147,7 @@ describe("RemovePersonForm – impact branches", () => {
     const impact = {
       managedTeams: [],
       headedDepartments: [],
-      teamMemberships: [{ teamName: "Gamma" }],
+      teamMemberships: [{ teamId: "t3", teamName: "Gamma" }],
       leaveRequests: 0,
       reviewRequests: 0,
     };

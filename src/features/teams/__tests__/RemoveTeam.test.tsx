@@ -52,6 +52,7 @@ describe("RemoveTeam Component", () => {
   test("shows generic error when removeTeam throws non-Error", async () => {
     (removeTeam as jest.MockedFunction<typeof removeTeam>).mockResolvedValue({
       error: "An unexpected error occurred",
+      code: "unexpectedError",
     });
     render(<RemoveTeamForm teamID={teamID} />);
 
@@ -66,6 +67,7 @@ describe("RemoveTeam Component", () => {
   test("shows error message when removeTeam fails", async () => {
     (removeTeam as jest.MockedFunction<typeof removeTeam>).mockResolvedValue({
       error: "Removal failed",
+      code: "unexpectedError",
     });
     render(<RemoveTeamForm teamID={teamID} />);
 

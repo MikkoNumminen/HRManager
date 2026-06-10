@@ -122,7 +122,12 @@ describe("RemoveDepartmentForm – impact branches", () => {
     render(
       <RemoveDepartmentForm
         departmentID="d1"
-        impact={{ teams: [{ teamName: "Alpha" }, { teamName: "Beta" }] }}
+        impact={{
+          teams: [
+            { teamId: "t1", teamName: "Alpha" },
+            { teamId: "t2", teamName: "Beta" },
+          ],
+        }}
       />,
     );
     await userEvent.click(screen.getByRole("button", { name: /Remove/i }));
