@@ -6,7 +6,7 @@ When "vittu" appears in the user's prompt: max speed, aggressive subagents for i
 
 ## Task tracking
 
-`TODO.md` is the shared task list across all Claude Code sessions. Read it at the start of every session. Update it when tasks are added, started, or completed. Keep it concise — no completed items, just in-progress and backlog. After finishing a task, note how long it took before removing it.
+`TODO.md` is the shared task list across all Claude Code sessions (a local working file, intentionally untracked — clones won't have it; create an empty one if missing). Read it at the start of every session. Update it when tasks are added, started, or completed. Keep it concise — no completed items, just in-progress and backlog. After finishing a task, note how long it took before removing it.
 
 Every TODO item must have a size estimate: 🟢 small, 🟡 medium, 🔴 large. In text: 🟢 **[S]**, 🟡 **[M]**, 🔴 **[L]**.
 
@@ -60,7 +60,7 @@ Next.js 16 (App Router) · React 19 · MUI v7 (dark theme, no Tailwind) · TypeS
 - **Always run tests** (`npm run test:all`) after code changes (logic, components, actions, queries). Never `npm test` alone.
 - **Always type-check** (`npm run typecheck`) before pushing — jest is transpile-only and does NOT catch type errors; without this they surface only in `next build` (CI's last step). The codebase is kept at zero `tsc` errors, tests included.
 - **Skip tests** after docs-only commits (README, CLAUDE.md, TODO.md) or formatting-only runs.
-- **Targeted tests first** — if only one file changed, run its test file first; full suite before final push. The full suite is ~10 min locally (server tests share one test DB — never run two suites concurrently).
+- **Targeted tests first** — if only one file changed, run its test file first; full suite before final push. The full suite is ~3-5 min (server tests share one test DB — never run two suites concurrently).
 - **Feature tests** co-located in `src/features/*/__tests__/`. **Shared tests** (accessibility, permissions, schemas) in `src/tests/shared/`. **Server tests** in `src/tests/server/`. Comment above each test explaining what it does.
 - Every new schema/component/module must have tests. Aim for 100% coverage.
 - Do not mock core logic — test real functionality.
@@ -75,5 +75,5 @@ Next.js 16 (App Router) · React 19 · MUI v7 (dark theme, no Tailwind) · TypeS
 - **`src/auth.ts` runs on the edge runtime** (imported by `proxy.ts`) — use `console`, never the pino logger, inside it.
 - **`jest.config.stryker.mjs` mirrors `jest.config.server.ts`** — any module mocked in one must be mirrored in the other (guarded by `src/tests/server/jestConfigSync.test.ts`).
 - **Permissions source of truth** is `src/permissions.ts` (currently 38 keys) — update README/architecture counts when adding one.
-- **Vercel**: `scripts/vercel-ignore.sh` cancels same-commit redeploys (deploy a new commit to force a build); migrations run only on production deploys (`scripts/vercel-build.sh`).
+- **Vercel**: `scripts/vercel-ignore.sh` skips builds for same-commit redeploys AND for pushes touching only docs/tests/CI config (push a code change to force a build); migrations run only on production deploys (`scripts/vercel-build.sh`).
 - **Pre-push hook** runs the i18n audit (blocks >25 untranslated keys) and the full test suite. When it blocks on new i18n keys: the hook has already added English fallbacks via `i18n:fix` — translate them into all 17 other locales (by hand or `npm run i18n:translate`), commit, and push again. This loop is by design; don't bypass it.

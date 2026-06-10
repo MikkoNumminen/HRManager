@@ -194,20 +194,20 @@ graph LR
 
 ## Tech stack
 
-| Layer      | Technology                       | Why this choice                                                   |
-| ---------- | -------------------------------- | ----------------------------------------------------------------- |
-| Framework  | Next.js 16 (App Router)          | Server Components for zero-waterfall data fetching                |
-| UI         | React 19 + MUI v7 + MUI X Charts | `useOptimistic` + `useActionState` eliminate form boilerplate     |
-| Org Chart  | ReactFlow + dagre                | Interactive graph visualization with auto-layout                  |
-| Language   | TypeScript 5.9                   | End-to-end type safety from database schema to UI props           |
-| ORM        | Prisma 7                         | Type-safe queries + raw SQL escape hatch for complex analytics    |
-| Databases  | PostgreSQL + MongoDB 8           | Relational data in SQL, append-only logs in a document store      |
-| Validation | Zod 4                            | Runtime validation + TypeScript type inference from one schema    |
-| Auth       | NextAuth v5 (JWT)                | Stateless auth that scales without session storage                |
-| Testing    | Jest 30 + Playwright             | Unit/integration against real DBs + E2E against production builds |
-| CI/CD      | GitHub Actions                   | Lint, format, i18n audit, test, build — on every push             |
-| Jobs       | pg-boss                          | PostgreSQL-based job queue — no Redis, retries, dead-letter queue |
-| Monitoring | Sentry + OpenTelemetry           | Error capture + distributed tracing + custom metrics; both opt-in |
+| Layer      | Technology                       | Why this choice                                                              |
+| ---------- | -------------------------------- | ---------------------------------------------------------------------------- |
+| Framework  | Next.js 16 (App Router)          | Server Components for zero-waterfall data fetching                           |
+| UI         | React 19 + MUI v7 + MUI X Charts | `useOptimistic` + `useActionState` eliminate form boilerplate                |
+| Org Chart  | ReactFlow + dagre                | Interactive graph visualization with auto-layout                             |
+| Language   | TypeScript 5.9                   | End-to-end type safety from database schema to UI props                      |
+| ORM        | Prisma 7                         | Type-safe queries + raw SQL escape hatch for complex analytics               |
+| Databases  | PostgreSQL + MongoDB 8           | Relational data in SQL, append-only logs in a document store                 |
+| Validation | Zod 4                            | Runtime validation + TypeScript type inference from one schema               |
+| Auth       | NextAuth v5 (JWT)                | Stateless auth that scales without session storage                           |
+| Testing    | Jest 30 + Playwright             | Unit/integration against real DBs + E2E against production builds            |
+| CI/CD      | GitHub Actions                   | Lint, format, type-check, i18n/error-code gates, test, build — on every push |
+| Jobs       | pg-boss                          | PostgreSQL-based job queue — no Redis, retries, dead-letter queue            |
+| Monitoring | Sentry + OpenTelemetry           | Error capture + distributed tracing + custom metrics; both opt-in            |
 
 ---
 
@@ -297,45 +297,46 @@ HRManager is designed as a standalone, independently deployable application — 
 
 ## Testing
 
-| Layer              | Tests    | What it covers                                                                                            |
-| ------------------ | -------- | --------------------------------------------------------------------------------------------------------- |
-| UI components      | 734      | All 52 components: charts, forms, permission toggles, mobile views, themes, skeletons, search, leave mgmt |
-| Server actions     | 253      | Every mutation: happy path, errors, permission denials, cascades, leave approval workflow                 |
-| Zod schemas        | 94       | Validation rules, edge cases, type inference                                                              |
-| Prisma queries     | 83       | Real PostgreSQL + MongoDB queries — not mocks; includes paged query tests for persons/teams/departments   |
-| CSV utils          | 39       | RFC 4180 parsing, import validation, export formatting                                                    |
-| Style tokens       | 37       | Responsive breakpoints, theme tokens, component styles                                                    |
-| Auth callbacks     | 36       | JWT enrichment, permission freshness, demoSessionId ownership, superuser bootstrap                        |
-| Two-factor auth    | 32       | TOTP crypto, setup/verify flow, recovery codes, admin reset, login gating                                 |
-| Session management | 17       | Session tracking, concurrent limits, force-logout, token invalidation, lastActiveAt                       |
-| RBAC logic         | 28       | Resolution, overrides, deny-wins, superuser bypass                                                        |
-| Tutorial config    | 26       | Tour steps, DOM selectors, completion detection                                                           |
-| CSP proxy          | 20       | Nonce generation, header injection, domain allowlists                                                     |
-| Rate limiting      | 18       | Sliding window, race conditions, cleanup                                                                  |
-| i18n               | 14       | Locale loading, cookie persistence, Accept-Language detection                                             |
-| Demo session       | 12       | Sandbox creation, isolation, cleanup, expiry                                                              |
-| Theme config       | 12       | All 6 themes, CSS variables, FOUC prevention                                                              |
-| Audit logging      | 11       | Deferred writes, before/after snapshots, security events, hash chain integration                          |
-| Hash chain         | 10       | HMAC-SHA256 tamper detection, chain verification, broken link reporting                                   |
-| Health endpoints   | 6        | Shallow health, deep readiness, PostgreSQL + MongoDB connectivity, degraded responses                     |
-| MongoDB schema     | 6        | `$jsonSchema` validation, required fields, BSON types, warn vs strict modes                               |
-| Structured logs    | 4        | Pino logger setup, JSON output, child loggers with context                                                |
-| OpenTelemetry      | 22       | SDK init gating, span creation/error/status, metrics caching, middleware tracing, instrumentation hook    |
-| iCal calendar      | 7        | RFC 5545 generation, DTEND exclusivity, text escaping, CRLF, multiple events                              |
-| Keyboard shortcuts | 8        | Chord navigation, help dialog, input suppression, search focus                                            |
-| Real-time (SSE)    | 43       | Event bus emit/subscribe/evict, ring buffer, emit helpers, schema validation, provider, hook, UI          |
-| Auth route         | 5        | Rate limiting on auth endpoints, CSRF, GET passthrough                                                    |
-| Reviews UI         | 86       | Cycle management, request table, submit form, templates, question CRUD, confirm dialogs                   |
-| Accessibility      | 25       | axe-core WCAG AA checks on 22 components — forms, tables, dialogs, skeletons, navigation                  |
-| E2E (Playwright)   | 75       | Auth, CRUD, detail editing, dashboard, profile, data I/O, form validation, full workflow                  |
-| **Total**          | **2825** | **98.9% line coverage · 96.6% function coverage**                                                         |
+| Layer              | Tests    | What it covers                                                                                               |
+| ------------------ | -------- | ------------------------------------------------------------------------------------------------------------ |
+| UI components      | 734      | All UI components: charts, forms, permission toggles, mobile views, themes, skeletons, search, leave mgmt    |
+| Server actions     | 253      | Every mutation: happy path, errors, permission denials, cascades, leave approval workflow                    |
+| Zod schemas        | 94       | Validation rules, edge cases, type inference                                                                 |
+| Prisma queries     | 83       | Real PostgreSQL + MongoDB queries — not mocks; includes paged query tests for persons/teams/departments      |
+| CSV utils          | 39       | RFC 4180 parsing, import validation, export formatting                                                       |
+| Style tokens       | 37       | Responsive breakpoints, theme tokens, component styles                                                       |
+| Auth callbacks     | 36       | JWT enrichment, permission freshness, demoSessionId ownership, superuser bootstrap                           |
+| Two-factor auth    | 32       | TOTP crypto, setup/verify flow, recovery codes, admin reset, login gating                                    |
+| Session management | 17       | Session tracking, concurrent limits, force-logout, token invalidation, lastActiveAt                          |
+| RBAC logic         | 28       | Resolution, overrides, deny-wins, superuser bypass                                                           |
+| Tutorial config    | 26       | Tour steps, DOM selectors, completion detection                                                              |
+| CSP proxy          | 20       | Nonce generation, header injection, domain allowlists                                                        |
+| Rate limiting      | 18       | Sliding window, race conditions, cleanup                                                                     |
+| i18n               | 14       | Locale loading, cookie persistence, Accept-Language detection                                                |
+| Demo session       | 12       | Sandbox creation, isolation, cleanup, expiry                                                                 |
+| Theme config       | 12       | All 6 themes, CSS variables, FOUC prevention                                                                 |
+| Audit logging      | 11       | Deferred writes, before/after snapshots, security events, hash chain integration                             |
+| Hash chain         | 10       | HMAC-SHA256 tamper detection, chain verification, broken link reporting                                      |
+| Health endpoints   | 6        | Shallow health, deep readiness, PostgreSQL + MongoDB connectivity, degraded responses                        |
+| MongoDB schema     | 6        | `$jsonSchema` validation, required fields, BSON types, warn vs strict modes                                  |
+| Structured logs    | 4        | Pino logger setup, JSON output, child loggers with context                                                   |
+| OpenTelemetry      | 22       | SDK init gating, span creation/error/status, metrics caching, middleware tracing, instrumentation hook       |
+| iCal calendar      | 7        | RFC 5545 generation, DTEND exclusivity, text escaping, CRLF, multiple events                                 |
+| Keyboard shortcuts | 8        | Chord navigation, help dialog, input suppression, search focus                                               |
+| Real-time (SSE)    | 43       | Event bus emit/subscribe/evict, ring buffer, emit helpers, schema validation, provider, hook, UI             |
+| Auth route         | 5        | Rate limiting on auth endpoints, CSRF, GET passthrough                                                       |
+| Reviews UI         | 86       | Cycle management, request table, submit form, templates, question CRUD, confirm dialogs                      |
+| Accessibility      | 25       | axe-core WCAG AA checks on 22 components — forms, tables, dialogs, skeletons, navigation                     |
+| E2E (Playwright)   | 75       | Auth, CRUD, detail editing, dashboard, profile, data I/O, form validation, full workflow                     |
+| Newer suites       | 1062     | Post-audit hardening: audit outbox + hash-chain linkage, boundary validation, leave/data/admin action growth |
+| **Total**          | **2825** | **98.9% line coverage · 96.6% function coverage**                                                            |
 
 ```
-Statements : 90.83%    Branches : 82.47%
-Functions  : 83.50%    Lines    : 91.91%
+Statements : 97.83%    Branches : 93.73%
+Functions  : 96.59%    Lines    : 98.87%
 ```
 
-**Testing philosophy:** Server-side tests run against **real PostgreSQL** and **in-memory MongoDB** — not mocks. If your test doesn't touch the real database, it's not catching the bugs that matter (wrong SQL, missing indexes, constraint violations). Client-side tests cover all 48 UI components. Playwright E2E tests run against a production build.
+**Testing philosophy:** Server-side tests run against **real PostgreSQL** and **in-memory MongoDB** — not mocks. If your test doesn't touch the real database, it's not catching the bugs that matter (wrong SQL, missing indexes, constraint violations). Client-side tests cover every UI component. Playwright E2E tests run against a production build.
 
 ---
 
@@ -344,7 +345,7 @@ Functions  : 83.50%    Lines    : 91.91%
 ```bash
 npm run test:e2e        # Playwright E2E tests (builds & starts production server)
 npm run test:e2e:ui     # Playwright interactive UI mode
-npm run validate        # pre-commit gate: Prettier + ESLint + i18n audit + full test suite
+npm run validate        # pre-commit gate: Prettier + ESLint + type-check + error-code gate + i18n audit + full test suite
 npm run i18n:audit      # report missing, extra, and untranslated keys across all locales
 npm run i18n:fix        # auto-fill missing keys with English fallback, remove extras
 npm run i18n:translate  # auto-translate via Claude Haiku API (requires ANTHROPIC_API_KEY)
