@@ -54,7 +54,6 @@ prisma/**/test.db-journal
 
 # Claude
 .claude/
-CLAUDE.md
 TODO.md
 REFACTOR_PLAN.md
 
