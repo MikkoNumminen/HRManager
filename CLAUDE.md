@@ -20,8 +20,8 @@ Every TODO item must have an LLM marker: ⚡ Sonnet-capable (mechanical, repetit
 
 [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
 
-- Do **not** run `git commit` — provide the message as text for the user to commit manually.
-- **Pause at natural commit boundaries.** List files, provide message, **wait for user confirmation** before continuing. Non-negotiable.
+- Claude commits and pushes directly on **feature branches** — logical, self-contained conventional commits (one concern per commit), verified before every push (`npm run typecheck` + targeted tests; the pre-push hook runs the full suite). Never commit to `main` — everything lands via a PR.
+- PRs are reviewed with `/review` (adversarially for substantial changes) and merged only on explicit instruction — **rebase-merge**, preserving the commit history.
 - **Before providing any commit message, update ALL affected files first** (README.md, etc.). Never provide a commit message while dependent files are still out of date.
 - Changes to `CLAUDE.md` or `README.md` must be committed **separately** from code — use a `docs()` commit.
 - **⚠️ After every push, re-read `TODO.md` and present the full task list.**
