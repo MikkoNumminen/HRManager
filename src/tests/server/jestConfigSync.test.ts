@@ -15,6 +15,9 @@ const strykerConfig = readFileSync(join(root, "jest.config.stryker.mjs"), "utf8"
 // Extract the full "pattern": "target" pairs from a config's moduleNameMapper block
 // (any quoted key, not just ^-anchored ones — and values too, so repointing a mock
 // in one file without the other is caught, not just adding/removing one).
+// Known limitation: only string-valued entries are compared; an array-valued mapper
+// ("pattern": ["a", "b"]) on the SERVER side would be skipped — if you ever add one,
+// extend this extraction alongside it.
 function mapperEntries(source: string): Map<string, string> {
   const block = source.match(/moduleNameMapper:\s*\{([\s\S]*?)\n\s*\}/);
   if (!block) return new Map();
