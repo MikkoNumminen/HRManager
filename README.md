@@ -59,7 +59,7 @@ sequenceDiagram
 
 ### 🔐 Security & access control
 
-- **34 permissions, not just 4 roles (granular RBAC)** — Instead of "admin = can do everything," each action has its own permission key (`person:create`, `team:delete`, `review:manage`, `leave:approve`, `position:manage`). Any permission can be overridden per-user: grant a regular user `person:create` without promoting them, or deny `team:delete` from an administrator who shouldn't have it. _Why? Simple role checks seem fine until you need exceptions — and every real organization has them._
+- **38 permissions, not just 4 roles (granular RBAC)** — Instead of "admin = can do everything," each action has its own permission key (`person:create`, `team:delete`, `review:manage`, `leave:approve`, `position:manage`). Any permission can be overridden per-user: grant a regular user `person:create` without promoting them, or deny `team:delete` from an administrator who shouldn't have it. _Why? Simple role checks seem fine until you need exceptions — and every real organization has them._
 
 ```mermaid
 graph TD
@@ -170,7 +170,7 @@ graph LR
 
 - **Sentry error tracking** — `@sentry/nextjs` captures unhandled exceptions, server action failures, and client-side errors. Separate `sentry.client/server/edge.config.ts` files initialize Sentry per runtime. A reusable `SentryErrorBoundary` component wraps MUI fallback UI; `global-error.tsx` catches render-level crashes; `captureServerActionError()` helper instruments server actions. Sentry is opt-in — the app runs normally without a DSN configured. _Why opt-in? This is a portfolio project — developers shouldn't need a Sentry account to run it locally._
 
-- **1828+ tests, 91.9% line coverage** — Unit tests, integration tests against real PostgreSQL + in-memory MongoDB (no database mocks), and 75 Playwright E2E tests covering full user flows. _Why real databases in tests? Mocked tests can pass while production breaks. If your test doesn't hit a real database, it's not testing what you think it's testing._
+- **2825+ tests, 98.9% line coverage** — Unit tests, integration tests against real PostgreSQL + in-memory MongoDB (no database mocks), and 75 Playwright E2E tests covering full user flows. _Why real databases in tests? Mocked tests can pass while production breaks. If your test doesn't hit a real database, it's not testing what you think it's testing._
 
 - **Structured logging (Pino) with trace correlation** — JSON logs in production, human-readable in development. Every log line automatically includes OpenTelemetry `traceId` and `spanId` via Pino's mixin — search a trace ID in your log aggregator to see every log from that request. `createRequestLogger()` adds userId context on top. _Why Pino? It's the fastest Node.js logger, and structured JSON logs are parseable by Datadog, Grafana Loki, and CloudWatch without custom parsing rules._
 
@@ -286,7 +286,7 @@ HRManager is designed as a standalone, independently deployable application — 
 
 | Role          | Access                           | Typical use case                                  |
 | ------------- | -------------------------------- | ------------------------------------------------- |
-| Superuser     | All 34 permissions (immutable)   | System admin — first OAuth user is auto-promoted  |
+| Superuser     | All 38 permissions (immutable)   | System admin — first OAuth user is auto-promoted  |
 | Administrator | All CRUD + dashboard + audit log | Day-to-day management (no admin UI or data reset) |
 | User          | Read-only                        | Regular employee viewing org data                 |
 | Guest         | Read-only (unauthenticated)      | Public visitors browsing without login            |
@@ -328,7 +328,7 @@ HRManager is designed as a standalone, independently deployable application — 
 | Reviews UI         | 86       | Cycle management, request table, submit form, templates, question CRUD, confirm dialogs                   |
 | Accessibility      | 25       | axe-core WCAG AA checks on 22 components — forms, tables, dialogs, skeletons, navigation                  |
 | E2E (Playwright)   | 75       | Auth, CRUD, detail editing, dashboard, profile, data I/O, form validation, full workflow                  |
-| **Total**          | **1828** | **91.9% line coverage · 83.5% function coverage**                                                         |
+| **Total**          | **2825** | **98.9% line coverage · 96.6% function coverage**                                                         |
 
 ```
 Statements : 90.83%    Branches : 82.47%
