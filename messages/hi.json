@@ -526,7 +526,13 @@
     "invalidTotpSecret": "अमान्य TOTP सीक्रेट",
     "twoFactorAlreadyEnabled": "दो-कारक प्रमाणीकरण पहले से सक्षम है",
     "twoFactorNotEnabled": "दो-कारक प्रमाणीकरण सक्षम नहीं है",
-    "resetRequiresDemoSession": "सभी डेटा को रीसेट करना केवल डेमो सत्र में ही उपलब्ध है"
+    "resetRequiresDemoSession": "सभी डेटा को रीसेट करना केवल डेमो सत्र में ही उपलब्ध है",
+    "cannotDeactivateOwnSession": "आप अपना स्वयं का सत्र निष्क्रिय नहीं कर सकते",
+    "featureFlagNotFound": "फ़ीचर फ़्लैग नहीं मिला",
+    "featureFlagAlreadyExists": "इस नाम का फ़ीचर फ़्लैग पहले से मौजूद है",
+    "ipNotAllowed": "इस IP पते से व्यवस्थापक पहुंच की अनुमति नहीं है",
+    "permissionDenied": "अनुमति अस्वीकृत",
+    "rateLimited": "बहुत अधिक अनुरोध। कृपया बाद में पुनः प्रयास करें।"
   },
   "reviews": {
     "title": "प्रदर्शन समीक्षाएँ",

@@ -526,7 +526,13 @@
     "invalidTotpSecret": "Неверный секрет TOTP",
     "twoFactorAlreadyEnabled": "Двухфакторная аутентификация уже включена",
     "twoFactorNotEnabled": "Двухфакторная аутентификация не включена",
-    "resetRequiresDemoSession": "Сброс всех данных доступен только в демонстрационном сеансе"
+    "resetRequiresDemoSession": "Сброс всех данных доступен только в демонстрационном сеансе",
+    "cannotDeactivateOwnSession": "Нельзя деактивировать собственный сеанс",
+    "featureFlagNotFound": "Флаг функции не найден",
+    "featureFlagAlreadyExists": "Флаг функции с таким именем уже существует",
+    "ipNotAllowed": "Доступ администратора с этого IP-адреса запрещён",
+    "permissionDenied": "Доступ запрещён",
+    "rateLimited": "Слишком много запросов. Повторите попытку позже."
   },
   "reviews": {
     "title": "Оценка эффективности",

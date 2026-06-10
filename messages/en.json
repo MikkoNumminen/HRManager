@@ -488,7 +488,13 @@
     "invalidTotpSecret": "Invalid TOTP secret",
     "twoFactorAlreadyEnabled": "Two-factor authentication is already enabled",
     "twoFactorNotEnabled": "Two-factor authentication is not enabled",
-    "resetRequiresDemoSession": "Resetting all data is only available within a demo session"
+    "resetRequiresDemoSession": "Resetting all data is only available within a demo session",
+    "cannotDeactivateOwnSession": "You cannot deactivate your own session",
+    "featureFlagNotFound": "Feature flag not found",
+    "featureFlagAlreadyExists": "A feature flag with this name already exists",
+    "ipNotAllowed": "Admin access is not allowed from this IP address",
+    "permissionDenied": "Permission denied",
+    "rateLimited": "Too many requests. Please try again later."
   },
   "tutorial": {
     "checklistTitle": "Demo Tour",

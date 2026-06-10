@@ -526,7 +526,13 @@
     "invalidTotpSecret": "Невірний секрет TOTP",
     "twoFactorAlreadyEnabled": "Двофакторна автентифікація вже увімкнена",
     "twoFactorNotEnabled": "Двофакторна автентифікація не увімкнена",
-    "resetRequiresDemoSession": "Скидання всіх даних доступне лише в демонстраційному сеансі"
+    "resetRequiresDemoSession": "Скидання всіх даних доступне лише в демонстраційному сеансі",
+    "cannotDeactivateOwnSession": "Неможливо деактивувати власний сеанс",
+    "featureFlagNotFound": "Прапорець функції не знайдено",
+    "featureFlagAlreadyExists": "Прапорець функції з такою назвою вже існує",
+    "ipNotAllowed": "Доступ адміністратора з цієї IP-адреси заборонено",
+    "permissionDenied": "Доступ заборонено",
+    "rateLimited": "Забагато запитів. Спробуйте пізніше."
   },
   "reviews": {
     "title": "Оцінка ефективності",

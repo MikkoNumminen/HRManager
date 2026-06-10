@@ -526,7 +526,13 @@
     "invalidTotpSecret": "Ungültiges TOTP-Geheimnis",
     "twoFactorAlreadyEnabled": "Die Zwei-Faktor-Authentifizierung ist bereits aktiviert",
     "twoFactorNotEnabled": "Die Zwei-Faktor-Authentifizierung ist nicht aktiviert",
-    "resetRequiresDemoSession": "Das Zurücksetzen aller Daten ist nur in einer Demositzung möglich"
+    "resetRequiresDemoSession": "Das Zurücksetzen aller Daten ist nur in einer Demositzung möglich",
+    "cannotDeactivateOwnSession": "Eigene Sitzung kann nicht deaktiviert werden",
+    "featureFlagNotFound": "Feature-Flag nicht gefunden",
+    "featureFlagAlreadyExists": "Ein Feature-Flag mit diesem Namen existiert bereits",
+    "ipNotAllowed": "Admin-Zugriff von dieser IP-Adresse nicht erlaubt",
+    "permissionDenied": "Zugriff verweigert",
+    "rateLimited": "Zu viele Anfragen. Bitte später erneut versuchen."
   },
   "reviews": {
     "title": "Leistungsbeurteilungen",

@@ -526,7 +526,13 @@
     "invalidTotpSecret": "Geçersiz TOTP gizli anahtarı",
     "twoFactorAlreadyEnabled": "İki faktörlü kimlik doğrulama zaten etkin",
     "twoFactorNotEnabled": "İki faktörlü kimlik doğrulama etkin değil",
-    "resetRequiresDemoSession": "Tüm verileri sıfırlama yalnızca demo oturumunda kullanılabilir"
+    "resetRequiresDemoSession": "Tüm verileri sıfırlama yalnızca demo oturumunda kullanılabilir",
+    "cannotDeactivateOwnSession": "Kendi oturumunuzu devre dışı bırakamazsınız",
+    "featureFlagNotFound": "Özellik bayrağı bulunamadı",
+    "featureFlagAlreadyExists": "Bu ada sahip bir özellik bayrağı zaten mevcut",
+    "ipNotAllowed": "Bu IP adresinden yönetici erişimine izin verilmiyor",
+    "permissionDenied": "İzin reddedildi",
+    "rateLimited": "Çok fazla istek. Lütfen daha sonra tekrar deneyin."
   },
   "reviews": {
     "title": "Performans Değerlendirmeleri",

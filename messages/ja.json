@@ -526,7 +526,13 @@
     "invalidTotpSecret": "TOTPシークレットが無効です",
     "twoFactorAlreadyEnabled": "二要素認証はすでに有効です",
     "twoFactorNotEnabled": "二要素認証が有効になっていません",
-    "resetRequiresDemoSession": "すべてのデータのリセットはデモセッションでのみ利用できます"
+    "resetRequiresDemoSession": "すべてのデータのリセットはデモセッションでのみ利用できます",
+    "cannotDeactivateOwnSession": "自分自身のセッションは無効化できません",
+    "featureFlagNotFound": "機能フラグが見つかりません",
+    "featureFlagAlreadyExists": "この名前の機能フラグは既に存在します",
+    "ipNotAllowed": "このIPアドレスからの管理者アクセスは許可されていません",
+    "permissionDenied": "権限がありません",
+    "rateLimited": "リクエストが多すぎます。しばらくしてから再試行してください。"
   },
   "reviews": {
     "title": "パフォーマンス評価",

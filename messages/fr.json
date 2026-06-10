@@ -526,7 +526,13 @@
     "invalidTotpSecret": "Secret TOTP invalide",
     "twoFactorAlreadyEnabled": "L'authentification à deux facteurs est déjà activée",
     "twoFactorNotEnabled": "L'authentification à deux facteurs n'est pas activée",
-    "resetRequiresDemoSession": "La réinitialisation de toutes les données n'est disponible que dans une session de démonstration"
+    "resetRequiresDemoSession": "La réinitialisation de toutes les données n'est disponible que dans une session de démonstration",
+    "cannotDeactivateOwnSession": "Impossible de désactiver votre propre session",
+    "featureFlagNotFound": "Indicateur de fonctionnalité introuvable",
+    "featureFlagAlreadyExists": "Un indicateur de fonctionnalité portant ce nom existe déjà",
+    "ipNotAllowed": "Accès administrateur non autorisé depuis cette adresse IP",
+    "permissionDenied": "Permission refusée",
+    "rateLimited": "Trop de requêtes. Veuillez réessayer plus tard."
   },
   "reviews": {
     "title": "Évaluations de performance",

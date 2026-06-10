@@ -51,6 +51,16 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      # jest is transpile-only — without this gate, type errors only surface in
+      # the Build step at the end (or worse, on Vercel). Fail fast here instead.
+      - name: Type-check
+        run: npm run typecheck
+
+      # ErrorCode is a manual union; every member must have an errors.* i18n key
+      # or `next build` fails. Catch the drift before the test suite runs.
+      - name: Check error-code i18n coverage
+        run: npm run check:error-codes
+
       - name: Run all tests with coverage
         run: npm run test:all -- --coverage
 
