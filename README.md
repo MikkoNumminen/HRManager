@@ -170,7 +170,7 @@ graph LR
 
 - **Sentry error tracking** — `@sentry/nextjs` captures unhandled exceptions, server action failures, and client-side errors. Separate `sentry.client/server/edge.config.ts` files initialize Sentry per runtime. A reusable `SentryErrorBoundary` component wraps MUI fallback UI; `global-error.tsx` catches render-level crashes; `captureServerActionError()` helper instruments server actions. Sentry is opt-in — the app runs normally without a DSN configured. _Why opt-in? This is a portfolio project — developers shouldn't need a Sentry account to run it locally._
 
-- **2825+ tests, 98.9% line coverage** — Unit tests, integration tests against real PostgreSQL + in-memory MongoDB (no database mocks), and 75 Playwright E2E tests covering full user flows. _Why real databases in tests? Mocked tests can pass while production breaks. If your test doesn't hit a real database, it's not testing what you think it's testing._
+- **2900 tests (2825 Jest + 75 Playwright E2E), 92% line coverage** — Unit tests, integration tests against real PostgreSQL + in-memory MongoDB (no database mocks), and 75 Playwright E2E tests covering full user flows. _Why real databases in tests? Mocked tests can pass while production breaks. If your test doesn't hit a real database, it's not testing what you think it's testing._
 
 - **Structured logging (Pino) with trace correlation** — JSON logs in production, human-readable in development. Every log line automatically includes OpenTelemetry `traceId` and `spanId` via Pino's mixin — search a trace ID in your log aggregator to see every log from that request. `createRequestLogger()` adds userId context on top. _Why Pino? It's the fastest Node.js logger, and structured JSON logs are parseable by Datadog, Grafana Loki, and CloudWatch without custom parsing rules._
 
@@ -180,7 +180,7 @@ graph LR
 
 - **Org-wide query caching** — A reusable `cache()` wrapper (`src/lib/cache.ts`) wraps `unstable_cache` from `next/cache` and is applied to the highest-traffic queries: the dashboard metrics + org chart, the analytics reports, and the four core org-wide listings (`getPersons`, `getTeams`, `getDepartments`, `getPositions`). All entries are keyed by `sessionId` (so demo users stay isolated) and tagged with `org-data` / `dashboard` / `org-chart`. Every mutating server action calls `updateTag("org-data")` (Next.js 16's read-your-own-writes API) so the same request that creates a person sees the new row immediately, while concurrent requests from other users see stale data for up to the 5-minute TTL. Test-safe — the wrapper short-circuits to a passthrough under `NODE_ENV=test`. _Why cache? The home page hits four org-wide queries on every load; caching turns ~80–200 ms of Prisma round-trips into a single ~1 ms in-memory lookup, which is the dominant CPU win on Vercel's serverless plan._
 
-- **Vercel `ignoreCommand`** — A `vercel.json` at the repo root short-circuits Vercel deployments when only docs (`*.md`), tests (`src/tests/**`, `src/**/__tests__/**`, `e2e/**`), CI configs (`.github/**`, `.husky/**`), or jest/playwright/stryker config files change. The check lives in `scripts/vercel-ignore.sh` (Vercel caps `ignoreCommand` at 256 characters, so the long pathspec list can't live inline) and uses `git diff HEAD^ HEAD --quiet` with `:(exclude)` pathspecs, falling back to "deploy" when `HEAD^` isn't reachable in a shallow clone. _Why? Each Vercel build runs `prisma migrate deploy && prisma generate && next build`, which is the most CPU-expensive step in the entire pipeline. Skipping deploys for test-only or docs-only commits typically halves monthly build minutes on a portfolio repo with frequent README/TODO churn._
+- **Vercel `ignoreCommand`** — A `vercel.json` at the repo root short-circuits Vercel deployments when only docs (`*.md`), tests (`src/tests/**`, `src/**/__tests__/**`, `e2e/**`), CI configs (`.github/**`, `.husky/**`), or jest/playwright/stryker config files change. The check lives in `scripts/vercel-ignore.sh` (Vercel caps `ignoreCommand` at 256 characters, so the long pathspec list can't live inline) and diffs against `$VERCEL_GIT_PREVIOUS_SHA` (the last deployed commit — correct for multi-commit pushes) with `:(exclude)` pathspecs, falling back to `HEAD^` and ultimately to "deploy" when no base is reachable. _Why? Each Vercel build runs `prisma migrate deploy && prisma generate && next build`, which is the most CPU-expensive step in the entire pipeline. Skipping deploys for test-only or docs-only commits typically halves monthly build minutes on a portfolio repo with frequent README/TODO churn._
 
 - **Per-request permission memoization** — `getCurrentUser()` and the no-arg `getUserPermissions()` are wrapped in React's `cache()`, which deduplicates identical calls within the same Server Component render. The home page calls `hasPermission()` ~5× (one per query) plus an explicit `getUserPermissions()` for the TopBar — without memoization that's 6 independent `prisma.user.findUnique` round-trips, each with a `permissions` join. After `cache()`, it collapses to a single DB hit per render. The `userId`-keyed variant intentionally stays unmemoized so admin pages can look up multiple users in one render. _Why? On the Vercel Hobby tier, every saved Prisma round-trip is also saved Active CPU — and this is the cheapest possible win because it's a one-line change._
 
@@ -194,20 +194,20 @@ graph LR
 
 ## Tech stack
 
-| Layer      | Technology                       | Why this choice                                                              |
-| ---------- | -------------------------------- | ---------------------------------------------------------------------------- |
-| Framework  | Next.js 16 (App Router)          | Server Components for zero-waterfall data fetching                           |
-| UI         | React 19 + MUI v7 + MUI X Charts | `useOptimistic` + `useActionState` eliminate form boilerplate                |
-| Org Chart  | ReactFlow + dagre                | Interactive graph visualization with auto-layout                             |
-| Language   | TypeScript 5.9                   | End-to-end type safety from database schema to UI props                      |
-| ORM        | Prisma 7                         | Type-safe queries + raw SQL escape hatch for complex analytics               |
-| Databases  | PostgreSQL + MongoDB 8           | Relational data in SQL, append-only logs in a document store                 |
-| Validation | Zod 4                            | Runtime validation + TypeScript type inference from one schema               |
-| Auth       | NextAuth v5 (JWT)                | Stateless auth that scales without session storage                           |
-| Testing    | Jest 30 + Playwright             | Unit/integration against real DBs + E2E against production builds            |
-| CI/CD      | GitHub Actions                   | Lint, format, type-check, i18n/error-code gates, test, build — on every push |
-| Jobs       | pg-boss                          | PostgreSQL-based job queue — no Redis, retries, dead-letter queue            |
-| Monitoring | Sentry + OpenTelemetry           | Error capture + distributed tracing + custom metrics; both opt-in            |
+| Layer      | Technology                       | Why this choice                                                        |
+| ---------- | -------------------------------- | ---------------------------------------------------------------------- |
+| Framework  | Next.js 16 (App Router)          | Server Components for zero-waterfall data fetching                     |
+| UI         | React 19 + MUI v7 + MUI X Charts | `useOptimistic` + `useActionState` eliminate form boilerplate          |
+| Org Chart  | ReactFlow + dagre                | Interactive graph visualization with auto-layout                       |
+| Language   | TypeScript 5.9                   | End-to-end type safety from database schema to UI props                |
+| ORM        | Prisma 7                         | Type-safe queries + raw SQL escape hatch for complex analytics         |
+| Databases  | PostgreSQL + MongoDB 8           | Relational data in SQL, append-only logs in a document store           |
+| Validation | Zod 4                            | Runtime validation + TypeScript type inference from one schema         |
+| Auth       | NextAuth v5 (JWT)                | Stateless auth that scales without session storage                     |
+| Testing    | Jest 30 + Playwright             | Unit/integration against real DBs + E2E against production builds      |
+| CI/CD      | GitHub Actions                   | Lint, format, type-check, error-code gate, test, build — on every push |
+| Jobs       | pg-boss                          | PostgreSQL-based job queue — no Redis, retries, dead-letter queue      |
+| Monitoring | Sentry + OpenTelemetry           | Error capture + distributed tracing + custom metrics; both opt-in      |
 
 ---
 
@@ -328,12 +328,12 @@ HRManager is designed as a standalone, independently deployable application — 
 | Reviews UI         | 86       | Cycle management, request table, submit form, templates, question CRUD, confirm dialogs                      |
 | Accessibility      | 25       | axe-core WCAG AA checks on 22 components — forms, tables, dialogs, skeletons, navigation                     |
 | E2E (Playwright)   | 75       | Auth, CRUD, detail editing, dashboard, profile, data I/O, form validation, full workflow                     |
-| Newer suites       | 1062     | Post-audit hardening: audit outbox + hash-chain linkage, boundary validation, leave/data/admin action growth |
-| **Total**          | **2825** | **98.9% line coverage · 96.6% function coverage**                                                            |
+| Newer suites       | 1137     | Post-audit hardening: audit outbox + hash-chain linkage, boundary validation, leave/data/admin action growth |
+| **Total**          | **2900** | **92.2% line coverage · 92.2% function coverage**                                                            |
 
 ```
-Statements : 97.83%    Branches : 93.73%
-Functions  : 96.59%    Lines    : 98.87%
+Statements : 90.37%    Branches : 87.35%
+Functions  : 92.24%    Lines    : 92.16%
 ```
 
 **Testing philosophy:** Server-side tests run against **real PostgreSQL** and **in-memory MongoDB** — not mocks. If your test doesn't touch the real database, it's not catching the bugs that matter (wrong SQL, missing indexes, constraint violations). Client-side tests cover every UI component. Playwright E2E tests run against a production build.
