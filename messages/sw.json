@@ -528,8 +528,8 @@
     "twoFactorNotEnabled": "Uthibitishaji wa hatua mbili haujawashwa",
     "resetRequiresDemoSession": "Kuweka upya data zote kunapatikana tu katika kipindi cha onyesho",
     "cannotDeactivateOwnSession": "Huwezi kuzima kipindi chako mwenyewe",
-    "featureFlagNotFound": "Bendera ya kipengele haikupatikana",
-    "featureFlagAlreadyExists": "Bendera ya kipengele yenye jina hili tayari ipo",
+    "featureFlagNotFound": "Alama ya kipengele haikupatikana",
+    "featureFlagAlreadyExists": "Alama ya kipengele yenye jina hili tayari ipo",
     "ipNotAllowed": "Ufikiaji wa msimamizi hauruhusiwi kutoka anwani hii ya IP",
     "permissionDenied": "Ruhusa imekataliwa",
     "rateLimited": "Maombi mengi mno. Tafadhali jaribu tena baadaye."

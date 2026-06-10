@@ -528,8 +528,8 @@
     "twoFactorNotEnabled": "双因素身份验证未启用",
     "resetRequiresDemoSession": "仅可在演示会话中重置所有数据",
     "cannotDeactivateOwnSession": "无法停用自己的会话",
-    "featureFlagNotFound": "未找到功能开关",
-    "featureFlagAlreadyExists": "同名的功能开关已存在",
+    "featureFlagNotFound": "未找到功能标志",
+    "featureFlagAlreadyExists": "同名功能标志已存在",
     "ipNotAllowed": "不允许从此 IP 地址进行管理员访问",
     "permissionDenied": "权限被拒绝",
     "rateLimited": "请求过多，请稍后重试。"

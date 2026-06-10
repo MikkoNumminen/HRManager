@@ -528,8 +528,8 @@
     "twoFactorNotEnabled": "A autenticação de dois fatores não está ativada",
     "resetRequiresDemoSession": "A redefinição de todos os dados só está disponível em uma sessão de demonstração",
     "cannotDeactivateOwnSession": "Não é possível desativar a própria sessão",
-    "featureFlagNotFound": "Sinalizador de recurso não encontrado",
-    "featureFlagAlreadyExists": "Já existe um sinalizador de recurso com este nome",
+    "featureFlagNotFound": "Sinalizador de funcionalidade não encontrado",
+    "featureFlagAlreadyExists": "Já existe um sinalizador de funcionalidade com este nome",
     "ipNotAllowed": "Acesso de administrador não permitido a partir deste endereço IP",
     "permissionDenied": "Permissão negada",
     "rateLimited": "Muitas solicitações. Tente novamente mais tarde."
