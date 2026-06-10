@@ -17,8 +17,9 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 // not terminate the union early (union members are plain quoted identifiers, so
 // after stripping, the first ';' genuinely ends the type).
 const source = readFileSync(join(root, "src/actionErrors.ts"), "utf8")
-  .replace(/\/\*[\s\S]*?\*\//g, "")
-  .replace(/\/\/[^\n]*/g, "");
+  // Single alternation so each comment is consumed atomically left-to-right —
+  // sequential passes would let a '/*' inside a line comment swallow real code.
+  .replace(/\/\/[^\n]*|\/\*[\s\S]*?\*\//g, "");
 const unionMatch = source.match(/export type ErrorCode =([\s\S]*?);/);
 if (!unionMatch) {
   console.error("check-error-codes: could not locate the ErrorCode union in src/actionErrors.ts");
