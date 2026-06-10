@@ -52,8 +52,9 @@ prisma/**/test.db-journal
 /playwright/.cache/
 /e2e/.auth/
 
-# Claude
-.claude/
+# Claude — personal settings stay local; shared project skills are tracked
+.claude/*
+!.claude/skills/
 TODO.md
 REFACTOR_PLAN.md
 
