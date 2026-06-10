@@ -526,7 +526,13 @@
     "invalidTotpSecret": "مفتاح TOTP غير صالح",
     "twoFactorAlreadyEnabled": "المصادقة الثنائية مفعّلة بالفعل",
     "twoFactorNotEnabled": "المصادقة الثنائية غير مفعّلة",
-    "resetRequiresDemoSession": "إعادة تعيين جميع البيانات متاحة فقط في جلسة تجريبية"
+    "resetRequiresDemoSession": "إعادة تعيين جميع البيانات متاحة فقط في جلسة تجريبية",
+    "cannotDeactivateOwnSession": "لا يمكنك إلغاء تنشيط جلستك الخاصة",
+    "featureFlagNotFound": "علامة الميزة غير موجودة",
+    "featureFlagAlreadyExists": "توجد بالفعل علامة ميزة بهذا الاسم",
+    "ipNotAllowed": "وصول المسؤول غير مسموح به من عنوان IP هذا",
+    "permissionDenied": "تم رفض الإذن",
+    "rateLimited": "طلبات كثيرة جدًا. يرجى المحاولة لاحقًا."
   },
   "reviews": {
     "title": "تقييمات الأداء",

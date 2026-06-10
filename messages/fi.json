@@ -526,7 +526,13 @@
     "invalidTotpSecret": "Virheellinen TOTP-salaisuus",
     "twoFactorAlreadyEnabled": "Kaksivaiheinen tunnistautuminen on jo käytössä",
     "twoFactorNotEnabled": "Kaksivaiheinen tunnistautuminen ei ole käytössä",
-    "resetRequiresDemoSession": "Kaikkien tietojen nollaus on käytettävissä vain demoistunnossa"
+    "resetRequiresDemoSession": "Kaikkien tietojen nollaus on käytettävissä vain demoistunnossa",
+    "cannotDeactivateOwnSession": "Omaa istuntoa ei voi poistaa käytöstä",
+    "featureFlagNotFound": "Ominaisuuslippua ei löytynyt",
+    "featureFlagAlreadyExists": "Samanniminen ominaisuuslippu on jo olemassa",
+    "ipNotAllowed": "Ylläpitokäyttö ei ole sallittua tästä IP-osoitteesta",
+    "permissionDenied": "Käyttöoikeus evätty",
+    "rateLimited": "Liikaa pyyntöjä. Yritä myöhemmin uudelleen."
   },
   "reviews": {
     "title": "Kehityskeskustelut",

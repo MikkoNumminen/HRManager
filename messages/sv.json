@@ -526,7 +526,13 @@
     "invalidTotpSecret": "Ogiltigt TOTP-hemligt",
     "twoFactorAlreadyEnabled": "Tvåfaktorsautentisering är redan aktiverad",
     "twoFactorNotEnabled": "Tvåfaktorsautentisering är inte aktiverad",
-    "resetRequiresDemoSession": "Återställning av all data är endast tillgänglig i en demosession"
+    "resetRequiresDemoSession": "Återställning av all data är endast tillgänglig i en demosession",
+    "cannotDeactivateOwnSession": "Det går inte att inaktivera din egen session",
+    "featureFlagNotFound": "Funktionsflaggan hittades inte",
+    "featureFlagAlreadyExists": "En funktionsflagga med detta namn finns redan",
+    "ipNotAllowed": "Administratörsåtkomst är inte tillåten från denna IP-adress",
+    "permissionDenied": "Åtkomst nekad",
+    "rateLimited": "För många förfrågningar. Försök igen senare."
   },
   "reviews": {
     "title": "Prestationsbedömningar",

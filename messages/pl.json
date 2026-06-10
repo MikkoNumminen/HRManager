@@ -526,7 +526,13 @@
     "invalidTotpSecret": "Nieprawidłowy sekret TOTP",
     "twoFactorAlreadyEnabled": "Uwierzytelnianie dwuskładnikowe jest już włączone",
     "twoFactorNotEnabled": "Uwierzytelnianie dwuskładnikowe nie jest włączone",
-    "resetRequiresDemoSession": "Resetowanie wszystkich danych jest dostępne tylko w sesji demonstracyjnej"
+    "resetRequiresDemoSession": "Resetowanie wszystkich danych jest dostępne tylko w sesji demonstracyjnej",
+    "cannotDeactivateOwnSession": "Nie można dezaktywować własnej sesji",
+    "featureFlagNotFound": "Nie znaleziono flagi funkcji",
+    "featureFlagAlreadyExists": "Flaga funkcji o tej nazwie już istnieje",
+    "ipNotAllowed": "Dostęp administratora z tego adresu IP jest niedozwolony",
+    "permissionDenied": "Odmowa dostępu",
+    "rateLimited": "Zbyt wiele żądań. Spróbuj ponownie później."
   },
   "reviews": {
     "title": "Oceny pracownicze",

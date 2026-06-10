@@ -526,7 +526,13 @@
     "invalidTotpSecret": "유효하지 않은 TOTP 비밀키",
     "twoFactorAlreadyEnabled": "이중 인증이 이미 활성화되어 있습니다",
     "twoFactorNotEnabled": "이중 인증이 활성화되어 있지 않습니다",
-    "resetRequiresDemoSession": "모든 데이터 초기화는 데모 세션에서만 사용할 수 있습니다"
+    "resetRequiresDemoSession": "모든 데이터 초기화는 데모 세션에서만 사용할 수 있습니다",
+    "cannotDeactivateOwnSession": "자신의 세션은 비활성화할 수 없습니다",
+    "featureFlagNotFound": "기능 플래그를 찾을 수 없습니다",
+    "featureFlagAlreadyExists": "같은 이름의 기능 플래그가 이미 존재합니다",
+    "ipNotAllowed": "이 IP 주소에서는 관리자 접근이 허용되지 않습니다",
+    "permissionDenied": "권한이 거부되었습니다",
+    "rateLimited": "요청이 너무 많습니다. 나중에 다시 시도하세요."
   },
   "reviews": {
     "title": "성과 평가",

@@ -526,7 +526,13 @@
     "invalidTotpSecret": "รหัสลับ TOTP ไม่ถูกต้อง",
     "twoFactorAlreadyEnabled": "การยืนยันตัวตนสองขั้นตอนเปิดใช้งานอยู่แล้ว",
     "twoFactorNotEnabled": "การยืนยันตัวตนสองขั้นตอนไม่ได้เปิดใช้งาน",
-    "resetRequiresDemoSession": "การรีเซ็ตข้อมูลทั้งหมดใช้ได้เฉพาะในเซสชันสาธิตเท่านั้น"
+    "resetRequiresDemoSession": "การรีเซ็ตข้อมูลทั้งหมดใช้ได้เฉพาะในเซสชันสาธิตเท่านั้น",
+    "cannotDeactivateOwnSession": "คุณไม่สามารถปิดใช้งานเซสชันของคุณเองได้",
+    "featureFlagNotFound": "ไม่พบฟีเจอร์แฟล็ก",
+    "featureFlagAlreadyExists": "มีฟีเจอร์แฟล็กชื่อนี้อยู่แล้ว",
+    "ipNotAllowed": "ไม่อนุญาตให้ผู้ดูแลระบบเข้าถึงจากที่อยู่ IP นี้",
+    "permissionDenied": "การอนุญาตถูกปฏิเสธ",
+    "rateLimited": "คำขอมากเกินไป กรุณาลองใหม่ภายหลัง"
   },
   "reviews": {
     "title": "การประเมินผลการปฏิบัติงาน",

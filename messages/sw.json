@@ -526,7 +526,13 @@
     "invalidTotpSecret": "Siri ya TOTP si sahihi",
     "twoFactorAlreadyEnabled": "Uthibitishaji wa hatua mbili umewashwa tayari",
     "twoFactorNotEnabled": "Uthibitishaji wa hatua mbili haujawashwa",
-    "resetRequiresDemoSession": "Kuweka upya data zote kunapatikana tu katika kipindi cha onyesho"
+    "resetRequiresDemoSession": "Kuweka upya data zote kunapatikana tu katika kipindi cha onyesho",
+    "cannotDeactivateOwnSession": "Huwezi kuzima kipindi chako mwenyewe",
+    "featureFlagNotFound": "Bendera ya kipengele haikupatikana",
+    "featureFlagAlreadyExists": "Bendera ya kipengele yenye jina hili tayari ipo",
+    "ipNotAllowed": "Ufikiaji wa msimamizi hauruhusiwi kutoka anwani hii ya IP",
+    "permissionDenied": "Ruhusa imekataliwa",
+    "rateLimited": "Maombi mengi mno. Tafadhali jaribu tena baadaye."
   },
   "reviews": {
     "title": "Tathmini za Utendaji",
