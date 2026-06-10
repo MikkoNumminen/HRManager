@@ -34,8 +34,12 @@ const config = {
   // transforms work correctly without needing a separate Babel config.
   inPlace: true,
   coverageAnalysis: "perTest",
-  // Allow 2× the normal Jest timeout per mutant
-  timeoutFactor: 2,
+  // 119 of 434 mutants timed out on the first green run (84 min total): 7 default
+  // test-runner processes oversubscribed CI's cores AND contended on the single
+  // shared test Postgres. Fewer runners + a tighter timeout cut wall-clock without
+  // changing the verdict (timeouts count as killed either way).
+  concurrency: 4,
+  timeoutFactor: 1.5,
   // Fail the run if mutation score drops below this threshold
   thresholds: {
     high: 80,
