@@ -20,6 +20,24 @@ class PgBoss {
   send() {
     return Promise.resolve("job-id");
   }
+  createQueue() {
+    return Promise.resolve();
+  }
+  fetch() {
+    return Promise.resolve([]);
+  }
+  complete() {
+    return Promise.resolve({ affected: 0 });
+  }
+  fail() {
+    return Promise.resolve({ affected: 0 });
+  }
+  retry() {
+    return Promise.resolve({ affected: 0 });
+  }
+  supervise() {
+    return Promise.resolve();
+  }
   schedule() {
     return Promise.resolve();
   }

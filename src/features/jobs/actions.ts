@@ -79,8 +79,10 @@ export async function retryFailedJob(queueName: QueueName, jobId: string): Promi
     validateUUID(jobId, "jobId");
 
     const boss = await getJobQueue();
-    await boss.resume(queueName, jobId);
-    // A resumed job is pending again — process it without waiting for the cron.
+    // v12: retry() is the call that re-queues a `failed` job (resume() only
+    // matches `cancelled` and is a silent no-op on failed jobs).
+    await boss.retry(queueName, jobId);
+    // The retried job is pending again — process it without waiting for the cron.
     scheduleJobDrain();
 
     await deferAuditLog({

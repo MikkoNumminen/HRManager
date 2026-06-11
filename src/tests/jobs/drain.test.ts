@@ -99,6 +99,20 @@ describe("processPendingJobs", () => {
     expect(mockFail).not.toHaveBeenCalled();
   });
 
+  // A queue-level error (e.g. queue missing on a fresh DB) skips only that queue.
+  test("isolates a queue-level failure so the other queue still drains", async () => {
+    mockFetch.mockImplementation(async (queue: string) => {
+      if (queue === "cleanup") throw new Error("Queue cleanup does not exist");
+      return [{ id: "ae-1", data: { format: "json" } }];
+    });
+    mockRunAuditExport.mockResolvedValue({ result: "[]", count: 0 });
+
+    const result = await processPendingJobs();
+
+    expect(result).toEqual({ processed: 1, failed: 0 });
+    expect(mockComplete).toHaveBeenCalledWith("audit-export", "ae-1", { result: "[]", count: 0 });
+  });
+
   // A full batch triggers another fetch; a short batch ends the loop.
   test("keeps fetching while batches come back full", async () => {
     const full = Array.from({ length: 2 }, (_, i) => ({ id: `c-${i}`, data: { type: "all" } }));

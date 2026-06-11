@@ -5,12 +5,14 @@ export {};
 const mockStart = jest.fn().mockResolvedValue(undefined);
 const mockStop = jest.fn().mockResolvedValue(undefined);
 const mockOn = jest.fn();
+const mockCreateQueue = jest.fn().mockResolvedValue(undefined);
 
 jest.mock("pg-boss", () => ({
   PgBoss: jest.fn().mockImplementation(() => ({
     start: mockStart,
     stop: mockStop,
     on: mockOn,
+    createQueue: mockCreateQueue,
   })),
 }));
 
@@ -46,6 +48,7 @@ async function loadModule() {
       start: mockStart,
       stop: mockStop,
       on: mockOn,
+      createQueue: mockCreateQueue,
     })),
   }));
   jest.mock("@/lib/logger", () => ({
@@ -75,6 +78,9 @@ test("getJobQueue initializes and starts pg-boss", async () => {
   expect(boss).toBeDefined();
   expect(mockStart).toHaveBeenCalledTimes(1);
   expect(mockOn).toHaveBeenCalledWith("error", expect.any(Function));
+  // v12 requires queues to exist before send()/fetch() — created at startup.
+  expect(mockCreateQueue).toHaveBeenCalledWith("cleanup");
+  expect(mockCreateQueue).toHaveBeenCalledWith("audit-export");
 });
 
 // getJobQueue returns the same instance on second call (singleton)
