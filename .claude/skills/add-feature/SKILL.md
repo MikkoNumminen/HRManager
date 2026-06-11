@@ -7,8 +7,9 @@ description: Add a new feature module / entity end-to-end — the S-Q-A scaffold
 
 Copy the closest existing feature instead of writing from scratch —
 `src/features/positions/` is the minimal CRUD specimen, `src/features/leave/`
-the comprehensive one. Every box below is a place an inconsistent feature has
-actually drifted; check them all.
+the comprehensive one (note: leave's UI lives at `src/components/LeaveManager/`
+as a documented legacy exception — copy positions' layout, not that). Every box
+below is a place an inconsistent feature has actually drifted; check them all.
 
 ## 1. The feature directory (`src/features/<entity>/`)
 
@@ -30,7 +31,7 @@ actually drifted; check them all.
 | 4   | `src/permissions.ts`                                                   | key in `PERMISSION_KEYS`, grants in `ROLE_DEFAULTS`, text in `formatPermissionDescription()` — then fix the permission COUNT in README + docs/architecture.md (source of truth note in CLAUDE.md) |
 | 5   | `prisma/schema.prisma` + migration                                     | model with `sessionId String?`, `deletedAt DateTime?`, timestamps; `@@index([deletedAt])`, `@@index([sessionId])`; natural-key `@@unique([…, sessionId])`. Migration must be additive/deploy-safe |
 | 6   | `messages/en.json` + 17 locales                                        | `<entity>` + `<entity>Notifications` namespaces, permission description — full procedure in the `i18n` skill                                                                                      |
-| 7   | `src/features/audit/schemas.ts`                                        | add the entity to `AuditEntityTypeSchema` or `addAudit` writes will fail validation                                                                                                               |
+| 7   | `src/features/audit/schemas.ts`                                        | add the entity to `AuditEntityTypeSchema` — `addAudit`'s entityType is typed from it, so a missing entry is a compile error (and the audit READ path parses against it)                           |
 | 8   | `src/actionErrors.ts`                                                  | new `ErrorCode` members (manual union — see the `i18n` skill for the 3-step coupling)                                                                                                             |
 | 9   | `src/tests/server/serverActions.<entity>.test.ts`                      | mock set copied from a neighbor (db/auth/permissions/auditLog/rateLimit/demoSession/next-cache/next-navigation); success + every error code                                                       |
 | 10  | `src/tests/server/testDb.ts`                                           | `createTest<Entity>()` factory + the model in `cleanDb()`'s truncate list                                                                                                                         |

@@ -11,7 +11,8 @@ Keys live in feature-shaped top-level namespaces (`persons`, `errors`,
 
 ```bash
 npm run i18n:audit       # report missing / extra / untranslated across locales
-npm run i18n:fix         # fill missing keys with English fallback text
+npm run i18n:fix         # fill missing keys with English fallback AND delete
+                         # keys absent from en.json — destructive to locale-only keys
 npm run i18n:translate   # auto-translate via API (needs ANTHROPIC_API_KEY) —
                          # translating by hand is equally fine
 ```
@@ -42,15 +43,18 @@ check:error-codes` fails without it.
 4. Throw it as `new ActionError("<code>", t("<code>"))` inside the action.
 
 Miss (1) and `next build` fails on the type; miss (2) and CI fails; miss (3)
-and the pre-push hook blocks once >25 keys are untranslated.
+and the keys count toward the pre-push untranslated threshold.
 
 ## When the pre-push hook blocks
 
-This is the designed loop, not an error:
+This is the designed loop, not an error. The hook has TWO independent block
+paths — read its output to know which fired:
 
-1. The hook already ran `i18n:fix` — English fallbacks are now in the locale
-   files, uncommitted.
-2. Translate them (17 locales, terminology rule above), commit, push again.
+- **"Auto-fixing with English fallback"** (missing keys existed): the hook ran
+  `i18n:fix`, so English fallbacks are now in the locale files, _uncommitted_.
+  Translate them (17 locales, terminology rule above), commit, push again.
+- **"untranslated keys detected" (>25)**: nothing was modified — the
+  English-identical values are already _committed_. `npm run i18n:audit` lists
+  them; translate, commit, push again.
 
-Do not bypass with `--no-verify`; pushing the fallback-only state ships
-English text to 17 locales.
+Do not bypass with `--no-verify`; that ships English text to 17 locales.

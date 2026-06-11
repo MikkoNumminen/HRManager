@@ -24,14 +24,17 @@ non-commit path (e.g. a script writing files) produced output.
 
 ## Targeted-test mapping
 
-| You changed                                   | Run                                                                      |
-| --------------------------------------------- | ------------------------------------------------------------------------ |
-| `src/features/<f>/actions.ts` or `queries.ts` | `npm run test:all -- serverActions.<f>` (and `queries` if reads changed) |
-| `src/features/<f>/components/*`               | `npm run test:all -- <ComponentName>`                                    |
-| `src/lib/*`, `src/auditLog.ts`                | the matching `src/tests/server/<name>.test.ts` name                      |
-| `src/jobs/*`                                  | `npm run test:all -- drain.test queue.test`                              |
-| jest configs                                  | `npm run test:all -- jestConfigSync`                                     |
-| `messages/*.json`, `src/actionErrors.ts`      | `npm run check:error-codes` + `npm run i18n:audit`                       |
+Test files are named after BEHAVIOR or the singular entity, not the source
+file — resolve the real name first, then run it:
+
+| You changed                                   | Find the test                                                                                                                                                                                    |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `src/features/<f>/actions.ts` or `queries.ts` | `ls src/tests/server/serverActions.*` — names are singular (`persons` → `serverActions.person`); featureFlags/jobs/sessions have no file there — grep the action name under `src/tests/` instead |
+| `src/features/<f>/components/*`               | `ls src/features/<f>/__tests__/` — behavior-named (AddTeamForm → `AddTeam.test`); never assume `<ComponentName>.test` exists                                                                     |
+| `src/lib/*`, `src/auditLog.ts`                | same-named `src/tests/server/<name>.test.ts` exists for ~half; the rest are covered via `src/tests/shared/` or feature suites — `grep -rl <module> src/tests/`                                   |
+| `src/jobs/*`                                  | `npm run test:all -- drain.test queue.test`                                                                                                                                                      |
+| jest configs                                  | `npm run test:all -- jestConfigSync`                                                                                                                                                             |
+| `messages/*.json`, `src/actionErrors.ts`      | `npm run check:error-codes` + `npm run i18n:audit`                                                                                                                                               |
 
 ## The single-suite rule (hard)
 
