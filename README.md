@@ -305,7 +305,7 @@ HRManager is designed as a standalone, independently deployable application — 
 | Shared component tests                     | 105                                  | Reusable components shared across features: LeaveManager tabs (types, balances, requests)                                 |
 | Shared suites (a11y, schemas, permissions) | 828                                  | Cross-cutting: axe-core WCAG AA, Zod schemas, RBAC permissions, i18n, themes, telemetry, tutorial, middleware             |
 | Server integration                         | 896                                  | Real PostgreSQL + MongoDB — server actions, queries, auth, audit hash chain, rate limiting, health, sessions              |
-| Jobs                                       | 19                                   | pg-boss queue setup and worker registration, retries, dead-letter handling                                                |
+| Jobs                                       | 19                                   | pg-boss queue setup, worker registration, and the serverless fetch-based drain                                            |
 | E2E (Playwright)                           | 75                                   | Auth, CRUD, detail editing, dashboard, profile, data I/O, form validation, full workflow                                  |
 | **Total**                                  | **2904** (2829 Jest + 75 Playwright) | **92.2% line coverage · 92.2% function coverage**                                                                         |
 

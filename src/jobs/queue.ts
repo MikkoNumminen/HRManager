@@ -19,7 +19,12 @@ export async function getJobQueue(): Promise<PgBoss> {
   boss = new PgBoss({
     connectionString,
     schema: "pgboss",
-    monitorIntervalSeconds: 30,
+    // Serverless: no background timers. supervise/schedule would start 60s/5s
+    // interval loops (plus an internal cron queue worker) per warm instance that
+    // mostly never fire before the function freezes — maintenance instead runs
+    // deterministically via boss.supervise() in the /api/cron/jobs backstop.
+    supervise: false,
+    schedule: false,
   });
 
   boss.on("error", (error: Error) => {
@@ -27,6 +32,11 @@ export async function getJobQueue(): Promise<PgBoss> {
   });
 
   await boss.start();
+  // v12 requires queues to exist before send()/fetch() (they throw otherwise on a
+  // fresh database). create_queue is an advisory-locked upsert — safe to repeat.
+  for (const name of Object.values(QUEUE_NAMES)) {
+    await boss.createQueue(name);
+  }
   logger.info("pg-boss job queue started");
   return boss;
 }

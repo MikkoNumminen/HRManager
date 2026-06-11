@@ -52,7 +52,7 @@ const GROUPS = [
   {
     layer: "Jobs",
     test: (p) => p.startsWith("src/tests/jobs/"),
-    covers: "pg-boss queue setup and worker registration, retries, dead-letter handling",
+    covers: "pg-boss queue setup, worker registration, and the serverless fetch-based drain",
   },
 ];
 
@@ -154,6 +154,12 @@ writeFileSync(
   readmePath,
   readme.slice(0, startIdx + START.length) + `\n\n${table}\n\n` + readme.slice(endIdx),
 );
+
+// Let Prettier own the final table formatting — its markdown alignment uses
+// display width, not string length, so this keeps `prettier --check` green even
+// if covers-text ever gains wide/combining characters.
+const fmt = spawnSync("npx", ["prettier", "--write", "README.md"], { cwd: root });
+if (fmt.status !== 0) die("prettier --write README.md failed after the table rewrite.");
 
 console.log("generate-test-table: README.md updated.");
 for (const g of GROUPS) console.log(`  ${g.layer}: ${counts.get(g.layer)}`);

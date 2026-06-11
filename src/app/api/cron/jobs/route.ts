@@ -1,6 +1,11 @@
 import { timingSafeEqual } from "crypto";
 import { NextResponse } from "next/server";
 import { processPendingJobs } from "@/jobs/drain";
+import { getJobQueue } from "@/jobs/queue";
+
+// Generous limit so a deep post-outage backlog isn't killed mid-job; the drain
+// also stops itself before its own internal time budget (drain.ts).
+export const maxDuration = 300;
 
 // Executes pending pg-boss jobs — the durability backstop for the opportunistic
 // after() drain that runs when a job is enqueued. Vercel Cron invokes this (GET,
@@ -19,6 +24,12 @@ async function handle(request: Request): Promise<NextResponse> {
   if (actual.length !== expected.length || !timingSafeEqual(actual, expected)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  // Maintenance first: no interval timers run in serverless (queue.ts disables
+  // them), so this is the deterministic pass that expires jobs left `active` by
+  // a killed drain — returning them to the queue (or failed) before we fetch.
+  const boss = await getJobQueue();
+  await boss.supervise();
 
   const result = await processPendingJobs();
   return NextResponse.json(result);

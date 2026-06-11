@@ -1,6 +1,7 @@
 import { hasPermission } from "@/permissions";
 import { getJobQueue, QUEUE_NAMES, type QueueName } from "@/jobs/queue";
 import type { JobStatusResponse, JobRecord } from "@/jobs/types";
+import { prisma } from "@/db";
 import logger from "@/lib/logger";
 
 /**
@@ -12,19 +13,28 @@ export async function getJobQueueStatuses(): Promise<JobStatusResponse[]> {
   if (!allowed) throw new Error("Permission denied");
 
   try {
-    const boss = await getJobQueue();
-    const queueNames = Object.values(QUEUE_NAMES);
-    const queues = await boss.getQueues(queueNames);
+    // Ensure the pgboss schema + queues exist before querying them.
+    await getJobQueue();
+    // boss.getQueues() exposes no completed/failed counts, which left the admin
+    // UI hard-coding failed: 0 — terminal-failed jobs were invisible. Count
+    // straight from pg-boss's job table instead (read-only).
+    const rows = await prisma.$queryRaw<{ name: string; state: string; count: bigint }[]>`
+      SELECT name, state, count(*) AS count
+      FROM pgboss.job
+      WHERE name = ANY(${Object.values(QUEUE_NAMES)})
+      GROUP BY name, state`;
 
-    return queueNames.map((queueName) => {
-      const queue = queues.find((q) => q.name === queueName);
+    return Object.values(QUEUE_NAMES).map((queueName) => {
+      const count = (state: string) =>
+        Number(rows.find((r) => r.name === queueName && r.state === state)?.count ?? 0);
       return {
         queueName,
         counts: {
-          created: queue?.queuedCount ?? 0,
-          active: queue?.activeCount ?? 0,
-          completed: 0,
-          failed: 0,
+          // `retry` is a job waiting to run again — pending from the UI's view.
+          created: count("created") + count("retry"),
+          active: count("active"),
+          completed: count("completed"),
+          failed: count("failed"),
           expired: 0,
         },
       };
