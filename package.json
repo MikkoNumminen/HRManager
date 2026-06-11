@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "check:error-codes": "node scripts/check-error-codes.mjs",
+    "readme:test-table": "node scripts/generate-test-table.mjs",
     "test": "jest --verbose",
     "test:server": "npx tsx -e \"require('dotenv').config({path:'.env.test',override:true})\" && npx prisma db push --accept-data-loss && jest --config jest.config.server.ts --verbose",
     "test:all": "export $(grep -v '^#' .env.test | xargs) && npx prisma db push --accept-data-loss && jest --config jest.config.all.ts --runInBand --verbose",

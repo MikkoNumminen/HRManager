@@ -170,7 +170,7 @@ graph LR
 
 - **Sentry error tracking** — `@sentry/nextjs` captures unhandled exceptions, server action failures, and client-side errors. Separate `sentry.client/server/edge.config.ts` files initialize Sentry per runtime. A reusable `SentryErrorBoundary` component wraps MUI fallback UI; `global-error.tsx` catches render-level crashes; `captureServerActionError()` helper instruments server actions. Sentry is opt-in — the app runs normally without a DSN configured. _Why opt-in? This is a portfolio project — developers shouldn't need a Sentry account to run it locally._
 
-- **2900 tests (2825 Jest + 75 Playwright E2E), 92% line coverage** — Unit tests, integration tests against real PostgreSQL + in-memory MongoDB (no database mocks), and 75 Playwright E2E tests covering full user flows. _Why real databases in tests? Mocked tests can pass while production breaks. If your test doesn't hit a real database, it's not testing what you think it's testing._
+- **2900+ tests (Jest + Playwright E2E), 92% line coverage** — Unit tests, integration tests against real PostgreSQL + in-memory MongoDB (no database mocks), and 75 Playwright E2E tests covering full user flows. _Why real databases in tests? Mocked tests can pass while production breaks. If your test doesn't hit a real database, it's not testing what you think it's testing._
 
 - **Structured logging (Pino) with trace correlation** — JSON logs in production, human-readable in development. Every log line automatically includes OpenTelemetry `traceId` and `spanId` via Pino's mixin — search a trace ID in your log aggregator to see every log from that request. `createRequestLogger()` adds userId context on top. _Why Pino? It's the fastest Node.js logger, and structured JSON logs are parseable by Datadog, Grafana Loki, and CloudWatch without custom parsing rules._
 
@@ -297,39 +297,19 @@ HRManager is designed as a standalone, independently deployable application — 
 
 ## Testing
 
-| Layer              | Tests    | What it covers                                                                                               |
-| ------------------ | -------- | ------------------------------------------------------------------------------------------------------------ |
-| UI components      | 734      | All UI components: charts, forms, permission toggles, mobile views, themes, skeletons, search, leave mgmt    |
-| Server actions     | 253      | Every mutation: happy path, errors, permission denials, cascades, leave approval workflow                    |
-| Zod schemas        | 94       | Validation rules, edge cases, type inference                                                                 |
-| Prisma queries     | 83       | Real PostgreSQL + MongoDB queries — not mocks; includes paged query tests for persons/teams/departments      |
-| CSV utils          | 39       | RFC 4180 parsing, import validation, export formatting                                                       |
-| Style tokens       | 37       | Responsive breakpoints, theme tokens, component styles                                                       |
-| Auth callbacks     | 36       | JWT enrichment, permission freshness, demoSessionId ownership, superuser bootstrap                           |
-| Two-factor auth    | 32       | TOTP crypto, setup/verify flow, recovery codes, admin reset, login gating                                    |
-| Session management | 17       | Session tracking, concurrent limits, force-logout, token invalidation, lastActiveAt                          |
-| RBAC logic         | 28       | Resolution, overrides, deny-wins, superuser bypass                                                           |
-| Tutorial config    | 26       | Tour steps, DOM selectors, completion detection                                                              |
-| CSP proxy          | 20       | Nonce generation, header injection, domain allowlists                                                        |
-| Rate limiting      | 18       | Sliding window, race conditions, cleanup                                                                     |
-| i18n               | 14       | Locale loading, cookie persistence, Accept-Language detection                                                |
-| Demo session       | 12       | Sandbox creation, isolation, cleanup, expiry                                                                 |
-| Theme config       | 12       | All 6 themes, CSS variables, FOUC prevention                                                                 |
-| Audit logging      | 11       | Deferred writes, before/after snapshots, security events, hash chain integration                             |
-| Hash chain         | 10       | HMAC-SHA256 tamper detection, chain verification, broken link reporting                                      |
-| Health endpoints   | 6        | Shallow health, deep readiness, PostgreSQL + MongoDB connectivity, degraded responses                        |
-| MongoDB schema     | 6        | `$jsonSchema` validation, required fields, BSON types, warn vs strict modes                                  |
-| Structured logs    | 4        | Pino logger setup, JSON output, child loggers with context                                                   |
-| OpenTelemetry      | 22       | SDK init gating, span creation/error/status, metrics caching, middleware tracing, instrumentation hook       |
-| iCal calendar      | 7        | RFC 5545 generation, DTEND exclusivity, text escaping, CRLF, multiple events                                 |
-| Keyboard shortcuts | 8        | Chord navigation, help dialog, input suppression, search focus                                               |
-| Real-time (SSE)    | 43       | Event bus emit/subscribe/evict, ring buffer, emit helpers, schema validation, provider, hook, UI             |
-| Auth route         | 5        | Rate limiting on auth endpoints, CSRF, GET passthrough                                                       |
-| Reviews UI         | 86       | Cycle management, request table, submit form, templates, question CRUD, confirm dialogs                      |
-| Accessibility      | 25       | axe-core WCAG AA checks on 22 components — forms, tables, dialogs, skeletons, navigation                     |
-| E2E (Playwright)   | 75       | Auth, CRUD, detail editing, dashboard, profile, data I/O, form validation, full workflow                     |
-| Newer suites       | 1137     | Post-audit hardening: audit outbox + hash-chain linkage, boundary validation, leave/data/admin action growth |
-| **Total**          | **2900** | **92.2% line coverage · 92.2% function coverage**                                                            |
+<!-- test-table:generated:start -->
+
+| Layer                                      | Tests                                | What it covers                                                                                                            |
+| ------------------------------------------ | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
+| Feature component tests                    | 981                                  | Per-feature UI + actions: persons, teams, departments, admin, reviews, realtime, leave, employee, 2FA, dashboard, reports |
+| Shared component tests                     | 105                                  | Reusable components shared across features: LeaveManager tabs (types, balances, requests)                                 |
+| Shared suites (a11y, schemas, permissions) | 828                                  | Cross-cutting: axe-core WCAG AA, Zod schemas, RBAC permissions, i18n, themes, telemetry, tutorial, middleware             |
+| Server integration                         | 896                                  | Real PostgreSQL + MongoDB — server actions, queries, auth, audit hash chain, rate limiting, health, sessions              |
+| Jobs                                       | 19                                   | pg-boss queue setup and worker registration, retries, dead-letter handling                                                |
+| E2E (Playwright)                           | 75                                   | Auth, CRUD, detail editing, dashboard, profile, data I/O, form validation, full workflow                                  |
+| **Total**                                  | **2904** (2829 Jest + 75 Playwright) | **92.2% line coverage · 92.2% function coverage**                                                                         |
+
+<!-- test-table:generated:end -->
 
 ```
 Statements : 90.37%    Branches : 87.35%
