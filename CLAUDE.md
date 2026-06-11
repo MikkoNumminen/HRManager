@@ -76,4 +76,13 @@ Next.js 16 (App Router) · React 19 · MUI v7 (dark theme, no Tailwind) · TypeS
 - **`jest.config.stryker.mjs` mirrors `jest.config.server.ts`** — any module mocked in one must be mirrored in the other (guarded by `src/tests/server/jestConfigSync.test.ts`).
 - **Permissions source of truth** is `src/permissions.ts` (currently 38 keys) — update README/architecture counts when adding one.
 - **Vercel**: `scripts/vercel-ignore.sh` skips builds for same-commit redeploys AND for pushes touching only docs/tests/CI config (push a code change to force a build); migrations run only on production deploys (`scripts/vercel-build.sh`).
-- **Pre-push hook** runs the i18n audit (blocks >25 untranslated keys) and the full test suite. When it blocks on new i18n keys: the hook has already added English fallbacks via `i18n:fix` — translate them into all 17 other locales (by hand or `npm run i18n:translate`), commit, and push again. This loop is by design; don't bypass it.
+- **Pre-push hook** runs the i18n audit (blocks >25 untranslated keys) and the full test suite — the unblock loop is in the `i18n` skill.
+
+## Project skills (`.claude/skills/`)
+
+Procedural knowledge lives in on-demand skills, not here: **verify** (the gate
+ladder before any push, single-suite rule, flaky suites), **i18n** (18-locale
+procedure, error-code coupling, the pre-push loop), **add-feature** (full
+feature-module scaffold + wiring checklist), **release** (merge → deploy →
+verify → flag cutover). Consult the matching skill before doing any of those
+tasks.
