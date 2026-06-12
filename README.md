@@ -305,15 +305,15 @@ HRManager is designed as a standalone, independently deployable application — 
 | Shared component tests                     | 105                                  | Reusable components shared across features: LeaveManager tabs (types, balances, requests)                                 |
 | Shared suites (a11y, schemas, permissions) | 828                                  | Cross-cutting: axe-core WCAG AA, Zod schemas, RBAC permissions, i18n, themes, telemetry, tutorial, middleware             |
 | Server integration                         | 896                                  | Real PostgreSQL + MongoDB — server actions, queries, auth, audit hash chain, rate limiting, health, sessions              |
-| Jobs                                       | 19                                   | pg-boss queue setup, worker registration, and the serverless fetch-based drain                                            |
+| Jobs                                       | 20                                   | pg-boss queue setup, worker registration, and the serverless fetch-based drain                                            |
 | E2E (Playwright)                           | 75                                   | Auth, CRUD, detail editing, dashboard, profile, data I/O, form validation, full workflow                                  |
-| **Total**                                  | **2904** (2829 Jest + 75 Playwright) | **92.2% line coverage · 92.2% function coverage**                                                                         |
+| **Total**                                  | **2905** (2830 Jest + 75 Playwright) | **92.1% line coverage · 92.0% function coverage**                                                                         |
 
 <!-- test-table:generated:end -->
 
 ```
-Statements : 90.37%    Branches : 87.35%
-Functions  : 92.24%    Lines    : 92.16%
+Statements : 90.27%    Branches : 87.36%
+Functions  : 91.98%    Lines    : 92.06%
 ```
 
 **Testing philosophy:** Server-side tests run against **real PostgreSQL** and **in-memory MongoDB** — not mocks. If your test doesn't touch the real database, it's not catching the bugs that matter (wrong SQL, missing indexes, constraint violations). Client-side tests cover every UI component. Playwright E2E tests run against a production build.
