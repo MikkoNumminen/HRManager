@@ -4,6 +4,7 @@ import type { AuditExportJobData } from "@/jobs/types";
 import { getAuditLogCollection, isMongoAvailable } from "@/mongoDb";
 import type { AuditLogDocument } from "@/mongoDb";
 import type { Filter } from "mongodb";
+import { generateCSV } from "@/csvUtils";
 import logger from "@/lib/logger";
 
 /**
@@ -73,22 +74,20 @@ export async function runAuditExportJob(
       "after",
       "createdAt",
     ];
-    const rows = docs.map((doc) =>
-      [
-        doc._id?.toString() ?? "",
-        doc.userId ?? "",
-        doc.userEmail ?? "",
-        doc.action,
-        doc.entityType,
-        doc.entityId ?? "",
-        (doc.before ?? "").replace(/"/g, '""'),
-        (doc.after ?? "").replace(/"/g, '""'),
-        doc.createdAt.toISOString(),
-      ]
-        .map((v) => `"${v}"`)
-        .join(","),
-    );
-    result = [headers.join(","), ...rows].join("\n");
+    // generateCSV handles RFC 4180 escaping AND formula-injection protection —
+    // the previous hand-rolled join quoted cells but let =/+/-/@ payloads through.
+    const rows = docs.map((doc) => [
+      doc._id?.toString() ?? "",
+      doc.userId ?? "",
+      doc.userEmail ?? "",
+      doc.action,
+      doc.entityType,
+      doc.entityId ?? "",
+      doc.before ?? "",
+      doc.after ?? "",
+      doc.createdAt.toISOString(),
+    ]);
+    result = generateCSV(headers, rows);
   }
 
   log.info({ count: docs.length, format }, "Audit export job finished");
