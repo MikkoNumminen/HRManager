@@ -58,6 +58,14 @@ migration, default off — see `audit-use-outbox` for the pattern):
 4. Rollback = flip the flag off. Remove the flag in a later cleanup PR once
    the new path is proven.
 
+## Rollback
+
+Full procedures per change-class in `docs/runbooks/rollback.md`. The three
+most common moves: bad deploy → Vercel "Instant Rollback" + a follow-up
+`git revert` PR; risky behavior → flip its feature flag OFF (atomic, no
+redeploy); migrations → roll FORWARD with an inverse migration (Prisma has no
+down-migrations; never edit applied migration files).
+
 ## Cron endpoints
 
 Scheduled work runs via CRON_SECRET-gated routes in `vercel.json` `crons`
