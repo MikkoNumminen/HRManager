@@ -196,6 +196,35 @@ test("audit export worker returns CSV format", async () => {
   expect(mockFindFn).toHaveBeenCalledWith(expect.objectContaining({ sessionId: "demo-session-1" }));
 });
 
+// CSV cells that start with a formula character are neutralized (OWASP CSV injection) —
+// the export must go through generateCSV's tab-prefix protection, not a raw join.
+test("audit export CSV neutralizes formula-injection payloads", async () => {
+  mockToArray.mockResolvedValue([
+    {
+      _id: { toString: () => "abc123" },
+      userId: "user-1",
+      userEmail: '=HYPERLINK("http://evil","x")',
+      action: "create",
+      entityType: "person",
+      entityId: "ent-1",
+      before: null,
+      after: "+SUM(1,1)",
+      createdAt: new Date("2026-01-01T00:00:00Z"),
+    },
+  ]);
+
+  const boss = createMockBoss();
+  registerAuditExportWorker(boss as never);
+  const handler = boss.getWorker("audit-export");
+  const result = (await handler([
+    { id: "job-7", data: { userId: "user-1", sessionId: null, filters: {}, format: "csv" } },
+  ])) as { result: string };
+
+  expect(result.result).toContain("\t=HYPERLINK");
+  expect(result.result).toContain("\t+SUM");
+  expect(result.result).not.toMatch(/,"=HYPERLINK/);
+});
+
 // Audit export worker returns empty when MongoDB is unavailable
 test("audit export worker returns empty when MongoDB unavailable", async () => {
   mockIsMongoAvailable.mockReturnValue(false);
