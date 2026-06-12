@@ -61,6 +61,9 @@ jobs:
       - name: Check error-code i18n coverage
         run: npm run check:error-codes
 
+      # Playwright E2E (75 tests) intentionally stays out of CI: it needs a
+      # production build + browsers (~10 min) and runs in the pre-release flow
+      # instead (npm run test:e2e). Revisit if the suite gains CI budget.
       - name: Run all tests with coverage
         run: npm run test:all -- --coverage
 
