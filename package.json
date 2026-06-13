@@ -12,7 +12,7 @@
     "readme:test-table": "node scripts/generate-test-table.mjs",
     "test": "jest --verbose",
     "test:server": "npx tsx -e \"require('dotenv').config({path:'.env.test',override:true})\" && npx prisma db push --accept-data-loss && jest --config jest.config.server.ts --verbose",
-    "test:all": "export $(grep -v '^#' .env.test | xargs) && npx prisma db push --accept-data-loss && jest --config jest.config.all.ts --runInBand --verbose",
+    "test:all": "node scripts/check-test-env.mjs && export $(grep -v '^#' .env.test | xargs) && npx prisma db push --accept-data-loss && jest --config jest.config.all.ts --runInBand --verbose",
     "test:watch": "jest --watchAll",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
