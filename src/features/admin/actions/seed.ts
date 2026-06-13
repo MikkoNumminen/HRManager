@@ -1,20 +1,15 @@
 "use server";
+// Mock-data seeding: populates persons, teams, departments, leave data, and (in
+// non-prod, non-demo sessions) sample users with permission overrides.
 import { prisma } from "@/db";
 import { LeaveRequestStatus } from "@prisma/client";
 import { revalidatePath } from "next/cache";
-import { requirePermission, seedPermissions } from "@/permissions";
-import { auth } from "@/auth";
-import { captureAuditContext, deferAudit, deferAuditLog, DeferredAuditEntry } from "@/auditLog";
-import { rateLimit } from "@/rateLimit";
-import { ActionError } from "@/actionErrors";
+import { seedPermissions } from "@/permissions";
+import { deferAuditLog } from "@/auditLog";
 import { getDemoSessionId } from "@/demoSession";
-import { DEMO_EMAIL } from "@/constants";
-import { getTranslations } from "next-intl/server";
-import { safe, validateUUID, type ActionResult } from "@/lib/actionUtils";
+import { type ActionResult } from "@/lib/actionUtils";
 import { guardedAction } from "@/lib/guardedAction";
-import { withAuditedTransaction } from "@/lib/auditedTransaction";
 import { invalidateDashboardCache } from "@/lib/cacheInvalidation";
-import { requireAdminIp } from "@/lib/ipAllowlist";
 import {
   PERSON_SEEDS,
   TEAM_SEEDS,
@@ -22,49 +17,6 @@ import {
   DEPARTMENT_SEEDS,
   LEAVE_TYPE_SEEDS,
 } from "@/seeds";
-
-export const resetAll: () => Promise<ActionResult> = guardedAction(
-  "data:reset",
-  "resetAll",
-  async (t) => {
-    const sessionId = await getDemoSessionId();
-    if (!sessionId) {
-      // resetAll deletes every row matching `where: { sessionId }`. For a non-demo
-      // caller getDemoSessionId() is null, which would hard-delete every org-wide
-      // row (sessionId IS NULL) while the audit log captures only row counts —
-      // unrecoverable. This destructive reset is the demo sandbox's "start fresh"
-      // action, so refuse it outside a demo session.
-      throw new ActionError("resetRequiresDemoSession", t("resetRequiresDemoSession"));
-    }
-    await withAuditedTransaction(async (tx, addAudit) => {
-      const sessionWhere = { sessionId };
-      const counts = {
-        teamMembers: await tx.teamMember.count({ where: sessionWhere }),
-        teams: await tx.team.count({ where: sessionWhere }),
-        departments: await tx.department.count({ where: sessionWhere }),
-        persons: await tx.person.count({ where: sessionWhere }),
-      };
-      await tx.leaveRequest.deleteMany({ where: sessionWhere });
-      await tx.leaveBalance.deleteMany({ where: sessionWhere });
-      await tx.leaveType.deleteMany({ where: sessionWhere });
-      await tx.teamMember.deleteMany({ where: sessionWhere });
-      await tx.team.deleteMany({ where: sessionWhere });
-      await tx.department.deleteMany({ where: sessionWhere });
-      await tx.person.deleteMany({ where: sessionWhere });
-      addAudit({
-        action: "reset",
-        entityType: "person",
-        before: counts,
-      });
-    });
-    revalidatePath("/");
-    invalidateDashboardCache();
-    revalidatePath("/managePersons");
-    revalidatePath("/manageTeams");
-    revalidatePath("/manageDepartments");
-    revalidatePath("/leave");
-  },
-);
 
 export const seedMockData: (clearExisting?: boolean) => Promise<ActionResult> = guardedAction(
   "data:seed",
@@ -337,179 +289,3 @@ export const seedMockData: (clearExisting?: boolean) => Promise<ActionResult> = 
     revalidatePath("/admin");
   },
 );
-
-export async function initializePermissions() {
-  await requireAdminIp();
-  await requirePermission("admin:manage_users");
-  await rateLimit("initializePermissions");
-  await seedPermissions();
-}
-
-export async function updateUserRole(data: FormData): Promise<ActionResult> {
-  return safe(async () => {
-    const t = await getTranslations("errors");
-    await requireAdminIp();
-    await requirePermission("admin:manage_users");
-    await rateLimit("updateUserRole");
-
-    const userId = data.get("userId")?.toString();
-    const newRole = data.get("role")?.toString();
-
-    if (!userId) throw new ActionError("noUserProvided", t("noUserProvided"));
-    if (!newRole) throw new ActionError("noRoleProvided", t("noRoleProvided"));
-    validateUUID(userId, "userId");
-
-    const demoSessionId = await getDemoSessionId();
-    const validRoles = demoSessionId
-      ? ["superuser", "administrator", "user", "guest"]
-      : ["administrator", "user", "guest"];
-    if (!validRoles.includes(newRole)) {
-      throw new ActionError("invalidRole", t("invalidRole"));
-    }
-
-    const targetUser = await prisma.user.findUnique({ where: { id: userId } });
-    if (!targetUser) throw new ActionError("userNotFound", t("userNotFound"));
-    if (!demoSessionId && targetUser.role === "superuser") {
-      throw new ActionError("cannotChangeSuperuserRole", t("cannotChangeSuperuserRole"));
-    }
-
-    const ctx = await captureAuditContext();
-    const auditEntries: DeferredAuditEntry[] = [];
-    await prisma.$transaction(async (tx) => {
-      await tx.user.update({
-        where: { id: userId },
-        data: { role: newRole, permissionsVersion: { increment: 1 } },
-      });
-      auditEntries.push({
-        ...ctx,
-        action: "update",
-        entityType: "user",
-        entityId: userId,
-        before: { role: targetUser.role, targetEmail: targetUser.email },
-        after: { role: newRole, targetEmail: targetUser.email },
-      });
-    });
-    deferAudit(auditEntries);
-    revalidatePath("/admin");
-  });
-}
-
-export async function updateUserPermission(data: FormData): Promise<ActionResult> {
-  return safe(async () => {
-    const t = await getTranslations("errors");
-    await requireAdminIp();
-    await requirePermission("admin:assign_permissions");
-    await rateLimit("updateUserPermission");
-
-    const userId = data.get("userId")?.toString();
-    const permissionKey = data.get("permissionKey")?.toString();
-    const action = data.get("action")?.toString();
-
-    if (!userId) throw new ActionError("noUserProvided", t("noUserProvided"));
-    if (!permissionKey) throw new ActionError("noPermissionProvided", t("noPermissionProvided"));
-    if (!action) throw new ActionError("noActionProvided", t("noActionProvided"));
-    validateUUID(userId, "userId");
-
-    const demoSessionId = await getDemoSessionId();
-    const targetUser = await prisma.user.findUnique({ where: { id: userId } });
-    if (!targetUser) throw new ActionError("userNotFound", t("userNotFound"));
-    if (!demoSessionId && targetUser.role === "superuser") {
-      throw new ActionError(
-        "cannotModifySuperuserPermissions",
-        t("cannotModifySuperuserPermissions"),
-      );
-    }
-
-    const permission = await prisma.permission.findUnique({ where: { key: permissionKey } });
-    if (!permission) throw new ActionError("permissionNotFound", t("permissionNotFound"));
-
-    const ctx = await captureAuditContext();
-    const auditEntries: DeferredAuditEntry[] = [];
-    await prisma.$transaction(async (tx) => {
-      if (action === "reset") {
-        await tx.userPermission.deleteMany({
-          where: { userId, permissionId: permission.id },
-        });
-        auditEntries.push({
-          ...ctx,
-          action: "delete",
-          entityType: "userPermission",
-          entityId: userId,
-          before: { permissionKey, action: "reset", targetEmail: targetUser.email },
-        });
-      } else {
-        const granted = action === "grant";
-        await tx.userPermission.upsert({
-          where: {
-            userId_permissionId: {
-              userId,
-              permissionId: permission.id,
-            },
-          },
-          update: { granted },
-          create: { userId, permissionId: permission.id, granted },
-        });
-        auditEntries.push({
-          ...ctx,
-          action: "update",
-          entityType: "userPermission",
-          entityId: userId,
-          after: { permissionKey, granted, targetEmail: targetUser.email },
-        });
-      }
-      // Bump version so JWT callback detects the change
-      await tx.user.update({
-        where: { id: userId },
-        data: { permissionsVersion: { increment: 1 } },
-      });
-    });
-    deferAudit(auditEntries);
-    revalidatePath("/admin");
-  });
-}
-
-export async function kickOutUser(data: FormData): Promise<ActionResult> {
-  return safe(async () => {
-    const t = await getTranslations("errors");
-    await requireAdminIp();
-    await requirePermission("admin:manage_users");
-    await rateLimit("kickOutUser");
-
-    const userId = data.get("userId")?.toString();
-    if (!userId) throw new ActionError("noUserProvided", t("noUserProvided"));
-    validateUUID(userId, "userId");
-
-    const session = await auth();
-    const demoSessionId = await getDemoSessionId();
-
-    const targetUser = await prisma.user.findUnique({ where: { id: userId } });
-    if (!targetUser) throw new ActionError("userNotFound", t("userNotFound"));
-    if (targetUser.role === "superuser") {
-      throw new ActionError("cannotKickSuperuser", t("cannotKickSuperuser"));
-    }
-    // Demo sessions can only kick the demo user — prevent deleting real OAuth users
-    if (demoSessionId && targetUser.email !== DEMO_EMAIL) {
-      throw new ActionError("demoCannotManageUsers", t("demoCannotManageUsers"));
-    }
-    // Prevent self-kick — deleting your own user orphans the session
-    if (session?.user?.id === userId) {
-      throw new ActionError("cannotKickYourself", t("cannotKickYourself"));
-    }
-
-    const ctx = await captureAuditContext();
-    const auditEntries: DeferredAuditEntry[] = [];
-    await prisma.$transaction(async (tx) => {
-      await tx.userPermission.deleteMany({ where: { userId } });
-      await tx.user.delete({ where: { id: userId } });
-      auditEntries.push({
-        ...ctx,
-        action: "kickout",
-        entityType: "user",
-        entityId: userId,
-        before: { email: targetUser.email, name: targetUser.name, role: targetUser.role },
-      });
-    });
-    deferAudit(auditEntries);
-    revalidatePath("/admin");
-  });
-}
