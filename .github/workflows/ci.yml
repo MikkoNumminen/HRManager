@@ -72,6 +72,11 @@ jobs:
       - name: Check file sizes
         run: npm run check:file-size
 
+      # Mutation-rails guard: every exported server action must pass an auth gate
+      # (guardedAction / requirePermission / auth). See scripts/check-mutation-rails.mjs.
+      - name: Check mutation rails
+        run: npm run check:mutation-rails
+
       # i18n parity is enforced locally by .husky/pre-push, but a --no-verify or
       # headless push skips that hook — mirror its thresholds here so the signal
       # always reaches CI. (Keep in sync with .husky/pre-push.)
@@ -95,12 +100,17 @@ jobs:
       # production build + browsers (~10 min) and runs in the pre-release flow
       # instead (npm run test:e2e). Revisit if the suite gains CI budget.
       - name: Run all tests with coverage
-        run: npm run test:all -- --coverage
+        run: npm run test:all -- --coverage --json --outputFile=jest-results.json
 
       # The coverage run just wrote coverage/coverage-summary.json — fail if the
       # README's advertised coverage numbers have drifted from it.
       - name: Check README coverage claims
         run: npm run check:coverage-claims
+
+      # The coverage run also wrote jest-results.json — fail if the README's
+      # advertised test counts have drifted from the live suite.
+      - name: Check README test counts
+        run: npm run check:test-count
 
       - name: Build
         run: npx next build
