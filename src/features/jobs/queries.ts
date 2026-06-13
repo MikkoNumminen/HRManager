@@ -1,4 +1,5 @@
 import { hasPermission } from "@/permissions";
+import { ActionError } from "@/actionErrors";
 import { getJobQueue, QUEUE_NAMES, type QueueName } from "@/jobs/queue";
 import type { JobStatusResponse, JobRecord } from "@/jobs/types";
 import { prisma } from "@/db";
@@ -10,7 +11,7 @@ import logger from "@/lib/logger";
  */
 export async function getJobQueueStatuses(): Promise<JobStatusResponse[]> {
   const allowed = await hasPermission("admin:manage_jobs");
-  if (!allowed) throw new Error("Permission denied");
+  if (!allowed) throw new ActionError("permissionDenied", "Permission denied");
 
   try {
     // Ensure the pgboss schema + queues exist before querying them.
@@ -55,7 +56,7 @@ export async function getJobQueueStatuses(): Promise<JobStatusResponse[]> {
  */
 export async function getRecentJobs(queueName: QueueName): Promise<JobRecord[]> {
   const allowed = await hasPermission("admin:manage_jobs");
-  if (!allowed) throw new Error("Permission denied");
+  if (!allowed) throw new ActionError("permissionDenied", "Permission denied");
 
   try {
     const boss = await getJobQueue();
@@ -85,7 +86,7 @@ export async function getRecentJobs(queueName: QueueName): Promise<JobRecord[]> 
  */
 export async function getJobById(queueName: QueueName, jobId: string): Promise<JobRecord | null> {
   const allowed = await hasPermission("admin:manage_jobs");
-  if (!allowed) throw new Error("Permission denied");
+  if (!allowed) throw new ActionError("permissionDenied", "Permission denied");
 
   try {
     const boss = await getJobQueue();
