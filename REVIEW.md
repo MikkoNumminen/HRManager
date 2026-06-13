@@ -1,5 +1,10 @@
 # HRManager — Code Review Report
 
+> **⚠️ Historical — 2026-03-24.** Predates the feature-module refactor: the monolithic
+> `serverActions.ts` / `queries.ts` described here were since split into `src/features/*`.
+> Kept for history; do **not** act on its findings against the current codebase.
+> Current architecture: [`AGENTS.md`](AGENTS.md), [`docs/architecture.md`](docs/architecture.md).
+
 **Date:** 2026-03-25
 **Reviewer:** Claude Sonnet (automated multi-layer review)
 **Scope:** Full codebase — UI layer, business logic layer, configuration & types layer
