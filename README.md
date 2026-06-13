@@ -364,7 +364,7 @@ That's it. Migrations run automatically, demo login works out of the box — no 
 npm install                   # install dependencies
 cp .env.example .env          # configure environment variables
 npx auth secret               # generate AUTH_SECRET
-createdb hrmanager_dev        # create PostgreSQL databases
+createdb hrmanager            # create PostgreSQL databases (matches .env.example)
 createdb hrmanager_test
 npx prisma migrate dev        # apply schema migrations
 npm run dev                   # start dev server at localhost:3000
