@@ -313,7 +313,7 @@ HRManager is designed as a standalone, independently deployable application — 
 
 ```
 Statements : 90.27%    Branches : 87.36%
-Functions  : 91.98%    Lines    : 92.06%
+Functions  : 91.97%    Lines    : 92.06%
 ```
 
 **Testing philosophy:** Server-side tests run against **real PostgreSQL** and **in-memory MongoDB** — not mocks. If your test doesn't touch the real database, it's not catching the bugs that matter (wrong SQL, missing indexes, constraint violations). Client-side tests cover every UI component. Playwright E2E tests run against a production build.

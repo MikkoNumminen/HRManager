@@ -59,16 +59,28 @@ documents every variable; demo login is OFF by default
 ### Running server tests locally
 
 Server/integration tests run against a **real** PostgreSQL test database (no
-mocks) and an **in-memory** MongoDB. They read `.env.test`, which is gitignored
-— create it from the template:
+mocks) and an **in-memory** MongoDB. They read `.env.test`, which is gitignored.
+
+If you already have Postgres on `:5432`:
 
 ```bash
-cp .env.test.example .env.test   # point DATABASE_URL/DIRECT_URL at a *test* DB
+cp .env.test.example .env.test   # targets :5432/hrmanager_test (postgres/postgres)
 npm run test:all                 # pushes schema to the test DB, runs every suite
 ```
 
-If `.env.test` is missing, `npm run test:all` fails at the Prisma step — that
-missing file, not your change, is usually the cause.
+**No Postgres running?** Bring one up headlessly with Docker — MongoDB is
+in-memory for tests, so only the `db` service is needed:
+
+```bash
+docker compose up -d db                                    # postgres:17 on :5432
+docker compose exec db createdb -U postgres hrmanager_test # one-time
+cp .env.test.example .env.test
+npm run test:all
+```
+
+If `.env.test` is missing (and no `DATABASE_URL` is set), `npm run test:all`
+fails fast with a `cp .env.test.example .env.test` hint (`scripts/check-test-env.mjs`)
+— that missing file, not your change, is usually the cause.
 
 ## Verification ladder (run before every push)
 
