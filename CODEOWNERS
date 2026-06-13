@@ -1,0 +1,19 @@
+# Code owners — auto-requested as reviewers on matching changes.
+# https://docs.github.com/en/repositories/managing-your-repos-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owner for everything in the repo.
+*                       @MikkoNumminen
+
+# Security-sensitive surfaces — auth, RBAC, audit trail, proxy/headers.
+/src/auth.ts            @MikkoNumminen
+/src/permissions.ts     @MikkoNumminen
+/src/proxy.ts           @MikkoNumminen
+/src/auditLog.ts        @MikkoNumminen
+/src/lib/auditOutbox.ts @MikkoNumminen
+/src/features/twoFactor/ @MikkoNumminen
+/SECURITY.md            @MikkoNumminen
+
+# Agent / contributor contracts and CI.
+/AGENTS.md              @MikkoNumminen
+/CLAUDE.md              @MikkoNumminen
+/.github/               @MikkoNumminen
