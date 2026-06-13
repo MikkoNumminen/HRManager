@@ -77,12 +77,16 @@ legibility).
 
 Remaining (higher churn / risk):
 
-1. **Boundary enforcement** (+~0.5 safety-rails): the barrel refactor above
-   (extract 2 shared components to `src/components/shared/`, route the ~18 deep
-   `actions`/`schemas` imports through the root barrels), then a CI-enforced
-   `no-restricted-imports` rule in `eslint.config.mjs`. The highest-value
-   remaining lever — **deferred pending a go-ahead**: it moves components and
-   rewrites ~18 imports (real structural churn in a maintenance-mode repo).
+1. **Boundary enforcement** (safety-rails). **Round 5 took the low-risk half:**
+   a CI ratchet (`scripts/check-feature-boundaries.mjs`, `npm run
+check:boundaries`) that fails the build if cross-feature `@/features/<other>`
+   imports drift from the baseline (19 in production code) — convention is now
+   mechanically enforced against regression, zero refactor. **Still deferred
+   pending a go-ahead** (the bigger +~0.4): reduce the 19 to ~0 — extract 2
+   shared components to `src/components/shared/`, route the deep `actions`/
+   `schemas` imports through the root barrels — then tighten the ratchet toward 0
+   (or swap it for a hard `no-restricted-imports` rule). That part is real
+   structural churn in a maintenance-mode repo.
 2. **Gate README/coverage drift in CI** (+~0.4 verifiability): a `--check` mode
    for `scripts/generate-test-table.mjs` reusing CI's Jest JSON + a coverage-cell
    check against `coverage/coverage-summary.json`, wired into `ci.yml`.
@@ -106,4 +110,5 @@ Remaining (higher churn / risk):
 | --------------- | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 2026-06-13      | 7.58 (→ ~8.3 est. after round-3) | First **tracked** rating (this doc). Fresh adversarial re-measure; round-3 docs/contracts PR estimated to lift to ~8.3.                                                                                    |
 | 2026-06-13 (r4) | ~8.3 → ~8.5 est.                 | Round 4 (code/CI, full suite verified locally): i18n-parity CI gate, `test:all` preflight, 5 inline-mutation-pattern headers. Boundary refactor + README-drift gate still deferred. Re-measure to confirm. |
+| 2026-06-13 (r5) | ~8.5 → ~8.6 est.                 | Round 5: CI feature-boundary ratchet (`check:boundaries`, baseline 19) — mechanical regression-guard on cross-feature imports. The reduce-to-0 refactor stays deferred. Re-measure to confirm.             |
 | 2026-06 (prior) | ~8.0 measured / ~8.4–8.5 est.    | Rounds 1–2 (PRs #14–#23): audit remediation, CI gates, 4 skills, rollback runbook. Recorded only in session transcripts — not a tracked artifact. Superseded by the un-anchored re-measure above.          |

@@ -98,7 +98,10 @@ _phantom_ failures. Run one suite at a time.
   re-exports all feature queries, `serverActions/index.ts` all actions,
   `schemas/index.ts` all schemas. Prefer importing another feature's public
   surface via `@/queries`, `@/serverActions`, `@/schemas` rather than reaching
-  into `@/features/<other>/...` internals.
+  into `@/features/<other>/...` internals. A CI ratchet (`npm run
+check:boundaries`) fails the build if cross-feature deep imports grow past the
+  current baseline — route new ones through a barrel, or put shared UI in
+  `src/components/shared/`.
 - **Two sanctioned mutation patterns** (both fine — match the file you are in):
   1. `guardedAction(permission, name, fn)` + `withAuditedTransaction(fn)` — the
      default for domain entities (persons, teams, departments, reviews, leave,
