@@ -14,7 +14,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { completeTutorialStep } from "@/tutorialConfig";
 import { useFormAction } from "@/hooks/useFormAction";
-import { PersonSelectCard } from "@/features/persons/components/PersonSelectCard";
+import { PersonSelectCard } from "@/components/shared/PersonSelectCard";
 import { Person } from "@/schemas";
 
 const AddMemberForm: React.FC<{ teamID: string; persons: Person[]; excludeIds?: string[] }> = ({

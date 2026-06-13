@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import { PersonSelectCard } from "@/features/persons/components/PersonSelectCard";
+import { PersonSelectCard } from "@/components/shared/PersonSelectCard";
 import { PersonCheckBoxList } from "@/features/persons/components/PersonCheckboxList";
 import { Person } from "@/schemas";
 
