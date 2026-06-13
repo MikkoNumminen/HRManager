@@ -38,7 +38,7 @@ Full-stack HR management system. **Portfolio / showcase project** — favour tho
 
 ## Tech stack
 
-Next.js 16 (App Router) · React 19 · MUI v7 (dark theme, no Tailwind) · TypeScript 5.9 · Prisma 7 · PostgreSQL + MongoDB 8 (audit logs) · Zod 4 · NextAuth v5 (JWT, Google/GitHub OAuth + demo login) · next-intl (18 locales) · Jest 30 + RTL · ESLint 9 · Prettier 3 · GitHub Actions CI · Vercel deployment
+Next.js 16 (App Router) · React 19 · MUI v7 (dark theme, no Tailwind) · TypeScript 5.9 · Prisma 7 · PostgreSQL + MongoDB 8 (audit logs) · Zod 4 · NextAuth v5 (JWT, Google/GitHub OAuth + opt-in demo login, TOTP 2FA) · next-intl (18 locales) · Jest 30 + RTL · ESLint 9 · Prettier 3 · GitHub Actions CI · Vercel deployment
 
 ## Architecture rules
 

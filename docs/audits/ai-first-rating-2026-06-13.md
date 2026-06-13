@@ -26,6 +26,14 @@ a mandatory checkout-verification preamble (two assessors once graded the stale
 `~/koodailua/HRManager` decoy), and a single-suite test rule (one assessor once
 manufactured a phantom "63 failing tests" by running jest concurrently).
 
+> **The scorecard below is the round-3 _baseline_ (mean 7.58).** For the latest
+> measured per-dimension scores, see the **Score history** table at the end —
+> currently **8.38** (verifiability 8.5 · agent-context 8.5 · workflow 8.0 ·
+> safety 8.5 · doc 8.3 · legibility 8.5). Several baseline rows below describe
+> gaps since closed: `AGENTS.md` now exists and the multi-instance protocol now
+> degrades to solo (row 2), and the two mutation patterns are now documented
+> (row 6).
+
 | #   | Dimension                             | Score    | One-line basis                                                                                                                                                                |
 | --- | ------------------------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1   | Verifiability & feedback loops        | 8.0      | Dense fast-failing CI ladder (format→lint→typecheck→error-codes→tests+coverage→build) + Stryker; gaps: no boundary lint, README-drift ungated, i18n only in a bypassable hook |
