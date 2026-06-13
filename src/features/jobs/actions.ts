@@ -1,4 +1,9 @@
 "use server";
+// Mutation style: this file uses the INLINE pattern — auth/rate-limit +
+// audit (captureAuditContext/deferAudit) handled directly, NOT the
+// guardedAction/withAuditedTransaction wrappers. See AGENTS.md → "two
+// sanctioned mutation patterns". Match this pattern when editing; new
+// domain features should use the wrappers.
 
 import { requirePermission } from "@/permissions";
 import { rateLimit } from "@/rateLimit";
