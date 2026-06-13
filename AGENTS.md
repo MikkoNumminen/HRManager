@@ -111,8 +111,11 @@ _phantom_ failures. Run one suite at a time.
 ## Architecture rules
 
 - **Feature modules** in `src/features/<domain>/`: each has `schemas.ts`,
-  `queries.ts`, `actions.ts`, `components/`, and `__tests__/`. **Reads** go in
-  `queries.ts`; **mutations** in `actions.ts` (`"use server"`), always inside
+  `queries.ts`, components, and `__tests__/`, plus its mutations in either an
+  `actions.ts` file or — when large — an `actions/` directory of per-concern
+  modules behind an `actions/index.ts` re-export barrel (reviews, admin, leave).
+  Either way `@/features/<domain>/actions` resolves to the same public surface.
+  **Reads** go in `queries.ts`; **mutations** are `"use server"`, always inside
   `prisma.$transaction()`. **Never nest `$transaction` calls.**
 - **Barrels** are the public cross-feature surface: `queries.ts` (root)
   re-exports all feature queries, `serverActions/index.ts` all actions,
