@@ -13,7 +13,7 @@ import { Box, Button, Typography } from "@mui/material";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useFormAction } from "@/hooks/useFormAction";
-import { PersonSelectCard } from "./PersonSelectCard";
+import { PersonSelectCard } from "@/components/shared/PersonSelectCard";
 import { Person } from "@/schemas";
 
 const UpdateManagerForm: React.FC<{ teamID: string; persons: Person[]; excludeIds?: string[] }> = ({

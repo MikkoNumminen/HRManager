@@ -34,7 +34,7 @@ const featuresDir = join(root, "src", "features");
 
 // Cross-feature imports allowed in production feature code today. A ratchet:
 // only ever lower this (with the refactor that earns it). See file header.
-const BASELINE = 19;
+const BASELINE = 16;
 
 function walk(dir) {
   const out = [];
