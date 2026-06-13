@@ -42,7 +42,7 @@ A full-stack HR management system built to production standards — not as a toy
 ```mermaid
 sequenceDiagram
     participant User
-    participant Server as serverActions.ts
+    participant Server as features/*/actions.ts
     participant PG as PostgreSQL
     participant Audit as auditLog.ts
     participant Mongo as MongoDB
@@ -180,13 +180,13 @@ graph LR
 
 - **Org-wide query caching** — A reusable `cache()` wrapper (`src/lib/cache.ts`) wraps `unstable_cache` from `next/cache` and is applied to the highest-traffic queries: the dashboard metrics + org chart, the analytics reports, and the four core org-wide listings (`getPersons`, `getTeams`, `getDepartments`, `getPositions`). All entries are keyed by `sessionId` (so demo users stay isolated) and tagged with `org-data` / `dashboard` / `org-chart`. Every mutating server action calls `updateTag("org-data")` (Next.js 16's read-your-own-writes API) so the same request that creates a person sees the new row immediately, while concurrent requests from other users see stale data for up to the 5-minute TTL. Test-safe — the wrapper short-circuits to a passthrough under `NODE_ENV=test`. _Why cache? The home page hits four org-wide queries on every load; caching turns ~80–200 ms of Prisma round-trips into a single ~1 ms in-memory lookup, which is the dominant CPU win on Vercel's serverless plan._
 
-- **Vercel `ignoreCommand`** — A `vercel.json` at the repo root short-circuits Vercel deployments when only docs (`*.md`), tests (`src/tests/**`, `src/**/__tests__/**`, `e2e/**`), CI configs (`.github/**`, `.husky/**`), or jest/playwright/stryker config files change. The check lives in `scripts/vercel-ignore.sh` (Vercel caps `ignoreCommand` at 256 characters, so the long pathspec list can't live inline) and diffs against `$VERCEL_GIT_PREVIOUS_SHA` (the last deployed commit — correct for multi-commit pushes) with `:(exclude)` pathspecs, falling back to `HEAD^` and ultimately to "deploy" when no base is reachable. _Why? Each Vercel build runs `prisma migrate deploy && prisma generate && next build`, which is the most CPU-expensive step in the entire pipeline. Skipping deploys for test-only or docs-only commits typically halves monthly build minutes on a portfolio repo with frequent README/TODO churn._
+- **Vercel `ignoreCommand`** — A `vercel.json` at the repo root short-circuits Vercel deployments when only docs (`*.md`), tests (`src/tests/**`, `src/**/__tests__/**`, `e2e/**`), CI configs (`.github/**`, `.husky/**`), or jest/playwright/stryker config files change. The check lives in `scripts/vercel-ignore.sh` (Vercel caps `ignoreCommand` at 256 characters, so the long pathspec list can't live inline) and diffs against `$VERCEL_GIT_PREVIOUS_SHA` (the last deployed commit — correct for multi-commit pushes) with `:(exclude)` pathspecs, falling back to `HEAD^` and ultimately to "deploy" when no base is reachable. _Why? Each Vercel build runs `scripts/vercel-build.sh` (`prisma generate` → `next build`, plus `prisma migrate deploy` on production deploys only), which is the most CPU-expensive step in the entire pipeline. Skipping deploys for test-only or docs-only commits typically halves monthly build minutes on a portfolio repo with frequent README/TODO churn._
 
 - **Per-request permission memoization** — `getCurrentUser()` and the no-arg `getUserPermissions()` are wrapped in React's `cache()`, which deduplicates identical calls within the same Server Component render. The home page calls `hasPermission()` ~5× (one per query) plus an explicit `getUserPermissions()` for the TopBar — without memoization that's 6 independent `prisma.user.findUnique` round-trips, each with a `permissions` join. After `cache()`, it collapses to a single DB hit per render. The `userId`-keyed variant intentionally stays unmemoized so admin pages can look up multiple users in one render. _Why? On the Vercel Hobby tier, every saved Prisma round-trip is also saved Active CPU — and this is the cheapest possible win because it's a one-line change._
 
 - **Edge runtime for `/api/health`** — The shallow health probe has no Prisma / Node-only dependencies, so it runs on the Edge runtime instead of a Node Lambda. Edge invocations spin up much faster than serverless functions, so uptime monitors and load-balancer probes burn far less Active CPU. The matching proxy excludes `/api/health`, `/api/ready`, `/api/realtime/poll`, and `/api/realtime/sse` so those high-frequency endpoints don't pay for CSP nonce generation and security-header injection on every hit.
 
-- **Performance at scale** — 14 database indexes on foreign keys and frequently queried columns, N+1 query elimination (replaced eager-loaded relation counts with `_count` aggregations and `groupBy` batching), and `select` narrowing on all relation includes to avoid fetching unused columns. Performance seeding script generates 10k employees / 200 teams / 50 departments for load testing. Benchmark script measures all major query patterns with warm-up runs and P95 reporting. Full scaling analysis in [`SCALING.md`](SCALING.md) documents known scaling cliffs and recommendations for 100k+ employees. _Why document scaling limits? A production system should be honest about where it breaks — and have a plan for when it gets there._
+- **Performance at scale** — 40+ database indexes on foreign keys and frequently queried columns, N+1 query elimination (replaced eager-loaded relation counts with `_count` aggregations and `groupBy` batching), and `select` narrowing on all relation includes to avoid fetching unused columns. Performance seeding script generates 10k employees / 200 teams / 50 departments for load testing. Benchmark script measures all major query patterns with warm-up runs and P95 reporting. Full scaling analysis in [`SCALING.md`](SCALING.md) documents known scaling cliffs and recommendations for 100k+ employees. _Why document scaling limits? A production system should be honest about where it breaks — and have a plan for when it gets there._
 
 - **Docker-ready** — `docker compose up` starts PostgreSQL + MongoDB + the app. Migrations run automatically, demo login works out of the box. _One command, zero setup, fully working._
 
@@ -253,7 +253,7 @@ graph LR
 | Caching        | `cacheInvalidation.ts`  | Tag-based `unstable_cache` (5-min TTL) on org-wide queries; mutations call `updateTag` (Next 16)           |
 | Hash chain     | `auditHashChain.ts`     | HMAC-SHA256 linking each audit entry to its predecessor; admin verification endpoint                       |
 
-**Feature-based module structure** — each domain (persons, teams, departments, reviews, leave, admin, etc.) is a self-contained module under `src/features/` with its own schemas, queries, actions, components, and co-located tests. Shared infrastructure (auth, permissions, audit, rate limiting) lives in `src/lib/`. This encapsulation means changes to one domain rarely touch other domains, reducing merge conflicts and making the codebase navigable at scale.
+**Feature-based module structure** — each domain (persons, teams, departments, reviews, leave, admin, etc.) is a self-contained module under `src/features/` with its own schemas, queries, actions, components, and co-located tests. Shared infrastructure lives at the `src/` root (`auth.ts`, `permissions.ts`, `auditLog.ts`, `rateLimit.ts`), with supporting helpers in `src/lib/` (`auditOutbox.ts`, `cache.ts`, `actionUtils.ts`). This encapsulation means changes to one domain rarely touch other domains, reducing merge conflicts and making the codebase navigable at scale.
 
 ```
 src/features/
@@ -385,6 +385,15 @@ npm run dev                   # start dev server at localhost:3000
 | `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` | No       | OTLP trace collector URL (default: `http://localhost:4318/v1/traces`)                                                                      |
 | `NEXT_PUBLIC_REALTIME_TRANSPORT`     | No       | `sse` or `poll` (auto-detected: SSE local, poll on Vercel)                                                                                 |
 
+**Running the test suite locally** — server/integration tests run against a real PostgreSQL test database (`hrmanager_test`, created above) and an in-memory MongoDB, not mocks. They read `.env.test`, which is gitignored — create it from the template first:
+
+```bash
+cp .env.test.example .env.test   # point DATABASE_URL / DIRECT_URL at hrmanager_test
+npm run test:all                 # pushes schema to the test DB, then runs every suite
+```
+
+If `.env.test` is missing, `npm run test:all` fails at the Prisma step — that missing file, not your change, is usually the cause. (Server tests share one DB; never run two suites at once.)
+
 ---
 
 ## Deployment
@@ -430,7 +439,7 @@ _Last updated: March 2026_
 
 - [x] OpenTelemetry tracing — instrument full request lifecycle; export to Jaeger/Datadog; P95/P99 dashboards
 - [x] Real-time updates (SSE) — live notifications via Server-Sent Events with polling fallback for Vercel
-- [x] Performance at scale — N+1 query fixes, 14 database indexes, load testing tools, scaling analysis
+- [x] Performance at scale — N+1 query fixes, 40+ database indexes, load testing tools, scaling analysis
 
 ### Security & Compliance
 
