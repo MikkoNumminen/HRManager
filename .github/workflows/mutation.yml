@@ -25,7 +25,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:16
+        image: postgres:17
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
@@ -92,14 +92,35 @@ jobs:
         with:
           script: |
             const fs = require('fs');
+            const runUrl = '../actions/runs/${{ github.run_id }}';
             let body;
             try {
-              // Stryker writes a JSON summary alongside the HTML report
-              const reportPath = 'reports/mutation/mutation.html';
-              const exists = fs.existsSync(reportPath);
-              body = exists
-                ? '### Mutation Testing Results\n\nStryker mutation report generated — see the [artifact](../actions/runs/${{ github.run_id }}) for details.'
-                : '### Mutation Testing\n\nMutation report was not generated (Stryker may have failed). Check the [workflow logs](../actions/runs/${{ github.run_id }}).';
+              // Compute the numeric mutation score from the JSON report so a
+              // reader sees the digits, not just a link to the artifact.
+              const jsonPath = 'reports/mutation/mutation.json';
+              if (fs.existsSync(jsonPath)) {
+                const report = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+                let killed = 0, timeout = 0, survived = 0, noCov = 0;
+                for (const file of Object.values(report.files || {})) {
+                  for (const m of file.mutants || []) {
+                    if (m.status === 'Killed') killed++;
+                    else if (m.status === 'Timeout') timeout++;
+                    else if (m.status === 'Survived') survived++;
+                    else if (m.status === 'NoCoverage') noCov++;
+                  }
+                }
+                const detected = killed + timeout;
+                const valid = detected + survived + noCov;
+                const score = valid ? (detected / valid) * 100 : 0;
+                const pass = score >= 60;
+                body = `### Mutation Testing\n\n**Score: ${score.toFixed(2)}%** ` +
+                  `(break threshold 60% — ${pass ? '✅ pass' : '❌ below'}). ` +
+                  `${detected} detected / ${valid} valid mutants ` +
+                  `(killed ${killed}, timeout ${timeout}, survived ${survived}, no-coverage ${noCov}). ` +
+                  `[Full report](${runUrl}).`;
+              } else {
+                body = `### Mutation Testing\n\nReport not generated (Stryker may have failed). [Logs](${runUrl}).`;
+              }
             } catch (e) {
               body = `### Mutation Testing\n\nCould not read mutation report: ${e.message}`;
             }

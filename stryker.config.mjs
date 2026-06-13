@@ -26,9 +26,12 @@ const config = {
     "src/lib/logger.ts",
     "!src/**/*.d.ts",
   ],
-  reporters: ["progress", "html", "dashboard"],
+  reporters: ["progress", "html", "json", "dashboard"],
   htmlReporter: {
     fileName: "reports/mutation/mutation.html",
+  },
+  jsonReporter: {
+    fileName: "reports/mutation/mutation.json",
   },
   // Run mutation testing in-place so the existing Next.js / SWC TypeScript
   // transforms work correctly without needing a separate Babel config.
