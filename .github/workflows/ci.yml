@@ -92,5 +92,10 @@ jobs:
       - name: Run all tests with coverage
         run: npm run test:all -- --coverage
 
+      # The coverage run just wrote coverage/coverage-summary.json — fail if the
+      # README's advertised coverage numbers have drifted from it.
+      - name: Check README coverage claims
+        run: npm run check:coverage-claims
+
       - name: Build
         run: npx next build
