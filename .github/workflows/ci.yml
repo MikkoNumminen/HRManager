@@ -61,6 +61,12 @@ jobs:
       - name: Check error-code i18n coverage
         run: npm run check:error-codes
 
+      # Feature-module boundary ratchet: fail if cross-feature `@/features/<other>`
+      # imports drift from the baseline (convention → CI-enforced). See
+      # scripts/check-feature-boundaries.mjs.
+      - name: Check feature boundaries
+        run: npm run check:boundaries
+
       # i18n parity is enforced locally by .husky/pre-push, but a --no-verify or
       # headless push skips that hook — mirror its thresholds here so the signal
       # always reaches CI. (Keep in sync with .husky/pre-push.)
