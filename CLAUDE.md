@@ -1,5 +1,10 @@
 # HRManager – Claude Code Rules
 
+> The canonical, vendor-neutral agent contract is **[`AGENTS.md`](AGENTS.md)** —
+> read it first for stack, architecture, the verification ladder, footguns, and
+> commit rules. This file is the Claude-Code overlay (session/instance protocol
+> plus the `.claude/skills/` procedures) layered on top of it.
+
 ## Vittu clause
 
 When "vittu" appears in the user's prompt: max speed, aggressive subagents for independent tasks in parallel, no confirmations between steps.
@@ -15,6 +20,8 @@ Every TODO item must have an LLM marker: ⚡ Sonnet-capable (mechanical, repetit
 **⚠️ MANDATORY: 4 permanent Claude instances: Claude 1, Claude 2, Claude 3, Claude 4.** Names assigned by user — never pick your own. Ask if you don't know. Move tasks to "In Progress" with your name, e.g. `[Claude 1, main]` or `[Claude 3, worktree-name]`. Unmarked work causes collisions. **No exceptions. No silent work.**
 
 **🚨 If you pause or stop mid-task, your "In Progress" entry MUST remain until the work is committed and pushed.** Other instances depend on this to avoid collisions.
+
+**Solo autonomous agents:** the instance protocol exists only to deconflict multiple concurrent Claude instances. If you are a single agent with no human-assigned name and no other instances running (e.g. a fresh clone with no `TODO.md`), skip the ritual — work on a feature branch and let the PR be your coordination record.
 
 ## Commit style
 
@@ -45,7 +52,7 @@ Next.js 16 (App Router) · React 19 · MUI v7 (dark theme, no Tailwind) · TypeS
 - **Shared constants** (MAX_NAME_LENGTH, EmailSchema, ImageUrlSchema) in `schemas/shared.ts` — feature schemas import from `@/schemas/shared`.
 - **Shared components** (SnackbarProvider, ThemeRegistry, DataTable, ConfirmDialog, etc.) in `src/components/shared/`. TopBar and LeaveManager subdirs remain at `src/components/`.
 - **Audit logging** is dual-path behind the `audit-use-outbox` feature flag (ON in production): entries are written to the `AuditOutbox` Postgres table **inside the mutation transaction**, then a single advisory-locked drainer (`src/lib/auditOutbox.ts`) delivers them to MongoDB and assigns the tamper-evident hash chain (drains via `after()` + the daily `/api/cron/audit-drain` backstop). Flag OFF = legacy direct `after()` writes to Mongo. No FK to User.
-- **Every mutation goes through the wrappers**: `guardedAction(permission, name, fn)` (auth + rate-limit + tracing) and `withAuditedTransaction(fn)` (Prisma tx + audit capture via `addAudit`). Never hand-roll permission checks or audit writes in an action.
+- **Mutations use one of two sanctioned patterns** — match the file you are editing, and never hand-roll permission/audit logic outside them: (1) the **wrappers** `guardedAction(permission, name, fn)` (auth + rate-limit + tracing) + `withAuditedTransaction(fn)` (Prisma tx + audit capture via `addAudit`) — the default for domain entities; (2) the **inline** pattern — `safe()` (`@/lib/actionUtils`) or a typed return with manual `requirePermission`/`auth()` + `rateLimit` + `captureAuditContext`/`deferAudit(Log)` inside an explicit `$transaction` — used by `data`, `featureFlags`, `jobs`, `profile`, `sessions` (self-service or infrastructure actions that need a typed `ActionResult` for `useActionState`). Prefer the wrappers for new domain features.
 - **Errors**: throw `ActionError(code, message)`. `ErrorCode` (`src/actionErrors.ts`) is a **manual union** — adding a code requires (1) the union member, (2) an `errors.<code>` key in `messages/en.json`, (3) translations (`npm run i18n:translate` or by hand). CI enforces (2) via `npm run check:error-codes`.
 - **Cache invalidation**: high-traffic queries use the `cache()` wrapper (`src/lib/cache.ts`) with tags (`ORG_DATA_TAG`, `DASHBOARD_TAG`); after a mutation call `revalidatePath()` and, when dashboard data changed, `invalidateDashboardCache()` (`src/lib/cacheInvalidation.ts`). Copy the pattern from a neighboring feature's actions.
 - Pages are async Server Components passing props to Client Components. No `useEffect` data fetching.
