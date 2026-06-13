@@ -61,6 +61,25 @@ jobs:
       - name: Check error-code i18n coverage
         run: npm run check:error-codes
 
+      # i18n parity is enforced locally by .husky/pre-push, but a --no-verify or
+      # headless push skips that hook — mirror its thresholds here so the signal
+      # always reaches CI. (Keep in sync with .husky/pre-push.)
+      - name: Check i18n key parity
+        run: |
+          OUT=$(npx tsx scripts/i18n-sync.ts 2>&1) || true
+          echo "$OUT"
+          MISSING=$(echo "$OUT" | grep -c "^      + " || true)
+          if [ "$MISSING" -gt 0 ]; then
+            echo "::error::$MISSING missing i18n key(s). Run 'npm run i18n:fix', then translate, and commit."
+            exit 1
+          fi
+          UNTRANSLATED=$(echo "$OUT" | grep "^Summary:" | sed -E 's/.*,[[:space:]]*([0-9]+) untranslated.*/\1/')
+          if [ -n "$UNTRANSLATED" ] && [ "$UNTRANSLATED" -gt 25 ]; then
+            echo "::error::$UNTRANSLATED untranslated i18n keys (threshold 25). Translate new keys with 'npm run i18n:translate'."
+            exit 1
+          fi
+          echo "i18n OK — $(echo "$OUT" | grep '^Summary:')"
+
       # Playwright E2E (75 tests) intentionally stays out of CI: it needs a
       # production build + browsers (~10 min) and runs in the pre-release flow
       # instead (npm run test:e2e). Revisit if the suite gains CI budget.
