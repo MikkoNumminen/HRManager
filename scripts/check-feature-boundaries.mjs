@@ -25,7 +25,7 @@
 //     raise BASELINE below and say why in the PR.
 //   • count < BASELINE — you removed coupling (nice). This only WARNS (exit 0);
 //     lower BASELINE to the new number to lock the gain in.
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
