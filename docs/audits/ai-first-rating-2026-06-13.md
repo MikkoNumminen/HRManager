@@ -66,24 +66,28 @@ first requires a small refactor (extract 2 shared components to
 `src/components/shared/`, route the ~18 deep `actions`/`schemas` imports through
 the existing barrels) — that's **round-4 code work**, not a docs PR.
 
-## Next +points, in leverage order (round 4 — code/CI, carries risk)
+## Next +points, in leverage order
 
-1. **Boundary enforcement** (+~0.5 safety-rails): do the barrel refactor above,
-   then add the `no-restricted-imports` rule to `eslint.config.mjs`, CI-enforced.
-2. **Gate README/coverage drift in CI** (+~0.4 verifiability): add a `--check`
-   mode to `scripts/generate-test-table.mjs` + a coverage-cell check against
-   `coverage/coverage-summary.json`, wired into `ci.yml`.
-3. **i18n:audit as a CI step** (+~0.3 verifiability): today it only blocks in the
-   bypassable `.husky/pre-push` hook; add an advisory-threshold CI step so a
-   headless agent gets the same signal.
-4. **`test:all` preflight** (+~0.3 workflow): fail loudly with "create .env.test
-   from .env.test.example" when `DATABASE_URL` is unset, instead of a silent
-   Prisma error.
-5. **Per-file headers on the 5 wrapper-exempt actions files** (+~0.3 legibility):
-   a one-line note in each of `data`/`featureFlags`/`jobs`/`profile`/`sessions`
-   `actions.ts` pointing at the documented inline pattern.
-6. **De-quantify remaining drift-prone README counts** (+~0.2): the largest
-   `actions.ts` files (reviews 555, admin 515, leave 454) could be split.
+**Round 4 shipped the three lowest-risk items** (code/CI, full suite verified
+locally): an i18n-parity CI gate (+~0.3 verifiability — closes the gap a
+`--no-verify`/headless push opened past the pre-push hook), a `test:all`
+preflight that errors clearly when the test-DB env is missing (+~0.3 workflow),
+and inline-mutation-pattern headers on the 5 wrapper-exempt action files (+~0.3
+legibility).
+
+Remaining (higher churn / risk):
+
+1. **Boundary enforcement** (+~0.5 safety-rails): the barrel refactor above
+   (extract 2 shared components to `src/components/shared/`, route the ~18 deep
+   `actions`/`schemas` imports through the root barrels), then a CI-enforced
+   `no-restricted-imports` rule in `eslint.config.mjs`. The highest-value
+   remaining lever — **deferred pending a go-ahead**: it moves components and
+   rewrites ~18 imports (real structural churn in a maintenance-mode repo).
+2. **Gate README/coverage drift in CI** (+~0.4 verifiability): a `--check` mode
+   for `scripts/generate-test-table.mjs` reusing CI's Jest JSON + a coverage-cell
+   check against `coverage/coverage-summary.json`, wired into `ci.yml`.
+3. **Split the largest `actions.ts` files** (+~0.2 legibility): reviews (555),
+   admin (515), leave (454).
 
 ## Method & caveats
 
@@ -98,7 +102,8 @@ the existing barrels) — that's **round-4 code work**, not a docs PR.
 
 ## Score history
 
-| Date            | Score                            | Notes                                                                                                                                                                                             |
-| --------------- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-06-13      | 7.58 (→ ~8.3 est. after round-3) | First **tracked** rating (this doc). Fresh adversarial re-measure; round-3 docs/contracts PR estimated to lift to ~8.3.                                                                           |
-| 2026-06 (prior) | ~8.0 measured / ~8.4–8.5 est.    | Rounds 1–2 (PRs #14–#23): audit remediation, CI gates, 4 skills, rollback runbook. Recorded only in session transcripts — not a tracked artifact. Superseded by the un-anchored re-measure above. |
+| Date            | Score                            | Notes                                                                                                                                                                                                      |
+| --------------- | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-06-13      | 7.58 (→ ~8.3 est. after round-3) | First **tracked** rating (this doc). Fresh adversarial re-measure; round-3 docs/contracts PR estimated to lift to ~8.3.                                                                                    |
+| 2026-06-13 (r4) | ~8.3 → ~8.5 est.                 | Round 4 (code/CI, full suite verified locally): i18n-parity CI gate, `test:all` preflight, 5 inline-mutation-pattern headers. Boundary refactor + README-drift gate still deferred. Re-measure to confirm. |
+| 2026-06 (prior) | ~8.0 measured / ~8.4–8.5 est.    | Rounds 1–2 (PRs #14–#23): audit remediation, CI gates, 4 skills, rollback runbook. Recorded only in session transcripts — not a tracked artifact. Superseded by the un-anchored re-measure above.          |
