@@ -2,6 +2,9 @@
   "name": "hrm",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "bash scripts/vercel-build.sh",
@@ -10,6 +13,7 @@
     "typecheck": "tsc --noEmit",
     "check:error-codes": "node scripts/check-error-codes.mjs",
     "check:boundaries": "node scripts/check-feature-boundaries.mjs",
+    "check:coverage-claims": "node scripts/check-coverage-claims.mjs",
     "readme:test-table": "node scripts/generate-test-table.mjs",
     "test": "jest --verbose",
     "test:server": "npx tsx -e \"require('dotenv').config({path:'.env.test',override:true})\" && npx prisma db push --accept-data-loss && jest --config jest.config.server.ts --verbose",
