@@ -30,7 +30,7 @@ Every TODO item must have an LLM marker: ⚡ Sonnet-capable (mechanical, repetit
 - Claude commits and pushes directly on **feature branches** — logical, self-contained conventional commits (one concern per commit), verified before every push (`npm run typecheck` + targeted tests; the pre-push hook runs the full suite). Never commit to `main` — everything lands via a PR.
 - PRs are reviewed with `/review` (adversarially for substantial changes) and merged only on explicit instruction — **rebase-merge**, preserving the commit history.
 - **Before providing any commit message, update ALL affected files first** (README.md, etc.). Never provide a commit message while dependent files are still out of date.
-- Changes to `CLAUDE.md` or `README.md` must be committed **separately** from code — use a `docs()` commit.
+- Changes to `CLAUDE.md`, `AGENTS.md`, or `README.md` must be committed **separately** from code — use a `docs()` commit.
 - **⚠️ After every push, re-read `TODO.md` and present the full task list.**
 - **⚠️ When editing any `.md` file, re-read it and present the content back to the user.**
 
