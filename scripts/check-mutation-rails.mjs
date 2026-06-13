@@ -11,7 +11,7 @@
 // Scope: exported actions in src/features/<x>/actions.ts and
 // src/features/<x>/actions/<group>.ts (excluding the index re-export barrels and
 // test files).
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -56,9 +56,34 @@ for (const file of actionFiles(featuresDir)) {
   }
 }
 
+// API route handlers: a mutating handler (POST/PUT/PATCH/DELETE) must also be
+// gated. Cron routes use a CRON_SECRET timingSafeEqual check; NextAuth is the
+// auth provider itself (`handlers`). A new un-gated mutating route fails here.
+const apiDir = join(root, "src", "app", "api");
+const API_GATE =
+  /CRON_SECRET|timingSafeEqual|requirePermission|requireAdminIp|getServerSession|\bhandlers\b|await auth\(/;
+const MUTATING = /export (?:async function|const) (?:POST|PUT|PATCH|DELETE)\b/;
+function routeFiles(dir) {
+  const out = [];
+  for (const entry of readdirSync(dir)) {
+    const full = join(dir, entry);
+    if (statSync(full).isDirectory()) out.push(...routeFiles(full));
+    else if (entry === "route.ts") out.push(full);
+  }
+  return out;
+}
+for (const file of existsSync(apiDir) ? routeFiles(apiDir) : []) {
+  const src = readFileSync(file, "utf8");
+  if (MUTATING.test(src) && !API_GATE.test(src)) {
+    ungated.push(
+      `  ${relative(root, file)}  (mutating API route handler with no auth/secret gate)`,
+    );
+  }
+}
+
 if (ungated.length) {
   console.error(
-    `check-mutation-rails: ${ungated.length} exported action(s) with no auth gate ` +
+    `check-mutation-rails: ${ungated.length} mutation(s) with no auth gate ` +
       `(guardedAction / requirePermission / requireAdminIp / auth):\n${ungated.join("\n")}\n\n` +
       "Every mutation must be authorized. Wrap it in guardedAction(), or add an explicit " +
       "requirePermission()/auth() check (see AGENTS.md → mutation patterns).",
