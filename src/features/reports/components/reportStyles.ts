@@ -35,5 +35,9 @@ export const CHART_COLORS = [
   "#66bb6a",
 ];
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type TranslationFn = any;
+// The subset of next-intl's `useTranslations()` translator that the report tabs
+// use: look up a key with optional ICU values. (Was `any`.)
+export type TranslationFn = (
+  key: string,
+  values?: Record<string, string | number | Date>,
+) => string;
