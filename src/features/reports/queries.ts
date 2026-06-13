@@ -1,4 +1,5 @@
 import { prisma } from "@/db";
+import { ActionError } from "@/actionErrors";
 import { hasPermission } from "@/permissions";
 import { getDemoSessionId } from "@/demoSession";
 import { cache } from "@/lib/cache";
@@ -55,7 +56,7 @@ const CACHE_TTL = 300;
 
 export async function getHeadcountTrends(filters?: ReportFilters): Promise<HeadcountTrend[]> {
   const allowed = await hasPermission("reports:view");
-  if (!allowed) throw new Error("Permission denied");
+  if (!allowed) throw new ActionError("permissionDenied", "Permission denied");
   const sessionId = await getDemoSessionId();
   return fetchHeadcountTrendsCached(
     sessionId,
@@ -152,7 +153,7 @@ async function fetchHeadcountTrendsUncached(
 
 export async function getTurnoverRates(filters?: ReportFilters): Promise<TurnoverRate[]> {
   const allowed = await hasPermission("reports:view");
-  if (!allowed) throw new Error("Permission denied");
+  if (!allowed) throw new ActionError("permissionDenied", "Permission denied");
   const sessionId = await getDemoSessionId();
   return fetchTurnoverRatesCached(
     sessionId,
@@ -258,7 +259,7 @@ async function fetchTurnoverRatesUncached(
 
 export async function getLeaveUtilization(filters?: ReportFilters): Promise<LeaveUtilization[]> {
   const allowed = await hasPermission("reports:view");
-  if (!allowed) throw new Error("Permission denied");
+  if (!allowed) throw new ActionError("permissionDenied", "Permission denied");
   const sessionId = await getDemoSessionId();
   const year = filters?.year ?? new Date().getFullYear();
   return fetchLeaveUtilizationCached(sessionId, filters?.departmentId ?? null, year);
@@ -325,7 +326,7 @@ export async function getReviewCompletionRates(
   _filters?: ReportFilters,
 ): Promise<ReviewCompletion[]> {
   const allowed = await hasPermission("reports:view");
-  if (!allowed) throw new Error("Permission denied");
+  if (!allowed) throw new ActionError("permissionDenied", "Permission denied");
   const sessionId = await getDemoSessionId();
   return fetchReviewCompletionCached(sessionId);
 }
@@ -379,7 +380,7 @@ export async function exportReportCsv(
   filters?: ReportFilters,
 ): Promise<string> {
   const allowed = await hasPermission("reports:export");
-  if (!allowed) throw new Error("Permission denied");
+  if (!allowed) throw new ActionError("permissionDenied", "Permission denied");
 
   switch (reportType) {
     case "headcount": {
