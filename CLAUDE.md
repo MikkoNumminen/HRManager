@@ -17,11 +17,7 @@ Every TODO item must have a size estimate: 🟢 small, 🟡 medium, 🔴 large. 
 
 Every TODO item must have an LLM marker: ⚡ Sonnet-capable (mechanical, repetitive, well-defined) or 🧠 Opus recommended (architectural, complex reasoning, multi-file). Place after size emoji: `🟢⚡` or `🟡🧠`. After completing a task, assess and tag new items.
 
-**⚠️ MANDATORY: 4 permanent Claude instances: Claude 1, Claude 2, Claude 3, Claude 4.** Names assigned by user — never pick your own. Ask if you don't know. Move tasks to "In Progress" with your name, e.g. `[Claude 1, main]` or `[Claude 3, worktree-name]`. Unmarked work causes collisions. **No exceptions. No silent work.**
-
-**🚨 If you pause or stop mid-task, your "In Progress" entry MUST remain until the work is committed and pushed.** Other instances depend on this to avoid collisions.
-
-**Solo autonomous agents:** the instance protocol exists only to deconflict multiple concurrent Claude instances. If you are a single agent with no human-assigned name and no other instances running (e.g. a fresh clone with no `TODO.md`), skip the ritual — work on a feature branch and let the PR be your coordination record.
+**Coordinating multiple concurrent instances (optional — solo is the default).** A single agent just works on a feature branch and lets the PR be its coordination record; no naming ritual is needed. _Only when several Claude instances run against this repo at once_ do they need to deconflict: the user gives each a name (e.g. `Claude 1`, `Claude 2`), and each marks its `TODO.md` items "In Progress" with that name before starting — and leaves the marker until the work is committed and pushed, so the others don't collide. Ask the user for a name only if you've been told you're one of several running.
 
 ## Commit style
 
