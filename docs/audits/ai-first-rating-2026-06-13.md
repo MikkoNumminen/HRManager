@@ -1,0 +1,104 @@
+# AI-first rating — 2026-06-13
+
+> **Score: 7.58 / 10 measured** (round-3 baseline, fresh adversarial re-measure).
+> Round-3 doc/contract changes (this PR) are estimated to lift it to **~8.2–8.3**;
+> re-run the rating to confirm.
+>
+> "AI-first" = how safely and cheaply a fresh autonomous coding agent (or new
+> human) can orient, understand intent, make a correct change, and verify its
+> own work in _this_ repo using only the repo's own docs and guardrails — no
+> human in the loop. This doc defines the rubric, records the measured state,
+> and is the trackable artifact for the score. Re-measure by re-running the
+> assessment; append a new dated row to the History table rather than editing
+> scores in place.
+
+## Rubric
+
+Six dimensions, each 0–10, equally weighted. Each was scored by an independent
+assessor and then re-checked by a separate adversarial verifier that re-ran the
+gates and re-grepped the claims. The number used is the **verifier's** score
+(conservative). Two calibrations are baked in from the prior round's mistakes:
+a mandatory checkout-verification preamble (two assessors once graded the stale
+`~/koodailua/HRManager` decoy), and a single-suite test rule (one assessor once
+manufactured a phantom "63 failing tests" by running jest concurrently).
+
+| #   | Dimension                             | Score    | One-line basis                                                                                                                                                                |
+| --- | ------------------------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Verifiability & feedback loops        | 8.0      | Dense fast-failing CI ladder (format→lint→typecheck→error-codes→tests+coverage→build) + Stryker; gaps: no boundary lint, README-drift ungated, i18n only in a bypassable hook |
+| 2   | Agent context & instructions          | 7.0      | Excellent CLAUDE.md + 4 skills, but Claude-branded; **no `AGENTS.md`**; multi-instance protocol doesn't degrade for a solo agent                                              |
+| 3   | Workflow automation & reproducibility | 8.0      | Deterministic, self-measuring tooling; the one trap: `npm run test:all` needs a gitignored `.env.test` no doc explained                                                       |
+| 4   | Safety rails & blast radius           | 7.5      | Strong runtime rails (guarded wrappers, hash-chained audit, 2FA gate, prod-only migrations, rollback runbook); module boundaries unenforced (22 cross-feature deep imports)   |
+| 5   | Doc accuracy & drift                  | 7.5      | Numbers/paths verify almost exactly; five dated audit docs lacked superseded banners; a few stale README facts                                                                |
+| 6   | Code legibility & consistency         | 7.5      | Near-zero typing escape hatches, WHY-comments, Zod contracts; two undocumented parallel mutation patterns across 18 features                                                  |
+|     | **Overall (mean)**                    | **7.58** |                                                                                                                                                                               |
+
+> The prior session reported ~8.0 (and estimated ~8.4–8.5 after PR #23). This
+> fresh, un-anchored, adversarial re-measure landed lower at **7.58** — the
+> assessors dug into gaps the targeted campaign didn't reach (`.env.test` setup,
+> boundary non-enforcement, missing banners, the second mutation pattern). The
+> lower number is the more honest baseline, not a regression.
+
+## Round-3 changes (this PR) — what moves the score
+
+All round-3 changes are **docs / contracts only** (zero behaviour or CI risk) —
+appropriate for a maintenance-mode showpiece. Estimated per-dimension lift:
+
+| Dimension            | → est.                 | What changed                                                                                                                                                                                                                                                   |
+| -------------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Agent context        | 7.0 → **8.5**          | New `AGENTS.md` (canonical cross-tool contract: stack, architecture, gate ladder, footguns, commits); CLAUDE.md gains an `AGENTS.md` pointer + a solo-agent fallback for the instance protocol; fixed the stale `serverActions.ts` mermaid label               |
+| Workflow automation  | 8.0 → **8.7**          | `.env.test.example` + a README "Running tests locally" block + AGENTS.md setup section close the gitignored-`.env.test` trap                                                                                                                                   |
+| Doc accuracy & drift | 7.5 → **8.5**          | Superseded banners on the dated audit reports + this index (`docs/audits/README.md`) with remediation mapping; banner on the tracked, pre-refactor `REVIEW.md`; README fixes (`src/lib` infra location, `14`→`40+` indexes, Vercel-build migrate-deploy claim) |
+| Safety rails         | 7.5 → **7.9**          | New `SECURITY.md` (trust boundaries, controls, 6 named security invariants, threat model, remediation history) + `CODEOWNERS` on security-sensitive paths; the boundary-enforcement lever is deferred (see below)                                              |
+| Code legibility      | 7.5 → **8.0**          | The two mutation patterns (wrappers vs. inline `safe()`/manual-audit, used by `data`/`featureFlags`/`jobs`/`profile`/`sessions`) are now documented in CLAUDE.md + AGENTS.md                                                                                   |
+| Verifiability        | 8.0 → 8.0              | Unchanged — the CI-gate levers are round-4 work (below)                                                                                                                                                                                                        |
+| **Mean**             | **7.58 → ~8.3 (est.)** | re-run the rating to confirm                                                                                                                                                                                                                                   |
+
+## Why module-boundary lint enforcement was _not_ added
+
+The single highest-rated cross-repo lever (it took a sibling repo to 8.7) is an
+ESLint `no-restricted-imports`/boundaries rule. It does **not** drop cleanly in
+here: cross-feature imports of another feature's **public surface**
+(`actions`/`queries`/`schemas`/top-level `components`) are pervasive and _by
+design_ — 22 cross-feature import lines, and CLAUDE.md documents root barrels
+(`@/queries`, `@/serverActions`, `@/schemas`) as the intended seam. A naïve
+ban would fail the build and contradict the architecture. Enforcing it safely
+first requires a small refactor (extract 2 shared components to
+`src/components/shared/`, route the ~18 deep `actions`/`schemas` imports through
+the existing barrels) — that's **round-4 code work**, not a docs PR.
+
+## Next +points, in leverage order (round 4 — code/CI, carries risk)
+
+1. **Boundary enforcement** (+~0.5 safety-rails): do the barrel refactor above,
+   then add the `no-restricted-imports` rule to `eslint.config.mjs`, CI-enforced.
+2. **Gate README/coverage drift in CI** (+~0.4 verifiability): add a `--check`
+   mode to `scripts/generate-test-table.mjs` + a coverage-cell check against
+   `coverage/coverage-summary.json`, wired into `ci.yml`.
+3. **i18n:audit as a CI step** (+~0.3 verifiability): today it only blocks in the
+   bypassable `.husky/pre-push` hook; add an advisory-threshold CI step so a
+   headless agent gets the same signal.
+4. **`test:all` preflight** (+~0.3 workflow): fail loudly with "create .env.test
+   from .env.test.example" when `DATABASE_URL` is unset, instead of a silent
+   Prisma error.
+5. **Per-file headers on the 5 wrapper-exempt actions files** (+~0.3 legibility):
+   a one-line note in each of `data`/`featureFlags`/`jobs`/`profile`/`sessions`
+   `actions.ts` pointing at the documented inline pattern.
+6. **De-quantify remaining drift-prone README counts** (+~0.2): the largest
+   `actions.ts` files (reviews 555, admin 515, leave 454) could be split.
+
+## Method & caveats
+
+- **Multi-agent, adversarially verified.** Six assessors (one per dimension) +
+  six independent verifiers; 12 agents, ~508K tokens. No assessor landed on the
+  decoy checkout this round (the verification preamble held).
+- **Read-only, point-in-time.** Scores describe the working tree at `main`
+  @ `366b997` on 2026-06-13. Round-3 "after" numbers are **estimates**, not a
+  re-measure — re-run the assessment to capture the real lift.
+- **Verifier-preferred scoring.** Where assessor and verifier disagreed, the
+  (lower) verifier number is used. The overall mean is computed from those.
+
+## Score history
+
+| Date            | Score                            | Notes                                                                                                                                                                                             |
+| --------------- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-06-13      | 7.58 (→ ~8.3 est. after round-3) | First **tracked** rating (this doc). Fresh adversarial re-measure; round-3 docs/contracts PR estimated to lift to ~8.3.                                                                           |
+| 2026-06 (prior) | ~8.0 measured / ~8.4–8.5 est.    | Rounds 1–2 (PRs #14–#23): audit remediation, CI gates, 4 skills, rollback runbook. Recorded only in session transcripts — not a tracked artifact. Superseded by the un-anchored re-measure above. |
