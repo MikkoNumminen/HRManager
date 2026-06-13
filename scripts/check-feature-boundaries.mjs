@@ -5,23 +5,28 @@
 // another's internals (AGENTS.md "Architecture rules": prefer the root barrels
 // `@/serverActions` / `@/queries` / `@/schemas`, and put shared UI in
 // `src/components/shared/`). This script makes that boundary a CI ratchet: it
-// counts cross-feature `@/features/<other>` imports in PRODUCTION feature code
-// and fails when the count drifts from BASELINE, so coupling can't silently grow
-// (and improvements get locked in).
+// counts cross-feature imports in PRODUCTION feature code and fails when the
+// count grows past BASELINE, so coupling can't silently increase.
 //
-// Scope: `.ts`/`.tsx` under `src/features/`, excluding `__tests__/` and
-// `*.test.*` (integration tests may legitimately span features). Type-only
-// imports still count — they document the same coupling intent.
+// Scope: it polices feature→feature coupling only — imports from `src/app/` or
+// `src/components/` into a feature's internals are out of scope (the barrels are
+// the contract for those). Files scanned: `.ts/.tsx/.js/.jsx/.mjs/.cjs` under
+// `src/features/`, excluding `__tests__/` and `*.test.*` (integration tests may
+// legitimately span features). A cross-feature import is one that targets a
+// DIFFERENT feature, via either the `@/features/<other>` alias OR a relative
+// path that resolves under `src/features/<other>/`. Comments are stripped first
+// so a feature path mentioned in prose isn't miscounted. Type-only imports count
+// — they document the same coupling intent.
 //
 // When this fails:
 //   • count > BASELINE — you added cross-feature coupling. Route the import
 //     through a root barrel (`@/serverActions` / `@/queries` / `@/schemas`), or
 //     move shared UI to `src/components/shared/`. If it is genuinely necessary,
-//     bump BASELINE below and say why in the PR.
-//   • count < BASELINE — you removed coupling (nice). Lower BASELINE to the new
-//     number to lock the gain in.
+//     raise BASELINE below and say why in the PR.
+//   • count < BASELINE — you removed coupling (nice). This only WARNS (exit 0);
+//     lower BASELINE to the new number to lock the gain in.
 import { readdirSync, readFileSync, statSync } from "node:fs";
-import { dirname, join, relative } from "node:path";
+import { dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -33,37 +38,54 @@ const BASELINE = 19;
 
 function walk(dir) {
   const out = [];
-  for (const entry of readdirSync(dir)) {
-    const full = join(dir, entry);
-    if (statSync(full).isDirectory()) {
-      if (entry === "__tests__") continue;
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const full = join(dir, entry.name);
+    if (entry.isDirectory()) {
+      if (entry.name === "__tests__") continue;
       out.push(...walk(full));
-    } else if (/\.tsx?$/.test(entry) && !/\.test\.tsx?$/.test(entry)) {
+    } else if (/\.(tsx?|jsx?|mjs|cjs)$/.test(entry.name) && !/\.test\.\w+$/.test(entry.name)) {
       out.push(full);
     }
   }
   return out;
 }
 
-// Matches `from "@/features/<name>"` / `from '@/features/<name>/...'` in both
-// `import ... from` and `export ... from` statements.
-const IMPORT_RE = /\bfrom\s+["']@\/features\/([a-zA-Z0-9_-]+)/g;
+// Remove block/JSDoc and line comments so a feature path mentioned in prose
+// isn't counted as a real import. Heuristic (no full parse): good enough for an
+// import-graph ratchet; the `[^:"'`\\]` guard skips `://` and most in-string `//`.
+function stripComments(s) {
+  return s.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:"'`\\])\/\/.*$/gm, "$1");
+}
+
+// The other feature a specifier targets, or null (same-feature / external / lib).
+function crossFeatureTarget(spec, fileDir, ownFeature) {
+  let target = null;
+  const alias = spec.match(/^@\/features\/([\w-]+)/);
+  if (alias) {
+    target = alias[1];
+  } else if (spec.startsWith(".")) {
+    const rel = relative(featuresDir, resolve(fileDir, spec));
+    if (rel && !rel.startsWith("..") && !rel.startsWith(sep)) {
+      target = rel.split(/[/\\]/)[0];
+    }
+  }
+  return target && target !== ownFeature ? target : null;
+}
+
+const FROM_RE = /\bfrom\s*["']([^"']+)["']/g; // import/export ... from "x"
+const SIDE_RE = /^[ \t]*import\s+["']([^"']+)["'][ \t]*;?[ \t]*$/gm; // side-effect import "x"
 
 const violations = [];
 for (const file of walk(featuresDir)) {
-  // own feature = first path segment under src/features/
   const ownFeature = relative(featuresDir, file).split(/[/\\]/)[0];
-  const src = readFileSync(file, "utf8");
-  for (const m of src.matchAll(IMPORT_RE)) {
-    const target = m[1];
-    if (target !== ownFeature) {
+  const fileDir = dirname(file);
+  const src = stripComments(readFileSync(file, "utf8"));
+  for (const re of [FROM_RE, SIDE_RE]) {
+    for (const m of src.matchAll(re)) {
+      const target = crossFeatureTarget(m[1], fileDir, ownFeature);
+      if (!target) continue;
       const line = src.slice(0, m.index).split("\n").length;
-      violations.push({
-        file: relative(root, file),
-        line,
-        from: ownFeature,
-        to: target,
-      });
+      violations.push({ file: relative(root, file), line, from: ownFeature, to: target });
     }
   }
 }
@@ -93,11 +115,13 @@ if (count > BASELINE) {
 }
 
 if (count < BASELINE) {
-  console.error(
+  // Improvement — nudge, but don't fail an unrelated PR that incidentally
+  // removed coupling. Lowering BASELINE is a deliberate, separate edit.
+  console.warn(
     `\nBoundaries improved: ${count} < baseline ${BASELINE}. ` +
       `Lower BASELINE to ${count} in scripts/check-feature-boundaries.mjs to lock the gain in.`,
   );
-  process.exit(1);
+  process.exit(0);
 }
 
 console.log("OK — feature boundaries held at baseline.");
