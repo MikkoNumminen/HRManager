@@ -79,8 +79,8 @@ Remaining (higher churn / risk):
 
 1. **Boundary enforcement** (safety-rails). **Round 5 took the low-risk half:**
    a CI ratchet (`scripts/check-feature-boundaries.mjs`, `npm run
-check:boundaries`) that fails the build if cross-feature `@/features/<other>`
-   imports drift from the baseline (19 in production code) — convention is now
+check:boundaries`) that fails the build if cross-feature imports (alias or
+   relative) grow past the baseline (19 in production code) — convention is now
    mechanically enforced against regression, zero refactor. **Still deferred
    pending a go-ahead** (the bigger +~0.4): reduce the 19 to ~0 — extract 2
    shared components to `src/components/shared/`, route the deep `actions`/
