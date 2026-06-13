@@ -15,6 +15,8 @@
     "check:boundaries": "node scripts/check-feature-boundaries.mjs",
     "check:coverage-claims": "node scripts/check-coverage-claims.mjs",
     "check:file-size": "node scripts/check-file-size.mjs",
+    "check:mutation-rails": "node scripts/check-mutation-rails.mjs",
+    "check:test-count": "node scripts/check-test-count.mjs",
     "readme:test-table": "node scripts/generate-test-table.mjs",
     "test": "jest --verbose",
     "test:server": "npx tsx -e \"require('dotenv').config({path:'.env.test',override:true})\" && npx prisma db push --accept-data-loss && jest --config jest.config.server.ts --verbose",
@@ -25,7 +27,7 @@
     "i18n:audit": "npx tsx scripts/i18n-sync.ts",
     "i18n:fix": "npx tsx scripts/i18n-sync.ts --fix",
     "i18n:translate": "npx tsx scripts/i18n-sync.ts --fix --translate",
-    "validate": "prettier --check . && eslint . && tsc --noEmit && node scripts/check-error-codes.mjs && node scripts/check-feature-boundaries.mjs && (npx tsx scripts/i18n-sync.ts || true) && npx prisma db push --accept-data-loss && jest --config jest.config.all.ts --runInBand --verbose",
+    "validate": "prettier --check . && eslint . && tsc --noEmit && node scripts/check-error-codes.mjs && node scripts/check-feature-boundaries.mjs && node scripts/check-mutation-rails.mjs && (npx tsx scripts/i18n-sync.ts || true) && npx prisma db push --accept-data-loss && jest --config jest.config.all.ts --runInBand --verbose",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "postinstall": "prisma generate",
@@ -97,10 +99,15 @@
     "jest-axe": "^10.0.0",
     "jest-environment-jsdom": "^30.3.0",
     "lint-staged": "^16.4.0",
-    "mongodb-memory-server": "^11.0.1",
+    "mongodb-memory-server": "11.0.1",
     "prettier": "^3.8.1",
     "prisma": "^7.5.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
+  },
+  "config": {
+    "mongodbMemoryServer": {
+      "version": "8.2.1"
+    }
   }
 }

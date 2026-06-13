@@ -64,3 +64,6 @@ REFACTOR_PLAN.md
 # Generated audit reports
 AUDIT_REPORT.md
 AUDIT_RESULTS.md
+
+# Jest --json results (CI test-count gate)
+jest-results.json
