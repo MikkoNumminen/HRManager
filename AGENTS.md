@@ -44,6 +44,14 @@ Stryker (mutation) · ESLint 9 · Prettier 3 · GitHub Actions CI · Vercel.
 
 ## Setup & run
 
+One-command bootstrap (deps + env templates + Docker Postgres + schema):
+
+```bash
+./scripts/setup.sh           # idempotent; then `npm run dev` or `npm run test:all`
+```
+
+Or by hand:
+
 ```bash
 npm ci                       # install (postinstall runs prisma generate)
 cp .env.example .env         # fill AUTH_SECRET (openssl rand -base64 32) etc.
