@@ -13,12 +13,12 @@
 
 ## Reports
 
-| Audit                     | Status  | Report                                                                               |                                 Findings |
-| ------------------------- | ------- | ------------------------------------------------------------------------------------ | ---------------------------------------: |
-| react-anti-patterns-audit | ✅ ok   | [react-anti-patterns-2026-06-06.md](react-anti-patterns-2026-06-06.md)               |                                       17 |
-| ai-codegen-smell-audit    | ✅ ok   | [ai-smell-2026-06-06.md](ai-smell-2026-06-06.md)                                     |            40 (4 high + 17 med + 19 low) |
-| audit (robustness)        | ✅ ok   | [audit-2026-06-06.md](audit-2026-06-06.md)                                           | 105 (6 crit + 25 high + 44 med + 30 low) |
-| security-audit            | ⏸ gated | [../security/attack-surface-2026-06-06.md](../security/attack-surface-2026-06-06.md) |                       145 (Phase 1 only) |
+| Audit                     | Status  | Report                                                                                        |                                 Findings |
+| ------------------------- | ------- | --------------------------------------------------------------------------------------------- | ---------------------------------------: |
+| react-anti-patterns-audit | ✅ ok   | [react-anti-patterns-2026-06-06.md](react-anti-patterns-2026-06-06.md)                        |                                       17 |
+| ai-codegen-smell-audit    | ✅ ok   | [ai-smell-2026-06-06.md](ai-smell-2026-06-06.md)                                              |            40 (4 high + 17 med + 19 low) |
+| audit (robustness)        | ✅ ok   | [audit-2026-06-06.md](audit-2026-06-06.md)                                                    | 105 (6 crit + 25 high + 44 med + 30 low) |
+| security-audit            | ⏸ gated | attack-surface (Phase 1) — kept local, not committed (see [`SECURITY.md`](../../SECURITY.md)) |                       145 (Phase 1 only) |
 
 ## Aggregate severity rollup
 
