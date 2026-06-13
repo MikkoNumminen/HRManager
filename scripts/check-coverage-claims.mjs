@@ -39,6 +39,7 @@ const grab = (re, label) => {
 
 // README claim  -> (metric, decimals, regex capturing the claimed number)
 const checks = [
+  ["prose (rounded) line %", "lines", 0, /(\d+)% line coverage\*\*/],
   ["Total-row line %", "lines", 1, /([\d.]+)% line coverage ·/],
   ["Total-row function %", "functions", 1, /· ([\d.]+)% function coverage/],
   ["block Statements", "statements", 2, /Statements\s*:\s*([\d.]+)%/],

@@ -12,7 +12,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:16
+        image: postgres:17
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
@@ -66,6 +66,11 @@ jobs:
       # scripts/check-feature-boundaries.mjs.
       - name: Check feature boundaries
         run: npm run check:boundaries
+
+      # File-size ratchet: fail if production files over the ~300-LOC cap grow
+      # past the baseline (see scripts/check-file-size.mjs).
+      - name: Check file sizes
+        run: npm run check:file-size
 
       # i18n parity is enforced locally by .husky/pre-push, but a --no-verify or
       # headless push skips that hook — mirror its thresholds here so the signal
