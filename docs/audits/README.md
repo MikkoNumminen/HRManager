@@ -5,14 +5,14 @@ snapshots**, not live task lists. This index records which rounds have been
 remediated and where, so an agent browsing `docs/audits/` sees the current
 status without chasing already-fixed findings.
 
-| Report                                                                             | Date       | Status                                                                                                                                                                                          |
-| ---------------------------------------------------------------------------------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`audit-2026-06-06.md`](audit-2026-06-06.md) — robustness                          | 2026-06-06 | **Remediated.** Critical/high findings fixed in PRs #14–#23; medium/low triaged (fixed or parked).                                                                                              |
-| security attack-surface (Phase 1) — _kept local, not committed_                    | 2026-06-06 | **Remediated** (critical/high). The detailed report carries step-by-step exploit write-ups, so it is kept out of this public repo; the living posture is in [`SECURITY.md`](../../SECURITY.md). |
-| [`ai-smell-2026-06-06.md`](ai-smell-2026-06-06.md) — AI-codegen smells             | 2026-06-06 | Reviewed; confirmed items addressed during the #14–#23 campaign.                                                                                                                                |
-| [`react-anti-patterns-2026-06-06.md`](react-anti-patterns-2026-06-06.md)           | 2026-06-06 | Reviewed; confirmed items addressed during the #14–#23 campaign.                                                                                                                                |
-| [`audit-suite-2026-06-06.md`](audit-suite-2026-06-06.md) — suite index             | 2026-06-06 | Index for the four reports above.                                                                                                                                                               |
-| [`ai-first-rating-2026-06-13.md`](ai-first-rating-2026-06-13.md) — AI-first rating | 2026-06-13 | **Living.** The trackable AI-first score + rubric. Re-measure and append a history row.                                                                                                         |
+| Report                                                                             | Date       | Status                                                                                                                                                                                                   |
+| ---------------------------------------------------------------------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| robustness audit — _kept local, not committed_                                     | 2026-06-06 | **Remediated** (critical/high fixed in #14–#23; medium/low triaged). Enumerates security findings with file:line, so kept out of this public repo; living posture in [`SECURITY.md`](../../SECURITY.md). |
+| security attack-surface (Phase 1) — _kept local, not committed_                    | 2026-06-06 | **Remediated** (critical/high). The detailed report carries step-by-step exploit write-ups, so it is kept out of this public repo; the living posture is in [`SECURITY.md`](../../SECURITY.md).          |
+| [`ai-smell-2026-06-06.md`](ai-smell-2026-06-06.md) — AI-codegen smells             | 2026-06-06 | Reviewed; confirmed items addressed during the #14–#23 campaign.                                                                                                                                         |
+| [`react-anti-patterns-2026-06-06.md`](react-anti-patterns-2026-06-06.md)           | 2026-06-06 | Reviewed; confirmed items addressed during the #14–#23 campaign.                                                                                                                                         |
+| audit suite — _kept local, not committed_                                          | 2026-06-06 | Aggregates the security/robustness findings, so kept local too. This `README.md` is the committed index.                                                                                                 |
+| [`ai-first-rating-2026-06-13.md`](ai-first-rating-2026-06-13.md) — AI-first rating | 2026-06-13 | **Living.** The trackable AI-first score + rubric. Re-measure and append a history row.                                                                                                                  |
 
 ## What "remediated" means here
 
@@ -27,6 +27,10 @@ login), `1039d93` (HMAC fail-closed), `db73d65` (`/api/*` 2FA gate), `7f91c69`
 `6da2178` (production-only migrations), `98e7635` (gate SSE/poll), `d95d443`
 (CSV via `generateCSV`).
 
-The dated reports each carry a superseded banner pointing here. Older root-level
-reports (`AUDIT_REPORT.md`, `AUDIT_RESULTS.md`, `REVIEW.md`, `REFACTOR_PLAN.md`,
-dated 2026-03) predate the feature-module refactor and are historical.
+The reports that enumerate security findings with `file:line` (robustness,
+audit suite, attack-surface) are **kept local, not committed** to this public
+repo — only the code-quality reports (AI-codegen smell, React anti-patterns) and
+this index are tracked. Each dated report carries a superseded banner. Older
+root-level reports (`AUDIT_REPORT.md`, `AUDIT_RESULTS.md`, `REVIEW.md`,
+`REFACTOR_PLAN.md`, dated 2026-03) predate the feature-module refactor and are
+historical.
