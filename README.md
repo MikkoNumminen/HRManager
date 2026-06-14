@@ -307,13 +307,13 @@ HRManager is designed as a standalone, independently deployable application — 
 | Server integration                         | 896                                  | Real PostgreSQL + MongoDB — server actions, queries, auth, audit hash chain, rate limiting, health, sessions              |
 | Jobs                                       | 21                                   | pg-boss queue setup, worker registration, and the serverless fetch-based drain                                            |
 | E2E (Playwright)                           | 75                                   | Auth, CRUD, detail editing, dashboard, profile, data I/O, form validation, full workflow                                  |
-| **Total**                                  | **2906** (2831 Jest + 75 Playwright) | **92.1% line coverage · 92.0% function coverage**                                                                         |
+| **Total**                                  | **2906** (2831 Jest + 75 Playwright) | **92.2% line coverage · 92.0% function coverage**                                                                         |
 
 <!-- test-table:generated:end -->
 
 ```
-Statements : 90.34%    Branches : 87.36%
-Functions  : 91.97%    Lines    : 92.12%
+Statements : 90.38%    Branches : 87.36%
+Functions  : 91.97%    Lines    : 92.16%
 ```
 
 **Testing philosophy:** Server-side tests run against **real PostgreSQL** and **in-memory MongoDB** — not mocks. If your test doesn't touch the real database, it's not catching the bugs that matter (wrong SQL, missing indexes, constraint violations). Client-side tests cover every UI component. Playwright E2E tests run against a production build.
