@@ -360,6 +360,9 @@ That's it. Migrations run automatically, demo login works out of the box — no 
 
 ### Manual setup
 
+Prefer `./scripts/setup.sh` (see [Getting started](#getting-started)) for a
+one-command bootstrap. To do it by hand:
+
 ```bash
 npm install                   # install dependencies
 cp .env.example .env          # configure environment variables
