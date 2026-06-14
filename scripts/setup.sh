@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # One-command local bootstrap: dependencies → env files → test/dev Postgres (Docker)
-# → schema → ready. Idempotent and safe to re-run. MongoDB is in-memory for tests,
-# so only the Postgres `db` service is started here.
+# → schema → ready. Idempotent and safe to re-run. Starts both Postgres and
+# MongoDB (the dev app uses real Mongo; tests use an in-memory Mongo).
 #
 #   ./scripts/setup.sh        # full setup
 #

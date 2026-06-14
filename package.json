@@ -17,6 +17,7 @@
     "check:file-size": "node scripts/check-file-size.mjs",
     "check:mutation-rails": "node scripts/check-mutation-rails.mjs",
     "check:test-count": "node scripts/check-test-count.mjs",
+    "mutation": "stryker run",
     "readme:test-table": "node scripts/generate-test-table.mjs",
     "test": "jest --verbose",
     "test:server": "npx tsx -e \"require('dotenv').config({path:'.env.test',override:true})\" && npx prisma db push --accept-data-loss && jest --config jest.config.server.ts --verbose",
