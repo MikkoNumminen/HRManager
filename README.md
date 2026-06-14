@@ -194,20 +194,20 @@ graph LR
 
 ## Tech stack
 
-| Layer      | Technology                       | Why this choice                                                        |
-| ---------- | -------------------------------- | ---------------------------------------------------------------------- |
-| Framework  | Next.js 16 (App Router)          | Server Components for zero-waterfall data fetching                     |
-| UI         | React 19 + MUI v7 + MUI X Charts | `useOptimistic` + `useActionState` eliminate form boilerplate          |
-| Org Chart  | ReactFlow + dagre                | Interactive graph visualization with auto-layout                       |
-| Language   | TypeScript 5.9                   | End-to-end type safety from database schema to UI props                |
-| ORM        | Prisma 7                         | Type-safe queries + raw SQL escape hatch for complex analytics         |
-| Databases  | PostgreSQL + MongoDB 8           | Relational data in SQL, append-only logs in a document store           |
-| Validation | Zod 4                            | Runtime validation + TypeScript type inference from one schema         |
-| Auth       | NextAuth v5 (JWT)                | Stateless auth that scales without session storage                     |
-| Testing    | Jest 30 + Playwright             | Unit/integration against real DBs + E2E against production builds      |
-| CI/CD      | GitHub Actions                   | Lint, format, type-check, error-code gate, test, build — on every push |
-| Jobs       | pg-boss                          | PostgreSQL-based job queue — no Redis, retries, dead-letter queue      |
-| Monitoring | Sentry + OpenTelemetry           | Error capture + distributed tracing + custom metrics; both opt-in      |
+| Layer      | Technology                       | Why this choice                                                                                                                                                                                                                |
+| ---------- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Framework  | Next.js 16 (App Router)          | Server Components for zero-waterfall data fetching                                                                                                                                                                             |
+| UI         | React 19 + MUI v7 + MUI X Charts | `useOptimistic` + `useActionState` eliminate form boilerplate                                                                                                                                                                  |
+| Org Chart  | ReactFlow + dagre                | Interactive graph visualization with auto-layout                                                                                                                                                                               |
+| Language   | TypeScript 5.9                   | End-to-end type safety from database schema to UI props                                                                                                                                                                        |
+| ORM        | Prisma 7                         | Type-safe queries + raw SQL escape hatch for complex analytics                                                                                                                                                                 |
+| Databases  | PostgreSQL + MongoDB 8           | Relational data in SQL, append-only logs in a document store                                                                                                                                                                   |
+| Validation | Zod 4                            | Runtime validation + TypeScript type inference from one schema                                                                                                                                                                 |
+| Auth       | NextAuth v5 (JWT)                | Stateless auth that scales without session storage                                                                                                                                                                             |
+| Testing    | Jest 30 + Playwright             | Unit/integration against real DBs + E2E against production builds                                                                                                                                                              |
+| CI/CD      | GitHub Actions                   | Format, lint, type-check, 7 drift/auth/size ratchets (error-codes, feature-boundaries, file-size, mutation-rails, i18n, README coverage-claims, test-count), full test suite, `next build`, and Stryker mutation — on every PR |
+| Jobs       | pg-boss                          | PostgreSQL-based job queue — no Redis, retries, dead-letter queue                                                                                                                                                              |
+| Monitoring | Sentry + OpenTelemetry           | Error capture + distributed tracing + custom metrics; both opt-in                                                                                                                                                              |
 
 ---
 

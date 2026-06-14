@@ -31,8 +31,13 @@ Claude Code gets from `CLAUDE.md`. **Read this first.**
   at **zero `tsc` errors** and green tests; CI runs the same gates plus the
   production build.
 - **What will block your push:** the pre-push hook runs the i18n audit and the
-  **full** test suite. CI re-runs format → lint → typecheck → error-code
-  coverage → tests+coverage → `next build` on every PR.
+  **full** test suite. CI re-runs the whole gate ladder on every PR: format →
+  lint → typecheck → error-code coverage → feature-boundaries (`check:boundaries`)
+  → file-size (`check:file-size`) → mutation-rails (`check:mutation-rails`) →
+  i18n parity → tests+coverage → README coverage-claims (`check:coverage-claims`)
+  → README test-count (`check:test-count`) → `next build`, plus a Stryker
+  mutation job that posts the numeric score. See the "Mechanical ratchets" note
+  in the verification ladder below.
 
 ## Tech stack
 
@@ -107,6 +112,15 @@ and the `verify` skill.
 **Single-suite rule:** server tests share one PostgreSQL test DB. **Never run
 two suites concurrently** — parallel runs corrupt the shared DB and produce
 _phantom_ failures. Run one suite at a time.
+
+**Mechanical ratchets (also CI-blocking — run them locally to avoid CI surprises):**
+
+- `npm run check:boundaries` — cross-feature `@/features/<other>` imports can't grow past the baseline.
+- `npm run check:file-size` — production files over ~300 LOC can't grow past the baseline.
+- `npm run check:mutation-rails` — every server action / mutating API route must pass an auth gate.
+- `npm run check:coverage-claims` / `check:test-count` — the README's coverage numbers and test counts must match the live suite (CI-only; they read the coverage run's artifacts).
+
+`npm run validate` runs the full local gate chain end to end.
 
 ## Architecture rules
 
