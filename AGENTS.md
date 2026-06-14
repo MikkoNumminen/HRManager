@@ -122,6 +122,12 @@ _phantom_ failures. Run one suite at a time.
 
 `npm run validate` runs the full local gate chain end to end.
 
+**Mutation testing** — `npm run mutation` runs Stryker locally (same as the CI
+`mutation.yml` job, which also posts the numeric score to PRs). Its mutate scope
+is deliberately the seven pure-logic modules (`stryker.config.mjs`): the
+DB-backed `actions`/`queries` layer is excluded because a full run there is
+~8h — a documented trade-off, not an oversight. The break threshold is 60%.
+
 ## Architecture rules
 
 - **Feature modules** in `src/features/<domain>/`: each has `schemas.ts`,
