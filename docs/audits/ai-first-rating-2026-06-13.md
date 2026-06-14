@@ -1,12 +1,12 @@
 # AI-first rating — 2026-06-13
 
-> **Latest measured score: 8.38 / 10** — 2026-06-14, post rounds 3–8, fresh
+> **Latest measured score: 8.83 / 10** — 2026-06-14, post rounds 3–11, fresh
 > adversarial re-measure on `main`. Per dimension (verifier-preferred):
-> verifiability 8.3 · agent-context 8.5 · workflow 8.0 · safety-rails 8.5 ·
-> doc-accuracy 8.5 · legibility 8.5. Baseline was **7.58** (round 3); prior
-> re-measure **8.17** (post rounds 3–5). Target: **≥ 9** — the remaining gaps are
-> mostly low-risk (test-count gate, mongo pin, file-size/Postgres alignment,
-> universal mutation wrappers); a clean 9 also bumps the moderate items.
+> verifiability **9** · agent-context **9** · workflow 8.5 · safety-rails **9** ·
+> doc-accuracy 8.5 · legibility **9**. Progression: 7.58 (round 3) → 8.17 → 8.38
+> → 8.38 (plateau) → **8.83** (round 11 broke it by closing every dimension's
+> named gap at once). The last 0.17 to a clean 9.0 is workflow + doc-accuracy,
+> both at 8.5 and both closeable with low-risk fixes (round 12).
 >
 > "AI-first" = how safely and cheaply a fresh autonomous coding agent (or new
 > human) can orient, understand intent, make a correct change, and verify its
@@ -28,11 +28,10 @@ manufactured a phantom "63 failing tests" by running jest concurrently).
 
 > **The scorecard below is the round-3 _baseline_ (mean 7.58).** For the latest
 > measured per-dimension scores, see the **Score history** table at the end —
-> currently **8.38** (verifiability 8.5 · agent-context 8.5 · workflow 8.0 ·
-> safety 8.5 · doc 8.3 · legibility 8.5). Several baseline rows below describe
-> gaps since closed: `AGENTS.md` now exists and the multi-instance protocol now
-> degrades to solo (row 2), and the two mutation patterns are now documented
-> (row 6).
+> currently **8.83** (verifiability 9 · agent-context 9 · workflow 8.5 · safety 9
+> · doc 8.5 · legibility 9). Several baseline rows below describe gaps since
+> closed: `AGENTS.md` now exists and the multi-instance protocol now degrades to
+> solo (row 2), and the two mutation patterns are now documented (row 6).
 
 | #   | Dimension                             | Score    | One-line basis                                                                                                                                                                |
 | --- | ------------------------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -118,11 +117,13 @@ check:boundaries`) that fails the build if cross-feature imports (alias or
 
 ## Score history
 
-| Date                             | Score                            | Notes                                                                                                                                                                                                                                                                                                                                                                                                |
-| -------------------------------- | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-06-13                       | 7.58 (→ ~8.3 est. after round-3) | First **tracked** rating (this doc). Fresh adversarial re-measure; round-3 docs/contracts PR estimated to lift to ~8.3.                                                                                                                                                                                                                                                                              |
-| 2026-06-13 (r4)                  | ~8.3 → ~8.5 est.                 | Round 4 (code/CI, full suite verified locally): i18n-parity CI gate, `test:all` preflight, 5 inline-mutation-pattern headers. Boundary refactor + README-drift gate still deferred. Re-measure to confirm.                                                                                                                                                                                           |
-| 2026-06-13 (r5)                  | ~8.5 → ~8.6 est.                 | Round 5: CI feature-boundary ratchet (`check:boundaries`, baseline 19) — mechanical regression-guard on cross-feature imports. The reduce-to-0 refactor stays deferred. Re-measure to confirm.                                                                                                                                                                                                       |
-| 2026-06-13 (measured, post r3–5) | **8.17 measured**                | Fresh adversarial re-measure on `main` @ `0f72284` (12 agents). Verifier-preferred per-dim: verifiability 8.0, agent-context 8.5, workflow 8.0, safety-rails 8.0, doc-accuracy 8.5, legibility 8.0. The earlier ~8.6 was an estimate; this is the honest measure. Round 6+ targets ≥9.                                                                                                               |
-| 2026-06-14 (measured, post r3–8) | **8.38 measured**                | Re-measure on `main` @ `a5ff5d9` (12 agents). Per-dim: verifiability 8.3, agent-context 8.5, workflow 8.0, safety-rails 8.5, doc-accuracy 8.5, legibility 8.5. Rounds 6–8 lifted verifiability (coverage gate), safety (PersonSelectCard→shared, baseline 16), legibility (TranslationFn typed + actions.ts splits). Round 9 (this) adds file-size + rounded-prose gates, Postgres align, doc fixes. |
-| 2026-06 (prior)                  | ~8.0 measured / ~8.4–8.5 est.    | Rounds 1–2 (PRs #14–#23): audit remediation, CI gates, 4 skills, rollback runbook. Recorded only in session transcripts — not a tracked artifact. Superseded by the un-anchored re-measure above.                                                                                                                                                                                                    |
+| Date                              | Score                            | Notes                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| --------------------------------- | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-06-13                        | 7.58 (→ ~8.3 est. after round-3) | First **tracked** rating (this doc). Fresh adversarial re-measure; round-3 docs/contracts PR estimated to lift to ~8.3.                                                                                                                                                                                                                                                                                                     |
+| 2026-06-13 (r4)                   | ~8.3 → ~8.5 est.                 | Round 4 (code/CI, full suite verified locally): i18n-parity CI gate, `test:all` preflight, 5 inline-mutation-pattern headers. Boundary refactor + README-drift gate still deferred. Re-measure to confirm.                                                                                                                                                                                                                  |
+| 2026-06-13 (r5)                   | ~8.5 → ~8.6 est.                 | Round 5: CI feature-boundary ratchet (`check:boundaries`, baseline 19) — mechanical regression-guard on cross-feature imports. The reduce-to-0 refactor stays deferred. Re-measure to confirm.                                                                                                                                                                                                                              |
+| 2026-06-13 (measured, post r3–5)  | **8.17 measured**                | Fresh adversarial re-measure on `main` @ `0f72284` (12 agents). Verifier-preferred per-dim: verifiability 8.0, agent-context 8.5, workflow 8.0, safety-rails 8.0, doc-accuracy 8.5, legibility 8.0. The earlier ~8.6 was an estimate; this is the honest measure. Round 6+ targets ≥9.                                                                                                                                      |
+| 2026-06-14 (measured, post r3–8)  | **8.38 measured**                | Re-measure on `main` @ `a5ff5d9` (12 agents). Per-dim: verifiability 8.3, agent-context 8.5, workflow 8.0, safety-rails 8.5, doc-accuracy 8.5, legibility 8.5. Rounds 6–8 lifted verifiability (coverage gate), safety (PersonSelectCard→shared, baseline 16), legibility (TranslationFn typed + actions.ts splits). Round 9 (this) adds file-size + rounded-prose gates, Postgres align, doc fixes.                        |
+| 2026-06-14 (measured, post r10)   | **8.38 measured**                | Re-measure @ `5d95b3b`. Per-dim 8.5/8.5/8.0/8.5/8.3/8.5 — flat despite real round-9/10 work (mutation-rails + test-count gates, mongo pin, optional instance ritual): skeptics kept finding new narrow gaps. The plateau.                                                                                                                                                                                                   |
+| 2026-06-14 (measured, post r3–11) | **8.83 measured**                | Re-measure @ `66ab23f` (12 agents). Per-dim: verifiability **9**, agent-context **9**, workflow 8.5, safety **9**, doc-accuracy 8.5, legibility **9**. Round 11 broke the plateau by closing every dimension's named gap at once (typed permission throws, API mutation-rails, numeric mutation score in PR, .env/docker align, rubric-table caption). Round 12 targets the last two 8.5s (workflow + doc) for a clean 9.0. |
+| 2026-06 (prior)                   | ~8.0 measured / ~8.4–8.5 est.    | Rounds 1–2 (PRs #14–#23): audit remediation, CI gates, 4 skills, rollback runbook. Recorded only in session transcripts — not a tracked artifact. Superseded by the un-anchored re-measure above.                                                                                                                                                                                                                           |
