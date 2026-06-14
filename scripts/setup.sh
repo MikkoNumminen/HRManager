@@ -21,8 +21,8 @@ if [ ! -f .env.test ]; then
   echo "==> Created .env.test from template"
 fi
 
-echo "==> Starting Postgres (docker compose up -d db)"
-docker compose up -d db
+echo "==> Starting Postgres + MongoDB (docker compose up -d db mongo)"
+docker compose up -d db mongo
 
 echo "==> Waiting for Postgres to accept connections"
 until docker compose exec -T db pg_isready -U postgres >/dev/null 2>&1; do sleep 1; done
@@ -31,8 +31,10 @@ until docker compose exec -T db pg_isready -U postgres >/dev/null 2>&1; do sleep
 docker compose exec -T db createdb -U postgres hrmanager 2>/dev/null || true
 docker compose exec -T db createdb -U postgres hrmanager_test 2>/dev/null || true
 
-echo "==> Applying schema to the dev database (prisma migrate dev)"
-npx prisma migrate dev
+# Apply the committed migrations headlessly — same seam as the deploy path
+# (scripts/vercel-build.sh), not the interactive `migrate dev`.
+echo "==> Applying committed migrations to the dev database (prisma migrate deploy)"
+npx prisma migrate deploy
 
 echo ""
 echo "==> Done. Next:"
