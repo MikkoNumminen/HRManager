@@ -20,7 +20,7 @@ import { fileURLToPath } from "node:url";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const srcDir = join(root, "src");
 const CAP = 300;
-const BASELINE = 8; // production files currently over CAP; ratchet only downward.
+const BASELINE = 7; // production files currently over CAP; ratchet only downward.
 
 function walk(dir) {
   const out = [];
