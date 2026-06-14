@@ -1,17 +1,22 @@
 # AI-first rating — 2026-06-13
 
-> **Latest measured score: 9.0 / 10** — 2026-06-14, post rounds 3–12, fresh
-> adversarial re-measure on `main`. **All six dimensions at 9** (verifier-preferred):
-> verifiability **9** · agent-context **9** · workflow **9** · safety-rails **9** ·
-> doc-accuracy **9** · legibility **9**. Progression: 7.58 (round 3) → 8.17 → 8.38
+> **Latest measured score: 9.17 / 10** — 2026-06-14, post rounds 3–14, fresh
+> adversarial re-measure on `main`. Per dimension (verifier-preferred):
+> verifiability **9.5** · agent-context 9 · workflow 9 · safety-rails 9 ·
+> doc-accuracy 9 · legibility **9.5**. Progression: 7.58 (round 3) → 8.17 → 8.38
 > → 8.38 (plateau) → **8.83** (round 11 broke it by closing every dimension's
-> named gap at once) → **9.0** (round 12 closed the last two: workflow + doc).
-> Method note: verifiability/agent/safety/legibility were each scored 9 by an
-> assessor+verifier pair in the post-r11 full re-measure (`66ab23f`) and round 12
-> did not touch their surfaces; workflow + doc were independently re-confirmed at
-> 9 after round 12 (`02110e6`). The path beyond 9 is documented but deliberately
-> not taken (e.g. the prod-risky `Person.email` migration, extending Stryker over
-> the DB-backed action layer) — those are the 9→10 frontier, not gaps.
+> named gap at once) → **9.0** (round 12) → **9.17** (rounds 13–14 pushed
+> verifiability and legibility into the 9–10 band: a local mutation runner +
+> documented Stryker-scope trade-off, and splitting the last three over-cap
+> monoliths — `reports/queries.ts`, `persons/actions.ts`, `twoFactor/actions.ts`).
+> Method note: the four dims at 9 were scored 9 by assessor+verifier pairs in the
+> post-r11/r12 re-measures and their surfaces only improved since; verifiability
+> (9.5 @ `2de620e`) and legibility (9.5 @ `767bf5b`) were each independently
+> re-confirmed by an assessor+verifier pair after the change that earned them.
+> The remaining 9→10 frontier (deliberately not taken): the prod-risky
+> `Person.email` migration (your standing call), a machine-checked Stryker-scope
+> manifest, and splitting `reviews/queries.ts` (the one borderline read-only
+> collection left). Those are 9.5→10 polish, not gaps.
 >
 > "AI-first" = how safely and cheaply a fresh autonomous coding agent (or new
 > human) can orient, understand intent, make a correct change, and verify its
@@ -33,7 +38,7 @@ manufactured a phantom "63 failing tests" by running jest concurrently).
 
 > **The scorecard below is the round-3 _baseline_ (mean 7.58).** For the latest
 > measured per-dimension scores, see the **Score history** table at the end —
-> currently **9.0** (all six dimensions at 9). Several baseline rows below describe gaps since
+> currently **9.17** (verifiability 9.5 · agent 9 · workflow 9 · safety 9 · doc 9 · legibility 9.5). Several baseline rows below describe gaps since
 > closed: `AGENTS.md` now exists and the multi-instance protocol now degrades to
 > solo (row 2), and the two mutation patterns are now documented (row 6).
 
@@ -131,4 +136,5 @@ check:boundaries`) that fails the build if cross-feature imports (alias or
 | 2026-06-14 (measured, post r10)   | **8.38 measured**                | Re-measure @ `5d95b3b`. Per-dim 8.5/8.5/8.0/8.5/8.3/8.5 — flat despite real round-9/10 work (mutation-rails + test-count gates, mongo pin, optional instance ritual): skeptics kept finding new narrow gaps. The plateau.                                                                                                                                                                                                   |
 | 2026-06-14 (measured, post r3–11) | **8.83 measured**                | Re-measure @ `66ab23f` (12 agents). Per-dim: verifiability **9**, agent-context **9**, workflow 8.5, safety **9**, doc-accuracy 8.5, legibility **9**. Round 11 broke the plateau by closing every dimension's named gap at once (typed permission throws, API mutation-rails, numeric mutation score in PR, .env/docker align, rubric-table caption). Round 12 targets the last two 8.5s (workflow + doc) for a clean 9.0. |
 | 2026-06-14 (measured, post r3–12) | **9.0 measured**                 | Targeted re-confirm @ `02110e6`: workflow and doc-accuracy both independently scored **9** (assessor+verifier) after round 12 — setup.sh starts MongoDB + uses `migrate deploy`; AGENTS.md/README name all 7 CI ratchets. Combined with the four dimensions measured at 9 post-r11 and untouched since → **all six at 9, mean 9.0**. Target reached.                                                                        |
+| 2026-06-14 (measured, post r3–14) | **9.17 measured**                | Pushed into the 9–10 band. Round 13: `npm run mutation` local Stryker runner + documented scope trade-off → **verifiability 9.5** (confirmed @ `2de620e`); split `reports/queries.ts`. Round 14: split the last two over-cap monoliths `persons/actions.ts` + `twoFactor/actions.ts`, file-size baseline 8→7→5 → **legibility 9.5** (confirmed @ `767bf5b`). Four dims hold at 9. Mean (9.5+9+9+9+9+9.5)/6 = **9.17 > 9**.  |
 | 2026-06 (prior)                   | ~8.0 measured / ~8.4–8.5 est.    | Rounds 1–2 (PRs #14–#23): audit remediation, CI gates, 4 skills, rollback runbook. Recorded only in session transcripts — not a tracked artifact. Superseded by the un-anchored re-measure above.                                                                                                                                                                                                                           |
