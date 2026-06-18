@@ -8,7 +8,7 @@ A full-stack HR management system built to production standards — not as a toy
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat-square&logo=typescript)
 ![MUI](https://img.shields.io/badge/MUI-7-007FFF?style=flat-square&logo=mui)
 ![Prisma](https://img.shields.io/badge/Prisma-7-2D3748?style=flat-square&logo=prisma)
-![MongoDB](https://img.shields.io/badge/MongoDB-8-47A248?style=flat-square&logo=mongodb)
+![MongoDB](https://img.shields.io/badge/MongoDB-7-47A248?style=flat-square&logo=mongodb)
 ![Zod](https://img.shields.io/badge/Zod-4-3E67B1?style=flat-square&logo=zod)
 ![Jest](https://img.shields.io/badge/Tested_with-Jest_30-C21325?style=flat-square&logo=jest)
 ![Prettier](https://img.shields.io/badge/Formatted_with-Prettier-F7B93E?style=flat-square&logo=prettier)
@@ -89,7 +89,7 @@ graph TD
 graph LR
     subgraph "Demo session isolation"
         Demo["Try Demo clicked"] --> UUID["Generate session UUID"]
-        UUID --> Seed["Seed sandbox data<br/><i>6 people, 3 teams, 2 depts, 4 leave types</i>"]
+        UUID --> Seed["Seed sandbox data<br/><i>9 people, 5 teams, 4 departments</i>"]
         Seed --> Filter["All queries filter by sessionId"]
         Filter --> R1["Real user data<br/><i>sessionId = NULL</i>"]
         Filter --> R2["Demo sandbox<br/><i>sessionId = abc-123</i>"]
@@ -120,7 +120,7 @@ graph LR
 
 - **Calendar export (iCal)** — `/api/calendar` exports approved leave requests as an RFC 5545 `.ics` file, importable into Google Calendar, Outlook, or Apple Calendar. Supports `?personId=` filtering. Zero external dependencies — generates the format directly. _Why no library? iCal is a simple text format; a 90-line generator is more maintainable than a dependency._
 
-- **Accessibility (WCAG)** — Semantic landmarks, skip-to-content, ARIA labels, `role="alert"` on errors (screen readers announce immediately), keyboard-navigable tables, and info tooltips with `cursor: "help"`. Automated axe-core testing runs 25 WCAG AA checks across 22 components to catch violations early. _Built into every component from the start, not bolted on afterward._
+- **Accessibility (WCAG)** — Semantic landmarks, skip-to-content, ARIA labels, `role="alert"` on errors (screen readers announce immediately), keyboard-navigable tables, and info tooltips with `cursor: "help"`. Automated axe-core testing runs 25 WCAG AA checks across 25 components to catch violations early. _Built into every component from the start, not bolted on afterward._
 
 - **Loading skeletons on every page (Suspense boundaries)** — Every route has a `loading.tsx` that renders a pixel-matched MUI Skeleton layout while the async server component fetches data. Next.js automatically wraps these in `<Suspense>` — the shell is streamed instantly and the real content replaces it once ready. _Why skeletons instead of spinners? Spinners tell you "loading"; skeletons show you where the content will land, reducing perceived latency._
 
