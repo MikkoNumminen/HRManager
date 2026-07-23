@@ -27,10 +27,12 @@ if (!existsSync(jestPath)) {
 
 const jest = JSON.parse(readFileSync(jestPath, "utf8")).numTotalTests;
 
-// Invoke the Playwright CLI through `node` rather than `npx`: on Windows `npx`
-// exists only as `npx.cmd`, which spawnSync rejects (ENOENT bare, EINVAL as
-// `.cmd` since Node's CVE-2024-27980 fix) unless a shell is used — so this gate
-// failed on every Windows checkout while passing in CI.
+// Invoke the Playwright CLI through `node` rather than `npx`: on Windows the
+// `npx` on PATH is a shebang script, which CreateProcess cannot execute
+// (spawnSync -> ENOENT), and its `npx.cmd` sibling is refused without a shell
+// since Node's CVE-2024-27980 fix (EINVAL). This gate therefore failed on every
+// Windows checkout while passing in CI. `@playwright/test/cli` is a declared
+// export of the package and the same file its `playwright` bin points at.
 const playwrightCli = createRequire(import.meta.url).resolve("@playwright/test/cli");
 const pw = spawnSync(process.execPath, [playwrightCli, "test", "--list"], {
   cwd: root,
@@ -38,8 +40,13 @@ const pw = spawnSync(process.execPath, [playwrightCli, "test", "--list"], {
 });
 const pwMatch = (pw.stdout || "").match(/^Total: (\d+) tests? in/m);
 if (!pwMatch) {
+  // When the spawn itself fails, stdout/stderr are null — report pw.error and
+  // the exit status too, or this prints a bare "undefined" (which is exactly
+  // how the npx-based version hid its own ENOENT on Windows).
+  const detail = pw.error ? pw.error.message : pw.stderr || pw.stdout || "(no output)";
   console.error(
-    `check-test-count: could not read the Playwright total from --list:\n${pw.stderr || pw.stdout}`,
+    `check-test-count: could not read the Playwright total from --list ` +
+      `(exit ${pw.status ?? pw.signal ?? "n/a"}):\n${detail}`,
   );
   process.exit(1);
 }
