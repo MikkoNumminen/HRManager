@@ -40,6 +40,9 @@ fi
 #  - all test trees (server tests, shared tests, feature __tests__, e2e)
 #  - jest / playwright / stryker config files
 #  - GitHub Actions workflows and git hooks
+#  - the CI-only drift gates and the README table generator (never imported by
+#    the app; scripts/vercel-*.sh is deliberately NOT excluded, since those DO
+#    decide what a deployment does)
 #  - dotfile metadata
 if git diff --quiet "$BASE" HEAD -- \
   ':(exclude,glob)**/*.md' \
@@ -54,6 +57,8 @@ if git diff --quiet "$BASE" HEAD -- \
   ':(exclude)jest.setup.ts' \
   ':(exclude).github/**' \
   ':(exclude).husky/**' \
+  ':(exclude,glob)scripts/check-*.mjs' \
+  ':(exclude)scripts/generate-test-table.mjs' \
   ':(exclude).gitignore' \
   ':(exclude).prettierignore' \
   ':(exclude).editorconfig'; then
