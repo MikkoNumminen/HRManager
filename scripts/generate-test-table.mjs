@@ -1,26 +1,58 @@
 // Regenerates the per-layer test table in README.md from what the suites actually
 // report. The hand-maintained table drifted by ~1000 tests once; this measures
-// instead. Jest counts come from `npm run test:all` with JSON output (that script
-// already loads .env.test and pushes the schema to the test Postgres), Playwright
-// from `npx playwright test --list`. Files are grouped into a few coarse path-based
-// rows on purpose — per-feature rows are what drifted. Only the region between the
-// test-table markers is rewritten; the coverage cell in the Total row is carried
-// over verbatim from the existing README, never recomputed here.
+// instead. Jest counts come from the same run `npm run test:all` performs (load
+// .env.test, push the schema to the test Postgres, run jest.config.all.ts) with
+// JSON output; Playwright from `playwright test --list`. Files are grouped into a
+// few coarse path-based rows on purpose — per-feature rows are what drifted. Only
+// the region between the test-table markers is rewritten; the coverage cell in the
+// Total row is carried over verbatim from the existing README, never recomputed here.
 //
 // Manual maintenance tool (not in validate/CI): npm run readme:test-table
 // Needs the test Postgres from .env.test running; the Jest suite takes ~3-5 min.
 import { spawnSync } from "node:child_process";
-import { readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import { dirname, join, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
+import { parse as parseEnv } from "dotenv";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+const require_ = createRequire(import.meta.url);
 
 function die(msg) {
   console.error(`generate-test-table: ${msg}`);
   process.exit(1);
 }
+
+// Every child process here runs as `node <package's bin entry>`. Spawning `npm`
+// or `npx` instead is not portable: on Windows both are shebang scripts that
+// CreateProcess cannot execute (ENOENT), and their .cmd siblings are refused
+// without a shell since Node's CVE-2024-27980 fix (EINVAL) — this script could
+// not run there at all. Resolving through each package's own manifest also keeps
+// it independent of PATH and of which package manager invoked us.
+function cliEntry(pkg, binName = pkg) {
+  const manifestPath = require_.resolve(`${pkg}/package.json`);
+  const { bin } = JSON.parse(readFileSync(manifestPath, "utf8"));
+  const entry = typeof bin === "string" ? bin : bin?.[binName];
+  if (!entry) die(`package ${pkg} declares no "${binName}" bin to run.`);
+  return join(dirname(manifestPath), entry);
+}
+
+// `npm run test:all` gets the test-database URL from `export $(grep … .env.test)`,
+// which is bash-only. Read the same file here so the schema push and the suite see
+// the same environment on every platform; CI has no .env.test and sets DATABASE_URL
+// in the job environment instead, which this leaves untouched.
+const envPath = join(root, ".env.test");
+const childEnv = existsSync(envPath)
+  ? { ...process.env, ...parseEnv(readFileSync(envPath)) }
+  : { ...process.env };
+
+const preflight = spawnSync(process.execPath, [join(root, "scripts", "check-test-env.mjs")], {
+  cwd: root,
+  stdio: "inherit",
+});
+if (preflight.status !== 0) process.exit(preflight.status ?? 1);
 
 // Every Jest test file must match exactly one row; an unmatched file is a hard
 // error so new test locations can't silently vanish from the README.
@@ -56,16 +88,34 @@ const GROUPS = [
   },
 ];
 
+console.log("generate-test-table: pushing the schema to the test database...");
+const push = spawnSync(process.execPath, [cliEntry("prisma"), "db", "push", "--accept-data-loss"], {
+  cwd: root,
+  env: childEnv,
+  stdio: ["ignore", "inherit", "inherit"],
+});
+if (push.status !== 0) die(`prisma db push failed (exit ${push.status ?? push.signal}).`);
+
 const jestJsonPath = join(tmpdir(), `jest-results-${process.pid}.json`);
-console.log("generate-test-table: running Jest via `npm run test:all` (takes ~3-5 min)...");
+console.log("generate-test-table: running the full Jest suite (takes ~3-5 min)...");
+// Mirrors the `test:all` script — keep the two in step when either changes.
 // --forceExit: the suite leaves open handles locally, so Jest hangs after "Test
 // results written to ..." and ends via SIGTERM. The JSON file is flushed before
 // the force exit, and pass/fail is judged from its `success` flag — the exit code
 // of a force-exited run is not meaningful.
 const jest = spawnSync(
-  "npm",
-  ["run", "test:all", "--", "--json", `--outputFile=${jestJsonPath}`, "--silent", "--forceExit"],
-  { cwd: root, stdio: ["ignore", "inherit", "inherit"] },
+  process.execPath,
+  [
+    cliEntry("jest"),
+    "--config",
+    "jest.config.all.ts",
+    "--runInBand",
+    "--json",
+    `--outputFile=${jestJsonPath}`,
+    "--silent",
+    "--forceExit",
+  ],
+  { cwd: root, env: childEnv, stdio: ["ignore", "inherit", "inherit"] },
 );
 
 // The tmp path is unique per run, so a parseable file here is from THIS run.
@@ -99,9 +149,20 @@ if (jestTotal !== jestResults.numTotalTests) {
 }
 
 console.log("generate-test-table: listing Playwright tests...");
-const pw = spawnSync("npx", ["playwright", "test", "--list"], { cwd: root, encoding: "utf8" });
+const pw = spawnSync(
+  process.execPath,
+  [cliEntry("@playwright/test", "playwright"), "test", "--list"],
+  {
+    cwd: root,
+    env: childEnv,
+    encoding: "utf8",
+  },
+);
 if (pw.status !== 0)
-  die(`\`npx playwright test --list\` failed (exit ${pw.status ?? pw.signal}):\n${pw.stderr}`);
+  die(
+    `\`playwright test --list\` failed (exit ${pw.status ?? pw.signal}):\n` +
+      `${pw.error ? pw.error.message : pw.stderr}`,
+  );
 const pwMatch = pw.stdout.match(/^Total: (\d+) tests? in \d+ files?$/m);
 if (!pwMatch) die('could not find "Total: N tests in M files" in Playwright --list output.');
 const e2eTotal = Number(pwMatch[1]);
@@ -158,7 +219,9 @@ writeFileSync(
 // Let Prettier own the final table formatting — its markdown alignment uses
 // display width, not string length, so this keeps `prettier --check` green even
 // if covers-text ever gains wide/combining characters.
-const fmt = spawnSync("npx", ["prettier", "--write", "README.md"], { cwd: root });
+const fmt = spawnSync(process.execPath, [cliEntry("prettier"), "--write", "README.md"], {
+  cwd: root,
+});
 if (fmt.status !== 0) die("prettier --write README.md failed after the table rewrite.");
 
 console.log("generate-test-table: README.md updated.");
