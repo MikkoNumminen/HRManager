@@ -32,22 +32,85 @@ describe("TOTP Crypto Utilities", () => {
       process.env.TOTP_ENCRYPTION_KEY = saved;
     });
 
-    // Throws when both TOTP_ENCRYPTION_KEY and NEXTAUTH_SECRET are absent — covers line 16.
-    it("throws when neither TOTP_ENCRYPTION_KEY nor NEXTAUTH_SECRET is set", () => {
+    // Falls back to AUTH_SECRET (the NextAuth v5 name) outside production —
+    // previously only the v4 NEXTAUTH_SECRET counted, which nothing v5 sets.
+    it("should use AUTH_SECRET as fallback when the other two are missing", () => {
       const savedTotp = process.env.TOTP_ENCRYPTION_KEY;
       const savedNext = process.env.NEXTAUTH_SECRET;
+      const savedAuth = process.env.AUTH_SECRET;
       delete process.env.TOTP_ENCRYPTION_KEY;
       delete process.env.NEXTAUTH_SECRET;
+      process.env.AUTH_SECRET = "auth-secret-v5-fallback-for-testing-32-chars";
+
+      const { encryptSecret, decryptSecret } = require("@/lib/totpCrypto");
+      const secret = "JBSWY3DPEHPK3PXP";
+      expect(decryptSecret(encryptSecret(secret))).toBe(secret);
+
+      process.env.TOTP_ENCRYPTION_KEY = savedTotp;
+      process.env.NEXTAUTH_SECRET = savedNext;
+      if (savedAuth === undefined) delete process.env.AUTH_SECRET;
+      else process.env.AUTH_SECRET = savedAuth;
+    });
+
+    // Throws when all three key sources are absent — covers the dev error branch.
+    it("throws when no key source is set", () => {
+      const savedTotp = process.env.TOTP_ENCRYPTION_KEY;
+      const savedNext = process.env.NEXTAUTH_SECRET;
+      const savedAuth = process.env.AUTH_SECRET;
+      delete process.env.TOTP_ENCRYPTION_KEY;
+      delete process.env.NEXTAUTH_SECRET;
+      delete process.env.AUTH_SECRET;
 
       jest.resetModules();
       const { encryptSecret: encryptFresh } = require("@/lib/totpCrypto");
       expect(() => encryptFresh("JBSWY3DPEHPK3PXP")).toThrow(
-        "TOTP_ENCRYPTION_KEY or NEXTAUTH_SECRET must be set",
+        "TOTP_ENCRYPTION_KEY, NEXTAUTH_SECRET, or AUTH_SECRET must be set",
       );
 
       process.env.TOTP_ENCRYPTION_KEY = savedTotp;
       process.env.NEXTAUTH_SECRET = savedNext;
+      if (savedAuth !== undefined) process.env.AUTH_SECRET = savedAuth;
       jest.resetModules();
+    });
+
+    // In production AUTH_SECRET deliberately does NOT satisfy the key lookup —
+    // 2FA fails closed until a dedicated TOTP_ENCRYPTION_KEY is set (mirrors
+    // the AUDIT_HMAC_SECRET pattern in auditHashChain.ts).
+    it("throws in production even when AUTH_SECRET is set", () => {
+      const savedTotp = process.env.TOTP_ENCRYPTION_KEY;
+      const savedNext = process.env.NEXTAUTH_SECRET;
+      const savedAuth = process.env.AUTH_SECRET;
+      const savedNodeEnv = process.env.NODE_ENV;
+      delete process.env.TOTP_ENCRYPTION_KEY;
+      delete process.env.NEXTAUTH_SECRET;
+      process.env.AUTH_SECRET = "auth-secret-v5-fallback-for-testing-32-chars";
+      (process.env as Record<string, string | undefined>).NODE_ENV = "production";
+
+      const { encryptSecret: encryptFresh } = require("@/lib/totpCrypto");
+      expect(() => encryptFresh("JBSWY3DPEHPK3PXP")).toThrow(/TOTP_ENCRYPTION_KEY is not set/);
+
+      (process.env as Record<string, string | undefined>).NODE_ENV = savedNodeEnv;
+      process.env.TOTP_ENCRYPTION_KEY = savedTotp;
+      process.env.NEXTAUTH_SECRET = savedNext;
+      if (savedAuth === undefined) delete process.env.AUTH_SECRET;
+      else process.env.AUTH_SECRET = savedAuth;
+    });
+
+    // The legacy NEXTAUTH_SECRET fallback keeps working in production — the k8s
+    // templates still set it, and TOTP secrets encrypted under it must stay
+    // decryptable.
+    it("honors NEXTAUTH_SECRET in production (k8s back-compat)", () => {
+      const savedTotp = process.env.TOTP_ENCRYPTION_KEY;
+      const savedNodeEnv = process.env.NODE_ENV;
+      delete process.env.TOTP_ENCRYPTION_KEY;
+      (process.env as Record<string, string | undefined>).NODE_ENV = "production";
+
+      const { encryptSecret, decryptSecret } = require("@/lib/totpCrypto");
+      const secret = "JBSWY3DPEHPK3PXP";
+      expect(decryptSecret(encryptSecret(secret))).toBe(secret);
+
+      (process.env as Record<string, string | undefined>).NODE_ENV = savedNodeEnv;
+      process.env.TOTP_ENCRYPTION_KEY = savedTotp;
     });
   });
 

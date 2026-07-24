@@ -8,12 +8,29 @@ const ISSUER = "HRManager";
 
 /**
  * Derives a 256-bit AES key from the TOTP_ENCRYPTION_KEY env var.
- * Falls back to a deterministic key derived from NEXTAUTH_SECRET for dev convenience.
+ *
+ * Fallback order matters for decryptability of existing secrets:
+ * - NEXTAUTH_SECRET (the NextAuth v4 name) is honored in every environment —
+ *   the k8s templates still set it, and any deployment that encrypted TOTP
+ *   secrets under that fallback must keep decrypting them.
+ * - AUTH_SECRET (the v5 name this app actually configures) is a dev/test
+ *   convenience only. In production it deliberately does NOT count: 2FA
+ *   fails closed until a dedicated TOTP_ENCRYPTION_KEY is set, mirroring
+ *   getHmacSecret() in auditHashChain.ts.
  */
 function getEncryptionKey(): Buffer {
-  const envKey = process.env.TOTP_ENCRYPTION_KEY ?? process.env.NEXTAUTH_SECRET;
+  let envKey = process.env.TOTP_ENCRYPTION_KEY ?? process.env.NEXTAUTH_SECRET;
+  if (!envKey && process.env.NODE_ENV !== "production") {
+    envKey = process.env.AUTH_SECRET;
+  }
   if (!envKey) {
-    throw new Error("TOTP_ENCRYPTION_KEY or NEXTAUTH_SECRET must be set");
+    throw new Error(
+      process.env.NODE_ENV === "production"
+        ? "TOTP_ENCRYPTION_KEY is not set. Two-factor secrets cannot be encrypted or " +
+            "decrypted without a dedicated key in production. Set TOTP_ENCRYPTION_KEY " +
+            "to a strong random value (openssl rand -base64 32)."
+        : "TOTP_ENCRYPTION_KEY, NEXTAUTH_SECRET, or AUTH_SECRET must be set",
+    );
   }
   // Derive a 32-byte key via SHA-256 so any-length secret works
   return createHash("sha256").update(envKey).digest();
