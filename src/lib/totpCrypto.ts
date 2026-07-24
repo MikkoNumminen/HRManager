@@ -19,7 +19,10 @@ const ISSUER = "HRManager";
  *   getHmacSecret() in auditHashChain.ts.
  */
 function getEncryptionKey(): Buffer {
-  let envKey = process.env.TOTP_ENCRYPTION_KEY ?? process.env.NEXTAUTH_SECRET;
+  // || not ??: .env.example ships TOTP_ENCRYPTION_KEY="" and an empty string is
+  // not nullish, so ?? would let an unfilled template value block the fallbacks.
+  // Truthiness also matches getHmacSecret's `if (secret) return secret`.
+  let envKey = process.env.TOTP_ENCRYPTION_KEY || process.env.NEXTAUTH_SECRET;
   if (!envKey && process.env.NODE_ENV !== "production") {
     envKey = process.env.AUTH_SECRET;
   }
