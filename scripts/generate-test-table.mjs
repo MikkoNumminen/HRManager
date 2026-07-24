@@ -219,10 +219,17 @@ writeFileSync(
 // Let Prettier own the final table formatting — its markdown alignment uses
 // display width, not string length, so this keeps `prettier --check` green even
 // if covers-text ever gains wide/combining characters.
+// stderr is captured rather than inherited (unlike the push/jest steps above), so
+// the failure branch has to print it — otherwise this dies with no reason given.
 const fmt = spawnSync(process.execPath, [cliEntry("prettier"), "--write", "README.md"], {
   cwd: root,
+  encoding: "utf8",
 });
-if (fmt.status !== 0) die("prettier --write README.md failed after the table rewrite.");
+if (fmt.status !== 0)
+  die(
+    `prettier --write README.md failed after the table rewrite ` +
+      `(exit ${fmt.status ?? fmt.signal}):\n${fmt.error ? fmt.error.message : fmt.stderr}`,
+  );
 
 console.log("generate-test-table: README.md updated.");
 for (const g of GROUPS) console.log(`  ${g.layer}: ${counts.get(g.layer)}`);
