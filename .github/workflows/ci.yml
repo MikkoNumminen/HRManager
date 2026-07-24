@@ -6,6 +6,14 @@ on:
   pull_request:
     branches: [main]
 
+# Supersede in-flight runs on the same ref: a newer push always re-validates,
+# so finishing the older ~5-minute run only burns a runner (same rationale as
+# mutation.yml). On main this cancels runs for already-superseded merges too —
+# the newest run still validates the final state.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   ci:
     runs-on: ubuntu-latest
