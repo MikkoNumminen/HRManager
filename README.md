@@ -304,15 +304,15 @@ HRManager is designed as a standalone, independently deployable application — 
 | Feature component tests                    | 981                                  | Per-feature UI + actions: persons, teams, departments, admin, reviews, realtime, leave, employee, 2FA, dashboard, reports |
 | Shared component tests                     | 105                                  | Reusable components shared across features: LeaveManager tabs (types, balances, requests)                                 |
 | Shared suites (a11y, schemas, permissions) | 828                                  | Cross-cutting: axe-core WCAG AA, Zod schemas, RBAC permissions, i18n, themes, telemetry, tutorial, middleware             |
-| Server integration                         | 896                                  | Real PostgreSQL + MongoDB — server actions, queries, auth, audit hash chain, rate limiting, health, sessions              |
+| Server integration                         | 899                                  | Real PostgreSQL + MongoDB — server actions, queries, auth, audit hash chain, rate limiting, health, sessions              |
 | Jobs                                       | 21                                   | pg-boss queue setup, worker registration, and the serverless fetch-based drain                                            |
 | E2E (Playwright)                           | 75                                   | Auth, CRUD, detail editing, dashboard, profile, data I/O, form validation, full workflow                                  |
-| **Total**                                  | **2906** (2831 Jest + 75 Playwright) | **92.2% line coverage · 92.0% function coverage**                                                                         |
+| **Total**                                  | **2909** (2834 Jest + 75 Playwright) | **92.2% line coverage · 92.0% function coverage**                                                                         |
 
 <!-- test-table:generated:end -->
 
 ```
-Statements : 90.45%    Branches : 87.36%
+Statements : 90.45%    Branches : 87.38%
 Functions  : 91.97%    Lines    : 92.22%
 ```
 
