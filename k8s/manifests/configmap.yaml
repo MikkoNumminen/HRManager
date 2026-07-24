@@ -9,8 +9,11 @@ metadata:
     app.kubernetes.io/managed-by: kubectl
 data:
   NODE_ENV: "production"
-  NEXTAUTH_URL: "https://hrmanager.example.com"
-  # MongoDB connection (non-sensitive host/db part — put full URI in secret)
-  MONGO_DB_NAME: "hrmanager_audit"
+  # Auth.js v5 canonical name (the legacy NEXTAUTH_URL still works, but use the
+  # name the rest of the config uses).
+  AUTH_URL: "https://hrmanager.example.com"
+  # Behind the ingress the Host header is proxied — without this Auth.js v5
+  # rejects requests with UntrustedHost.
+  AUTH_TRUST_HOST: "true"
   # Next.js performance tuning
   NEXT_TELEMETRY_DISABLED: "1"

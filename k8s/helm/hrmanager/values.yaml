@@ -108,8 +108,11 @@ affinity: {}
 # -- Application environment variables (non-sensitive)
 config:
   NODE_ENV: "production"
-  NEXTAUTH_URL: "https://hrmanager.example.com"
-  MONGO_DB_NAME: "hrmanager_audit"
+  # Auth.js v5 canonical name (legacy NEXTAUTH_URL also works).
+  AUTH_URL: "https://hrmanager.example.com"
+  # Required behind the ingress — Auth.js v5 rejects proxied Host headers
+  # with UntrustedHost otherwise.
+  AUTH_TRUST_HOST: "true"
   NEXT_TELEMETRY_DISABLED: "1"
 
 # -- Sensitive environment variables.
@@ -120,14 +123,22 @@ secrets:
   # If set, the 'data' block below is ignored.
   existingSecret: ""
   data:
-    # Replace all placeholder values with actual base64-encoded secrets before deploying.
+    # Key names match exactly what the app reads (injected verbatim via envFrom)
+    # — see .env.example at the repo root for the authoritative list.
     DATABASE_URL: ""
-    NEXTAUTH_SECRET: ""
-    GOOGLE_CLIENT_ID: ""
-    GOOGLE_CLIENT_SECRET: ""
-    GITHUB_CLIENT_ID: ""
-    GITHUB_CLIENT_SECRET: ""
-    MONGODB_URI: ""
+    # Auth.js v5 session secret (v5 does not read the legacy NEXTAUTH_SECRET).
+    AUTH_SECRET: ""
+    # Fail-closed in production: audit hash chain + 2FA secret encryption.
+    AUDIT_HMAC_SECRET: ""
+    TOTP_ENCRYPTION_KEY: ""
+    AUTH_GOOGLE_ID: ""
+    AUTH_GOOGLE_SECRET: ""
+    AUTH_GITHUB_ID: ""
+    AUTH_GITHUB_SECRET: ""
+    # The app reads MONGODB_URL — with any other name the audit trail no-ops.
+    MONGODB_URL: ""
+    # Optional: gates /api/cron/* if scheduled via CronJob/external scheduler.
+    # CRON_SECRET: ""
 
 # -- Liveness probe configuration
 livenessProbe:
