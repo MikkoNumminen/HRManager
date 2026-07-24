@@ -391,7 +391,7 @@ npm run dev                   # start dev server at localhost:3000
 **Running the test suite locally** — server/integration tests run against a real PostgreSQL test database (`hrmanager_test`, created above) and an in-memory MongoDB, not mocks. They read `.env.test`, which is gitignored — create it from the template first:
 
 ```bash
-cp .env.test.example .env.test   # point DATABASE_URL / DIRECT_URL at hrmanager_test
+cp .env.test.example .env.test   # point DATABASE_URL at hrmanager_test
 npm run test:all                 # pushes schema to the test DB, then runs every suite
 ```
 
