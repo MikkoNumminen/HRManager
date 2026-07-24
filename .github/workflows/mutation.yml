@@ -17,11 +17,10 @@ jobs:
     runs-on: ubuntu-latest
 
     # Job-level so `npm ci`'s postinstall (`prisma generate`, which loads the Prisma 7
-    # config that reads DATABASE_URL + DIRECT_URL) can resolve them — without this the
-    # install fails. Mirrors ci.yml.
+    # config that reads DATABASE_URL) can resolve it — without this the install
+    # fails. Mirrors ci.yml.
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/hrmanager_test
-      DIRECT_URL: postgresql://postgres:postgres@localhost:5432/hrmanager_test
 
     services:
       postgres:
@@ -71,7 +70,7 @@ jobs:
         id: stryker
         run: npx stryker run
         env:
-          # DATABASE_URL + DIRECT_URL come from the job-level env.
+          # DATABASE_URL comes from the job-level env.
           MONGODB_URI: mongodb://localhost:27017/hrmanager_audit_test
           NEXTAUTH_SECRET: test-secret-for-ci
           NEXTAUTH_URL: http://localhost:3000
