@@ -43,6 +43,11 @@ services:
       DATABASE_URL: postgresql://postgres:postgres@db:5432/hrmanager
       MONGODB_URL: mongodb://mongo:27017/hrmanager
       AUTH_SECRET: "${AUTH_SECRET:?AUTH_SECRET must be set - generate with: openssl rand -base64 32}"
+      # Both fail closed in the production build this image runs (NODE_ENV=production):
+      # without AUDIT_HMAC_SECRET every audit write throws (entries silently lost —
+      # Mongo IS wired here), and without TOTP_ENCRYPTION_KEY 2FA setup/verify errors.
+      AUDIT_HMAC_SECRET: "${AUDIT_HMAC_SECRET:?AUDIT_HMAC_SECRET must be set - generate with: openssl rand -base64 32}"
+      TOTP_ENCRYPTION_KEY: "${TOTP_ENCRYPTION_KEY:?TOTP_ENCRYPTION_KEY must be set - generate with: openssl rand -base64 32}"
       AUTH_TRUST_HOST: "true"
       AUTH_GOOGLE_ID: ${AUTH_GOOGLE_ID:-}
       AUTH_GOOGLE_SECRET: ${AUTH_GOOGLE_SECRET:-}
