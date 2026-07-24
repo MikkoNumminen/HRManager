@@ -188,7 +188,7 @@ graph LR
 
 - **Performance at scale** — 40+ database indexes on foreign keys and frequently queried columns, N+1 query elimination (replaced eager-loaded relation counts with `_count` aggregations and `groupBy` batching), and `select` narrowing on all relation includes to avoid fetching unused columns. Performance seeding script generates 10k employees / 200 teams / 50 departments for load testing. Benchmark script measures all major query patterns with warm-up runs and P95 reporting. Full scaling analysis in [`SCALING.md`](SCALING.md) documents known scaling cliffs and recommendations for 100k+ employees. _Why document scaling limits? A production system should be honest about where it breaks — and have a plan for when it gets there._
 
-- **Docker-ready** — `docker compose up` starts PostgreSQL + MongoDB + the app. Migrations run automatically, demo login works out of the box. _One command, zero setup, fully working._
+- **Docker-ready** — `docker compose up` starts PostgreSQL + MongoDB + the app. Migrations run automatically, demo login works out of the box. _One command after generating three secrets into `.env` — the production build fails closed without them, by design._
 
 ---
 
@@ -353,10 +353,14 @@ The **CI auto-fix agent** (optional — requires paid API credits) runs a 6-stag
 ### Docker (recommended)
 
 ```bash
+# One-time: the production build fails closed without these three secrets
+printf 'AUTH_SECRET=%s\nAUDIT_HMAC_SECRET=%s\nTOTP_ENCRYPTION_KEY=%s\n' \
+  "$(openssl rand -base64 32)" "$(openssl rand -base64 32)" "$(openssl rand -base64 32)" >> .env
+
 docker compose up             # starts PostgreSQL + MongoDB + app at localhost:3000
 ```
 
-That's it. Migrations run automatically, demo login works out of the box — no OAuth setup needed. To add Google/GitHub OAuth, create a `.env` file with your credentials (see below).
+That's it. Migrations run automatically, demo login works out of the box — no OAuth setup needed. To add Google/GitHub OAuth, add your credentials to the same `.env` file (see below).
 
 ### Manual setup
 
