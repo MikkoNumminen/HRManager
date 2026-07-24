@@ -43,6 +43,7 @@ fi
 #  - the CI-only drift gates and the README table generator (never imported by
 #    the app; scripts/vercel-*.sh is deliberately NOT excluded, since those DO
 #    decide what a deployment does)
+#  - k8s manifests and the Helm chart (a different deployment target entirely)
 #  - dotfile metadata
 if git diff --quiet "$BASE" HEAD -- \
   ':(exclude,glob)**/*.md' \
@@ -59,6 +60,7 @@ if git diff --quiet "$BASE" HEAD -- \
   ':(exclude).husky/**' \
   ':(exclude,glob)scripts/check-*.mjs' \
   ':(exclude)scripts/generate-test-table.mjs' \
+  ':(exclude)k8s/**' \
   ':(exclude).gitignore' \
   ':(exclude).prettierignore' \
   ':(exclude).editorconfig'; then
