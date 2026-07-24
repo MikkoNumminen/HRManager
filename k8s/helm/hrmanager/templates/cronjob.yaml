@@ -1,0 +1,44 @@
+{{- if .Values.cron.enabled }}
+{{- range .Values.cron.jobs }}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "hrmanager.fullname" $ }}-cron-{{ .name }}
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    {{- include "hrmanager.labels" $ | nindent 4 }}
+    app.kubernetes.io/component: cron
+spec:
+  schedule: {{ .schedule | quote }}
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 600
+      backoffLimit: 1
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: curl
+              image: {{ $.Values.cron.image }}
+              env:
+                - name: CRON_SECRET
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ include "hrmanager.secretName" $ }}
+                      key: CRON_SECRET
+              # The route accepts GET or POST with the same Bearer secret.
+              args:
+                - -fsS
+                - --max-time
+                - "300"
+                - -X
+                - POST
+                - -H
+                - "Authorization: Bearer $(CRON_SECRET)"
+                - http://{{ include "hrmanager.fullname" $ }}-svc:{{ $.Values.service.port }}{{ .path }}
+{{- end }}
+{{- end }}

@@ -232,6 +232,17 @@ secrets:
 
 ---
 
+## Scheduled work
+
+Background maintenance runs through the CRON_SECRET-gated `/api/cron/*` routes,
+mirroring the Vercel deployment's `vercel.json` crons:
+
+- **Raw manifests** — `cronjob.yaml` ships two CronJobs (audit-outbox drain at
+  03:00, pg-boss job drain at 03:30). They read `CRON_SECRET` from
+  `hrmanager-secret`, so set that key before applying.
+- **Helm** — disabled by default. Set `secrets.data.CRON_SECRET`, then deploy
+  with `--set cron.enabled=true` (schedules and paths under `cron.jobs`).
+
 ## Architecture notes
 
 | Resource   | Details                                                               |
