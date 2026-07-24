@@ -64,10 +64,10 @@ npx prisma migrate dev       # apply migrations to your dev DB
 npm run dev                  # http://localhost:3000
 ```
 
-Two databases are required: **PostgreSQL** (primary, via `DATABASE_URL` /
-`DIRECT_URL`) and **MongoDB** (audit logs, via `MONGODB_URL`). `.env.example`
-documents every variable; demo login is OFF by default
-(`NEXT_PUBLIC_DEMO_LOGIN=true` to enable).
+Two databases are required: **PostgreSQL** (primary, via `DATABASE_URL`) and
+**MongoDB** (audit logs, via `MONGODB_URL`). `.env.example` documents every
+variable; demo login is OFF by default (`NEXT_PUBLIC_DEMO_LOGIN=true` to
+enable).
 
 ### Running server tests locally
 
