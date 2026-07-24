@@ -1,0 +1,82 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: hrmanager-cron-audit-drain
+  namespace: hrmanager
+  labels:
+    app.kubernetes.io/name: hrmanager
+    app.kubernetes.io/component: cron
+    app.kubernetes.io/managed-by: kubectl
+spec:
+  # Mirrors vercel.json: durability backstop for the opportunistic after() drain.
+  schedule: "0 3 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 600
+      backoffLimit: 1
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: curl
+              image: curlimages/curl:8.10.1
+              env:
+                - name: CRON_SECRET
+                  valueFrom:
+                    secretKeyRef:
+                      name: hrmanager-secret
+                      key: CRON_SECRET
+              # The route accepts GET or POST with the same Bearer secret.
+              args:
+                - -fsS
+                - --max-time
+                - "300"
+                - -X
+                - POST
+                - -H
+                - "Authorization: Bearer $(CRON_SECRET)"
+                - http://hrmanager-svc:3000/api/cron/audit-drain
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: hrmanager-cron-jobs-drain
+  namespace: hrmanager
+  labels:
+    app.kubernetes.io/name: hrmanager
+    app.kubernetes.io/component: cron
+    app.kubernetes.io/managed-by: kubectl
+spec:
+  # Mirrors vercel.json: drains the pg-boss queue (cleanup, audit exports).
+  schedule: "30 3 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 600
+      backoffLimit: 1
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: curl
+              image: curlimages/curl:8.10.1
+              env:
+                - name: CRON_SECRET
+                  valueFrom:
+                    secretKeyRef:
+                      name: hrmanager-secret
+                      key: CRON_SECRET
+              args:
+                - -fsS
+                - --max-time
+                - "300"
+                - -X
+                - POST
+                - -H
+                - "Authorization: Bearer $(CRON_SECRET)"
+                - http://hrmanager-svc:3000/api/cron/jobs

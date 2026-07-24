@@ -137,8 +137,21 @@ secrets:
     AUTH_GITHUB_SECRET: ""
     # The app reads MONGODB_URL — with any other name the audit trail no-ops.
     MONGODB_URL: ""
-    # Optional: gates /api/cron/* if scheduled via CronJob/external scheduler.
+    # Required when cron.enabled=true (gates /api/cron/*).
     # CRON_SECRET: ""
+
+# -- Scheduled work (mirrors vercel.json's crons). Disabled by default because
+# the endpoints 500/401 without secrets.data.CRON_SECRET — set that, then enable.
+cron:
+  enabled: false
+  image: curlimages/curl:8.10.1
+  jobs:
+    - name: audit-drain
+      path: /api/cron/audit-drain
+      schedule: "0 3 * * *"
+    - name: jobs-drain
+      path: /api/cron/jobs
+      schedule: "30 3 * * *"
 
 # -- Liveness probe configuration
 livenessProbe:
