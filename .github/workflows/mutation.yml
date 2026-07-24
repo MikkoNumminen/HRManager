@@ -81,10 +81,11 @@ jobs:
         id: stryker
         run: npx stryker run
         env:
-          # DATABASE_URL comes from the job-level env.
-          MONGODB_URI: mongodb://localhost:27017/hrmanager_audit_test
-          NEXTAUTH_SECRET: test-secret-for-ci
-          NEXTAUTH_URL: http://localhost:3000
+          # DATABASE_URL comes from the job-level env. Mongo needs no URL here —
+          # server tests use mongodb-memory-server. TOTP_ENCRYPTION_KEY keys
+          # totpCrypto for related tests that don't set their own (this was
+          # previously the legacy NEXTAUTH_SECRET fallback name).
+          TOTP_ENCRYPTION_KEY: test-secret-for-ci
           NODE_ENV: test
         continue-on-error: true
 
