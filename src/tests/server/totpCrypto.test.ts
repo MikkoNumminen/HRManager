@@ -32,6 +32,20 @@ describe("TOTP Crypto Utilities", () => {
       process.env.TOTP_ENCRYPTION_KEY = saved;
     });
 
+    // An unfilled template value must not block the fallbacks: .env.example
+    // ships TOTP_ENCRYPTION_KEY="" and "" is not nullish, so with ?? a copied
+    // template would break k8s deployments whose key is NEXTAUTH_SECRET.
+    it("treats an empty TOTP_ENCRYPTION_KEY as unset (falls through to NEXTAUTH_SECRET)", () => {
+      const savedTotp = process.env.TOTP_ENCRYPTION_KEY;
+      process.env.TOTP_ENCRYPTION_KEY = "";
+
+      const { encryptSecret, decryptSecret } = require("@/lib/totpCrypto");
+      const secret = "JBSWY3DPEHPK3PXP";
+      expect(decryptSecret(encryptSecret(secret))).toBe(secret);
+
+      process.env.TOTP_ENCRYPTION_KEY = savedTotp;
+    });
+
     // Falls back to AUTH_SECRET (the NextAuth v5 name) outside production —
     // previously only the v4 NEXTAUTH_SECRET counted, which nothing v5 sets.
     it("should use AUTH_SECRET as fallback when the other two are missing", () => {
