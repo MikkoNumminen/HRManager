@@ -18,7 +18,7 @@ if (!existsSync(join(root, ".env.test")) && !process.env.DATABASE_URL) {
     [
       "test:all/test:server: no .env.test file and no DATABASE_URL in the environment.",
       "",
-      "Create one from the template (points DATABASE_URL/DIRECT_URL at a TEST database):",
+      "Create one from the template (points DATABASE_URL at a TEST database):",
       "  cp .env.test.example .env.test",
       "",
       'See README → "Running tests locally". Never point it at your dev/prod DB —',

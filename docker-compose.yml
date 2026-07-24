@@ -41,7 +41,6 @@ services:
         condition: service_healthy
     environment:
       DATABASE_URL: postgresql://postgres:postgres@db:5432/hrmanager
-      DIRECT_URL: postgresql://postgres:postgres@db:5432/hrmanager
       MONGODB_URL: mongodb://mongo:27017/hrmanager
       AUTH_SECRET: "${AUTH_SECRET:?AUTH_SECRET must be set - generate with: openssl rand -base64 32}"
       AUTH_TRUST_HOST: "true"
