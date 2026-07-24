@@ -5,6 +5,14 @@ on:
     branches:
       - main
 
+# A ~35-minute run outlives several pushes to the same PR, and without a
+# concurrency group every superseded run kept going to completion — burning a
+# full runner for a score nobody would read, and leaving "pending" checks on
+# branches that were already merged and deleted.
+concurrency:
+  group: mutation-${{ github.ref }}
+  cancel-in-progress: true
+
 # The score-comment step posts to the PR; without this the default token is read-only.
 permissions:
   contents: read
@@ -15,6 +23,9 @@ jobs:
   mutation:
     name: Stryker Mutation Score
     runs-on: ubuntu-latest
+    # Runs measure 28-37 min; this bounds a hung one instead of letting it sit
+    # on the default 6-hour job limit.
+    timeout-minutes: 60
 
     # Job-level so `npm ci`'s postinstall (`prisma generate`, which loads the Prisma 7
     # config that reads DATABASE_URL) can resolve it — without this the install
