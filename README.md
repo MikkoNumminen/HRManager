@@ -15,7 +15,7 @@ A full-stack HR management system built to production standards — not as a toy
 ![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=flat-square&logo=docker)
 ![Last Commit](https://img.shields.io/github/last-commit/MikkoNumminen/HRManager?style=flat-square)
 
-### **[Try the live demo](https://hr-manager-pearl.vercel.app)** — click "Try Demo" to sign in instantly with your own isolated data sandbox, no account required.
+### **[Try the live demo](https://mikkonumminen.dev/hrm)** — click "Try Demo" to sign in instantly with your own isolated data sandbox, no account required.
 
 <p align="center">
   <img src="docs/screenshots/overview.png" alt="Dashboard overview — dark theme" width="100%">
